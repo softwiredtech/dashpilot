@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.softwiredtech.pilotboard"
+        applicationId = "com.softwiredtech.dashpilot"
         minSdk = 29
         targetSdk = 36
         versionCode = 1

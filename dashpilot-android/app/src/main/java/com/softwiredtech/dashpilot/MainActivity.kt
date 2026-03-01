@@ -15,9 +15,8 @@ import androidx.startup.AppInitializer
 import app.rive.runtime.kotlin.RiveInitializer
 import com.softwiredtech.dashpilot.datasource.CommaDataSource
 import com.softwiredtech.dashpilot.datasource.IDataSource
-import com.softwiredtech.dashpilot.ui.RiveDashView
 import com.softwiredtech.dashpilot.ui.WebDashView
-import com.softwiredtech.dashpilot.ui.theme.PilotBoardTheme
+import com.softwiredtech.dashpilot.ui.theme.DashPilotTheme
 import com.softwiredtech.dashpilot.utils.FileUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -50,7 +49,7 @@ class MainActivity : ComponentActivity() {
                 Log.d("Rive", error)
             })*/
 
-            PilotBoardTheme {
+            DashPilotTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { _ ->
                     WebDashView(
                         modifier = Modifier.fillMaxSize(),

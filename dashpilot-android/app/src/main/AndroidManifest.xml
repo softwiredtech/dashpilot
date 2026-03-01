@@ -11,12 +11,12 @@
         android:usesCleartextTraffic="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.PilotBoard">
+        android:theme="@style/Theme.DashPilot">
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.PilotBoard">
+            android:theme="@style/Theme.DashPilot">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
