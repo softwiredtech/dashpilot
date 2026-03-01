@@ -4,12 +4,6 @@ A 3D ADAS visualization engine built with Bevy, compiled to WebAssembly.
 
 ---
 
-## Quick Start
-
-1. build `adasviz`:  
- 
-Run `./build_adasviz.sh`, this will generate the `.wasm` and `.js` bindings for `adasviz` which is used in `pilotboard`.
-
 ## Integration
 
 The engine reads data from a global variable you set on `window`:
