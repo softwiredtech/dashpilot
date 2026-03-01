@@ -1,4 +1,4 @@
-package com.softwiredtech.pilotboard.utils
+package com.softwiredtech.dashpilot.utils
 
 import android.content.Context
 import java.io.File

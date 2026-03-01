@@ -1,4 +1,4 @@
-package com.softwiredtech.pilotboard.ui.theme
+package com.softwiredtech.dashpilot.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

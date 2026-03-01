@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(pilotboard-android LANGUAGES CXX)
+project(dashpilot-android LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 

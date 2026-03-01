@@ -54,7 +54,7 @@ jint JNI_OnLoad(JavaVM* vm, void*) {
 
 // === DBC ===
 JNIEXPORT jboolean JNICALL
-Java_com_softwiredtech_pilotboard_jni_CommaBridge_loadDbcFile(JNIEnv *env, jobject thiz, jstring dbcPath) {
+Java_com_softwiredtech_dashpilot_jni_CommaBridge_loadDbcFile(JNIEnv *env, jobject thiz, jstring dbcPath) {
     const char* dbcPathString = env->GetStringUTFChars(dbcPath, nullptr);
     dbcFile = new DBCFile(dbcPathString);
     env->ReleaseStringUTFChars(dbcPath, dbcPathString);
@@ -85,13 +85,13 @@ Java_com_softwiredtech_pilotboard_jni_CommaBridge_loadDbcFile(JNIEnv *env, jobje
 
 // === Context ===
 JNIEXPORT jlong JNICALL
-Java_com_softwiredtech_pilotboard_jni_CommaBridge_nativeCreateContext(JNIEnv *env, jobject thiz) {
+Java_com_softwiredtech_dashpilot_jni_CommaBridge_nativeCreateContext(JNIEnv *env, jobject thiz) {
     Context *ctx = Context::create();
     return reinterpret_cast<jlong>(ctx);
 }
 
 JNIEXPORT void JNICALL
-Java_com_softwiredtech_pilotboard_jni_CommaBridge_nativeDeleteContext(JNIEnv *env, jobject thiz,
+Java_com_softwiredtech_dashpilot_jni_CommaBridge_nativeDeleteContext(JNIEnv *env, jobject thiz,
                                                            jlong ctxPtr) {
     Context *ctx = reinterpret_cast<Context *>(ctxPtr);
     delete ctx;
@@ -99,7 +99,7 @@ Java_com_softwiredtech_pilotboard_jni_CommaBridge_nativeDeleteContext(JNIEnv *en
 
 // === SubSocket ===
 JNIEXPORT jlong JNICALL
-Java_com_softwiredtech_pilotboard_jni_CommaBridge_nativeCreateSubSocket(
+Java_com_softwiredtech_dashpilot_jni_CommaBridge_nativeCreateSubSocket(
         JNIEnv* env, jobject thiz,
         jlong ctxPtr,
         jstring endpoint,
@@ -123,14 +123,14 @@ Java_com_softwiredtech_pilotboard_jni_CommaBridge_nativeCreateSubSocket(
 }
 
 JNIEXPORT void JNICALL
-Java_com_softwiredtech_pilotboard_jni_CommaBridge_nativeDeleteSubSocket(JNIEnv* env, jobject thiz, jlong subPtr) {
+Java_com_softwiredtech_dashpilot_jni_CommaBridge_nativeDeleteSubSocket(JNIEnv* env, jobject thiz, jlong subPtr) {
     SubSocket* sub = reinterpret_cast<SubSocket*>(subPtr);
     delete sub;
 }
 
 // === Message ===
 JNIEXPORT void JNICALL
-Java_com_softwiredtech_pilotboard_jni_CommaBridge_nativeStartReceiveLoop(
+Java_com_softwiredtech_dashpilot_jni_CommaBridge_nativeStartReceiveLoop(
         JNIEnv* env,
         jobject thiz,
         jlong subPtr,
@@ -207,12 +207,12 @@ Java_com_softwiredtech_pilotboard_jni_CommaBridge_nativeStartReceiveLoop(
 }
 
 JNIEXPORT void JNICALL
-Java_com_softwiredtech_pilotboard_jni_CommaBridge_nativeStopReceiveLoop(JNIEnv* env, jobject thiz) {
+Java_com_softwiredtech_dashpilot_jni_CommaBridge_nativeStopReceiveLoop(JNIEnv* env, jobject thiz) {
     receiveLoopRunning = false;
 }
 
 JNIEXPORT jbyteArray JNICALL
-Java_com_softwiredtech_pilotboard_jni_CommaBridge_nativeGetData(JNIEnv* env, jobject thiz, jlong msgPtr) {
+Java_com_softwiredtech_dashpilot_jni_CommaBridge_nativeGetData(JNIEnv* env, jobject thiz, jlong msgPtr) {
     Message* msg = reinterpret_cast<Message*>(msgPtr);
     size_t size = msg->getSize();
     char* data = msg->getData();
@@ -223,13 +223,13 @@ Java_com_softwiredtech_pilotboard_jni_CommaBridge_nativeGetData(JNIEnv* env, job
 }
 
 JNIEXPORT jint JNICALL
-Java_com_softwiredtech_pilotboard_jni_CommaBridge_nativeGetSize(JNIEnv* env, jobject thiz, jlong msgPtr) {
+Java_com_softwiredtech_dashpilot_jni_CommaBridge_nativeGetSize(JNIEnv* env, jobject thiz, jlong msgPtr) {
     Message* msg = reinterpret_cast<Message*>(msgPtr);
     return static_cast<jint>(msg->getSize());
 }
 
 JNIEXPORT void JNICALL
-Java_com_softwiredtech_pilotboard_jni_CommaBridge_nativeDeleteMessage(JNIEnv* env, jobject thiz, jlong msgPtr) {
+Java_com_softwiredtech_dashpilot_jni_CommaBridge_nativeDeleteMessage(JNIEnv* env, jobject thiz, jlong msgPtr) {
     Message* msg = reinterpret_cast<Message*>(msgPtr);
     delete msg;
 }

@@ -1,8 +1,8 @@
-package com.softwiredtech.pilotboard.js
+package com.softwiredtech.dashpilot.js
 
 import android.webkit.WebView
 import com.google.gson.Gson
-import com.softwiredtech.pilotboard.datamodel.WorldMessage
+import com.softwiredtech.dashpilot.datamodel.WorldMessage
 
 class JSBridge {
     private val gson = Gson()

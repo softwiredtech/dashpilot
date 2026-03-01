@@ -1,4 +1,4 @@
-package com.softwiredtech.pilotboard.jni
+package com.softwiredtech.dashpilot.jni
 
 fun interface CanSignalCallback {
     fun onCanData(values: DoubleArray)

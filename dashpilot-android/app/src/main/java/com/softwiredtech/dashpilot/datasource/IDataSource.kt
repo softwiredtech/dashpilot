@@ -1,6 +1,6 @@
-package com.softwiredtech.pilotboard.datasource
+package com.softwiredtech.dashpilot.datasource
 
-import com.softwiredtech.pilotboard.datamodel.WorldMessage
+import com.softwiredtech.dashpilot.datamodel.WorldMessage
 import kotlinx.coroutines.flow.Flow
 
 interface IDataSource {

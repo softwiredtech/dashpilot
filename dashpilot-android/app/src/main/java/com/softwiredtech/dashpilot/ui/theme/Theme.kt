@@ -1,4 +1,4 @@
-package com.softwiredtech.pilotboard.ui.theme
+package com.softwiredtech.dashpilot.ui.theme
 
 import android.app.Activity
 import android.os.Build

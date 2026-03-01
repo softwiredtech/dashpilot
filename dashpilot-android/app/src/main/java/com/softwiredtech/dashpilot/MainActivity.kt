@@ -1,4 +1,4 @@
-package com.softwiredtech.pilotboard
+package com.softwiredtech.dashpilot
 
 import android.os.Build
 import android.os.Bundle
@@ -13,12 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
 import androidx.startup.AppInitializer
 import app.rive.runtime.kotlin.RiveInitializer
-import com.softwiredtech.pilotboard.datasource.CommaDataSource
-import com.softwiredtech.pilotboard.datasource.IDataSource
-import com.softwiredtech.pilotboard.ui.RiveDashView
-import com.softwiredtech.pilotboard.ui.WebDashView
-import com.softwiredtech.pilotboard.ui.theme.PilotBoardTheme
-import com.softwiredtech.pilotboard.utils.FileUtils
+import com.softwiredtech.dashpilot.datasource.CommaDataSource
+import com.softwiredtech.dashpilot.datasource.IDataSource
+import com.softwiredtech.dashpilot.ui.RiveDashView
+import com.softwiredtech.dashpilot.ui.WebDashView
+import com.softwiredtech.dashpilot.ui.theme.PilotBoardTheme
+import com.softwiredtech.dashpilot.utils.FileUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

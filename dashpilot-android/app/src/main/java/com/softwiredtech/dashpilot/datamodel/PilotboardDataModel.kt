@@ -1,4 +1,4 @@
-package com.softwiredtech.pilotboard.datamodel
+package com.softwiredtech.dashpilot.datamodel
 
 data class WorldMessage(
     val frame: Int,

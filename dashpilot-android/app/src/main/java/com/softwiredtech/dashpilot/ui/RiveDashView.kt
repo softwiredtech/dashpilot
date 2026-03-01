@@ -1,4 +1,4 @@
-package com.softwiredtech.pilotboard.ui
+package com.softwiredtech.dashpilot.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -18,9 +18,9 @@ import app.rive.ViewModelSource
 import app.rive.rememberRiveFile
 import app.rive.rememberRiveWorkerOrNull
 import app.rive.rememberViewModelInstance
-import com.softwiredtech.pilotboard.R
-import com.softwiredtech.pilotboard.datasource.IDataSource
-import com.softwiredtech.pilotboard.datasource.WebsocketDataSource
+import com.softwiredtech.dashpilot.R
+import com.softwiredtech.dashpilot.datasource.IDataSource
+import com.softwiredtech.dashpilot.datasource.WebsocketDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 

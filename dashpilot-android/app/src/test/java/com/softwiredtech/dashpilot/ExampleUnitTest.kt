@@ -1,4 +1,4 @@
-package com.softwiredtech.pilotboard
+package com.softwiredtech.dashpilot
 
 import org.junit.Test
 

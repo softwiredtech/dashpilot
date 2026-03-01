@@ -1,4 +1,4 @@
-package com.softwiredtech.pilotboard.ui.theme
+package com.softwiredtech.dashpilot.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

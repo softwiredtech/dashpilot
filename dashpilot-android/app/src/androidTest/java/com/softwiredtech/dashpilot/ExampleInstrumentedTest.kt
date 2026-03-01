@@ -1,4 +1,4 @@
-package com.softwiredtech.pilotboard
+package com.softwiredtech.dashpilot
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

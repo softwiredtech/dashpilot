@@ -362,6 +362,7 @@
         data.world.ego_speed = speedMs;
 
         // Serialize
+        data.world.lane = { laneWidth:4,viewRange:50,lanePolyC0:0,lanePolyC1:0,lanePolyC2:0,lanePolyC3:0 }
         window.__ADAS_DATA_JSON__ = JSON.stringify(data.world);
 
         const gearMap = { 1: "P", 2: "R", 3: "N", 4: "D" };
@@ -411,7 +412,7 @@
 
     // Incoming from dashpilot android app
     window.onWorldMessage = function(message) {
-      receiveMessage({event: { data: message }});
+      receiveMessage({ data: JSON.stringify(message) });
     }
   </script>
 

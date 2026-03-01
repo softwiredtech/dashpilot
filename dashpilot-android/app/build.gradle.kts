@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.softwiredtech.pilotboard"
+    namespace = "com.softwiredtech.dashpilot"
     compileSdk {
         version = release(36)
     }
