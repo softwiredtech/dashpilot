@@ -5,7 +5,6 @@ import asyncio
 import websockets
 import json
 import functools
-import tomllib
 import time
 from data_model import SpeedLimitSign, RoadSign, StopSign, TrafficLight, Vehicle, Lane, Pedestrian
 from dynamic_sim import DynamicSim
@@ -118,13 +117,7 @@ if __name__ == "__main__":
     parser.add_argument("--scenario", type=int, default=2, help="Scenario number to run (default: 0)")
     parser.add_argument("--fps", type=float, default=30.0, help="WebSocket FPS (default: 30.0)")
     parser.add_argument("--route", type=str, default=None, help="Path to route.jsonl")
-
-    # Use config.toml as source-of-truth for network host:port on both server and client
-    with open("../adasviz/config.toml", "rb") as f:
-        data = tomllib.load(f)
-        port = data["network"]["port"]
-
-    assert port != None, "Please specify a port in config.toml"
+    parser.add_argument("--port", type=int, default=8080, help="Port number for websocket connection")
     args = parser.parse_args()
     print(f"Selected scenario: {args.scenario}")
-    asyncio.run(main(args.scenario, port, args.fps, args.route))
+    asyncio.run(main(args.scenario, args.port, args.fps, args.route))

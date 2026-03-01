@@ -1,4 +1,1 @@
-numpy
-matplotlib
-websockets
-tomli
+websockets>=11.0

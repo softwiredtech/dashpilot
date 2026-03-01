@@ -24,6 +24,7 @@ For dynamic scenario generator:
 
 For route replay (recorded with Cabana):  
 
-`python3 server.py --route '/Users/ahmedharmouche/Documents/car-surroundings/simulator/routes/route_20260211_142908_598.jsonl'`
+`python3 server.py --route '/path/to/your/route_20260211_142908_598.jsonl'`
 
-2. Run the dashboard
+2. Run `dash-apps/web`
+
