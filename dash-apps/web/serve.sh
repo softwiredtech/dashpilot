@@ -1,0 +1,2 @@
+cp -rf ../../adasviz/* .
+serve .
