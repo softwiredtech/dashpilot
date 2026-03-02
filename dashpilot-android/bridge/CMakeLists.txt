@@ -3,10 +3,10 @@ project(dashpilot-android LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(MSGQ_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../bridge")
-set(ZMQ_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/third_party/zmq")
-set(CAPNP_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/third_party/capnp")
-set(GENERATED_CEREAL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/../bridge/cereal/gen")
+set(MSGQ_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../bridge")
+set(ZMQ_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/zmq")
+set(CAPNP_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/capnp")
+set(GENERATED_CEREAL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/../../bridge/cereal/gen")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-z,max-page-size=0x4000")
 file(GLOB_RECURSE GENERATED_CAPNP_SOURCES
         "${GENERATED_CEREAL_FILES}/*.c++"
@@ -48,7 +48,7 @@ set(MSGQ_SOURCES
         ${MSGQ_ROOT}/dbc/dbc.cc
         ${MSGQ_ROOT}/dbc/dbcfile.cc
         ${GENERATED_CAPNP_SOURCES}
-        jni/jni_bridge.cpp
+        src/main/cpp/jni_bridge.cpp
 )
 
 add_library(bridge SHARED ${MSGQ_SOURCES})
@@ -60,7 +60,7 @@ target_include_directories(bridge PRIVATE
         ${MSGQ_ROOT}
         ${MSGQ_ROOT}/msgq
         ${MSGQ_ROOT}/dbc
-        "${CMAKE_CURRENT_SOURCE_DIR}/../bridge/cereal/gen"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../bridge/cereal/gen"
 )
 
 target_link_libraries(bridge

@@ -1,0 +1,4 @@
+/Users/ahmedharmouche/Library/Android/sdk/cmake/3.22.1/bin/ninja \
+  -C \
+  /Users/ahmedharmouche/Documents/dashpilot/dashpilot-android/bridge/.cxx/Debug/4a404i40/arm64-v8a \
+  bridge

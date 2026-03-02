@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Pilot Board"
 include(":app")
+include(":bridge")
