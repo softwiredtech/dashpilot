@@ -1,2 +1,0 @@
-ninja: Entering directory `/Users/ahmedharmouche/Documents/dashpilot/dashpilot-android/bridge/.cxx/Debug/4a404i40/x86_64'
-ninja: no work to do.

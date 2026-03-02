@@ -1,9 +1,0 @@
--- The CXX compiler identification is Clang 18.0.1
--- Detecting CXX compiler ABI info
--- Detecting CXX compiler ABI info - done
--- Check for working CXX compiler: /Users/ahmedharmouche/Library/Android/sdk/ndk/27.0.12077973/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang++ - skipped
--- Detecting CXX compile features
--- Detecting CXX compile features - done
--- Configuring done
--- Generating done
--- Build files have been written to: /Users/ahmedharmouche/Documents/dashpilot/dashpilot-android/bridge/.cxx/Debug/4a404i40/x86_64
