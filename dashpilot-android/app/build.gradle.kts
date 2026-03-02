@@ -19,10 +19,6 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        ndk {
-            // Only build these ABIs
-            abiFilters.addAll(listOf("arm64-v8a", "armeabi-v7a", "x86_64"))
-        }
     }
 
     buildTypes {
@@ -44,15 +40,10 @@ android {
     buildFeatures {
         compose = true
     }
-    // Connect CMake build to Gradle
-    externalNativeBuild {
-        cmake {
-            path = file("../CMakeLists.txt")
-        }
-    }
 }
 
 dependencies {
+    implementation(project(":bridge"))
     implementation("app.rive:rive-android:11.1.2")
     implementation("androidx.startup:startup-runtime:1.1.1")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
