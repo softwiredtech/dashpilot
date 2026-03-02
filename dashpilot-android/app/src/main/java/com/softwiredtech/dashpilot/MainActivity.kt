@@ -10,22 +10,19 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.lifecycleScope
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import androidx.startup.AppInitializer
 import app.rive.runtime.kotlin.RiveInitializer
-import com.softwiredtech.dashpilot.datasource.CommaDataSource
-import com.softwiredtech.dashpilot.datasource.IDataSource
-import com.softwiredtech.dashpilot.ui.WebDashView
+import com.softwiredtech.dashpilot.navigation.DashboardRoute
+import com.softwiredtech.dashpilot.navigation.SetupRoute
+import com.softwiredtech.dashpilot.ui.DashboardScreen
+import com.softwiredtech.dashpilot.ui.SetupScreen
 import com.softwiredtech.dashpilot.ui.theme.DashPilotTheme
-import com.softwiredtech.dashpilot.utils.FileUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-
-const val dashboardServerAddress = "http://192.168.1.105:3000"
 
 class MainActivity : ComponentActivity() {
-
-    private lateinit var dataSource: IDataSource
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,30 +30,36 @@ class MainActivity : ComponentActivity() {
         AppInitializer.getInstance(applicationContext)
             .initializeComponent(RiveInitializer::class.java)
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            dataSource =
-                CommaDataSource(FileUtils.copyAssetToFile(this@MainActivity, "tesla_model3_party.dbc"))
-            dataSource.connect("192.168.1.105")
-        }
-
         // Enable edge-to-edge for Compose
         enableEdgeToEdge()
         hideSystemBars()
 
         setContent {
-            // TODO : Handle switching between the two
-            /*RiveDashView(dataSource, lifecycleScope, { error ->
-                Log.d("Rive", error)
-            })*/
-
             DashPilotTheme {
+                val navController = rememberNavController()
+
                 Scaffold(modifier = Modifier.fillMaxSize()) { _ ->
-                    WebDashView(
-                        modifier = Modifier.fillMaxSize(),
-                        dashboardServerAddress,
-                        lifecycleScope,
-                        dataSource
-                    )
+                    NavHost(
+                        navController = navController,
+                        startDestination = SetupRoute
+                    ) {
+                        composable<SetupRoute> {
+                            SetupScreen(
+                                onLaunch = { dashboardType, serverAddress ->
+                                    navController.navigate(
+                                        DashboardRoute(dashboardType, serverAddress)
+                                    )
+                                }
+                            )
+                        }
+                        composable<DashboardRoute> { backStackEntry ->
+                            val route = backStackEntry.toRoute<DashboardRoute>()
+                            DashboardScreen(
+                                dashboardType = route.dashboardType,
+                                serverAddress = route.serverAddress
+                            )
+                        }
+                    }
                 }
             }
         }
