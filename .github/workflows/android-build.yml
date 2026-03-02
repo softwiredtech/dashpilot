@@ -21,22 +21,6 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Cache Android SDK components
-        uses: actions/cache@v4
-        with:
-          path: |
-            /usr/local/lib/android/sdk/ndk
-            /usr/local/lib/android/sdk/cmake
-          key: android-ndk-cmake-${{ hashFiles('dashpilot-android/app/build.gradle.kts') }}
-
       - name: Build debug APK
         working-directory: dashpilot-android
-        run: ./gradlew assembleDebug --parallel -Pci_build=true
-
-      - name: Upload APK
-        if: github.event_name == 'push'
-        uses: actions/upload-artifact@v4
-        with:
-          name: debug-apk
-          path: dashpilot-android/app/build/outputs/apk/debug/*.apk
-          retention-days: 7
+        run: ./gradlew assembleDebug
