@@ -20,8 +20,11 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {
-            // Only build these ABIs
-            abiFilters.addAll(listOf("arm64-v8a", "armeabi-v7a", "x86_64"))
+            if (project.hasProperty("ci_build")) {
+                abiFilters.add("arm64-v8a")
+            } else {
+                abiFilters.addAll(listOf("arm64-v8a", "armeabi-v7a", "x86_64"))
+            }
         }
     }
 
