@@ -8,5 +8,6 @@ object SetupRoute
 @Serializable
 data class DashboardRoute(
     val dashboardType: String,
-    val serverAddress: String
+    val serverAddress: String,
+    val dataSourceType: String = "comma"
 )

@@ -1,0 +1,42 @@
+package com.softwiredtech.dashpilot.vehicle
+
+import com.softwiredtech.dashpilot.datamodel.CarState
+import com.softwiredtech.dashpilot.jni.VehicleBridge
+
+// This is a wrapper for the C++ VehicleDecoder so that DataSources that are
+// non-native (such as PandaBleDataSource) can still decode can frames.
+class CanFrameDecoder(
+    private val bridge: VehicleBridge,
+    profile: VehicleProfile
+) {
+    val decoderHandle: Long = bridge.nativeCreateVehicleDecoder(
+        profile.dbcContents, profile.busIndices, profile.type
+    )
+
+    fun decodeFrame(bus: Int, address: Int, data: ByteArray): CarState {
+        val values = bridge.nativeDecodeCanFrame(decoderHandle, bus, address, data)
+        return arrayToCarState(values)
+    }
+
+    fun destroy() {
+        bridge.nativeDestroyVehicleDecoder(decoderHandle)
+    }
+
+    companion object {
+        fun arrayToCarState(values: DoubleArray): CarState {
+            return CarState(
+                egoSteeringAngle = values[0].toFloat(),
+                egoSpeed = values[1].toFloat(),
+                leftBlinker = values[2].toFloat(),
+                rightBlinker = values[3].toFloat(),
+                gear = values[4].toFloat(),
+                adasOn = values[5] > 0,
+                leftBlindSpot = values[6].toFloat(),
+                rightBlindSpot = values[7].toFloat(),
+                fusedSpeedLimit = values[8].toFloat(),
+                stopLineDist = values[9].toFloat(),
+                trafficLightColor = values[10].toFloat()
+            )
+        }
+    }
+}

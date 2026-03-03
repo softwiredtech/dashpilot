@@ -9,22 +9,36 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.softwiredtech.dashpilot.datasource.CommaDataSource
-import com.softwiredtech.dashpilot.utils.FileUtils
+import com.softwiredtech.dashpilot.datasource.IDataSource
+import com.softwiredtech.dashpilot.datasource.PandaBleDataSource
+import com.softwiredtech.dashpilot.jni.VehicleBridge
+import com.softwiredtech.dashpilot.vehicle.CanFrameDecoder
+import com.softwiredtech.dashpilot.vehicle.VehicleProfileLoader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Composable
 fun DashboardScreen(
     dashboardType: String,
-    serverAddress: String
+    serverAddress: String,
+    dataSourceType: String = "comma"
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val dataSource = remember {
-        CommaDataSource(FileUtils.copyAssetToFile(context, "tesla_model3_party.dbc"))
+    val vehicleName = "tesla" // TODO: make configurable via UI
+    val dataSource: IDataSource = remember(dataSourceType, vehicleName) {
+        val profile = VehicleProfileLoader.loadProfile(context, vehicleName)
+        val bridge = VehicleBridge()
+        when (dataSourceType) {
+            "ble" -> {
+                val decoder = CanFrameDecoder(bridge, profile)
+                PandaBleDataSource(context, decoder)
+            }
+            else -> CommaDataSource(bridge, profile)
+        }
     }
 
-    LaunchedEffect(serverAddress) {
+    LaunchedEffect(serverAddress, dataSourceType) {
         launch(Dispatchers.IO) {
             dataSource.connect(serverAddress)
         }

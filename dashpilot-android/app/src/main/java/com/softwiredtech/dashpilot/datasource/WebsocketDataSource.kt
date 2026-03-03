@@ -1,7 +1,7 @@
 package com.softwiredtech.dashpilot.datasource
 
 import com.google.gson.Gson
-import com.softwiredtech.dashpilot.datamodel.WorldMessage
+import com.softwiredtech.dashpilot.datamodel.CarState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -11,8 +11,8 @@ import okio.ByteString
 
 class WebsocketDataSource() : IDataSource {
     private val _incoming = MutableSharedFlow<String>()
-    override val incomingMessages: Flow<WorldMessage> =
-        _incoming.map { json -> gson.fromJson(json, WorldMessage::class.java) }
+    override val incomingMessages: Flow<CarState> =
+        _incoming.map { json -> gson.fromJson(json, CarState::class.java) }
     private val client = OkHttpClient()
     private var webSocket: WebSocket? = null
 
