@@ -60,7 +60,7 @@ target_include_directories(bridge PRIVATE
         ${MSGQ_ROOT}
         ${MSGQ_ROOT}/msgq
         ${MSGQ_ROOT}/dbc
-        "${CMAKE_CURRENT_SOURCE_DIR}/../../bridge/cereal/gen"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../bridge/capnp/gen"
 )
 
 target_link_libraries(bridge
