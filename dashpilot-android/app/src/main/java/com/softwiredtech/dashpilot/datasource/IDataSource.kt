@@ -1,10 +1,10 @@
 package com.softwiredtech.dashpilot.datasource
 
-import com.softwiredtech.dashpilot.datamodel.WorldMessage
+import com.softwiredtech.dashpilot.datamodel.CarState
 import kotlinx.coroutines.flow.Flow
 
 interface IDataSource {
     fun connect(address: String)
     fun disconnect()
-    val incomingMessages: Flow<WorldMessage>
+    val incomingMessages: Flow<CarState>
 }

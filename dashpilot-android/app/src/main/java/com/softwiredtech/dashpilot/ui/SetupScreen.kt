@@ -25,10 +25,11 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun SetupScreen(
-    onLaunch: (dashboardType: String, serverAddress: String) -> Unit
+    onLaunch: (dashboardType: String, serverAddress: String, dataSourceType: String) -> Unit
 ) {
     var serverAddress by rememberSaveable { mutableStateOf("192.168.1.105") }
     var dashboardType by rememberSaveable { mutableStateOf("web") }
+    var dataSourceType by rememberSaveable { mutableStateOf("comma") }
 
     Column(
         modifier = Modifier
@@ -75,9 +76,32 @@ fun SetupScreen(
             )
         }
 
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Text(
+            text = "Data Source",
+            style = MaterialTheme.typography.labelLarge
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row {
+            FilterChip(
+                selected = dataSourceType == "comma",
+                onClick = { dataSourceType = "comma" },
+                label = { Text("Comma") }
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            FilterChip(
+                selected = dataSourceType == "ble",
+                onClick = { dataSourceType = "ble" },
+                label = { Text("BLE") }
+            )
+        }
+
         Spacer(modifier = Modifier.height(32.dp))
 
-        Button(onClick = { onLaunch(dashboardType, serverAddress) }) {
+        Button(onClick = { onLaunch(dashboardType, serverAddress, dataSourceType) }) {
             Text("Launch Dashboard")
         }
     }

@@ -1,8 +1,14 @@
 #include <jni.h>
 #include <string>
 #include <iostream>
+#include <cmath>
+#include <memory>
 #include "msgq/ipc.h"
 #include "dbc/dbcfile.h"
+#include "car/car_state.h"
+#include "car/can_parsers.h"
+#include "car/car_state_mapper.h"
+#include "car/cars/tesla.h"
 #include <android/log.h>
 #define LOG_TAG "MsgQNative"
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
@@ -15,33 +21,48 @@
 #include <thread>
 #include <chrono>
 
+static std::unique_ptr<CarStateMapper> createMapper(const std::string& vehicleType) {
+    if (vehicleType == "tesla") return std::make_unique<TeslaCarState>();
+    // Add new vehicles here:
+    // if (vehicleType == "honda") return std::make_unique<HondaCarState>();
+    return nullptr;
+}
+
+class VehicleDecoder {
+public:
+    VehicleDecoder(const std::vector<std::string>& dbcContents,
+                   const std::vector<int>& busIndices,
+                   const std::string& vehicleType) {
+
+        for (size_t i = 0; i < dbcContents.size(); i++) {
+            parsers_.addBus(busIndices[i], dbcContents[i]);
+        }
+
+        mapper_ = createMapper(vehicleType);
+        if (!mapper_) {
+            LOGD("VehicleDecoder: unknown vehicle type '%s'", vehicleType.c_str());
+        }
+    }
+
+    // Feed a CAN frame, update internal state
+    void updateFrame(int bus, uint32_t address, const uint8_t* data, size_t len) {
+        parsers_.updateFrame(bus, address, data, len);
+        if (mapper_) {
+            mapper_->update(parsers_, state_);
+        }
+    }
+
+    const CarState& state() const { return state_; }
+
+private:
+    CANParsers parsers_;
+    std::unique_ptr<CarStateMapper> mapper_;
+    CarState state_;
+};
 
 extern "C" {
 
-DBCFile* dbcFile;
-bool receiveLoopRunning = false;
-
-std::vector<std::string> targetSignalNames = {
-        "SCCM_steeringAngle",
-        "DAS_accState",
-        "DAS_trafficLightColor",
-        "DAS_stopLineDist",
-        "DAS_blindSpotRearLeft",
-        "DAS_blindSpotRearRight",
-        "DAS_fusedSpeedLimit",
-        "DI_uiSpeed",
-        "DI_gear",
-        "leftBlinkerBlinking",
-        "rightBlinkerBlinking"
-};
-
-struct OrderedSignal {
-    uint32_t messageId;
-    const cabana::Signal* signal;
-};
-
-std::vector<OrderedSignal> orderedSignals;
-
+static bool receiveLoopRunning = false;
 static JavaVM* g_vm = nullptr;
 static jobject g_callback = nullptr;
 static jdoubleArray g_buffer = nullptr;
@@ -52,46 +73,15 @@ jint JNI_OnLoad(JavaVM* vm, void*) {
     return JNI_VERSION_1_6;
 }
 
-// === DBC ===
-JNIEXPORT jboolean JNICALL
-Java_com_softwiredtech_dashpilot_jni_CommaBridge_loadDbcFile(JNIEnv *env, jobject thiz, jstring dbcPath) {
-    const char* dbcPathString = env->GetStringUTFChars(dbcPath, nullptr);
-    dbcFile = new DBCFile(dbcPathString);
-    env->ReleaseStringUTFChars(dbcPath, dbcPathString);
-
-    std::unordered_map<std::string, OrderedSignal> lookup;
-
-    for (const auto& msgPair : dbcFile->getMessages()) {
-        const auto& msg = msgPair.second;
-
-        for (const auto& sig : msg.getSignals()) {
-            lookup[sig->name] = { msg.address,sig };
-        }
-    }
-
-    orderedSignals.clear();
-
-    for (const auto& name : targetSignalNames) {
-        if (lookup.count(name)) {
-            orderedSignals.push_back(lookup[name]);
-        } else {
-            LOGD("Missing signal: %s", name.c_str());
-            orderedSignals.push_back({0, nullptr});
-        }
-    }
-
-    return true;
-}
-
 // === Context ===
 JNIEXPORT jlong JNICALL
-Java_com_softwiredtech_dashpilot_jni_CommaBridge_nativeCreateContext(JNIEnv *env, jobject thiz) {
+Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeCreateContext(JNIEnv *env, jobject thiz) {
     Context *ctx = Context::create();
     return reinterpret_cast<jlong>(ctx);
 }
 
 JNIEXPORT void JNICALL
-Java_com_softwiredtech_dashpilot_jni_CommaBridge_nativeDeleteContext(JNIEnv *env, jobject thiz,
+Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDeleteContext(JNIEnv *env, jobject thiz,
                                                            jlong ctxPtr) {
     Context *ctx = reinterpret_cast<Context *>(ctxPtr);
     delete ctx;
@@ -99,7 +89,7 @@ Java_com_softwiredtech_dashpilot_jni_CommaBridge_nativeDeleteContext(JNIEnv *env
 
 // === SubSocket ===
 JNIEXPORT jlong JNICALL
-Java_com_softwiredtech_dashpilot_jni_CommaBridge_nativeCreateSubSocket(
+Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeCreateSubSocket(
         JNIEnv* env, jobject thiz,
         jlong ctxPtr,
         jstring endpoint,
@@ -123,96 +113,18 @@ Java_com_softwiredtech_dashpilot_jni_CommaBridge_nativeCreateSubSocket(
 }
 
 JNIEXPORT void JNICALL
-Java_com_softwiredtech_dashpilot_jni_CommaBridge_nativeDeleteSubSocket(JNIEnv* env, jobject thiz, jlong subPtr) {
+Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDeleteSubSocket(JNIEnv* env, jobject thiz, jlong subPtr) {
     SubSocket* sub = reinterpret_cast<SubSocket*>(subPtr);
     delete sub;
 }
 
-// === Message ===
 JNIEXPORT void JNICALL
-Java_com_softwiredtech_dashpilot_jni_CommaBridge_nativeStartReceiveLoop(
-        JNIEnv* env,
-        jobject thiz,
-        jlong subPtr,
-        jdoubleArray buffer,
-        jobject callback) {
-
-    // Setup callbacks:
-    g_callback = env->NewGlobalRef(callback);
-    g_buffer = (jdoubleArray) env->NewGlobalRef(buffer);
-
-    jclass callbackClass = env->GetObjectClass(callback);
-    g_onCanDataMethod = env->GetMethodID(
-            callbackClass,
-            "onCanData",
-            "([D)V");
-    auto sub = reinterpret_cast<SubSocket*>(subPtr);
-    receiveLoopRunning = true;
-    std::vector<double> nativeBuffer(orderedSignals.size(), 0.0);
-
-    while (receiveLoopRunning) {
-        Message *msg = sub->receive(true);
-        if (msg) {
-            kj::ArrayPtr<capnp::word> canArray = kj::ArrayPtr<capnp::word>((capnp::word*)msg->getData(), msg->getSize() / sizeof(capnp::word));
-            capnp::FlatArrayMessageReader reader(canArray);
-            auto event = reader.getRoot<cereal::Event>();
-
-            if (event.which() == cereal::Event::Which::CAN) {
-                auto canList = event.getCan();
-
-                // TODO: refactor me, this is experimental
-                for (const auto &c : canList) {
-                    auto src = c.getSrc();
-                    auto addr = c.getAddress();
-                    auto dat = c.getDat();
-                    auto canMsg = dbcFile->msg(addr);
-                    if (canMsg) {
-                        uint32_t currentMsgId = canMsg->address;
-                        for (size_t i = 0; i < orderedSignals.size(); i++) {
-                            const auto& os = orderedSignals[i];
-
-                            if (!os.signal)
-                                continue;
-
-                            if (os.messageId != currentMsgId)
-                                continue;
-
-                            double value = 0.0;
-
-                            os.signal->getValue(
-                                    (const uint8_t*)(dat.begin()),
-                                    dat.size(),
-                                    &value);
-
-                            nativeBuffer[i] = value;
-                        }
-                    }
-
-                    env->SetDoubleArrayRegion(
-                            g_buffer,
-                            0,
-                            nativeBuffer.size(),
-                            nativeBuffer.data());
-
-                    env->CallVoidMethod(
-                            g_callback,
-                            g_onCanDataMethod,
-                            g_buffer);
-                }
-            }
-        } else {
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
-        }
-    }
-}
-
-JNIEXPORT void JNICALL
-Java_com_softwiredtech_dashpilot_jni_CommaBridge_nativeStopReceiveLoop(JNIEnv* env, jobject thiz) {
+Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStopReceiveLoop(JNIEnv* env, jobject thiz) {
     receiveLoopRunning = false;
 }
 
 JNIEXPORT jbyteArray JNICALL
-Java_com_softwiredtech_dashpilot_jni_CommaBridge_nativeGetData(JNIEnv* env, jobject thiz, jlong msgPtr) {
+Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeGetData(JNIEnv* env, jobject thiz, jlong msgPtr) {
     Message* msg = reinterpret_cast<Message*>(msgPtr);
     size_t size = msg->getSize();
     char* data = msg->getData();
@@ -223,15 +135,141 @@ Java_com_softwiredtech_dashpilot_jni_CommaBridge_nativeGetData(JNIEnv* env, jobj
 }
 
 JNIEXPORT jint JNICALL
-Java_com_softwiredtech_dashpilot_jni_CommaBridge_nativeGetSize(JNIEnv* env, jobject thiz, jlong msgPtr) {
+Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeGetSize(JNIEnv* env, jobject thiz, jlong msgPtr) {
     Message* msg = reinterpret_cast<Message*>(msgPtr);
     return static_cast<jint>(msg->getSize());
 }
 
 JNIEXPORT void JNICALL
-Java_com_softwiredtech_dashpilot_jni_CommaBridge_nativeDeleteMessage(JNIEnv* env, jobject thiz, jlong msgPtr) {
+Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDeleteMessage(JNIEnv* env, jobject thiz, jlong msgPtr) {
     Message* msg = reinterpret_cast<Message*>(msgPtr);
     delete msg;
+}
+
+// ============================================================
+// VehicleDecoder JNI functions
+// ============================================================
+
+JNIEXPORT jlong JNICALL
+Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeCreateVehicleDecoder(
+        JNIEnv* env, jobject thiz,
+        jobjectArray dbcContents,
+        jintArray busIndices,
+        jstring vehicleType) {
+
+    int dbcCount = env->GetArrayLength(dbcContents);
+    std::vector<std::string> dbcContentsVec;
+    std::vector<int> busIndicesVec;
+
+    jint* busIndicesArr = env->GetIntArrayElements(busIndices, nullptr);
+    for (int i = 0; i < dbcCount; i++) {
+        auto jstr = (jstring) env->GetObjectArrayElement(dbcContents, i);
+        const char* str = env->GetStringUTFChars(jstr, nullptr);
+        dbcContentsVec.emplace_back(str);
+        env->ReleaseStringUTFChars(jstr, str);
+        busIndicesVec.push_back(busIndicesArr[i]);
+    }
+    env->ReleaseIntArrayElements(busIndices, busIndicesArr, 0);
+
+    const char* typeStr = env->GetStringUTFChars(vehicleType, nullptr);
+    std::string type(typeStr);
+    env->ReleaseStringUTFChars(vehicleType, typeStr);
+
+    auto* decoder = new VehicleDecoder(dbcContentsVec, busIndicesVec, type);
+    LOGD("VehicleDecoder created: type=%s, %d buses", type.c_str(), dbcCount);
+    return reinterpret_cast<jlong>(decoder);
+}
+
+JNIEXPORT jdoubleArray JNICALL
+Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDecodeCanFrame(
+        JNIEnv* env, jobject thiz,
+        jlong decoderHandle,
+        jint bus,
+        jint address,
+        jbyteArray data) {
+
+    auto* decoder = reinterpret_cast<VehicleDecoder*>(decoderHandle);
+    jsize dataLen = env->GetArrayLength(data);
+    jbyte* dataBytes = env->GetByteArrayElements(data, nullptr);
+
+    decoder->updateFrame(bus, static_cast<uint32_t>(address),
+                         reinterpret_cast<const uint8_t*>(dataBytes), dataLen);
+
+    env->ReleaseByteArrayElements(data, dataBytes, 0);
+
+    // Return full CarState as double array
+    double output[CarState::FIELD_COUNT];
+    decoder->state().toArray(output);
+
+    jdoubleArray result = env->NewDoubleArray(CarState::FIELD_COUNT);
+    env->SetDoubleArrayRegion(result, 0, CarState::FIELD_COUNT, output);
+    return result;
+}
+
+JNIEXPORT void JNICALL
+Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDestroyVehicleDecoder(
+        JNIEnv* env, jobject thiz,
+        jlong decoderHandle) {
+    auto* decoder = reinterpret_cast<VehicleDecoder*>(decoderHandle);
+    delete decoder;
+    LOGD("VehicleDecoder destroyed");
+}
+
+// Receive loop using VehicleDecoder (for CommaDataSource / ZMQ)
+JNIEXPORT void JNICALL
+Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStartReceiveLoop(
+        JNIEnv* env,
+        jobject thiz,
+        jlong decoderHandle,
+        jlong subPtr,
+        jdoubleArray buffer,
+        jobject callback) {
+
+    auto* decoder = reinterpret_cast<VehicleDecoder*>(decoderHandle);
+
+    g_callback = env->NewGlobalRef(callback);
+    g_buffer = (jdoubleArray) env->NewGlobalRef(buffer);
+
+    jclass callbackClass = env->GetObjectClass(callback);
+    g_onCanDataMethod = env->GetMethodID(callbackClass, "onCanData", "([D)V");
+
+    auto sub = reinterpret_cast<SubSocket*>(subPtr);
+    receiveLoopRunning = true;
+
+    long prev = 0.0;
+    while (receiveLoopRunning) {
+        Message *msg = sub->receive(true);
+        if (msg) {
+
+            kj::ArrayPtr<capnp::word> canArray = kj::ArrayPtr<capnp::word>(
+                (capnp::word*)msg->getData(), msg->getSize() / sizeof(capnp::word));
+            capnp::FlatArrayMessageReader reader(canArray);
+            auto event = reader.getRoot<cereal::Event>();
+
+            if (event.which() == cereal::Event::Which::CAN) {
+                auto canList = event.getCan();
+
+                for (const auto &c : canList) {
+                    auto src = c.getSrc();
+                    auto addr = c.getAddress();
+                    auto dat = c.getDat();
+
+                    decoder->updateFrame(src, addr,
+                                        reinterpret_cast<const uint8_t*>(dat.begin()),
+                                        dat.size());
+                }
+
+                double output[CarState::FIELD_COUNT];
+                decoder->state().toArray(output);
+
+                env->SetDoubleArrayRegion(g_buffer, 0, CarState::FIELD_COUNT, output);
+                env->CallVoidMethod(g_callback, g_onCanDataMethod, g_buffer);
+            }
+            delete msg;
+        } else {
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        }
+    }
 }
 
 }

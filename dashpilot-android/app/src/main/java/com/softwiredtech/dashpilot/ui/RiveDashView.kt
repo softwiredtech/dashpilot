@@ -71,17 +71,17 @@ fun RiveDashView(
                 LaunchedEffect(Unit) {
                     scope.launch {
                         dataSource.incomingMessages.collect { message ->
-                            vmi.setNumber("speed", message.world.ego_speed)
-                            vmi.setNumber("speedLimit", message.world.fusedSpeedLimit)
-                            vmi.setNumber("gear", message.world.gear)
-                            vmi.setNumber("steeringAngle", message.world.ego_steering_angle)
-                            vmi.setNumber("blinkerLeft", message.world.leftBlinker)
-                            vmi.setNumber("blinkerRight", message.world.rightBlinker)
-                            vmi.setNumber("leftBlindspot", message.world.leftBlindSpot)
-                            vmi.setNumber("rightBlindspot", message.world.rightBlindSpot)
-                            vmi.setNumber("stopDist", message.world.stopLineDist)
-                            vmi.setNumber("trafficLightColor", message.world.trafficLightColor)
-                            vmi.setNumber("trafficLightDist", message.world.stopLineDist)
+                            vmi.setNumber("speed", message.egoSpeed)
+                            vmi.setNumber("speedLimit", message.fusedSpeedLimit)
+                            vmi.setNumber("gear", message.gear)
+                            vmi.setNumber("steeringAngle", message.egoSteeringAngle)
+                            vmi.setNumber("blinkerLeft", message.leftBlinker)
+                            vmi.setNumber("blinkerRight", message.rightBlinker)
+                            vmi.setNumber("leftBlindspot", message.leftBlindSpot)
+                            vmi.setNumber("rightBlindspot", message.rightBlindSpot)
+                            vmi.setNumber("stopDist", message.stopLineDist)
+                            vmi.setNumber("trafficLightColor", message.trafficLightColor)
+                            vmi.setNumber("trafficLightDist", message.stopLineDist)
                         }
                     }
                 }

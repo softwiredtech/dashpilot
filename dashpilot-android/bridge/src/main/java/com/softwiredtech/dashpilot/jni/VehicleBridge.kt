@@ -3,7 +3,7 @@ package com.softwiredtech.dashpilot.jni
 fun interface CanSignalCallback {
     fun onCanData(values: DoubleArray)
 }
-class CommaBridge {
+class VehicleBridge {
     init {
         System.loadLibrary("bridge")
     }
@@ -21,12 +21,14 @@ class CommaBridge {
 
     external fun nativeDeleteSubSocket(subPtr: Long)
 
-    // DBC
-    external fun loadDbcFile(dbcPath: String): Boolean
-
-    // Receive messages
-    external fun nativeStartReceiveLoop(subPtr: Long, buffer: DoubleArray, callback: CanSignalCallback)
+    // Receive messages using VehicleDecoder
+    external fun nativeStartReceiveLoop(decoderHandle: Long, subPtr: Long, buffer: DoubleArray, callback: CanSignalCallback)
     external fun nativeStopReceiveLoop()
+
+    // VehicleDecoder
+    external fun nativeCreateVehicleDecoder(dbcContents: Array<String>, busIndices: IntArray, vehicleType: String): Long
+    external fun nativeDecodeCanFrame(decoderHandle: Long, bus: Int, address: Int, data: ByteArray): DoubleArray
+    external fun nativeDestroyVehicleDecoder(decoderHandle: Long)
 
     // Message
     external fun nativeGetData(msgPtr: Long): ByteArray

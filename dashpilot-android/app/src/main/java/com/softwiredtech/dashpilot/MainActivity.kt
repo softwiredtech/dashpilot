@@ -1,5 +1,7 @@
 package com.softwiredtech.dashpilot
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowInsets
@@ -7,6 +9,8 @@ import android.view.WindowInsetsController
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
@@ -24,8 +28,14 @@ import com.softwiredtech.dashpilot.ui.theme.DashPilotTheme
 
 class MainActivity : ComponentActivity() {
 
+    private val bluetoothPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { /* permissions granted or denied — BLE will fail gracefully if denied */ }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        requestBluetoothPermissions()
 
         AppInitializer.getInstance(applicationContext)
             .initializeComponent(RiveInitializer::class.java)
@@ -45,9 +55,9 @@ class MainActivity : ComponentActivity() {
                     ) {
                         composable<SetupRoute> {
                             SetupScreen(
-                                onLaunch = { dashboardType, serverAddress ->
+                                onLaunch = { dashboardType, serverAddress, dataSourceType ->
                                     navController.navigate(
-                                        DashboardRoute(dashboardType, serverAddress)
+                                        DashboardRoute(dashboardType, serverAddress, dataSourceType)
                                     )
                                 }
                             )
@@ -56,12 +66,35 @@ class MainActivity : ComponentActivity() {
                             val route = backStackEntry.toRoute<DashboardRoute>()
                             DashboardScreen(
                                 dashboardType = route.dashboardType,
-                                serverAddress = route.serverAddress
+                                serverAddress = route.serverAddress,
+                                dataSourceType = route.dataSourceType
                             )
                         }
                     }
                 }
             }
+        }
+    }
+
+    private fun requestBluetoothPermissions() {
+        val needed = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            arrayOf(
+                Manifest.permission.BLUETOOTH_SCAN,
+                Manifest.permission.BLUETOOTH_CONNECT,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+        } else {
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        }.filter {
+            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+        }.toTypedArray()
+
+        if (needed.isNotEmpty()) {
+            bluetoothPermissionLauncher.launch(needed)
         }
     }
 
