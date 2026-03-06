@@ -316,14 +316,6 @@
       world.objects = objects;
     }
 
-    const ws = new WebSocket("ws://localhost:8080");
-    const speedText = document.getElementById("speedText");
-    const steeringAngleText = document.getElementById("steeringAngle");
-    const steeringWheel = document.getElementById("steeringWheel");
-    
-
-    ws.onopen = () => console.log("WebSocket connected");
-
     var receiveMessage = function(event) {
       try {
         const data = JSON.parse(event.data);
@@ -336,39 +328,35 @@
           data.world.gear = 4;
         }
 
-        const gear = parseInt(data.world.gear);
-        const leftBlinker = parseInt(data.world.leftBlinker);
+        const gear         = parseInt(data.world.gear);
+        const leftBlinker  = parseInt(data.world.leftBlinker);
         const rightBlinker = parseInt(data.world.rightBlinker);
-        const speedLimit = parseInt(data.world.fusedSpeedLimit);
+        const speedLimit   = parseInt(data.world.fusedSpeedLimit);
         const roundedSpeed = Math.floor(speed / 10) * 10;
-        
+
         buildTrafficLightState(data.world);
         buildBlindSpotState(data.world);
 
         const IN_MIN = -360;
         const IN_MAX =  360;
-
-        // OUTPUT desired range
         const OUT_MIN = -30;
         const OUT_MAX =  30;
 
-        const remappedDeg =
-        (angle - IN_MIN) * (OUT_MAX - OUT_MIN) / (IN_MAX - IN_MIN) + OUT_MIN;
-
+        const remappedDeg = (angle - IN_MIN) * (OUT_MAX - OUT_MIN) / (IN_MAX - IN_MIN) + OUT_MIN;
         const remappedRad = -remappedDeg * Math.PI / 180;
-        const speedMs = roundedSpeed / 3.6;
+        const speedMs     = roundedSpeed / 3.6;
 
         data.world.ego_steering_angle = remappedRad;
-        data.world.ego_speed = speedMs;
+        data.world.ego_speed          = speedMs;
+        data.world.gear               = gear;
+        data.world.lane = { laneWidth: 4, viewRange: 50, lanePolyC0: 0, lanePolyC1: 0, lanePolyC2: 0, lanePolyC3: 0 };
 
-        // Serialize
-        data.world.lane = { laneWidth:4,viewRange:50,lanePolyC0:0,lanePolyC1:0,lanePolyC2:0,lanePolyC3:0 }
-        window.__ADAS_DATA_JSON__ = JSON.stringify(data.world);
+        window._setWorldModel?.(data.world);
 
         const gearMap = { 1: "P", 2: "R", 3: "N", 4: "D" };
         gearText.textContent = gearMap[gear] || "-";
 
-        showBlinker(leftBlinker, leftBlinkerIcon);
+        showBlinker(leftBlinker,  leftBlinkerIcon);
         showBlinker(rightBlinker, rightBlinkerIcon);
 
         speedText.textContent = speed;
@@ -378,56 +366,41 @@
           speedLimitText.textContent = speedLimit;
         }
 
-        leftHideTimeout = applyBlindSpotListener(
-          data.world.leftBlindSpot,
-          leftHideTimeout,
-          leftBlindSpot
-        );
+        leftHideTimeout  = applyBlindSpotListener(data.world.leftBlindSpot,  leftHideTimeout,  leftBlindSpot);
+        rightHideTimeout = applyBlindSpotListener(data.world.rightBlindSpot, rightHideTimeout, rightBlindSpot);
 
-        rightHideTimeout = applyBlindSpotListener(
-          data.world.rightBlindSpot,
-          rightHideTimeout,
-          rightBlindSpot
-        );
+        outerBorder.style.background = data.world.adas_on ? "#5cbd68" : "#C1E7C8";
 
-        if (data.world.adas_on) {
-          outerBorder.style.background = "#5cbd68";
-        } else {
-          outerBorder.style.background = "#C1E7C8";
-        }
-
-        // Rotate the steering wheel
         steeringWheel.style.transform = `rotate(${angle}deg)`;
       } catch (err) {
         console.error("Failed to parse message", err);
       }
     };
 
-    ws.onmessage = function(event) {
-      receiveMessage(event);
-    };
-
-    ws.onerror = (err) => console.error("WebSocket error", err);
-    ws.onclose = () => console.log("WebSocket closed");
-
-    // Incoming from dashpilot android app
     window.onWorldMessage = function(message) {
       receiveMessage({ data: JSON.stringify(message) });
-    }
+    };
   </script>
 
   <script type="module">
-    import init from './car-visualization.js';
-    (async () => {
-      try {
-        await init();
-        console.log('[WASM] Bevy initialized');
-      } catch (e) {
-        if (!e.message?.includes("control flow")) {
-          console.error("[WASM] init failed:", e);
-        }
+    import init, { setWorldModel } from './car-visualization.js';
+
+    window._setWorldModel = setWorldModel;
+
+    window._onWasmReady = function() {
+      console.log('[WASM] Bevy ready, starting WebSocket');
+      const ws = new WebSocket(`ws://${window.location.hostname}:8080`);
+      ws.onopen    = () => console.log("WebSocket connected");
+      ws.onmessage = (event) => receiveMessage(event);
+      ws.onerror   = (err) => console.error("WebSocket error", err);
+      ws.onclose   = () => console.log("WebSocket closed");
+    };
+
+    init().catch(e => {
+      if (!e.message?.includes("control flow")) {
+        console.error("[WASM] init failed:", e);
       }
-    })();
+    });
   </script>
 </body>
 </html>
