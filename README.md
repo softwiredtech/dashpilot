@@ -1,4 +1,6 @@
-# PilotBoard
+# Dashpilot
+
+![Dashpilot header](./assets/dashpilot-header.png)
 
 Turn your phone into a real-time dashboard for your car.
 
@@ -8,13 +10,13 @@ Turn your phone into a real-time dashboard for your car.
 
 Contains the Bevy rendering engine used in `/pilotboard` that is capable of rendering vehicles, lanes, traffic lights and many more.
 
-`/pilotboard`:  
+`/dash-apps`:  
 
-The web app the receives data from the car through a websocket bridge.
+Contains source code for apps running in the sandbox dashpilot mobile app. They fall into two main categories: web apps, and rive apps. See the dash-apps readme for more.
 
-`/pilotboard-android`:  
+`/dashpilot-android`:  
 
-The android app the hosts a full screen webview inside which `/pilotboard` runs.
+The android app the hosts a full screen webview inside which `/dash-apps` run.
 
 `/simulator`:  
 
