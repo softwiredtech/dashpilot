@@ -24,7 +24,7 @@ class CommaDataSource(
     )
     private val reusableBuffer = DoubleArray(CarState.FIELD_COUNT)
 
-    private var subSocketHandle: Long = -1
+    private var subSocketHandle: Long = 0
 
     override fun connect(address: String) {
         subSocketHandle = bridge.nativeCreateSubSocket(ctx, "can", address)

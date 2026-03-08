@@ -83,6 +83,9 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeCreateContext(JNIEnv *e
 JNIEXPORT void JNICALL
 Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDeleteContext(JNIEnv *env, jobject thiz,
                                                            jlong ctxPtr) {
+    if (ctxPtr == 0) {
+        return;
+    }
     Context *ctx = reinterpret_cast<Context *>(ctxPtr);
     delete ctx;
 }
@@ -114,6 +117,9 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeCreateSubSocket(
 
 JNIEXPORT void JNICALL
 Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDeleteSubSocket(JNIEnv* env, jobject thiz, jlong subPtr) {
+    if (subPtr == 0) {
+        return;
+    }
     SubSocket* sub = reinterpret_cast<SubSocket*>(subPtr);
     delete sub;
 }
@@ -210,9 +216,11 @@ JNIEXPORT void JNICALL
 Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDestroyVehicleDecoder(
         JNIEnv* env, jobject thiz,
         jlong decoderHandle) {
+    if (decoderHandle == 0) {
+        return;
+    }
     auto* decoder = reinterpret_cast<VehicleDecoder*>(decoderHandle);
     delete decoder;
-    LOGD("VehicleDecoder destroyed");
 }
 
 // Receive loop using VehicleDecoder (for CommaDataSource / ZMQ)
