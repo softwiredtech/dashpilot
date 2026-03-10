@@ -1,10 +1,13 @@
 /* tslint:disable */
 /* eslint-disable */
 
+export function setWorldModel(val: any): void;
+
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
 
 export interface InitOutput {
     readonly memory: WebAssembly.Memory;
+    readonly setWorldModel: (a: any) => void;
     readonly main: (a: number, b: number) => number;
     readonly wgpu_render_pass_set_pipeline: (a: number, b: bigint) => void;
     readonly wgpu_compute_pass_set_pipeline: (a: number, b: bigint) => void;

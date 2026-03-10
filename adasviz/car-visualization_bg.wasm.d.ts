@@ -1,6 +1,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export const memory: WebAssembly.Memory;
+export const setWorldModel: (a: any) => void;
 export const main: (a: number, b: number) => number;
 export const wgpu_render_pass_set_pipeline: (a: number, b: bigint) => void;
 export const wgpu_compute_pass_set_pipeline: (a: number, b: bigint) => void;
