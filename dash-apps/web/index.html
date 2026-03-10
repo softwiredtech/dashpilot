@@ -318,24 +318,41 @@
 
     var receiveMessage = function(event) {
       try {
-        const data = JSON.parse(event.data);
+        const car = JSON.parse(event.data);
 
-        const speed = parseInt(data.world.ego_speed);
-        const angle = data.world.ego_steering_angle;
-
-        if (!data.world) data.world = {};
-        if (data.world.gear == null) {
-          data.world.gear = 4;
-        }
-
-        const gear         = parseInt(data.world.gear);
-        const leftBlinker  = parseInt(data.world.leftBlinker);
-        const rightBlinker = parseInt(data.world.rightBlinker);
-        const speedLimit   = parseInt(data.world.fusedSpeedLimit);
+        const angle = car.egoSteeringAngle;
+        const speed = parseInt(car.egoSpeed);
+        const gear = parseInt(car.gear);
+        const leftBlinker = parseInt(car.leftBlinker);
+        const rightBlinker = parseInt(car.rightBlinker);
+        const speedLimit = parseInt(car.fusedSpeedLimit);
         const roundedSpeed = Math.floor(speed / 10) * 10;
 
-        buildTrafficLightState(data.world);
-        buildBlindSpotState(data.world);
+        // Build world object for ADAS viz
+        const world = {
+          ego_steering_angle: angle,
+          ego_speed: car.egoSpeed,
+          leftBlinker: car.leftBlinker,
+          rightBlinker: car.rightBlinker,
+          gear: car.gear,
+          adas_on: car.adasOn,
+          leftBlindSpot: car.leftBlindSpot,
+          rightBlindSpot: car.rightBlindSpot,
+          fusedSpeedLimit: car.fusedSpeedLimit,
+          stopLineDist: car.stopLineDist,
+          trafficLightColor: car.trafficLightColor,
+          objects: [],
+          traffic_lights:[],
+          speed_limits:[],
+          stop_signs:[],
+          road_signs:[],
+          pedestrians:[],
+          events:[],
+          lane: {laneWidth:4,viewRange:50,lanePolyC0:0,lanePolyC1:0,lanePolyC2:0,lanePolyC3:0},
+        };
+
+        buildTrafficLightState(world);
+        buildBlindSpotState(world);
 
         const IN_MIN = -360;
         const IN_MAX =  360;
@@ -346,12 +363,12 @@
         const remappedRad = -remappedDeg * Math.PI / 180;
         const speedMs     = roundedSpeed / 3.6;
 
-        data.world.ego_steering_angle = remappedRad;
-        data.world.ego_speed          = speedMs;
-        data.world.gear               = gear;
-        data.world.lane = { laneWidth: 4, viewRange: 50, lanePolyC0: 0, lanePolyC1: 0, lanePolyC2: 0, lanePolyC3: 0 };
+        world.ego_steering_angle = remappedRad;
+        world.ego_speed = speedMs;
 
-        window._setWorldModel?.(data.world);
+        // Serialize for ADAS viz
+        world.lane = { laneWidth:4,viewRange:50,lanePolyC0:0,lanePolyC1:0,lanePolyC2:0,lanePolyC3:0 }
+        window._setWorldModel?.(world);
 
         const gearMap = { 1: "P", 2: "R", 3: "N", 4: "D" };
         gearText.textContent = gearMap[gear] || "-";
@@ -366,11 +383,25 @@
           speedLimitText.textContent = speedLimit;
         }
 
-        leftHideTimeout  = applyBlindSpotListener(data.world.leftBlindSpot,  leftHideTimeout,  leftBlindSpot);
-        rightHideTimeout = applyBlindSpotListener(data.world.rightBlindSpot, rightHideTimeout, rightBlindSpot);
+        leftHideTimeout = applyBlindSpotListener(
+          car.leftBlindSpot,
+          leftHideTimeout,
+          leftBlindSpot
+        );
 
-        outerBorder.style.background = data.world.adas_on ? "#5cbd68" : "#C1E7C8";
+        rightHideTimeout = applyBlindSpotListener(
+          car.rightBlindSpot,
+          rightHideTimeout,
+          rightBlindSpot
+        );
 
+        if (car.adasOn) {
+          outerBorder.style.background = "#5cbd68";
+        } else {
+          outerBorder.style.background = "#C1E7C8";
+        }
+
+        // Rotate the steering wheel
         steeringWheel.style.transform = `rotate(${angle}deg)`;
       } catch (err) {
         console.error("Failed to parse message", err);
@@ -379,7 +410,8 @@
 
     window.onWorldMessage = function(message) {
       receiveMessage({ data: JSON.stringify(message) });
-    };
+    }
+
   </script>
 
   <script type="module">
