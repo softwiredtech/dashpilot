@@ -16,13 +16,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.softwiredtech.dashpilot.datasource.IDataSource
-import com.softwiredtech.dashpilot.js.JSBridge
+import com.softwiredtech.dashpilot.js.CarStateBridge
 import kotlinx.coroutines.CoroutineScope
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun WebDashView(modifier: Modifier = Modifier, url: String, scope: CoroutineScope, datasource: IDataSource) {
-    val jsBridge = remember { JSBridge() }
+    val carStateBridge = remember { CarStateBridge() }
     val context = LocalContext.current
     val webView = remember { WebView(context) }
     var pageLoaded by remember { mutableStateOf(false) }
@@ -51,6 +51,7 @@ fun WebDashView(modifier: Modifier = Modifier, url: String, scope: CoroutineScop
                     }
                 }
                 settings.javaScriptEnabled = true
+                addJavascriptInterface(carStateBridge, "NativeCarState")
                 loadUrl(url)
             }
         },
@@ -60,7 +61,10 @@ fun WebDashView(modifier: Modifier = Modifier, url: String, scope: CoroutineScop
     LaunchedEffect(pageLoaded) {
         if (pageLoaded) {
             datasource.incomingMessages.collect { message ->
-                jsBridge.sendMessageToJs(webView, message)
+                carStateBridge.update(message)
+                webView.post {
+                    webView.evaluateJavascript("window.onCarStateUpdate && window.onCarStateUpdate()", null)
+                }
             }
         }
     }

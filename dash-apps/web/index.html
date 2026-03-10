@@ -316,10 +316,8 @@
       world.objects = objects;
     }
 
-    var receiveMessage = function(event) {
+    var receiveMessage = function(car) {
       try {
-        const car = JSON.parse(event.data);
-
         const angle = car.egoSteeringAngle;
         const speed = parseInt(car.egoSpeed);
         const gear = parseInt(car.gear);
@@ -408,8 +406,21 @@
       }
     };
 
-    window.onWorldMessage = function(message) {
-      receiveMessage({ data: JSON.stringify(message) });
+    window.onCarStateUpdate = function() {
+      var car = {
+        egoSteeringAngle: NativeCarState.getEgoSteeringAngle(),
+        egoSpeed: NativeCarState.getEgoSpeed(),
+        leftBlinker: NativeCarState.getLeftBlinker(),
+        rightBlinker: NativeCarState.getRightBlinker(),
+        gear: NativeCarState.getGear(),
+        adasOn: NativeCarState.isAdasOn(),
+        leftBlindSpot: NativeCarState.getLeftBlindSpot(),
+        rightBlindSpot: NativeCarState.getRightBlindSpot(),
+        fusedSpeedLimit: NativeCarState.getFusedSpeedLimit(),
+        stopLineDist: NativeCarState.getStopLineDist(),
+        trafficLightColor: NativeCarState.getTrafficLightColor(),
+      };
+      receiveMessage(car);
     }
 
   </script>
