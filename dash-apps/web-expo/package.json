@@ -1,0 +1,26 @@
+{
+  "name": "expo-dash",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web --port 3000"
+  },
+  "dependencies": {
+    "@expo/metro-runtime": "^55.0.6",
+    "expo": "~55.0.6",
+    "expo-status-bar": "~55.0.4",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-native": "0.83.2",
+    "react-native-svg": "^15.15.3",
+    "react-native-web": "^0.21.2"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.2",
+    "typescript": "~5.9.2"
+  },
+  "private": true
+}
