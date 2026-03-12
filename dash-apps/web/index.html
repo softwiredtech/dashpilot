@@ -431,6 +431,10 @@
     window._setWorldModel = setWorldModel;
 
     window._onWasmReady = function() {
+      if (typeof NativeCarState !== 'undefined') {
+        console.log('[WASM] Running in Android WebView, skipping WebSocket');
+        return;
+      }
       console.log('[WASM] Bevy ready, starting WebSocket');
       const ws = new WebSocket(`ws://${window.location.hostname}:8080`);
       ws.onopen    = () => console.log("WebSocket connected");
