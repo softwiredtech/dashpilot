@@ -1,0 +1,34 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      ".firebaserc",
+      ".firebase/**",
+      ".gitignore",
+      ".DS_Store",
+      "serve.sh",
+      "**/node_modules/**"
+    ],
+    "headers": [
+      {
+        "source": "**/*.wasm",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/wasm"
+          }
+        ]
+      },
+      {
+        "source": "**/*.js",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/javascript"
+          }
+        ]
+      }
+    ]
+  }
+}

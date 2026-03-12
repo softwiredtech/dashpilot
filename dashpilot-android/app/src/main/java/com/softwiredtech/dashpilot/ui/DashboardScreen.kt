@@ -84,7 +84,9 @@ fun DashboardScreen(
 
     when (dashboardType) {
         "web" -> {
-            val url = "http://$serverAddress:3000"
+            // TODO: make it user selectable: dev: http://$serverAddress:3000
+            // dashpilot-vanilla: https://dashpilot-vanilla.web.app
+            val url = "https://dashpilot-expo.web.app" // TODO: m dev:"http://$serverAddress:3000"
             WebDashView(
                 modifier = Modifier.fillMaxSize(),
                 url = url,
