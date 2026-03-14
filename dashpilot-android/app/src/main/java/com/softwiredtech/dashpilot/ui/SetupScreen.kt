@@ -60,10 +60,9 @@ private val dataSources = listOf(
 
 @Composable
 fun SetupScreen(
-    onLaunch: (dashboardType: String, serverAddress: String, dataSourceType: String) -> Unit
+    onLaunch: (serverAddress: String, dataSourceType: String) -> Unit
 ) {
     var serverAddress by rememberSaveable { mutableStateOf("192.168.1.105") }
-    val dashboardType = "web"
 
     val pagerState = rememberPagerState(pageCount = { dataSources.size })
     val currentSource by remember { derivedStateOf { dataSources[pagerState.currentPage] } }
@@ -193,7 +192,7 @@ fun SetupScreen(
             }
 
             Button(
-                onClick = { onLaunch(dashboardType, serverAddress, currentSource.key) },
+                onClick = { onLaunch(serverAddress, currentSource.key) },
                 shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.White,
