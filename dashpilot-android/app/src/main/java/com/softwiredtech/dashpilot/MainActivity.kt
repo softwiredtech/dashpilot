@@ -20,9 +20,12 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import androidx.startup.AppInitializer
 import app.rive.runtime.kotlin.RiveInitializer
+import com.softwiredtech.dashpilot.datamodel.DashboardType
 import com.softwiredtech.dashpilot.navigation.DashboardRoute
+import com.softwiredtech.dashpilot.navigation.DashboardSelectionRoute
 import com.softwiredtech.dashpilot.navigation.SetupRoute
 import com.softwiredtech.dashpilot.ui.DashboardScreen
+import com.softwiredtech.dashpilot.ui.DashboardSelectionScreen
 import com.softwiredtech.dashpilot.ui.SetupScreen
 import com.softwiredtech.dashpilot.ui.theme.DashPilotTheme
 
@@ -55,9 +58,24 @@ class MainActivity : ComponentActivity() {
                     ) {
                         composable<SetupRoute> {
                             SetupScreen(
-                                onLaunch = { dashboardType, serverAddress, dataSourceType ->
+                                onLaunch = { serverAddress, dataSourceType ->
                                     navController.navigate(
-                                        DashboardRoute(dashboardType, serverAddress, dataSourceType)
+                                        DashboardSelectionRoute(serverAddress, dataSourceType)
+                                    )
+                                }
+                            )
+                        }
+                        composable<DashboardSelectionRoute> { backStackEntry ->
+                            val route = backStackEntry.toRoute<DashboardSelectionRoute>()
+                            DashboardSelectionScreen(
+                                onSelect = { dashboard ->
+                                    navController.navigate(
+                                        DashboardRoute(
+                                            dashboardType = dashboard.type.name.lowercase(),
+                                            dashboardUrl = dashboard.url,
+                                            serverAddress = route.serverAddress,
+                                            dataSourceType = route.dataSourceType
+                                        )
                                     )
                                 }
                             )
@@ -66,6 +84,7 @@ class MainActivity : ComponentActivity() {
                             val route = backStackEntry.toRoute<DashboardRoute>()
                             DashboardScreen(
                                 dashboardType = route.dashboardType,
+                                dashboardUrl = route.dashboardUrl,
                                 serverAddress = route.serverAddress,
                                 dataSourceType = route.dataSourceType
                             )

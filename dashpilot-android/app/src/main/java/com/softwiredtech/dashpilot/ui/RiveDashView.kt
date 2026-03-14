@@ -18,15 +18,15 @@ import app.rive.ViewModelSource
 import app.rive.rememberRiveFile
 import app.rive.rememberRiveWorkerOrNull
 import app.rive.rememberViewModelInstance
-import com.softwiredtech.dashpilot.R
+import androidx.compose.ui.platform.LocalContext
 import com.softwiredtech.dashpilot.datasource.IDataSource
-import com.softwiredtech.dashpilot.datasource.WebsocketDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun RiveDashView(
+    assetName: String,
     dataSource: IDataSource,
     scope: CoroutineScope,
     onError: ((message: String) -> Unit)
@@ -36,6 +36,7 @@ fun RiveDashView(
             .fillMaxSize()
             .background(Color.Black)
     ) {
+        val context = LocalContext.current
         val errorState = remember { mutableStateOf<Throwable?>(null) }
         val riveWorker = rememberRiveWorkerOrNull(errorState)
         if (riveWorker == null) {
@@ -44,8 +45,11 @@ fun RiveDashView(
         }
         val myFile: MutableState<RiveFile?> = remember { mutableStateOf(null) }
 
+        val resId = remember(assetName) {
+            context.resources.getIdentifier(assetName, "raw", context.packageName)
+        }
         val riveFile = rememberRiveFile(
-            RiveFileSource.RawRes.from(R.raw.dashboard_test),
+            RiveFileSource.RawRes.from(resId),
             riveWorker
         )
 

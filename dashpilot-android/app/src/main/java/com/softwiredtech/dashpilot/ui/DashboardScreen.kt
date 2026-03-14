@@ -30,6 +30,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun DashboardScreen(
     dashboardType: String,
+    dashboardUrl: String,
     serverAddress: String,
     dataSourceType: String = "comma"
 ) {
@@ -84,18 +85,16 @@ fun DashboardScreen(
 
     when (dashboardType) {
         "web" -> {
-            // TODO: make it user selectable: dev: http://$serverAddress:3000
-            // dashpilot-vanilla: https://dashpilot-vanilla.web.app
-            val url = "https://dashpilot-expo.web.app" // TODO: m dev:"http://$serverAddress:3000"
             WebDashView(
                 modifier = Modifier.fillMaxSize(),
-                url = url,
+                url = dashboardUrl,
                 scope = scope,
                 datasource = dataSource
             )
         }
         "rive" -> {
             RiveDashView(
+                assetName = dashboardUrl,
                 dataSource = dataSource,
                 scope = scope,
                 onError = { message -> Log.d("Rive", message) }
