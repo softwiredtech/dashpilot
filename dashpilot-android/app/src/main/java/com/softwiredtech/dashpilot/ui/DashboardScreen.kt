@@ -14,7 +14,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.datamodel.CarState
 import kotlinx.coroutines.flow.Flow
 
@@ -41,7 +43,7 @@ fun DashboardScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Rotate your phone to landscape",
+                text = stringResource(R.string.dashboard_rotate_prompt),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

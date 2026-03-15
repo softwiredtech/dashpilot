@@ -25,9 +25,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.datamodel.DashboardConfig
 import com.softwiredtech.dashpilot.datamodel.DashboardType
 import com.softwiredtech.dashpilot.datamodel.availableDashboards
@@ -44,7 +46,7 @@ fun DashboardSelectionScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Select Dashboard",
+            text = stringResource(R.string.dashboard_select_title),
             color = Color.White,
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
@@ -52,7 +54,7 @@ fun DashboardSelectionScreen(
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
-            text = "Choose a dashboard to display",
+            text = stringResource(R.string.dashboard_select_subtitle),
             color = Color(0xFF888888),
             fontSize = 14.sp
         )
