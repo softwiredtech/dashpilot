@@ -43,9 +43,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.softwiredtech.dashpilot.R
 import kotlin.math.absoluteValue
 
 private data class DataSource(
@@ -82,7 +84,7 @@ fun SetupScreen(
         // Header
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "DashPilot",
+                text = stringResource(R.string.app_name),
                 color = Color.White,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
@@ -90,7 +92,7 @@ fun SetupScreen(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Select data source",
+                text = stringResource(R.string.setup_select_data_source),
                 color = Color(0xFF888888),
                 fontSize = 14.sp
             )
@@ -178,7 +180,7 @@ fun SetupScreen(
                 OutlinedTextField(
                     value = serverAddress,
                     onValueChange = { serverAddress = it },
-                    label = { Text("Server IP") },
+                    label = { Text(stringResource(R.string.connection_device_ip)) },
                     singleLine = true,
                     enabled = !isConnected,
                     shape = RoundedCornerShape(12.dp),
@@ -211,7 +213,7 @@ fun SetupScreen(
                         .height(52.dp)
                 ) {
                     Text(
-                        text = "Disconnect",
+                        text = stringResource(R.string.setup_disconnect),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -231,7 +233,7 @@ fun SetupScreen(
                         .height(52.dp)
                 ) {
                     Text(
-                        text = "Next",
+                        text = stringResource(R.string.setup_next),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -249,7 +251,7 @@ fun SetupScreen(
                         .height(52.dp)
                 ) {
                     Text(
-                        text = "Connect",
+                        text = stringResource(R.string.setup_connect),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold
                     )
