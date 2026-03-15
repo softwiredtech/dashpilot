@@ -14,12 +14,14 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import androidx.startup.AppInitializer
@@ -51,13 +53,19 @@ class MainActivity : ComponentActivity() {
 
         // Enable edge-to-edge for Compose
         enableEdgeToEdge()
-        hideSystemBars()
 
         setContent {
             DashPilotTheme {
                 val navController = rememberNavController()
                 val context = LocalContext.current
                 val dataSource by connectionVM.dataSource.collectAsState()
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val onDashboard = navBackStackEntry?.destination?.route
+                    ?.contains("DashboardRoute") == true
+
+                LaunchedEffect(onDashboard) {
+                    if (onDashboard) hideSystemBars() else showSystemBars()
+                }
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { _ ->
                     NavHost(
@@ -138,7 +146,6 @@ class MainActivity : ComponentActivity() {
                     WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
             }
         } else {
-            // fallback for pre-R devices
             @Suppress("DEPRECATION")
             window.decorView.systemUiVisibility = (
                     android.view.View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
@@ -154,11 +161,13 @@ class MainActivity : ComponentActivity() {
         window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
-    // Re-apply when focus changes
-    override fun onWindowFocusChanged(hasFocus: Boolean) {
-        super.onWindowFocusChanged(hasFocus)
-        if (hasFocus) {
-            hideSystemBars()
+    private fun showSystemBars() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            window.setDecorFitsSystemWindows(true)
+            window.insetsController?.show(WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars())
+        } else {
+            @Suppress("DEPRECATION")
+            window.decorView.systemUiVisibility = android.view.View.SYSTEM_UI_FLAG_VISIBLE
         }
     }
 }
