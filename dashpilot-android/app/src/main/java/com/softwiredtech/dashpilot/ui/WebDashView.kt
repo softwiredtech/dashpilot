@@ -15,13 +15,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
-import com.softwiredtech.dashpilot.datasource.IDataSource
+import com.softwiredtech.dashpilot.datamodel.CarState
 import com.softwiredtech.dashpilot.js.CarStateBridge
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun WebDashView(modifier: Modifier = Modifier, url: String, scope: CoroutineScope, datasource: IDataSource) {
+fun WebDashView(modifier: Modifier = Modifier, url: String, scope: CoroutineScope, carStateFlow: Flow<CarState>) {
     val carStateBridge = remember { CarStateBridge() }
     val context = LocalContext.current
     val webView = remember { WebView(context) }
@@ -60,7 +61,7 @@ fun WebDashView(modifier: Modifier = Modifier, url: String, scope: CoroutineScop
 
     LaunchedEffect(pageLoaded) {
         if (pageLoaded) {
-            datasource.incomingMessages.collect { message ->
+            carStateFlow.collect { message ->
                 carStateBridge.update(message)
                 webView.post {
                     webView.evaluateJavascript("window.onCarStateUpdate && window.onCarStateUpdate()", null)

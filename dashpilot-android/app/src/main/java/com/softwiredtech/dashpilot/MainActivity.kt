@@ -10,17 +10,20 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import androidx.startup.AppInitializer
 import app.rive.runtime.kotlin.RiveInitializer
-import com.softwiredtech.dashpilot.datamodel.DashboardType
 import com.softwiredtech.dashpilot.navigation.DashboardRoute
 import com.softwiredtech.dashpilot.navigation.DashboardSelectionRoute
 import com.softwiredtech.dashpilot.navigation.SetupRoute
@@ -28,8 +31,11 @@ import com.softwiredtech.dashpilot.ui.DashboardScreen
 import com.softwiredtech.dashpilot.ui.DashboardSelectionScreen
 import com.softwiredtech.dashpilot.ui.SetupScreen
 import com.softwiredtech.dashpilot.ui.theme.DashPilotTheme
+import com.softwiredtech.dashpilot.viewmodel.ConnectionViewModel
 
 class MainActivity : ComponentActivity() {
+
+    private val connectionVM: ConnectionViewModel by viewModels()
 
     private val bluetoothPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -50,6 +56,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             DashPilotTheme {
                 val navController = rememberNavController()
+                val context = LocalContext.current
+                val dataSource by connectionVM.dataSource.collectAsState()
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { _ ->
                     NavHost(
@@ -58,23 +66,25 @@ class MainActivity : ComponentActivity() {
                     ) {
                         composable<SetupRoute> {
                             SetupScreen(
-                                onLaunch = { serverAddress, dataSourceType ->
-                                    navController.navigate(
-                                        DashboardSelectionRoute(serverAddress, dataSourceType)
-                                    )
+                                isConnected = dataSource != null,
+                                onConnect = { serverAddress, dataSourceType ->
+                                    connectionVM.connect(context, serverAddress, dataSourceType)
+                                },
+                                onDisconnect = {
+                                    connectionVM.disconnect()
+                                },
+                                onNext = {
+                                    navController.navigate(DashboardSelectionRoute)
                                 }
                             )
                         }
-                        composable<DashboardSelectionRoute> { backStackEntry ->
-                            val route = backStackEntry.toRoute<DashboardSelectionRoute>()
+                        composable<DashboardSelectionRoute> {
                             DashboardSelectionScreen(
                                 onSelect = { dashboard ->
                                     navController.navigate(
                                         DashboardRoute(
                                             dashboardType = dashboard.type.name.lowercase(),
-                                            dashboardUrl = dashboard.url,
-                                            serverAddress = route.serverAddress,
-                                            dataSourceType = route.dataSourceType
+                                            dashboardUrl = dashboard.url
                                         )
                                     )
                                 }
@@ -82,12 +92,14 @@ class MainActivity : ComponentActivity() {
                         }
                         composable<DashboardRoute> { backStackEntry ->
                             val route = backStackEntry.toRoute<DashboardRoute>()
-                            DashboardScreen(
-                                dashboardType = route.dashboardType,
-                                dashboardUrl = route.dashboardUrl,
-                                serverAddress = route.serverAddress,
-                                dataSourceType = route.dataSourceType
-                            )
+                            val ds = dataSource
+                            if (ds != null) {
+                                DashboardScreen(
+                                    dashboardType = route.dashboardType,
+                                    dashboardUrl = route.dashboardUrl,
+                                    carStateFlow = ds.incomingMessages
+                                )
+                            }
                         }
                     }
                 }
