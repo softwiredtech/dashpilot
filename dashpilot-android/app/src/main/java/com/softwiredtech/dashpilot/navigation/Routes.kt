@@ -6,15 +6,10 @@ import kotlinx.serialization.Serializable
 object SetupRoute
 
 @Serializable
-data class DashboardSelectionRoute(
-    val serverAddress: String,
-    val dataSourceType: String
-)
+object DashboardSelectionRoute
 
 @Serializable
 data class DashboardRoute(
     val dashboardType: String,
-    val dashboardUrl: String,
-    val serverAddress: String,
-    val dataSourceType: String = "comma"
+    val dashboardUrl: String
 )

@@ -26,6 +26,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -60,7 +61,10 @@ private val dataSources = listOf(
 
 @Composable
 fun SetupScreen(
-    onLaunch: (serverAddress: String, dataSourceType: String) -> Unit
+    isConnected: Boolean,
+    onConnect: (serverAddress: String, dataSourceType: String) -> Unit,
+    onDisconnect: () -> Unit,
+    onNext: () -> Unit
 ) {
     var serverAddress by rememberSaveable { mutableStateOf("192.168.1.105") }
 
@@ -165,7 +169,7 @@ fun SetupScreen(
             }
         }
 
-        // Bottom section: server field + connect button
+        // Bottom section: server field + connect/disconnect + next
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
@@ -176,6 +180,7 @@ fun SetupScreen(
                     onValueChange = { serverAddress = it },
                     label = { Text("Server IP") },
                     singleLine = true,
+                    enabled = !isConnected,
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         unfocusedTextColor = Color.White,
@@ -184,29 +189,71 @@ fun SetupScreen(
                         focusedBorderColor = Color.White,
                         unfocusedLabelColor = Color(0xFF888888),
                         focusedLabelColor = Color.White,
-                        cursorColor = Color.White
+                        cursorColor = Color.White,
+                        disabledTextColor = Color(0xFF888888),
+                        disabledBorderColor = Color(0xFF333333),
+                        disabledLabelColor = Color(0xFF666666)
                     ),
                     modifier = Modifier.fillMaxWidth(0.7f)
                 )
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(16.dp))
             }
 
-            Button(
-                onClick = { onLaunch(serverAddress, currentSource.key) },
-                shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color.Black
-                ),
-                modifier = Modifier
-                    .fillMaxWidth(0.7f)
-                    .height(52.dp)
-            ) {
-                Text(
-                    text = "Connect",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
+            if (isConnected) {
+                OutlinedButton(
+                    onClick = { onDisconnect() },
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Color(0xFFFF5252)
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth(0.7f)
+                        .height(52.dp)
+                ) {
+                    Text(
+                        text = "Disconnect",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Button(
+                    onClick = { onNext() },
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White,
+                        contentColor = Color.Black
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth(0.7f)
+                        .height(52.dp)
+                ) {
+                    Text(
+                        text = "Next",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            } else {
+                Button(
+                    onClick = { onConnect(serverAddress, currentSource.key) },
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White,
+                        contentColor = Color.Black
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth(0.7f)
+                        .height(52.dp)
+                ) {
+                    Text(
+                        text = "Connect",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
             }
         }
     }

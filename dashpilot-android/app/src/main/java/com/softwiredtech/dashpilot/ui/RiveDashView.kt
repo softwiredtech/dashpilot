@@ -10,6 +10,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import app.rive.Result
 import app.rive.Rive
 import app.rive.RiveFile
@@ -18,16 +19,16 @@ import app.rive.ViewModelSource
 import app.rive.rememberRiveFile
 import app.rive.rememberRiveWorkerOrNull
 import app.rive.rememberViewModelInstance
-import androidx.compose.ui.platform.LocalContext
-import com.softwiredtech.dashpilot.datasource.IDataSource
+import com.softwiredtech.dashpilot.datamodel.CarState
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 
 @Composable
 fun RiveDashView(
     assetName: String,
-    dataSource: IDataSource,
+    carStateFlow: Flow<CarState>,
     scope: CoroutineScope,
     onError: ((message: String) -> Unit)
 ) {
@@ -74,7 +75,7 @@ fun RiveDashView(
 
                 LaunchedEffect(Unit) {
                     scope.launch {
-                        dataSource.incomingMessages.collect { message ->
+                        carStateFlow.collect { message ->
                             vmi.setNumber("speed", message.egoSpeed)
                             vmi.setNumber("speedLimit", message.fusedSpeedLimit)
                             vmi.setNumber("gear", message.gear)
