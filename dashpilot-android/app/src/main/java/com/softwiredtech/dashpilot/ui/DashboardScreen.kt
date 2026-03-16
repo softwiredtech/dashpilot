@@ -60,12 +60,13 @@ fun DashboardScreen(
                 carStateFlow = carStateFlow
             )
         }
-        "rive" -> {
+        "rive", "dev_rive" -> {
             RiveDashView(
-                assetName = dashboardUrl,
+                assetName = if (dashboardType == "dev_rive") "" else dashboardUrl,
                 carStateFlow = carStateFlow,
                 scope = scope,
-                onError = { message -> Log.d("Rive", message) }
+                onError = { message -> Log.d("Rive", message) },
+                fileUri = if (dashboardType == "dev_rive") dashboardUrl else null
             )
         }
     }

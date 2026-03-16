@@ -23,6 +23,7 @@ import com.softwiredtech.dashpilot.datamodel.CarState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import androidx.core.net.toUri
 
 
 @Composable
@@ -30,7 +31,8 @@ fun RiveDashView(
     assetName: String,
     carStateFlow: Flow<CarState>,
     scope: CoroutineScope,
-    onError: ((message: String) -> Unit)
+    onError: ((message: String) -> Unit),
+    fileUri: String? = null
 ) {
     Box(
         modifier = Modifier
@@ -46,15 +48,27 @@ fun RiveDashView(
         }
         val myFile: MutableState<RiveFile?> = remember { mutableStateOf(null) }
 
-        val resId = remember(assetName) {
-            context.resources.getIdentifier(assetName, "raw", context.packageName)
+        val riveSource = remember(assetName, fileUri) {
+            if (fileUri != null) {
+                try {
+                    val uri = fileUri.toUri()
+                    val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                    if (bytes != null) RiveFileSource.Bytes(bytes) else null
+                } catch (e: Exception) {
+                    null
+                }
+            } else {
+                val resId = context.resources.getIdentifier(assetName, "raw", context.packageName)
+                RiveFileSource.RawRes(resId, context.resources)
+            }
         }
-        val riveFile = rememberRiveFile(
-            RiveFileSource.RawRes.from(resId),
-            riveWorker
-        )
 
-        when (riveFile) {
+        if (riveSource == null) {
+            onError("Failed to read rive file from: $fileUri")
+            return
+        }
+
+        when (val riveFile = rememberRiveFile(riveSource, riveWorker)) {
             is Result.Loading -> {
             }
 

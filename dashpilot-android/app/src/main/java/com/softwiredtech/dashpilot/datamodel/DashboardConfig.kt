@@ -2,13 +2,13 @@ package com.softwiredtech.dashpilot.datamodel
 
 import com.softwiredtech.dashpilot.R
 
-enum class DashboardType { WEB, RIVE }
+enum class DashboardType { WEB, RIVE, DEV_RIVE }
 
 data class DashboardConfig(
     val name: String,
     val url: String,
     val type: DashboardType,
-    val screenshotRes: Int
+    val screenshotRes: Int = 0
 )
 
 val availableDashboards = listOf(
@@ -29,5 +29,10 @@ val availableDashboards = listOf(
         url = "dashboard_test",
         type = DashboardType.RIVE,
         screenshotRes = R.drawable.preview_rive
+    ),
+    DashboardConfig(
+        name = "Load Rive File",
+        url = "",
+        type = DashboardType.DEV_RIVE
     ),
 )

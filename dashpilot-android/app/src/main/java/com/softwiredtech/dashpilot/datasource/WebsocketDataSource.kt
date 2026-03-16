@@ -2,6 +2,7 @@ package com.softwiredtech.dashpilot.datasource
 
 import com.google.gson.Gson
 import com.softwiredtech.dashpilot.datamodel.CarState
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -10,23 +11,23 @@ import okhttp3.*
 import okio.ByteString
 
 class WebsocketDataSource() : IDataSource {
-    private val _incoming = MutableSharedFlow<String>()
+
+    private val _incoming = MutableSharedFlow<String>(
+        replay = 0,
+        extraBufferCapacity = 16,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
     override val incomingMessages: Flow<CarState> =
         _incoming.map { json -> gson.fromJson(json, CarState::class.java) }
     private val client = OkHttpClient()
     private var webSocket: WebSocket? = null
 
-    private val _messages = MutableSharedFlow<String>(
-        replay = 0,
-        extraBufferCapacity = 64
-    )
-    val messages: SharedFlow<String> = _messages
 
     private val gson = Gson()
 
     override fun connect(address: String) {
         val request = Request.Builder()
-            .url("ws://${address}")
+            .url("ws://${address}:8080")
             .build()
 
         webSocket = client.newWebSocket(request, listener)
@@ -46,7 +47,7 @@ class WebsocketDataSource() : IDataSource {
         }
 
         override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-            _messages.tryEmit(bytes.utf8())
+            _incoming.tryEmit(bytes.utf8())
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
