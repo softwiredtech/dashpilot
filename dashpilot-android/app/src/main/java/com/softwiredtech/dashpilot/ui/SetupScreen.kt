@@ -1,5 +1,6 @@
 package com.softwiredtech.dashpilot.ui
 
+import android.content.Context
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -44,10 +45,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.edit
 import com.softwiredtech.dashpilot.R
 import kotlin.math.absoluteValue
 
@@ -70,8 +73,9 @@ fun SetupScreen(
     onDisconnect: () -> Unit,
     onNext: () -> Unit
 ) {
-    var serverAddress by rememberSaveable { mutableStateOf("192.168.1.105") }
-
+    val context = LocalContext.current
+    val sharedPrefs = remember { context.getSharedPreferences("dash_prefs", Context.MODE_PRIVATE) }
+    var serverAddress by rememberSaveable { mutableStateOf(sharedPrefs.getString("device_ip", "192.168.1.105") ?: "192.168.1.105") }
     val pagerState = rememberPagerState(pageCount = { dataSources.size })
     val currentSource by remember { derivedStateOf { dataSources[pagerState.currentPage] } }
 
@@ -242,7 +246,10 @@ fun SetupScreen(
                 }
             } else {
                 Button(
-                    onClick = { onConnect(serverAddress, currentSource.key) },
+                    onClick = {
+                        onConnect(serverAddress, currentSource.key)
+                        sharedPrefs.edit { putString("device_ip", serverAddress) }
+                    },
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color.White,
