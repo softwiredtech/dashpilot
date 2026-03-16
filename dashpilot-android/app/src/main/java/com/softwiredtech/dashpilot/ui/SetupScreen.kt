@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Bluetooth
 import androidx.compose.material.icons.rounded.DirectionsCar
+import androidx.compose.material.icons.rounded.Lan
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -59,6 +60,7 @@ private data class DataSource(
 private val dataSources = listOf(
     DataSource("comma", "comma", Icons.Rounded.DirectionsCar),
     DataSource("ble", "BLE", Icons.Rounded.Bluetooth),
+    DataSource("websocket", "WebSocket", Icons.Rounded.Lan),
 )
 
 @Composable
@@ -176,7 +178,7 @@ fun SetupScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
         ) {
-            if (currentSource.key == "comma") {
+            if (currentSource.key in listOf("comma", "websocket")) {
                 OutlinedTextField(
                     value = serverAddress,
                     onValueChange = { serverAddress = it },

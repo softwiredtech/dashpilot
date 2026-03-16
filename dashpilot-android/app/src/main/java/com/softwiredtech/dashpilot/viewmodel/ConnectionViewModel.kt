@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.softwiredtech.dashpilot.datasource.CommaDataSource
 import com.softwiredtech.dashpilot.datasource.IDataSource
 import com.softwiredtech.dashpilot.datasource.PandaBleDataSource
+import com.softwiredtech.dashpilot.datasource.WebsocketDataSource
 import com.softwiredtech.dashpilot.jni.VehicleBridge
 import com.softwiredtech.dashpilot.vehicle.CanFrameDecoder
 import com.softwiredtech.dashpilot.vehicle.VehicleProfileLoader
@@ -32,6 +33,7 @@ class ConnectionViewModel : ViewModel() {
                 val decoder = CanFrameDecoder(bridge, profile)
                 PandaBleDataSource(context, decoder)
             }
+            "websocket" -> WebsocketDataSource()
             else -> CommaDataSource(bridge, profile)
         }
         _dataSource.value = ds
