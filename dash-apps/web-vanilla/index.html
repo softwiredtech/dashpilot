@@ -101,7 +101,7 @@
 
     #leftColumn {
       position: fixed;
-      top: 80px;
+      top: 30px;
       left: 80px;
       display: flex;
       flex-direction: column;
@@ -184,6 +184,26 @@
       font-weight: 500;
       color: #111;
     }
+
+    #warningIcons {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #seatbeltIcon {
+      width: 32px;
+      height: 32px;
+      filter: brightness(0) saturate(100%) invert(19%) sepia(97%) saturate(7482%) hue-rotate(358deg) brightness(102%) contrast(113%);
+      display: none;
+    }
+
+    #doorIcon {
+      width: 32px;
+      height: 32px;
+      filter: brightness(0) saturate(100%) invert(19%) sepia(97%) saturate(7482%) hue-rotate(358deg) brightness(102%) contrast(113%);
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -206,6 +226,11 @@
   </div>
   
   <div id="leftColumn">
+    <div id="warningIcons">
+      <img id="seatbeltIcon" src="seat-belt.png" alt="Seatbelt unbuckled" />
+      <img id="doorIcon" src="car-door.svg" alt="Door open" />
+    </div>
+
     <div id="speedRow">
       <div id="speedText">0</div>
       <div id="speedUnit">km/h</div>
@@ -225,6 +250,8 @@
     const rightBlinkerIcon = document.getElementById("rightBlinkerIcon");
     let leftHideTimeout = null;
     let rightHideTimeout = null;
+    let seatbeltInterval = null;
+    let seatbeltOn = false;
 
     function showBorder(show) {
       const wrapper = document.getElementById("borderWrapper");
@@ -357,7 +384,7 @@
 
         const remappedDeg = (angle - IN_MIN) * (OUT_MAX - OUT_MIN) / (IN_MAX - IN_MIN) + OUT_MIN;
         const remappedRad = -remappedDeg * Math.PI / 180;
-        const speedMs     = roundedSpeed / 3.6;
+        const speedMs     = speed / 3.6;
 
         world.ego_steering_angle = remappedRad;
         world.ego_speed = speedMs;
@@ -397,6 +424,27 @@
           outerBorder.style.background = "#C1E7C8";
         }
 
+        const buckle = car.buckleStatus;
+        if (buckle != null && buckle == 0) {
+          seatbeltIcon.style.display = "block";
+          if (!seatbeltInterval) {
+            seatbeltInterval = setInterval(() => {
+              seatbeltOn = !seatbeltOn;
+              seatbeltIcon.style.opacity = seatbeltOn ? "1" : "0.3";
+            }, 500);
+          }
+        } else {
+          if (seatbeltInterval) {
+            clearInterval(seatbeltInterval);
+            seatbeltInterval = null;
+          }
+          seatbeltIcon.style.display = "none";
+        }
+
+        // Door open warning
+        const door = car.anyDoorOpen;
+        doorIcon.style.display = (door != null && door > 0) ? "block" : "none";
+
         // Rotate the steering wheel
         steeringWheel.style.transform = `rotate(${angle}deg)`;
       } catch (err) {
@@ -417,6 +465,8 @@
         fusedSpeedLimit: NativeCarState.getFusedSpeedLimit(),
         stopLineDist: NativeCarState.getStopLineDist(),
         trafficLightColor: NativeCarState.getTrafficLightColor(),
+        buckleStatus: NativeCarState.getBuckleStatus(),
+        anyDoorOpen: NativeCarState.getAnyDoorOpen(),
       };
       receiveMessage(car);
     }
