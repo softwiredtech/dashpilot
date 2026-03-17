@@ -8,7 +8,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 
-  <title>PilotBoard</title>
+  <title>Dashpilot</title>
   <style>
     html, body {
       margin: 0;
@@ -367,12 +367,17 @@
           stop_signs:[],
           road_signs:[],
           pedestrians:[],
-          // TODO: Add this back once we have it in CarState
-          /*events: [
-          { event_type: "LaneDepartureWarningLeft", target_id: 0, severity: 1.0 }
-          ],*/
+          events: [],
           lane: {laneWidth:4,viewRange:50,lanePolyC0:0,lanePolyC1:0,lanePolyC2:0,lanePolyC3:0},
         };
+
+        // Lane departure warning: 1,3=left, 2,4=right, 0,5=none
+        const ldw = parseInt(car.laneDepartureWarning);
+        if (ldw === 1 || ldw === 3) {
+          world.events.push({ event_type: "LaneDepartureWarningLeft", target_id: 0, severity: 1.0 });
+        } else if (ldw === 2 || ldw === 4) {
+          world.events.push({ event_type: "LaneDepartureWarningRight", target_id: 0, severity: 1.0 });
+        }
 
         buildTrafficLightState(car, world);
         buildBlindSpotState(car, world);
@@ -384,7 +389,7 @@
 
         const remappedDeg = (angle - IN_MIN) * (OUT_MAX - OUT_MIN) / (IN_MAX - IN_MIN) + OUT_MIN;
         const remappedRad = -remappedDeg * Math.PI / 180;
-        const speedMs     = speed / 3.6;
+        const speedMs     = roundedSpeed / 3.6;
 
         world.ego_steering_angle = remappedRad;
         world.ego_speed = speedMs;
@@ -465,8 +470,9 @@
         fusedSpeedLimit: NativeCarState.getFusedSpeedLimit(),
         stopLineDist: NativeCarState.getStopLineDist(),
         trafficLightColor: NativeCarState.getTrafficLightColor(),
-        buckleStatus: NativeCarState.getBuckleStatus(),
-        anyDoorOpen: NativeCarState.getAnyDoorOpen(),
+        buckleStatus: NativeCarState.getBuckleStatus?.() ?? undefined,
+        anyDoorOpen: NativeCarState.getAnyDoorOpen?.() ?? undefined,
+        laneDepartureWarning: NativeCarState.getLaneDepartureWarning?.() ?? undefined,
       };
       receiveMessage(car);
     }
