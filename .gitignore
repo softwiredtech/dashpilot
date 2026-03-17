@@ -1,7 +1,7 @@
 __pycache__
 .DS_Store
 venv
-dash-apps/web/assets
-dash-apps/web/*.wasm
-dash-apps/web/*.d.ts
-dash-apps/web/car-visualization.js
+dash-apps/web-vanilla/assets
+dash-apps/web-vanilla/*.wasm
+dash-apps/web-vanilla/*.d.ts
+dash-apps/web-vanilla/car-visualization.js
