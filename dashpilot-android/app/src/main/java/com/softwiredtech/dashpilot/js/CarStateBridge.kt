@@ -16,6 +16,8 @@ class CarStateBridge {
     @Volatile private var fusedSpeedLimit: Float = 0f
     @Volatile private var stopLineDist: Float = 0f
     @Volatile private var trafficLightColor: Float = 0f
+    @Volatile private var buckleStatus: Float = 0f
+    @Volatile private var anyDoorOpen: Float = 0f
 
     fun update(state: CarState) {
         egoSteeringAngle = state.egoSteeringAngle
@@ -29,6 +31,8 @@ class CarStateBridge {
         fusedSpeedLimit = state.fusedSpeedLimit
         stopLineDist = state.stopLineDist
         trafficLightColor = state.trafficLightColor
+        buckleStatus = state.buckleStatus
+        anyDoorOpen = state.anyDoorOpen
     }
 
     @JavascriptInterface fun getEgoSteeringAngle(): Float = egoSteeringAngle
@@ -42,4 +46,6 @@ class CarStateBridge {
     @JavascriptInterface fun getFusedSpeedLimit(): Float = fusedSpeedLimit
     @JavascriptInterface fun getStopLineDist(): Float = stopLineDist
     @JavascriptInterface fun getTrafficLightColor(): Float = trafficLightColor
+    @JavascriptInterface fun getBuckleStatus(): Float = buckleStatus
+    @JavascriptInterface fun getAnyDoorOpen(): Float = anyDoorOpen
 }
