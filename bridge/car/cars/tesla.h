@@ -16,5 +16,9 @@ public:
         cs.stopLineDist = cp.get("DAS_road", "DAS_stopLineDist");
         cs.leftBlinker = cp.get("UI_warning", "leftBlinkerBlinking");
         cs.rightBlinker = cp.get("UI_warning", "rightBlinkerBlinking");
+        cs.laneDepartureWarning = cp.get("DAS_status", "DAS_laneDepartureWarning");
+        cs.sideCollisionWarning = cp.get("DAS_status", "DAS_sideCollisionWarning");
+        cs.anyDoorOpen = cp.get("UI_warning", "anyDoorOpen");
+        cs.sideCollisionWarning = cp.get("UI_warning", "buckleStatus");
     }
 };

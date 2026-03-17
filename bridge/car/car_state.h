@@ -14,8 +14,12 @@ struct CarState {
     double fusedSpeedLimit = 0;
     double stopLineDist = 0;
     double trafficLightColor = 0;
+    double laneDepartureWarning = 0;
+    double sideCollisionWarning = 0;
+    double anyDoorOpen = 0;
+    double buckleStatus = 0;
 
-    static constexpr size_t FIELD_COUNT = 11;
+    static constexpr size_t FIELD_COUNT = 15;
 
     void toArray(double* out) const {
         out[0] = egoSteeringAngle;
@@ -29,5 +33,9 @@ struct CarState {
         out[8] = fusedSpeedLimit;
         out[9] = stopLineDist;
         out[10] = trafficLightColor;
+        out[11] = laneDepartureWarning;
+        out[12] = sideCollisionWarning;
+        out[13] = anyDoorOpen;
+        out[14] = buckleStatus;
     }
 };
