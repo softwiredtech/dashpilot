@@ -260,9 +260,9 @@
     const TL_COLOR_MAP = { 1: "Red", 2: "Green", 3: "Yellow" };
     const TL_FIXED_DY = -3.0;
 
-    function buildTrafficLightState(world) {
-        const dist = world.stopLineDist;
-        const colorName = TL_COLOR_MAP[world.trafficLightColor];
+    function buildTrafficLightState(car, world) {
+        const dist = car.stopLineDist;
+        const colorName = TL_COLOR_MAP[car.trafficLightColor];
 
         if (colorName && dist != null && dist > 0) {
           world.traffic_lights = [{
@@ -288,10 +288,10 @@
     const BS_LEFT_ID = 9990;
     const BS_RIGHT_ID = 9991;
 
-    function buildBlindSpotState(world) {
+    function buildBlindSpotState(car, world) {
       const objects = (world.objects || []).filter(o => o.id !== BS_LEFT_ID && o.id !== BS_RIGHT_ID);
 
-      if (world.leftBlindSpot > 0) {
+      if (car.leftBlindSpot > 0) {
         objects.push({
           id: BS_LEFT_ID,
           Dx: BS_DX,
@@ -302,7 +302,7 @@
         });
       }
 
-      if (world.rightBlindSpot > 0) {
+      if (car.rightBlindSpot > 0) {
         objects.push({
           id: BS_RIGHT_ID,
           Dx: BS_DX,
@@ -334,23 +334,21 @@
           rightBlinker: car.rightBlinker,
           gear: car.gear,
           adas_on: car.adasOn,
-          leftBlindSpot: car.leftBlindSpot,
-          rightBlindSpot: car.rightBlindSpot,
-          fusedSpeedLimit: car.fusedSpeedLimit,
-          stopLineDist: car.stopLineDist,
-          trafficLightColor: car.trafficLightColor,
           objects: [],
           traffic_lights:[],
           speed_limits:[],
           stop_signs:[],
           road_signs:[],
           pedestrians:[],
-          events:[],
+          // TODO: Add this back once we have it in CarState
+          /*events: [
+          { event_type: "LaneDepartureWarningLeft", target_id: 0, severity: 1.0 }
+          ],*/
           lane: {laneWidth:4,viewRange:50,lanePolyC0:0,lanePolyC1:0,lanePolyC2:0,lanePolyC3:0},
         };
 
-        buildTrafficLightState(world);
-        buildBlindSpotState(world);
+        buildTrafficLightState(car, world);
+        buildBlindSpotState(car, world);
 
         const IN_MIN = -360;
         const IN_MAX =  360;
