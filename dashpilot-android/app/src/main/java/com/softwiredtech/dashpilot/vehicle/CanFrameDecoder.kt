@@ -35,7 +35,11 @@ class CanFrameDecoder(
                 rightBlindSpot = values[7].toFloat(),
                 fusedSpeedLimit = values[8].toFloat(),
                 stopLineDist = values[9].toFloat(),
-                trafficLightColor = values[10].toFloat()
+                trafficLightColor = values[10].toFloat(),
+                laneDepartureWarning = values[11].toFloat(),
+                sideCollisionWarning = values[12].toFloat(),
+                anyDoorOpen = values[13].toFloat(),
+                buckleStatus = values[14].toFloat()
             )
         }
     }
