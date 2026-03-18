@@ -39,7 +39,8 @@ class CanFrameDecoder(
                 laneDepartureWarning = values[11].toFloat(),
                 sideCollisionWarning = values[12].toFloat(),
                 anyDoorOpen = values[13].toFloat(),
-                buckleStatus = values[14].toFloat()
+                buckleStatus = values[14].toFloat(),
+                accSetSpeed = values[15].toFloat()
             )
         }
     }
