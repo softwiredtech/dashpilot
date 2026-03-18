@@ -19,6 +19,6 @@ public:
         cs.laneDepartureWarning = cp.get("DAS_status", "DAS_laneDepartureWarning");
         cs.sideCollisionWarning = cp.get("DAS_status", "DAS_sideCollisionWarning");
         cs.anyDoorOpen = cp.get("UI_warning", "anyDoorOpen");
-        cs.sideCollisionWarning = cp.get("UI_warning", "buckleStatus");
+        cs.buckleStatus = cp.get("UI_warning", "buckleStatus");
     }
 };
