@@ -8,7 +8,7 @@ public:
         cs.egoSteeringAngle = cp.get("SCCM_steeringAngleSensor", "SCCM_steeringAngle");
         cs.gear = cp.get("DI_systemStatus", "DI_gear");
         cs.egoSpeed = cp.get("DI_speed", "DI_uiSpeed");
-        cs.adasOn = cp.get("DAS_control", "DAS_accState") > 0 ? 1.0 : 0.0;
+        cs.adasOn = cp.get("DI_state", "DI_cruiseState") == 2.0 ? 1.0 : 0.0;
         cs.leftBlindSpot = cp.get("DAS_status", "DAS_blindSpotRearLeft");
         cs.rightBlindSpot = cp.get("DAS_status", "DAS_blindSpotRearRight");
         cs.fusedSpeedLimit = cp.get("DAS_status", "DAS_fusedSpeedLimit");
