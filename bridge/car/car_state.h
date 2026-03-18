@@ -18,8 +18,9 @@ struct CarState {
     double sideCollisionWarning = 0;
     double anyDoorOpen = 0;
     double buckleStatus = 0;
+    double accSetSpeed = 0;
 
-    static constexpr size_t FIELD_COUNT = 15;
+    static constexpr size_t FIELD_COUNT = 16;
 
     void toArray(double* out) const {
         out[0] = egoSteeringAngle;
@@ -37,5 +38,6 @@ struct CarState {
         out[12] = sideCollisionWarning;
         out[13] = anyDoorOpen;
         out[14] = buckleStatus;
+        out[15] = accSetSpeed;
     }
 };

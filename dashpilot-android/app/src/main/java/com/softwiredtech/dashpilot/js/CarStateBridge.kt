@@ -19,6 +19,7 @@ class CarStateBridge {
     @Volatile private var buckleStatus: Float = 0f
     @Volatile private var anyDoorOpen: Float = 0f
     @Volatile private var laneDepartureWarning: Float = 0f
+    @Volatile private var accSetSpeed: Float = 0f
 
     fun update(state: CarState) {
         egoSteeringAngle = state.egoSteeringAngle
@@ -35,6 +36,7 @@ class CarStateBridge {
         buckleStatus = state.buckleStatus
         anyDoorOpen = state.anyDoorOpen
         laneDepartureWarning = state.laneDepartureWarning
+        accSetSpeed = state.accSetSpeed
     }
 
     @JavascriptInterface fun getEgoSteeringAngle(): Float = egoSteeringAngle
@@ -51,4 +53,5 @@ class CarStateBridge {
     @JavascriptInterface fun getBuckleStatus(): Float = buckleStatus
     @JavascriptInterface fun getAnyDoorOpen(): Float = anyDoorOpen
     @JavascriptInterface fun getLaneDepartureWarning(): Float = laneDepartureWarning
+    @JavascriptInterface fun getAccSetSpeed(): Float = accSetSpeed
 }

@@ -20,5 +20,6 @@ public:
         cs.sideCollisionWarning = cp.get("DAS_status", "DAS_sideCollisionWarning");
         cs.anyDoorOpen = cp.get("UI_warning", "anyDoorOpen");
         cs.buckleStatus = cp.get("UI_warning", "buckleStatus");
+        cs.accSetSpeed = cp.get("DI_state", "DI_digitalSpeed");
     }
 };

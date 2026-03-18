@@ -15,9 +15,10 @@ data class CarState(
     val laneDepartureWarning: Float = 0f,
     val sideCollisionWarning: Float = 0f,
     val anyDoorOpen: Float = 0f,
-    val buckleStatus: Float = 0f
+    val buckleStatus: Float = 0f,
+    val accSetSpeed: Float = 0f
 ) {
     companion object {
-        const val FIELD_COUNT = 15
+        const val FIELD_COUNT = 16
     }
 }

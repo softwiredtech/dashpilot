@@ -54,10 +54,33 @@
       display: block !important;
     }
 
-    #speedLimitSign {
+    #speedSignRow {
       position: fixed;
       top: 50px;
       right: 40px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      z-index: 2000;
+    }
+
+    #accSetSpeed {
+      font-family: "Inter", sans-serif;
+      font-size: 36px;
+      font-weight: 400;
+      color: #d3d3d3;
+      user-select: none;
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    #accMax {
+      font-size: 14px;
+      color: inherit;
+    }
+
+    #speedLimitSign {
       width: 80px;
       height: 80px;
       border: 8px solid red;
@@ -72,7 +95,6 @@
       font-weight: 600;
       user-select: none;
       box-sizing: border-box;
-      z-index: 2000;
     }
 
     #leftBlindSpot {
@@ -216,8 +238,14 @@
   <div id="leftBlindSpot"></div>
   <div id="rightBlindSpot"></div>
   
-  <div id="speedLimitSign">
-    <span id="speedLimitText">50</span>
+  <div id="speedSignRow">
+    <span id="accSetSpeed">
+      <span id="accValue"></span>
+      <span id="accMax"></span>
+    </span>
+    <div id="speedLimitSign">
+      <span id="speedLimitText">50</span>
+    </div>
   </div>
   
   <div id="blinkerRow">
@@ -411,6 +439,18 @@
           speedLimitText.textContent = speedLimit;
         }
 
+        const accSet = parseInt(car.accSetSpeed);
+
+        if (accSet > 0) {
+          accValue.textContent = accSet;
+          accMax.textContent = "max";
+        } else {
+          accValue.textContent = "";
+          accMax.textContent = "";
+        }
+
+        accSetSpeed.style.color = car.adasOn ? "#5cbd68" : "#d3d3d3";
+
         leftHideTimeout = applyBlindSpotListener(
           car.leftBlindSpot,
           leftHideTimeout,
@@ -473,6 +513,7 @@
         buckleStatus: NativeCarState.getBuckleStatus?.() ?? undefined,
         anyDoorOpen: NativeCarState.getAnyDoorOpen?.() ?? undefined,
         laneDepartureWarning: NativeCarState.getLaneDepartureWarning?.() ?? undefined,
+        accSetSpeed: NativeCarState.getAccSetSpeed?.() ?? undefined,
       };
       receiveMessage(car);
     }
