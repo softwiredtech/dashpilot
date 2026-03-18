@@ -244,7 +244,16 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStartReceiveLoop(
     auto sub = reinterpret_cast<SubSocket*>(subPtr);
     receiveLoopRunning = true;
 
-    long prev = 0.0;
+    // Drain stale messages that accumulated in ZMQ buffer
+    int drained = 0;
+    while (true) {
+        Message *msg = sub->receive(true);
+        if (!msg) break;
+        delete msg;
+        drained++;
+    }
+    LOGD("Drained %d stale messages from ZMQ buffer", drained);
+
     while (receiveLoopRunning) {
         Message *msg = sub->receive(true);
         if (msg) {
