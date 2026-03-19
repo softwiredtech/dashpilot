@@ -15,14 +15,12 @@ class CommaDataSource(
     private val profile: VehicleProfile
 ) : IDataSource {
     private val _incoming = MutableSharedFlow<CarState>(
-        replay = 0,
-        extraBufferCapacity = 16,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
+        replay = 1
     )
 
     @OptIn(FlowPreview::class)
     // Change sample ms to throttle up or down the flow. It's set for 20 FPS for now.
-    override val incomingMessages: Flow<CarState> = _incoming.sample(50)
+    override val incomingMessages: Flow<CarState> = _incoming
 
     private val ctx = bridge.nativeCreateContext()
     private val decoderHandle = bridge.nativeCreateVehicleDecoder(

@@ -37,6 +37,7 @@ public:
         for (size_t i = 0; i < dbcContents.size(); i++) {
             parsers_.addBus(busIndices[i], dbcContents[i]);
         }
+        parsers_.buildCache();
 
         mapper_ = createMapper(vehicleType);
         if (!mapper_) {
@@ -109,8 +110,7 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeCreateSubSocket(
             addressStr,
             false,
             true,
-            0
-    );
+            0);
 
     return reinterpret_cast<jlong>(sub);
 }
@@ -244,15 +244,7 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStartReceiveLoop(
     auto sub = reinterpret_cast<SubSocket*>(subPtr);
     receiveLoopRunning = true;
 
-    // Drain stale messages that accumulated in ZMQ buffer
-    int drained = 0;
-    while (true) {
-        Message *msg = sub->receive(true);
-        if (!msg) break;
-        delete msg;
-        drained++;
-    }
-    LOGD("Drained %d stale messages from ZMQ buffer", drained);
+    sub->setTimeout(0);
 
     while (receiveLoopRunning) {
         Message *msg = sub->receive(true);
@@ -267,13 +259,9 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStartReceiveLoop(
                 auto canList = event.getCan();
 
                 for (const auto &c : canList) {
-                    auto src = c.getSrc();
-                    auto addr = c.getAddress();
-                    auto dat = c.getDat();
-
-                    decoder->updateFrame(src, addr,
-                                        reinterpret_cast<const uint8_t*>(dat.begin()),
-                                        dat.size());
+                    decoder->updateFrame(c.getSrc(), c.getAddress(),
+                                         reinterpret_cast<const uint8_t*>(c.getDat().begin()),
+                                         c.getDat().size());
                 }
 
                 double output[CarState::FIELD_COUNT];
@@ -282,7 +270,6 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStartReceiveLoop(
                 env->SetDoubleArrayRegion(g_buffer, 0, CarState::FIELD_COUNT, output);
                 env->CallVoidMethod(g_callback, g_onCanDataMethod, g_buffer);
             }
-            delete msg;
         } else {
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
