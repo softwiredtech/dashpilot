@@ -408,10 +408,23 @@
 
         // Serialize for ADAS viz
         world.lane = { laneWidth:4,viewRange:50,lanePolyC0:0,lanePolyC1:0,lanePolyC2:0,lanePolyC3:0 }
-        window._setWorldModel?.(world);
 
+        // Show gears
         const gearMap = { 1: "P", 2: "R", 3: "N", 4: "D" };
         gearText.textContent = gearMap[gear] || "-";
+
+        if (gearMap[gear] == "D") {
+          world.camera_view = { view: "back", zoom: 0.8 };
+        } else if (gearMap[gear] == "P") {
+          world.camera_view = { view: "left_side", zoom: 0.8 };
+        } else if (gearMap[gear] == "R") {
+          world.camera_view = { view: "top", zoom: 0.8 };
+        } else {
+          world.camera_view = { view: "back", zoom: 0.8 };
+        }
+
+        window._setWorldModel?.(world);
+
 
         showBlinker(leftBlinker,  leftBlinkerIcon);
         showBlinker(rightBlinker, rightBlinkerIcon);
