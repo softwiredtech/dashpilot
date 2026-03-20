@@ -1,6 +1,7 @@
 package com.softwiredtech.dashpilot.datamodel
 
 import com.softwiredtech.dashpilot.R
+import com.softwiredtech.dashpilot.ui.LOCAL_ASSET_BASE_URL
 
 enum class DashboardType { WEB, RIVE, DEV_RIVE }
 
@@ -20,7 +21,7 @@ val availableDashboards = listOf(
     ),
     DashboardConfig(
         name = "Vanilla Dashboard",
-        url = "https://dashpilot-vanilla.web.app",
+        url = "${LOCAL_ASSET_BASE_URL}web-vanilla/index.html",
         type = DashboardType.WEB,
         screenshotRes = R.drawable.preview_vanilla
     ),
