@@ -270,6 +270,7 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStartReceiveLoop(
                 env->SetDoubleArrayRegion(g_buffer, 0, CarState::FIELD_COUNT, output);
                 env->CallVoidMethod(g_callback, g_onCanDataMethod, g_buffer);
             }
+            delete msg;
         } else {
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
