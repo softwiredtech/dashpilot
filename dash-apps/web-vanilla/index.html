@@ -276,10 +276,6 @@
   <script>
     const leftBlinkerIcon = document.getElementById("leftBlinkerIcon");
     const rightBlinkerIcon = document.getElementById("rightBlinkerIcon");
-    let leftHideTimeout = null;
-    let rightHideTimeout = null;
-    let seatbeltInterval = null;
-    let seatbeltOn = false;
 
     function showBorder(show) {
       const wrapper = document.getElementById("borderWrapper");
@@ -296,20 +292,8 @@
         }
     }
 
-    function applyBlindSpotListener(blindSpotState, hideTimeout, blindSpotView) {
-      if (blindSpotState > 0) {
-        if (hideTimeout) {
-          clearTimeout(hideTimeout);
-          hideTimeout = null;
-        }
-        blindSpotView.style.display = "block";
-      } else if (!hideTimeout) {
-        hideTimeout = setTimeout(() => {
-          blindSpotView.style.display = "none";
-          hideTimeout = null;
-        }, 1000);
-      }
-      return hideTimeout;
+    function applyBlindSpotBorderEffect(blindSpotState, blindSpotView) {
+      blindSpotView.style.display = blindSpotState > 0 ? "block" : "none";
     }
 
     const TL_COLOR_MAP = { 1: "Red", 2: "Green", 3: "Yellow" };
@@ -424,10 +408,23 @@
 
         // Serialize for ADAS viz
         world.lane = { laneWidth:4,viewRange:50,lanePolyC0:0,lanePolyC1:0,lanePolyC2:0,lanePolyC3:0 }
-        window._setWorldModel?.(world);
 
+        // Show gears
         const gearMap = { 1: "P", 2: "R", 3: "N", 4: "D" };
         gearText.textContent = gearMap[gear] || "-";
+
+        if (gearMap[gear] == "D") {
+          world.camera_view = { view: "back", zoom: 0.8 };
+        } else if (gearMap[gear] == "P") {
+          world.camera_view = { view: "left_side", zoom: 0.8 };
+        } else if (gearMap[gear] == "R") {
+          world.camera_view = { view: "top", zoom: 0.8 };
+        } else {
+          world.camera_view = { view: "back", zoom: 0.8 };
+        }
+
+        window._setWorldModel?.(world);
+
 
         showBlinker(leftBlinker,  leftBlinkerIcon);
         showBlinker(rightBlinker, rightBlinkerIcon);
@@ -451,17 +448,8 @@
 
         accSetSpeed.style.color = car.adasOn ? "#5cbd68" : "#d3d3d3";
 
-        leftHideTimeout = applyBlindSpotListener(
-          car.leftBlindSpot,
-          leftHideTimeout,
-          leftBlindSpot
-        );
-
-        rightHideTimeout = applyBlindSpotListener(
-          car.rightBlindSpot,
-          rightHideTimeout,
-          rightBlindSpot
-        );
+        applyBlindSpotBorderEffect(car.leftBlindSpot, leftBlindSpot);
+        applyBlindSpotBorderEffect(car.rightBlindSpot, rightBlindSpot);
 
         if (car.adasOn) {
           outerBorder.style.background = "#5cbd68";
@@ -470,21 +458,7 @@
         }
 
         const buckle = car.buckleStatus;
-        if (buckle != null && buckle == 0) {
-          seatbeltIcon.style.display = "block";
-          if (!seatbeltInterval) {
-            seatbeltInterval = setInterval(() => {
-              seatbeltOn = !seatbeltOn;
-              seatbeltIcon.style.opacity = seatbeltOn ? "1" : "0.3";
-            }, 500);
-          }
-        } else {
-          if (seatbeltInterval) {
-            clearInterval(seatbeltInterval);
-            seatbeltInterval = null;
-          }
-          seatbeltIcon.style.display = "none";
-        }
+        seatbeltIcon.style.display = (buckle != null && buckle == 0) ? "block" : "none";
 
         // Door open warning
         const door = car.anyDoorOpen;
