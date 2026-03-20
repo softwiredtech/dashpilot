@@ -19,7 +19,7 @@ class CommaDataSource(
     )
 
     @OptIn(FlowPreview::class)
-    // Change sample ms to throttle up or down the flow. It's set for 20 FPS for now.
+    // Change sample ms to throttle up or down the flow.
     override val incomingMessages: Flow<CarState> = _incoming.sample(16)
 
     private val ctx = bridge.nativeCreateContext()
