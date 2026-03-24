@@ -1,14 +1,17 @@
 package com.softwiredtech.dashpilot.ui
 
 import android.content.Context
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,55 +19,60 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Bluetooth
 import androidx.compose.material.icons.rounded.DirectionsCar
 import androidx.compose.material.icons.rounded.Lan
+import androidx.compose.material.icons.rounded.PhoneAndroid
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.edit
+import com.softwiredtech.dashpilot.BuildConfig
 import com.softwiredtech.dashpilot.R
-import kotlin.math.absoluteValue
 
 private data class DataSource(
     val key: String,
     val label: String,
-    val icon: ImageVector,
+    val icon: ImageVector?,
 )
 
-private val dataSources = listOf(
-    DataSource("comma", "comma", Icons.Rounded.DirectionsCar),
-    DataSource("ble", "BLE", Icons.Rounded.Bluetooth),
-    DataSource("websocket", "WebSocket", Icons.Rounded.Lan),
-)
+private val dataSources = buildList {
+    add(DataSource("comma", "comma", null))
+    if (BuildConfig.DEBUG) {
+        add(DataSource("ble", "BLE", Icons.Rounded.Bluetooth))
+        add(DataSource("websocket", "WebSocket", Icons.Rounded.Lan))
+    }
+}
 
 @Composable
 fun SetupScreen(
@@ -76,8 +84,8 @@ fun SetupScreen(
     val context = LocalContext.current
     val sharedPrefs = remember { context.getSharedPreferences("dash_prefs", Context.MODE_PRIVATE) }
     var serverAddress by rememberSaveable { mutableStateOf(sharedPrefs.getString("device_ip", "192.168.1.105") ?: "192.168.1.105") }
-    val pagerState = rememberPagerState(pageCount = { dataSources.size })
-    val currentSource by remember { derivedStateOf { dataSources[pagerState.currentPage] } }
+    var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
+    val currentSource = dataSources[selectedIndex]
 
     Column(
         modifier = Modifier
@@ -87,7 +95,6 @@ fun SetupScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        // Header
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = stringResource(R.string.app_name),
@@ -104,108 +111,41 @@ fun SetupScreen(
             )
         }
 
-        // Data source pager
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.fillMaxWidth()
-            ) { page ->
-                val source = dataSources[page]
-                val pageOffset = ((pagerState.currentPage - page) +
-                        pagerState.currentPageOffsetFraction).absoluteValue
+        ConnectionVisualization(
+            currentSource = currentSource,
+            selectedIndex = selectedIndex,
+            onSourceSelected = { selectedIndex = it }
+        )
 
-                val scale by animateFloatAsState(
-                    targetValue = 1f - (pageOffset * 0.15f).coerceIn(0f, 0.15f),
-                    animationSpec = tween(150),
-                    label = "scale"
-                )
-
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(160.dp)
-                            .scale(scale)
-                            .clip(CircleShape)
-                            .background(Color(0xFF1A1A1A)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = source.icon,
-                            contentDescription = source.label,
-                            tint = Color.White,
-                            modifier = Modifier.size(64.dp)
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Source label
-            Text(
-                text = currentSource.label,
-                color = Color.White,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Medium
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Page indicators
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                dataSources.forEachIndexed { index, _ ->
-                    val isSelected = pagerState.currentPage == index
-                    val dotColor by animateColorAsState(
-                        targetValue = if (isSelected) Color.White else Color(0xFF444444),
-                        animationSpec = tween(200),
-                        label = "dotColor"
-                    )
-                    Box(
-                        modifier = Modifier
-                            .padding(horizontal = 4.dp)
-                            .size(if (isSelected) 8.dp else 6.dp)
-                            .clip(CircleShape)
-                            .background(dotColor)
-                    )
-                }
-            }
-        }
-
-        // Bottom section: server field + connect/disconnect + next
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
         ) {
-            if (currentSource.key in listOf("comma", "websocket")) {
-                OutlinedTextField(
-                    value = serverAddress,
-                    onValueChange = { serverAddress = it },
-                    label = { Text(stringResource(R.string.connection_device_ip)) },
-                    singleLine = true,
-                    enabled = !isConnected,
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedTextColor = Color.White,
-                        focusedTextColor = Color.White,
-                        unfocusedBorderColor = Color(0xFF333333),
-                        focusedBorderColor = Color.White,
-                        unfocusedLabelColor = Color(0xFF888888),
-                        focusedLabelColor = Color.White,
-                        cursorColor = Color.White,
-                        disabledTextColor = Color(0xFF888888),
-                        disabledBorderColor = Color(0xFF333333),
-                        disabledLabelColor = Color(0xFF666666)
-                    ),
-                    modifier = Modifier.fillMaxWidth(0.7f)
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-            }
+            val showIpField = currentSource.key in listOf("comma", "websocket")
+            OutlinedTextField(
+                value = serverAddress,
+                onValueChange = { serverAddress = it },
+                label = { Text(stringResource(R.string.connection_device_ip)) },
+                singleLine = true,
+                enabled = showIpField && !isConnected,
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedTextColor = Color.White,
+                    focusedTextColor = Color.White,
+                    unfocusedBorderColor = Color(0xFF333333),
+                    focusedBorderColor = Color.White,
+                    unfocusedLabelColor = Color(0xFF888888),
+                    focusedLabelColor = Color.White,
+                    cursorColor = Color.White,
+                    disabledTextColor = Color(0xFF888888),
+                    disabledBorderColor = Color(0xFF333333),
+                    disabledLabelColor = Color(0xFF666666)
+                ),
+                modifier = Modifier
+                    .fillMaxWidth(0.7f)
+                    .alpha(if (showIpField) 1f else 0f)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
 
             if (isConnected) {
                 OutlinedButton(
@@ -267,5 +207,142 @@ fun SetupScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun ConnectionVisualization(
+    currentSource: DataSource,
+    selectedIndex: Int,
+    onSourceSelected: (Int) -> Unit
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "dashFlow")
+    val phase by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 20f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "dashPhase"
+    )
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier
+                .size(80.dp)
+                .clip(CircleShape)
+                .background(Color(0xFF1A1A1A)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.DirectionsCar,
+                contentDescription = "Vehicle",
+                tint = Color.White,
+                modifier = Modifier.size(36.dp)
+            )
+        }
+
+        AnimatedDashedLine(phase = phase)
+
+        if (BuildConfig.DEBUG && dataSources.size > 1) {
+            var expanded by remember { mutableStateOf(false) }
+            Box {
+                OutlinedButton(
+                    onClick = { expanded = true },
+                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Color.White
+                    )
+                ) {
+                    DataSourceIcon(currentSource, size = 18, tint = Color.White)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(text = currentSource.label)
+                }
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    dataSources.forEachIndexed { index, source ->
+                        DropdownMenuItem(
+                            text = { Text(source.label) },
+                            leadingIcon = { DataSourceIcon(source, size = 18, tint = Color.Black) },
+                            onClick = {
+                                onSourceSelected(index)
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
+        } else {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFF1A1A1A)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    DataSourceIcon(currentSource, size = 24, tint = Color.White)
+                }
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = currentSource.label,
+                    color = Color(0xFF888888),
+                    fontSize = 12.sp
+                )
+            }
+        }
+
+        AnimatedDashedLine(phase = phase)
+
+        Box(
+            modifier = Modifier
+                .size(80.dp)
+                .clip(CircleShape)
+                .background(Color(0xFF1A1A1A)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.PhoneAndroid,
+                contentDescription = "Phone",
+                tint = Color.White,
+                modifier = Modifier.size(36.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun DataSourceIcon(source: DataSource, size: Int, tint: Color = Color.Unspecified) {
+    Icon(
+        imageVector = source.icon ?: ImageVector.vectorResource(R.drawable.ic_comma),
+        contentDescription = source.label,
+        tint = tint,
+        modifier = Modifier.size(size.dp)
+    )
+}
+
+@Composable
+private fun AnimatedDashedLine(phase: Float) {
+    Canvas(
+        modifier = Modifier
+            .width(4.dp)
+            .height(64.dp)
+            .padding(vertical = 4.dp)
+    ) {
+        drawLine(
+            color = Color(0xFF555555),
+            start = Offset(size.width / 2, 0f),
+            end = Offset(size.width / 2, size.height),
+            strokeWidth = 3f,
+            pathEffect = PathEffect.dashPathEffect(
+                intervals = floatArrayOf(10f, 10f),
+                phase = -phase
+            )
+        )
     }
 }
