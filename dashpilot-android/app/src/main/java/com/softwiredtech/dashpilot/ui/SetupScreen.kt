@@ -151,15 +151,56 @@ fun SetupScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            val isConnecting = connectionStatus is ConnectionStatus.Connecting
-
             when (connectionStatus) {
-                is ConnectionStatus.Disconnected, is ConnectionStatus.Connecting -> {
+                is ConnectionStatus.Disconnected -> {
                     Button(
                         onClick = {
                             onConnect(serverAddress, currentSource.key)
                             sharedPrefs.edit { putString("device_ip", serverAddress) }
                         },
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White,
+                            contentColor = Color.Black
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth(0.7f)
+                            .height(52.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.setup_connect),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
+                is ConnectionStatus.Connecting, is ConnectionStatus.Connected -> {
+                    val isConnecting = connectionStatus is ConnectionStatus.Connecting
+
+                    OutlinedButton(
+                        onClick = { onDisconnect() },
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = Color(0xFFFF5252)
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth(0.7f)
+                            .height(52.dp)
+                    ) {
+                        Text(
+                            text = stringResource(
+                                if (isConnecting) R.string.setup_cancel
+                                else R.string.setup_disconnect
+                            ),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Button(
+                        onClick = { onNext() },
                         enabled = !isConnecting,
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
@@ -175,46 +216,8 @@ fun SetupScreen(
                         Text(
                             text = stringResource(
                                 if (isConnecting) R.string.setup_connecting
-                                else R.string.setup_connect
+                                else R.string.setup_next
                             ),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
-                }
-                is ConnectionStatus.Connected -> {
-                    OutlinedButton(
-                        onClick = { onDisconnect() },
-                        shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = Color(0xFFFF5252)
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth(0.7f)
-                            .height(52.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.setup_disconnect),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Button(
-                        onClick = { onNext() },
-                        shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.White,
-                            contentColor = Color.Black
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth(0.7f)
-                            .height(52.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.setup_next),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold
                         )
