@@ -3,6 +3,7 @@
     <string name="connection_device_ip">Device IP</string>
     <string name="setup_select_data_source">Select data source</string>
     <string name="setup_connect">Connect</string>
+    <string name="setup_connecting">Connecting…</string>
     <string name="setup_disconnect">Disconnect</string>
     <string name="setup_next">Next</string>
     <string name="dashboard_select_title">Select Dashboard</string>

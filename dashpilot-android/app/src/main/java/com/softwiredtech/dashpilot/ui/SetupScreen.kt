@@ -9,6 +9,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -59,6 +60,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.edit
 import com.softwiredtech.dashpilot.BuildConfig
 import com.softwiredtech.dashpilot.R
+import com.softwiredtech.dashpilot.datasource.ConnectionStatus
+import com.softwiredtech.dashpilot.ui.theme.AccentColor
 
 private data class DataSource(
     val key: String,
@@ -76,7 +79,7 @@ private val dataSources = buildList {
 
 @Composable
 fun SetupScreen(
-    isConnected: Boolean,
+    connectionStatus: ConnectionStatus,
     onConnect: (serverAddress: String, dataSourceType: String) -> Unit,
     onDisconnect: () -> Unit,
     onNext: () -> Unit
@@ -112,6 +115,7 @@ fun SetupScreen(
         }
 
         ConnectionVisualization(
+            connectionStatus = connectionStatus,
             currentSource = currentSource,
             selectedIndex = selectedIndex,
             onSourceSelected = { selectedIndex = it }
@@ -127,7 +131,7 @@ fun SetupScreen(
                 onValueChange = { serverAddress = it },
                 label = { Text(stringResource(R.string.connection_device_ip)) },
                 singleLine = true,
-                enabled = showIpField && !isConnected,
+                enabled = showIpField && connectionStatus is ConnectionStatus.Disconnected,
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedTextColor = Color.White,
@@ -147,63 +151,74 @@ fun SetupScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (isConnected) {
-                OutlinedButton(
-                    onClick = { onDisconnect() },
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color(0xFFFF5252)
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth(0.7f)
-                        .height(52.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.setup_disconnect),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
+            val isConnecting = connectionStatus is ConnectionStatus.Connecting
 
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Button(
-                    onClick = { onNext() },
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White,
-                        contentColor = Color.Black
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth(0.7f)
-                        .height(52.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.setup_next),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
+            when (connectionStatus) {
+                is ConnectionStatus.Disconnected, is ConnectionStatus.Connecting -> {
+                    Button(
+                        onClick = {
+                            onConnect(serverAddress, currentSource.key)
+                            sharedPrefs.edit { putString("device_ip", serverAddress) }
+                        },
+                        enabled = !isConnecting,
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White,
+                            contentColor = Color.Black,
+                            disabledContainerColor = Color(0xFF555555),
+                            disabledContentColor = Color(0xFFAAAAAA)
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth(0.7f)
+                            .height(52.dp)
+                    ) {
+                        Text(
+                            text = stringResource(
+                                if (isConnecting) R.string.setup_connecting
+                                else R.string.setup_connect
+                            ),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
                 }
-            } else {
-                Button(
-                    onClick = {
-                        onConnect(serverAddress, currentSource.key)
-                        sharedPrefs.edit { putString("device_ip", serverAddress) }
-                    },
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White,
-                        contentColor = Color.Black
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth(0.7f)
-                        .height(52.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.setup_connect),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
+                is ConnectionStatus.Connected -> {
+                    OutlinedButton(
+                        onClick = { onDisconnect() },
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = Color(0xFFFF5252)
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth(0.7f)
+                            .height(52.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.setup_disconnect),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Button(
+                        onClick = { onNext() },
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White,
+                            contentColor = Color.Black
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth(0.7f)
+                            .height(52.dp)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.setup_next),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
                 }
             }
         }
@@ -212,10 +227,15 @@ fun SetupScreen(
 
 @Composable
 private fun ConnectionVisualization(
+    connectionStatus: ConnectionStatus,
     currentSource: DataSource,
     selectedIndex: Int,
     onSourceSelected: (Int) -> Unit
 ) {
+    val isConnected = connectionStatus is ConnectionStatus.Connected
+    val showDashLine = connectionStatus !is ConnectionStatus.Disconnected
+    val dashLineColor = if (isConnected) AccentColor else Color(0xFF555555)
+
     val infiniteTransition = rememberInfiniteTransition(label = "dashFlow")
     val phase by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -227,12 +247,19 @@ private fun ConnectionVisualization(
         label = "dashPhase"
     )
 
+    val circleBorderModifier = if (isConnected) {
+        Modifier.border(2.dp, AccentColor, CircleShape)
+    } else {
+        Modifier
+    }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
             modifier = Modifier
                 .size(80.dp)
+                .then(circleBorderModifier)
                 .clip(CircleShape)
                 .background(Color(0xFF1A1A1A)),
             contentAlignment = Alignment.Center
@@ -245,7 +272,7 @@ private fun ConnectionVisualization(
             )
         }
 
-        AnimatedDashedLine(phase = phase)
+        AnimatedDashedLine(phase = phase, visible = showDashLine, color = dashLineColor)
 
         if (BuildConfig.DEBUG && dataSources.size > 1) {
             var expanded by remember { mutableStateOf(false) }
@@ -297,11 +324,12 @@ private fun ConnectionVisualization(
             }
         }
 
-        AnimatedDashedLine(phase = phase)
+        AnimatedDashedLine(phase = phase, visible = showDashLine, color = dashLineColor)
 
         Box(
             modifier = Modifier
                 .size(80.dp)
+                .then(circleBorderModifier)
                 .clip(CircleShape)
                 .background(Color(0xFF1A1A1A)),
             contentAlignment = Alignment.Center
@@ -327,15 +355,16 @@ private fun DataSourceIcon(source: DataSource, size: Int, tint: Color = Color.Un
 }
 
 @Composable
-private fun AnimatedDashedLine(phase: Float) {
+private fun AnimatedDashedLine(phase: Float, visible: Boolean, color: Color) {
     Canvas(
         modifier = Modifier
             .width(4.dp)
             .height(64.dp)
             .padding(vertical = 4.dp)
+            .alpha(if (visible) 1f else 0f)
     ) {
         drawLine(
-            color = Color(0xFF555555),
+            color = color,
             start = Offset(size.width / 2, 0f),
             end = Offset(size.width / 2, size.height),
             strokeWidth = 3f,
