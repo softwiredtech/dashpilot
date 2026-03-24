@@ -108,7 +108,7 @@ fun SetupScreen(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = stringResource(R.string.setup_select_data_source),
+                text = if (BuildConfig.DEBUG) stringResource(R.string.setup_select_data_source) else stringResource(R.string.setup_connect_your_comma_device),
                 color = Color(0xFF888888),
                 fontSize = 14.sp
             )
