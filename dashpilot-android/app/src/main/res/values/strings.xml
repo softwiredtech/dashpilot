@@ -5,6 +5,7 @@
     <string name="setup_connect_your_comma_device">Connect to your comma device</string>
     <string name="setup_connect">Connect</string>
     <string name="setup_connecting">Connecting…</string>
+    <string name="setup_cancel">Cancel</string>
     <string name="setup_disconnect">Disconnect</string>
     <string name="setup_next">Next</string>
     <string name="dashboard_select_title">Select Dashboard</string>
