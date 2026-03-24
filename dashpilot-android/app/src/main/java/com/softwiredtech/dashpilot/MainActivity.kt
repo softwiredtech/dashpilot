@@ -32,6 +32,7 @@ import com.softwiredtech.dashpilot.navigation.SetupRoute
 import com.softwiredtech.dashpilot.ui.DashboardScreen
 import com.softwiredtech.dashpilot.ui.DashboardSelectionScreen
 import com.softwiredtech.dashpilot.ui.SetupScreen
+import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.ui.theme.DashPilotTheme
 import com.softwiredtech.dashpilot.viewmodel.ConnectionViewModel
 
@@ -59,6 +60,7 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val context = LocalContext.current
                 val dataSource by connectionVM.dataSource.collectAsState()
+                val connectionStatus by connectionVM.connectionStatus.collectAsState()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val onDashboard = navBackStackEntry?.destination?.route
                     ?.contains("DashboardRoute") == true
@@ -74,7 +76,7 @@ class MainActivity : ComponentActivity() {
                     ) {
                         composable<SetupRoute> {
                             SetupScreen(
-                                isConnected = dataSource != null,
+                                connectionStatus = connectionStatus,
                                 onConnect = { serverAddress, dataSourceType ->
                                     connectionVM.connect(context, serverAddress, dataSourceType)
                                 },
