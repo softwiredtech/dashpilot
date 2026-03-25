@@ -236,8 +236,9 @@ private fun ConnectionVisualization(
     onSourceSelected: (Int) -> Unit
 ) {
     val isConnected = connectionStatus is ConnectionStatus.Connected
-    val showDashLine = connectionStatus !is ConnectionStatus.Disconnected
+    val isDisconnected = connectionStatus is ConnectionStatus.Disconnected
     val dashLineColor = if (isConnected) AccentColor else Color(0xFF555555)
+    val animating = !isDisconnected
 
     val infiniteTransition = rememberInfiniteTransition(label = "dashFlow")
     val phase by infiniteTransition.animateFloat(
@@ -275,7 +276,7 @@ private fun ConnectionVisualization(
             )
         }
 
-        AnimatedDashedLine(phase = phase, visible = showDashLine, color = dashLineColor)
+        AnimatedDashedLine(phase = phase, animating = animating, color = dashLineColor)
 
         if (BuildConfig.DEBUG && dataSources.size > 1) {
             var expanded by remember { mutableStateOf(false) }
@@ -327,7 +328,7 @@ private fun ConnectionVisualization(
             }
         }
 
-        AnimatedDashedLine(phase = phase, visible = showDashLine, color = dashLineColor)
+        AnimatedDashedLine(phase = phase, animating = animating, color = dashLineColor)
 
         Box(
             modifier = Modifier
@@ -358,13 +359,12 @@ private fun DataSourceIcon(source: DataSource, size: Int, tint: Color = Color.Un
 }
 
 @Composable
-private fun AnimatedDashedLine(phase: Float, visible: Boolean, color: Color) {
+private fun AnimatedDashedLine(phase: Float, animating: Boolean, color: Color) {
     Canvas(
         modifier = Modifier
             .width(4.dp)
             .height(64.dp)
             .padding(vertical = 4.dp)
-            .alpha(if (visible) 1f else 0f)
     ) {
         drawLine(
             color = color,
@@ -373,7 +373,7 @@ private fun AnimatedDashedLine(phase: Float, visible: Boolean, color: Color) {
             strokeWidth = 3f,
             pathEffect = PathEffect.dashPathEffect(
                 intervals = floatArrayOf(10f, 10f),
-                phase = -phase
+                phase = if (animating) -phase else 0f
             )
         )
     }
