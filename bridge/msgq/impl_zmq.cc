@@ -9,13 +9,6 @@
 
 #include "msgq/impl_zmq.h"
 
-#ifdef __ANDROID__
-#include <android/log.h>
-#define ZMQ_LOGE(...) __android_log_print(ANDROID_LOG_ERROR, "ZMQSubSocket", __VA_ARGS__)
-#else
-#define ZMQ_LOGE(...) fprintf(stderr, __VA_ARGS__)
-#endif
-
 static size_t fnv1a_hash(const std::string &str) {
     const size_t fnv_prime = 0x100000001b3;
     size_t hash_value = 0xcbf29ce484222325;
@@ -69,7 +62,6 @@ ZMQMessage::~ZMQMessage() {
 int ZMQSubSocket::connect(Context *context, std::string endpoint, std::string address, bool conflate, bool check_endpoint, size_t segment_size){
   sock = zmq_socket(context->getRawContext(), ZMQ_SUB);
   if (sock == NULL){
-    ZMQ_LOGE("connect: zmq_socket failed, errno=%d (%s)", errno, strerror(errno));
     return -1;
   }
 
@@ -91,50 +83,22 @@ int ZMQSubSocket::connect(Context *context, std::string endpoint, std::string ad
     full_endpoint += endpoint;
   }
 
-  int rc = zmq_connect(sock, full_endpoint.c_str());
-  if (rc == 0) {
-    ZMQ_LOGE("connect: connected to %s (endpoint='%s', address='%s', port=%d)",
-             full_endpoint.c_str(), endpoint.c_str(), address.c_str(),
-             check_endpoint ? get_port(endpoint) : -1);
-  } else {
-    ZMQ_LOGE("connect: zmq_connect failed for %s, errno=%d (%s)",
-             full_endpoint.c_str(), errno, strerror(errno));
-  }
-  return rc;
+  return zmq_connect(sock, full_endpoint.c_str());
 }
 
 
 Message * ZMQSubSocket::receive(bool non_blocking){
-  static int recv_call_count = 0;
-  static int recv_fail_count = 0;
-
   zmq_msg_t msg;
-  int init_rc = zmq_msg_init(&msg);
-  assert(init_rc == 0);
-  (void)init_rc;
+  assert(zmq_msg_init(&msg) == 0);
 
   int flags = non_blocking ? ZMQ_DONTWAIT : 0;
   int rc = zmq_msg_recv(&msg, sock, flags);
   Message *r = NULL;
 
-  recv_call_count++;
-
   if (rc >= 0){
     // Make a copy to ensure the data is aligned
     r = new ZMQMessage;
     r->init((char*)zmq_msg_data(&msg), zmq_msg_size(&msg));
-    if (recv_call_count <= 3) {
-      ZMQ_LOGE("receive: got msg #%d, size=%d", recv_call_count, rc);
-    }
-    recv_fail_count = 0;
-  } else {
-    recv_fail_count++;
-    int err = zmq_errno();
-    // Log first few failures, then every 500th
-    if (recv_fail_count <= 3 || recv_fail_count % 500 == 0) {
-      ZMQ_LOGE("receive: fail #%d, zmq_errno=%d (%s), sock=%p, endpoint=%s",
-               recv_fail_count, err, zmq_strerror(err), sock, full_endpoint.c_str());
-    }
   }
 
   zmq_msg_close(&msg);

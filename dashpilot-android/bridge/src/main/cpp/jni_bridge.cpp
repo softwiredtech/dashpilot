@@ -241,33 +241,14 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStartReceiveLoop(
     jclass callbackClass = env->GetObjectClass(callback);
     g_onCanDataMethod = env->GetMethodID(callbackClass, "onCanData", "([D)V");
 
-    if (g_onCanDataMethod == nullptr) {
-        __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "FATAL: GetMethodID failed for onCanData([D)V — ProGuard likely stripped or renamed it");
-        env->ExceptionClear();
-        env->DeleteGlobalRef(g_callback);
-        env->DeleteGlobalRef(g_buffer);
-        g_callback = nullptr;
-        g_buffer = nullptr;
-        return;
-    }
-
     auto sub = reinterpret_cast<SubSocket*>(subPtr);
     receiveLoopRunning = true;
 
-    __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "receiveLoop started, decoder=%p sub=%p", decoder, sub);
-
-    int msgCount = 0;
-    int canEventCount = 0;
-    int nonCanEventCount = 0;
-    int nullMsgCount = 0;
+    sub->setTimeout(0);
 
     while (receiveLoopRunning) {
         Message *msg = sub->receive(true);
         if (msg) {
-            msgCount++;
-            if (msgCount <= 5 || msgCount % 100 == 0) {
-                __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "msg #%d received, size=%zu", msgCount, msg->getSize());
-            }
 
             kj::ArrayPtr<capnp::word> canArray = kj::ArrayPtr<capnp::word>(
                 (capnp::word*)msg->getData(), msg->getSize() / sizeof(capnp::word));
@@ -275,7 +256,6 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStartReceiveLoop(
             auto event = reader.getRoot<cereal::Event>();
 
             if (event.which() == cereal::Event::Which::CAN) {
-                canEventCount++;
                 auto canList = event.getCan();
 
                 for (const auto &c : canList) {
@@ -289,33 +269,12 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStartReceiveLoop(
 
                 env->SetDoubleArrayRegion(g_buffer, 0, CarState::FIELD_COUNT, output);
                 env->CallVoidMethod(g_callback, g_onCanDataMethod, g_buffer);
-
-                if (env->ExceptionCheck()) {
-                    __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "JNI exception after CallVoidMethod onCanData");
-                    env->ExceptionDescribe();
-                    env->ExceptionClear();
-                }
-
-                if (canEventCount <= 3) {
-                    __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "onCanData callback fired #%d", canEventCount);
-                }
-            } else {
-                nonCanEventCount++;
-                if (nonCanEventCount <= 5) {
-                    __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "non-CAN event, type=%d", (int)event.which());
-                }
             }
             delete msg;
         } else {
-            nullMsgCount++;
-            if (nullMsgCount <= 3 || nullMsgCount % 200 == 0) {
-                __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "no msg (null), count=%d", nullMsgCount);
-            }
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }
     }
-
-    __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "receiveLoop stopped: msgs=%d can=%d nonCan=%d nulls=%d", msgCount, canEventCount, nonCanEventCount, nullMsgCount);
 }
 
 }
