@@ -244,12 +244,9 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStartReceiveLoop(
     auto sub = reinterpret_cast<SubSocket*>(subPtr);
     receiveLoopRunning = true;
 
-    sub->setTimeout(0);
-
     while (receiveLoopRunning) {
         Message *msg = sub->receive(true);
         if (msg) {
-
             kj::ArrayPtr<capnp::word> canArray = kj::ArrayPtr<capnp::word>(
                 (capnp::word*)msg->getData(), msg->getSize() / sizeof(capnp::word));
             capnp::FlatArrayMessageReader reader(canArray);

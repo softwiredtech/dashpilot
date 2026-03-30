@@ -28,23 +28,21 @@ class ConnectionViewModel : ViewModel() {
     fun connect(context: Context, serverAddress: String, dataSourceType: String) {
         if (_connectionStatus.value != ConnectionStatus.Disconnected) return
 
-        val vehicleName = "tesla" // TODO: make configurable via UI
-        val profile = VehicleProfileLoader.loadProfile(context, vehicleName)
-        val bridge = VehicleBridge()
-        val ds = when (dataSourceType) {
-            "ble" -> {
-                val decoder = CanFrameDecoder(bridge, profile)
-                PandaBleDataSource(context, decoder)
-            }
-            "websocket" -> WebsocketDataSource()
-            else -> CommaDataSource(bridge, profile)
-        }
-        _dataSource.value = ds
         _connectionStatus.value = ConnectionStatus.Connecting
         viewModelScope.launch(Dispatchers.IO) {
-            ds.connect(serverAddress)
-        }
-        viewModelScope.launch {
+            val vehicleName = "tesla" // TODO: make configurable via UI
+            val profile = VehicleProfileLoader.loadProfile(context, vehicleName)
+            val bridge = VehicleBridge()
+            val ds = when (dataSourceType) {
+                "ble" -> {
+                    val decoder = CanFrameDecoder(bridge, profile)
+                    PandaBleDataSource(context, decoder)
+                }
+                "websocket" -> WebsocketDataSource()
+                else -> CommaDataSource(bridge, profile)
+            }
+            _dataSource.value = ds
+            launch(Dispatchers.IO) { ds.connect(serverAddress) }
             ds.incomingMessages.first()
             _connectionStatus.value = ConnectionStatus.Connected
         }
