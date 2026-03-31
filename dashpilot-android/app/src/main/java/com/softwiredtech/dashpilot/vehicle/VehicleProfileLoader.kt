@@ -5,9 +5,9 @@ import kotlinx.serialization.json.Json
 
 object VehicleProfileLoader {
 
-    fun loadProfile(context: Context, vehicleName: String): VehicleProfile {
+    fun loadProfile(context: Context, vehicleName: String, configFile: String = "config_comma_normal.json"): VehicleProfile {
         val basePath = "vehicles/$vehicleName"
-        val jsonContent = context.assets.open("$basePath/vehicle.json")
+        val jsonContent = context.assets.open("$basePath/$configFile")
             .bufferedReader().use { it.readText() }
 
         val config = Json.decodeFromString<VehicleProfileConfig>(jsonContent)
