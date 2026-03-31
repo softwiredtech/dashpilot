@@ -27,8 +27,10 @@ import androidx.compose.material.icons.rounded.Bluetooth
 import androidx.compose.material.icons.rounded.DirectionsCar
 import androidx.compose.material.icons.rounded.Lan
 import androidx.compose.material.icons.rounded.PhoneAndroid
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -82,7 +84,8 @@ fun SetupScreen(
     connectionStatus: ConnectionStatus,
     onConnect: (serverAddress: String, dataSourceType: String) -> Unit,
     onDisconnect: () -> Unit,
-    onNext: () -> Unit
+    onNext: () -> Unit,
+    onSettingsClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val sharedPrefs = remember { context.getSharedPreferences("dash_prefs", Context.MODE_PRIVATE) }
@@ -90,10 +93,14 @@ fun SetupScreen(
     var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
     val currentSource = dataSources[selectedIndex]
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFF0D0D0D))
+    ) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
             .padding(horizontal = 32.dp, vertical = 48.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween
@@ -224,6 +231,21 @@ fun SetupScreen(
                     }
                 }
             }
+        }
+    }
+
+        IconButton(
+            onClick = onSettingsClick,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(start = 12.dp, top = 40.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.Settings,
+                contentDescription = "Settings",
+                tint = Color(0xFF888888),
+                modifier = Modifier.size(24.dp)
+            )
         }
     }
 }
