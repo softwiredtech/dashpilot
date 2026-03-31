@@ -19,6 +19,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -28,9 +30,11 @@ import androidx.startup.AppInitializer
 import app.rive.runtime.kotlin.RiveInitializer
 import com.softwiredtech.dashpilot.navigation.DashboardRoute
 import com.softwiredtech.dashpilot.navigation.DashboardSelectionRoute
+import com.softwiredtech.dashpilot.navigation.SettingsRoute
 import com.softwiredtech.dashpilot.navigation.SetupRoute
 import com.softwiredtech.dashpilot.ui.DashboardScreen
 import com.softwiredtech.dashpilot.ui.DashboardSelectionScreen
+import com.softwiredtech.dashpilot.ui.SettingsScreen
 import com.softwiredtech.dashpilot.ui.SetupScreen
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.ui.theme.DashPilotTheme
@@ -72,7 +76,11 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { _ ->
                     NavHost(
                         navController = navController,
-                        startDestination = SetupRoute
+                        startDestination = SetupRoute,
+                        enterTransition = { EnterTransition.None },
+                        exitTransition = { ExitTransition.None },
+                        popEnterTransition = { EnterTransition.None },
+                        popExitTransition = { ExitTransition.None }
                     ) {
                         composable<SetupRoute> {
                             SetupScreen(
@@ -85,8 +93,14 @@ class MainActivity : ComponentActivity() {
                                 },
                                 onNext = {
                                     navController.navigate(DashboardSelectionRoute)
+                                },
+                                onSettingsClick = {
+                                    navController.navigate(SettingsRoute)
                                 }
                             )
+                        }
+                        composable<SettingsRoute> {
+                            SettingsScreen(onBack = { navController.popBackStack() })
                         }
                         composable<DashboardSelectionRoute> {
                             DashboardSelectionScreen(

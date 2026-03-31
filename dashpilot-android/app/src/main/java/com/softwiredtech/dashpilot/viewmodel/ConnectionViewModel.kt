@@ -31,7 +31,10 @@ class ConnectionViewModel : ViewModel() {
         _connectionStatus.value = ConnectionStatus.Connecting
         viewModelScope.launch(Dispatchers.IO) {
             val vehicleName = "tesla" // TODO: make configurable via UI
-            val profile = VehicleProfileLoader.loadProfile(context, vehicleName)
+            val extraBus = context.getSharedPreferences("dash_prefs", Context.MODE_PRIVATE)
+                .getBoolean("extra_vehicle_bus", false)
+            val configFile = if (extraBus) "config_comma_extra_bus.json" else "config_comma_normal.json"
+            val profile = VehicleProfileLoader.loadProfile(context, vehicleName, configFile)
             val bridge = VehicleBridge()
             val ds = when (dataSourceType) {
                 "ble" -> {
