@@ -230,6 +230,18 @@
       filter: brightness(0) saturate(100%) invert(19%) sepia(97%) saturate(7482%) hue-rotate(358deg) brightness(102%) contrast(113%);
       display: none;
     }
+
+    #odometer {
+      position: fixed;
+      bottom: 30px;
+      left: 80px;
+      font-family: "Inter", sans-serif;
+      font-size: 16px;
+      font-weight: 400;
+      color: #777;
+      z-index: 2000;
+      user-select: none;
+    }
   </style>
 </head>
 <body>
@@ -274,6 +286,8 @@
       <img id="steeringWheel" src="steering-wheel.svg" />
     </div>
     </div>
+
+    <div id="odometer"></div>
     </div>
   </div>
 
@@ -468,6 +482,12 @@
         const door = car.anyDoorOpen;
         doorIcon.style.display = (door != null && door > 0) ? "block" : "none";
 
+        // Odometer
+        const odo = car.odometer;
+        if (odo != null && odo > 0) {
+          document.getElementById("odometer").textContent = Math.round(odo).toLocaleString() + " km";
+        }
+
         // Rotate the steering wheel
         steeringWheel.style.transform = `rotate(${angle}deg)`;
       } catch (err) {
@@ -492,6 +512,7 @@
         anyDoorOpen: NativeCarState.getAnyDoorOpen?.() ?? undefined,
         laneDepartureWarning: NativeCarState.getLaneDepartureWarning?.() ?? undefined,
         accSetSpeed: NativeCarState.getAccSetSpeed?.() ?? undefined,
+        odometer: NativeCarState.getOdometer?.() ?? undefined,
       };
       receiveMessage(car);
     }

@@ -22,7 +22,8 @@
 #include <chrono>
 
 static std::unique_ptr<CarStateMapper> createMapper(const std::string& vehicleType) {
-    if (vehicleType == "tesla") return std::make_unique<TeslaCarState>();
+    if (vehicleType == "tesla_party") return std::make_unique<TeslaCommaPartyMapper>();
+    if (vehicleType == "tesla_extra") return std::make_unique<TeslaCommaExtraMapper>();
     // Add new vehicles here:
     // if (vehicleType == "honda") return std::make_unique<HondaCarState>();
     return nullptr;
@@ -30,9 +31,9 @@ static std::unique_ptr<CarStateMapper> createMapper(const std::string& vehicleTy
 
 class VehicleDecoder {
 public:
-    VehicleDecoder(const std::vector<std::string>& dbcContents,
-                   const std::vector<int>& busIndices,
-                   const std::string& vehicleType) {
+    VehicleDecoder(const std::vector<std::string> &dbcContents,
+                   const std::vector<int> &busIndices,
+                   const std::string &vehicleType) {
 
         for (size_t i = 0; i < dbcContents.size(); i++) {
             parsers_.addBus(busIndices[i], dbcContents[i]);
@@ -45,9 +46,16 @@ public:
         }
     }
 
+    long long storeAccum = 0;
+    long long mapAccum = 0;
+    int frameCount = 0;
+
     // Feed a CAN frame, update internal state
-    void updateFrame(int bus, uint32_t address, const uint8_t* data, size_t len) {
+    void updateFrame(int bus, uint32_t address, const uint8_t *data, size_t len) {
         parsers_.updateFrame(bus, address, data, len);
+    }
+
+    void updateMapper() {
         if (mapper_) {
             mapper_->update(parsers_, state_);
         }
@@ -244,9 +252,14 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStartReceiveLoop(
     auto sub = reinterpret_cast<SubSocket*>(subPtr);
     receiveLoopRunning = true;
 
+    long long msgTimeAccum = 0;
+    int msgCount = 0;
+
     while (receiveLoopRunning) {
         Message *msg = sub->receive(true);
         if (msg) {
+            auto t0 = std::chrono::high_resolution_clock::now();
+
             kj::ArrayPtr<capnp::word> canArray = kj::ArrayPtr<capnp::word>(
                 (capnp::word*)msg->getData(), msg->getSize() / sizeof(capnp::word));
             capnp::FlatArrayMessageReader reader(canArray);
@@ -261,13 +274,22 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStartReceiveLoop(
                                          c.getDat().size());
                 }
 
+                decoder->updateMapper();
                 double output[CarState::FIELD_COUNT];
                 decoder->state().toArray(output);
-
                 env->SetDoubleArrayRegion(g_buffer, 0, CarState::FIELD_COUNT, output);
                 env->CallVoidMethod(g_callback, g_onCanDataMethod, g_buffer);
             }
             delete msg;
+
+            auto t1 = std::chrono::high_resolution_clock::now();
+            msgTimeAccum += std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
+            msgCount++;
+            if (msgCount >= 100) {
+                LOGD("receiveLoop avg: %.3f ms/msg (over %d msgs)", msgTimeAccum / 1000.0 / msgCount, msgCount);
+                msgTimeAccum = 0;
+                msgCount = 0;
+            }
         } else {
             std::this_thread::sleep_for(std::chrono::milliseconds(50));
         }

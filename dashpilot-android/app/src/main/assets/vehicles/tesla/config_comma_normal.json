@@ -1,6 +1,6 @@
 {
   "name": "Tesla Model 3",
-  "type": "tesla",
+  "type": "tesla_party",
   "buses": [
     { "index": 2, "dbc": "bus_2_tesla_party.dbc" }
   ]

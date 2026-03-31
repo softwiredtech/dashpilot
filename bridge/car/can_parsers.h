@@ -35,7 +35,7 @@ public:
     }
 
     void updateFrame(int bus, uint32_t address, const uint8_t* data, size_t len) {
-        uint64_t key = frameKey(bus & 3, address);
+        uint64_t key = frameKey(bus, address);
         auto& stored = latestFrames_[key];
         stored.resize(len);
         std::memcpy(stored.data(), data, len);
