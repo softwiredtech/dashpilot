@@ -5,6 +5,7 @@ import android.os.BatteryManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.softwiredtech.dashpilot.datamodel.DashState
+import com.softwiredtech.dashpilot.datamodel.DisplaySettings
 import com.softwiredtech.dashpilot.datasource.CommaDataSource
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.IDataSource
@@ -28,6 +29,8 @@ class ConnectionViewModel : ViewModel() {
 
     private val _connectionStatus = MutableStateFlow<ConnectionStatus>(ConnectionStatus.Disconnected)
     val connectionStatus = _connectionStatus.asStateFlow()
+
+    private val _displaySettings = MutableStateFlow(DisplaySettings())
 
     private val _dashState = MutableStateFlow<Flow<DashState>?>(null)
     val dashState = _dashState.asStateFlow()
@@ -62,12 +65,23 @@ class ConnectionViewModel : ViewModel() {
             }
             _dataSource.value = ds
 
-            // Emits everytime any of the flows emits, combining the emission from one with the latest value from the other one.
-            val combined = ds.incomingMessages.combine(phoneBatteryFlow(context)) { carState, battery ->
+            val prefs = context.getSharedPreferences("dash_prefs", Context.MODE_PRIVATE)
+            _displaySettings.value = DisplaySettings(
+                showPhoneBattery = prefs.getBoolean("show_phone_battery", true),
+                showCarBattery = prefs.getBoolean("show_car_battery", true),
+                showOdometer = prefs.getBoolean("show_odometer", true)
+            )
+
+            val combined = combine(
+                ds.incomingMessages,
+                phoneBatteryFlow(context),
+                _displaySettings
+            ) { carState, battery, settings ->
                 DashState(
                     carState = carState,
                     phoneBattery = battery,
-                    currentTime = System.currentTimeMillis()
+                    currentTime = System.currentTimeMillis(),
+                    displaySettings = settings
                 )
             }
             _dashState.value = combined
@@ -76,6 +90,10 @@ class ConnectionViewModel : ViewModel() {
             ds.incomingMessages.first()
             _connectionStatus.value = ConnectionStatus.Connected
         }
+    }
+
+    fun updateDisplaySettings(settings: DisplaySettings) {
+        _displaySettings.value = settings
     }
 
     fun disconnect() {

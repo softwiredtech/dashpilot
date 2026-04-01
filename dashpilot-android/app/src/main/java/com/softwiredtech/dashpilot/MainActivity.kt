@@ -99,7 +99,10 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable<SettingsRoute> {
-                            SettingsScreen(onBack = { navController.popBackStack() })
+                            SettingsScreen(
+                                onBack = { navController.popBackStack() },
+                                onDisplaySettingsChanged = { connectionVM.updateDisplaySettings(it) }
+                            )
                         }
                         composable<DashboardSelectionRoute> {
                             DashboardSelectionScreen(

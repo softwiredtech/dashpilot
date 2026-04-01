@@ -397,10 +397,10 @@
       </div>
       <span class="battery-percent" id="phoneBatteryPercent"></span>
     </div>
-    <div class="status-separator"></div>
+    <div class="status-separator" id="statusSeparator"></div>
     <div class="battery-group" id="carBatteryGroup" style="display: none;">
-      <span class="battery-label">Car</span>
-      <div class="battery-shell">
+      <span class="battery-label" id="carBatteryLabel">Car</span>
+      <div class="battery-shell" id="carBatteryShell">
         <div class="battery-fill" id="carBatteryFill"></div>
       </div>
       <span class="battery-percent" id="carBatteryPercent"></span>
@@ -632,43 +632,57 @@
         doorIcon.style.display = (door != null && door > 0) ? "block" : "none";
 
         // Phone battery
-        const phoneBat = car.phoneBattery;
-        if (phoneBat != null && phoneBat >= 0) {
-          document.getElementById("phoneBatteryFill").style.width = phoneBat + "%";
-          document.getElementById("phoneBatteryPercent").textContent = phoneBat + "%";
-          if (phoneBat <= 20) {
-            document.getElementById("phoneBatteryFill").style.background = "#ff4444";
-          } else {
-            document.getElementById("phoneBatteryFill").style.background = "#4a90d9";
+        const phoneBatGroup = document.getElementById("phoneBatteryGroup");
+        if (car.showPhoneBattery) {
+          const phoneBat = car.phoneBattery;
+          if (phoneBat != null && phoneBat >= 0) {
+            phoneBatGroup.style.display = "flex";
+            document.getElementById("phoneBatteryFill").style.width = phoneBat + "%";
+            document.getElementById("phoneBatteryPercent").textContent = phoneBat + "%";
+            if (phoneBat <= 20) {
+              document.getElementById("phoneBatteryFill").style.background = "#ff4444";
+            } else {
+              document.getElementById("phoneBatteryFill").style.background = "#4a90d9";
+            }
           }
+        } else {
+          phoneBatGroup.style.display = "none";
         }
+
+        // Show separator only when both phone and car groups are visible
+        document.getElementById("statusSeparator").style.display =
+          (car.showPhoneBattery && car.showCarBattery) ? "block" : "none";
 
         // Battery SOC + temperature widget
-        const fullPack = car.fullPackEnergy;
-        const remaining = car.nominalEnergyRemaining;
-        const buffer = car.energyBuffer;
-        const tMin = car.packTMin;
-        const tMax = car.packTMax;
-        const hasBattery = fullPack > 0 && remaining > 0 && (fullPack - buffer) > 0;
-        const hasTemp = tMin != null && tMax != null && (tMin > 0 || tMax > 0);
+        if (car.showCarBattery) {
+          const fullPack = car.fullPackEnergy;
+          const remaining = car.nominalEnergyRemaining;
+          const buffer = car.energyBuffer;
+          const tMin = car.packTMin;
+          const tMax = car.packTMax;
+          const hasBattery = fullPack > 0 && remaining > 0 && (fullPack - buffer) > 0;
+          const hasTemp = tMin != null && tMax != null && (tMin > 0 || tMax > 0);
 
-        if (hasBattery || hasTemp) {
-          document.getElementById("carBatteryGroup").style.display = "flex";
-        }
-        if (hasBattery) {
-          const soc = Math.round(((remaining - buffer) / (fullPack - buffer)) * 100);
-          const clampedSoc = Math.max(0, Math.min(100, soc));
-          document.getElementById("carBatteryFill").style.width = clampedSoc + "%";
-          document.getElementById("carBatteryPercent").textContent = soc + "%";
-          if (clampedSoc <= 20) {
-            document.getElementById("carBatteryFill").style.background = "#ff4444";
-          } else {
-            document.getElementById("carBatteryFill").style.background = "#5cbd68";
+          if (hasBattery || hasTemp) {
+            document.getElementById("carBatteryGroup").style.display = "flex";
           }
-        }
-        if (hasTemp) {
-          const avgTemp = (tMin + tMax) / 2;
-          document.getElementById("batteryTempText").textContent = avgTemp.toFixed(0) + "°C";
+          if (hasBattery) {
+            const soc = Math.round(((remaining - buffer) / (fullPack - buffer)) * 100);
+            const clampedSoc = Math.max(0, Math.min(100, soc));
+            document.getElementById("carBatteryFill").style.width = clampedSoc + "%";
+            document.getElementById("carBatteryPercent").textContent = soc + "%";
+            if (clampedSoc <= 20) {
+              document.getElementById("carBatteryFill").style.background = "#ff4444";
+            } else {
+              document.getElementById("carBatteryFill").style.background = "#5cbd68";
+            }
+          }
+          if (hasTemp) {
+            const avgTemp = (tMin + tMax) / 2;
+            document.getElementById("batteryTempText").textContent = avgTemp.toFixed(0) + "°C";
+          }
+        } else {
+          document.getElementById("carBatteryGroup").style.display = "none";
         }
 
         // Power bar
@@ -696,9 +710,14 @@
         }
 
         // Odometer
-        const odo = car.odometer;
-        if (odo != null && odo > 0) {
-          document.getElementById("odometer").textContent = Math.round(odo).toLocaleString() + " km";
+        if (car.showOdometer) {
+          const odo = car.odometer;
+          if (odo != null && odo > 0) {
+            document.getElementById("odometer").textContent = Math.round(odo).toLocaleString() + " km";
+            document.getElementById("bottomLeft").style.display = "flex";
+          }
+        } else {
+          document.getElementById("bottomLeft").style.display = "none";
         }
 
         // Rotate the steering wheel
@@ -736,6 +755,9 @@
         maxDischargePower: NativeCarState.getMaxDischargePower?.() ?? undefined,
         packVoltage: NativeCarState.getPackVoltage?.() ?? undefined,
         packCurrent: NativeCarState.getPackCurrent?.() ?? undefined,
+        showPhoneBattery: NativeCarState.getShowPhoneBattery?.() ?? true,
+        showCarBattery: NativeCarState.getShowCarBattery?.() ?? true,
+        showOdometer: NativeCarState.getShowOdometer?.() ?? true,
       };
       receiveMessage(car);
     }

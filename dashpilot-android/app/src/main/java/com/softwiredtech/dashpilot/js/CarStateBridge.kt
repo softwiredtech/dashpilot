@@ -2,6 +2,7 @@ package com.softwiredtech.dashpilot.js
 
 import android.webkit.JavascriptInterface
 import com.softwiredtech.dashpilot.datamodel.CarState
+import com.softwiredtech.dashpilot.datamodel.DisplaySettings
 
 class CarStateBridge {
 
@@ -32,6 +33,9 @@ class CarStateBridge {
     @Volatile private var odometer: Float = 0f
     @Volatile private var phoneBattery: Int = -1
     @Volatile private var currentTime: Long = 0L
+    @Volatile private var showPhoneBattery: Boolean = true
+    @Volatile private var showCarBattery: Boolean = true
+    @Volatile private var showOdometer: Boolean = true
 
     fun update(state: CarState) {
         egoSteeringAngle = state.egoSteeringAngle
@@ -88,6 +92,9 @@ class CarStateBridge {
     @JavascriptInterface fun getOdometer(): Float = odometer
     @JavascriptInterface fun getPhoneBattery(): Int = phoneBattery
     @JavascriptInterface fun getCurrentTime(): Long = currentTime
+    @JavascriptInterface fun getShowPhoneBattery(): Boolean = showPhoneBattery
+    @JavascriptInterface fun getShowCarBattery(): Boolean = showCarBattery
+    @JavascriptInterface fun getShowOdometer(): Boolean = showOdometer
 
     fun updatePhoneBattery(level: Int) {
         phoneBattery = level
@@ -95,5 +102,11 @@ class CarStateBridge {
 
     fun updateCurrentTime(time: Long) {
         currentTime = time
+    }
+
+    fun updateDisplaySettings(settings: DisplaySettings) {
+        showPhoneBattery = settings.showPhoneBattery
+        showCarBattery = settings.showCarBattery
+        showOdometer = settings.showOdometer
     }
 }
