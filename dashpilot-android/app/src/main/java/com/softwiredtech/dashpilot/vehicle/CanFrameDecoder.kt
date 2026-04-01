@@ -40,7 +40,18 @@ class CanFrameDecoder(
                 sideCollisionWarning = values[12].toFloat(),
                 anyDoorOpen = values[13].toFloat(),
                 buckleStatus = values[14].toFloat(),
-                accSetSpeed = values[15].toFloat()
+                accSetSpeed = values[15].toFloat(),
+                // Vehicle bus
+                fullPackEnergy = values[16].toFloat(),
+                nominalEnergyRemaining = values[17].toFloat(),
+                energyBuffer = values[18].toFloat(),
+                maxRegenPower = values[19].toFloat(),
+                maxDischargePower = values[20].toFloat(),
+                packVoltage = values[21].toFloat(),
+                packCurrent = values[22].toFloat(),
+                packTMin = values[23].toFloat(),
+                packTMax = values[24].toFloat(),
+                odometer = values[25].toFloat()
             )
         }
     }

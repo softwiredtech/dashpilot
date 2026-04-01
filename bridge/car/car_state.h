@@ -3,6 +3,7 @@
 #include <cstddef>
 
 struct CarState {
+    // Party bus
     double egoSteeringAngle = 0;
     double egoSpeed = 0;
     double leftBlinker = 0;
@@ -20,9 +21,22 @@ struct CarState {
     double buckleStatus = 0;
     double accSetSpeed = 0;
 
-    static constexpr size_t FIELD_COUNT = 16;
+    // Vehicle bus
+    double fullPackEnergy = 0;
+    double nominalEnergyRemaining = 0;
+    double energyBuffer = 0;
+    double maxRegenPower = 0;
+    double maxDischargePower = 0;
+    double packVoltage = 0;
+    double packCurrent = 0;
+    double packTMin = 0;
+    double packTMax = 0;
+    double odometer = 0;
+
+    static constexpr size_t FIELD_COUNT = 26;
 
     void toArray(double* out) const {
+        // Party bus
         out[0] = egoSteeringAngle;
         out[1] = egoSpeed;
         out[2] = leftBlinker;
@@ -39,5 +53,17 @@ struct CarState {
         out[13] = anyDoorOpen;
         out[14] = buckleStatus;
         out[15] = accSetSpeed;
+
+        // Vehicle bus
+        out[16] = fullPackEnergy;
+        out[17] = nominalEnergyRemaining;
+        out[18] = energyBuffer;
+        out[19] = maxRegenPower;
+        out[20] = maxDischargePower;
+        out[21] = packVoltage;
+        out[22] = packCurrent;
+        out[23] = packTMin;
+        out[24] = packTMax;
+        out[25] = odometer;
     }
 };

@@ -16,9 +16,20 @@ data class CarState(
     val sideCollisionWarning: Float = 0f,
     val anyDoorOpen: Float = 0f,
     val buckleStatus: Float = 0f,
-    val accSetSpeed: Float = 0f
+    val accSetSpeed: Float = 0f,
+    // Vehicle bus
+    val fullPackEnergy: Float = 0f,
+    val nominalEnergyRemaining: Float = 0f,
+    val energyBuffer: Float = 0f,
+    val maxRegenPower: Float = 0f,
+    val maxDischargePower: Float = 0f,
+    val packVoltage: Float = 0f,
+    val packCurrent: Float = 0f,
+    val packTMin: Float = 0f,
+    val packTMax: Float = 0f,
+    val odometer: Float = 0f
 ) {
     companion object {
-        const val FIELD_COUNT = 16
+        const val FIELD_COUNT = 26
     }
 }

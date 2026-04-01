@@ -20,6 +20,16 @@ class CarStateBridge {
     @Volatile private var anyDoorOpen: Float = 0f
     @Volatile private var laneDepartureWarning: Float = 0f
     @Volatile private var accSetSpeed: Float = 0f
+    @Volatile private var fullPackEnergy: Float = 0f
+    @Volatile private var nominalEnergyRemaining: Float = 0f
+    @Volatile private var energyBuffer: Float = 0f
+    @Volatile private var maxRegenPower: Float = 0f
+    @Volatile private var maxDischargePower: Float = 0f
+    @Volatile private var packVoltage: Float = 0f
+    @Volatile private var packCurrent: Float = 0f
+    @Volatile private var packTMin: Float = 0f
+    @Volatile private var packTMax: Float = 0f
+    @Volatile private var odometer: Float = 0f
 
     fun update(state: CarState) {
         egoSteeringAngle = state.egoSteeringAngle
@@ -37,6 +47,16 @@ class CarStateBridge {
         anyDoorOpen = state.anyDoorOpen
         laneDepartureWarning = state.laneDepartureWarning
         accSetSpeed = state.accSetSpeed
+        fullPackEnergy = state.fullPackEnergy
+        nominalEnergyRemaining = state.nominalEnergyRemaining
+        energyBuffer = state.energyBuffer
+        maxRegenPower = state.maxRegenPower
+        maxDischargePower = state.maxDischargePower
+        packVoltage = state.packVoltage
+        packCurrent = state.packCurrent
+        packTMin = state.packTMin
+        packTMax = state.packTMax
+        odometer = state.odometer
     }
 
     @JavascriptInterface fun getEgoSteeringAngle(): Float = egoSteeringAngle
@@ -54,4 +74,14 @@ class CarStateBridge {
     @JavascriptInterface fun getAnyDoorOpen(): Float = anyDoorOpen
     @JavascriptInterface fun getLaneDepartureWarning(): Float = laneDepartureWarning
     @JavascriptInterface fun getAccSetSpeed(): Float = accSetSpeed
+    @JavascriptInterface fun getFullPackEnergy(): Float = fullPackEnergy
+    @JavascriptInterface fun getNominalEnergyRemaining(): Float = nominalEnergyRemaining
+    @JavascriptInterface fun getEnergyBuffer(): Float = energyBuffer
+    @JavascriptInterface fun getMaxRegenPower(): Float = maxRegenPower
+    @JavascriptInterface fun getMaxDischargePower(): Float = maxDischargePower
+    @JavascriptInterface fun getPackVoltage(): Float = packVoltage
+    @JavascriptInterface fun getPackCurrent(): Float = packCurrent
+    @JavascriptInterface fun getPackTMin(): Float = packTMin
+    @JavascriptInterface fun getPackTMax(): Float = packTMax
+    @JavascriptInterface fun getOdometer(): Float = odometer
 }
