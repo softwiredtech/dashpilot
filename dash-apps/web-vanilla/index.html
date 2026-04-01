@@ -60,7 +60,7 @@
 
     #speedSignRow {
       position: fixed;
-      top: 50px;
+      top: 70px;
       right: 40px;
       display: flex;
       align-items: center;
@@ -95,7 +95,7 @@
       background: transparent;
       font-family: "Inter", sans-serif;
       color: black;
-      font-size: 36px;
+      font-size: 32px;
       font-weight: 600;
       user-select: none;
       box-sizing: border-box;
@@ -125,15 +125,57 @@
       display: none;
     }
 
-    #leftColumn {
+    #leftArea {
       position: fixed;
       top: 30px;
-      left: 80px;
+      left: 50px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      z-index: 2000;
+    }
+
+    #powerBar {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      width: 8px;
+      height: 220px;
+      margin-top: 50px;
+    }
+
+    #powerBarTrack {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: #eee;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    #powerBarCenter {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 1px;
+      background: #999;
+    }
+
+    #powerBarFill {
+      position: absolute;
+      left: 0;
+      right: 0;
+      background: #5cbd68;
+      transition: top 0.1s ease, height 0.1s ease;
+    }
+
+    #leftColumn {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
       gap: 12px;
-      z-index: 2000;
+      margin-top: 20px;
     }
 
     #speedRow {
@@ -231,16 +273,94 @@
       display: none;
     }
 
-    #odometer {
+    #bottomLeft {
       position: fixed;
       bottom: 30px;
-      left: 80px;
+      left: 50px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
       font-family: "Inter", sans-serif;
       font-size: 16px;
       font-weight: 400;
       color: #777;
       z-index: 2000;
       user-select: none;
+    }
+
+    #statusBar {
+      position: fixed;
+      top: 30px;
+      right: 40px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      z-index: 2000;
+      user-select: none;
+      font-family: "Inter", sans-serif;
+      font-size: 13px;
+    }
+
+    .battery-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .battery-label {
+      font-weight: 500;
+      color: #999;
+      font-size: 12px;
+    }
+
+    .battery-shell {
+      position: relative;
+      width: 28px;
+      height: 14px;
+      border: 2px solid #bbb;
+      border-radius: 3px;
+      background: transparent;
+    }
+
+    .battery-shell::after {
+      content: '';
+      position: absolute;
+      right: -4px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 2px;
+      height: 7px;
+      background: #bbb;
+      border-radius: 0 1px 1px 0;
+    }
+
+    .battery-fill {
+      position: absolute;
+      left: 2px;
+      top: 2px;
+      bottom: 2px;
+      width: 0%;
+      max-width: calc(100% - 4px);
+      border-radius: 1px;
+      transition: width 0.3s ease;
+    }
+
+    .battery-percent {
+      font-weight: 500;
+      color: #555;
+      font-size: 13px;
+    }
+
+    .status-separator {
+      width: 1px;
+      height: 16px;
+      background: #ddd;
+    }
+
+    #batteryTempText {
+      font-weight: 400;
+      color: #777;
+      font-size: 13px;
     }
   </style>
 </head>
@@ -268,26 +388,55 @@
     <img id="leftBlinkerIcon" src="left.png" style="opacity: 0.0;" />
     <img id="rightBlinkerIcon" src="right.png" style="opacity: 0.0;" />
   </div>
+
+  <div id="statusBar">
+    <div class="battery-group" id="phoneBatteryGroup">
+      <span class="battery-label">Phone</span>
+      <div class="battery-shell">
+        <div class="battery-fill" id="phoneBatteryFill" style="width: 75%; background: #4a90d9;"></div>
+      </div>
+      <span class="battery-percent" id="phoneBatteryPercent">75%</span>
+    </div>
+    <div class="status-separator"></div>
+    <div class="battery-group" id="carBatteryGroup" style="display: none;">
+      <span class="battery-label">Car</span>
+      <div class="battery-shell">
+        <div class="battery-fill" id="carBatteryFill"></div>
+      </div>
+      <span class="battery-percent" id="carBatteryPercent"></span>
+      <span id="batteryTempText"></span>
+    </div>
+  </div>
   
-  <div id="leftColumn">
-    <div id="warningIcons">
-      <img id="seatbeltIcon" src="seat-belt.png" alt="Seatbelt unbuckled" />
-      <img id="doorIcon" src="car-door.svg" alt="Door open" />
+  <div id="leftArea">
+    <div id="powerBar">
+      <div id="powerBarTrack">
+        <div id="powerBarCenter"></div>
+        <div id="powerBarFill"></div>
+      </div>
     </div>
+    <div id="leftColumn">
+      <div id="warningIcons">
+        <img id="seatbeltIcon" src="seat-belt.png" alt="Seatbelt unbuckled" />
+        <img id="doorIcon" src="car-door.svg" alt="Door open" />
+      </div>
 
-    <div id="speedRow">
-      <div id="speedText">0</div>
-      <div id="speedUnit">km/h</div>
+      <div id="speedRow">
+        <div id="speedText">0</div>
+        <div id="speedUnit">km/h</div>
+      </div>
+
+      <div id="gearText">-</div>
+
+      <div id="steeringContainer">
+        <img id="steeringWheel" src="steering-wheel.svg" />
+      </div>
     </div>
+  </div>
 
-    <div id="gearText">-</div>
-
-    <div id="steeringContainer">
-      <img id="steeringWheel" src="steering-wheel.svg" />
+    <div id="bottomLeft">
+      <div id="odometer"></div>
     </div>
-    </div>
-
-    <div id="odometer"></div>
     </div>
   </div>
 
@@ -482,6 +631,58 @@
         const door = car.anyDoorOpen;
         doorIcon.style.display = (door != null && door > 0) ? "block" : "none";
 
+        // Battery SOC + temperature widget
+        const fullPack = car.fullPackEnergy;
+        const remaining = car.nominalEnergyRemaining;
+        const buffer = car.energyBuffer;
+        const tMin = car.packTMin;
+        const tMax = car.packTMax;
+        const hasBattery = fullPack > 0 && remaining > 0 && (fullPack - buffer) > 0;
+        const hasTemp = tMin != null && tMax != null && (tMin > 0 || tMax > 0);
+
+        if (hasBattery || hasTemp) {
+          document.getElementById("carBatteryGroup").style.display = "flex";
+        }
+        if (hasBattery) {
+          const soc = Math.round(((remaining - buffer) / (fullPack - buffer)) * 100);
+          const clampedSoc = Math.max(0, Math.min(100, soc));
+          document.getElementById("carBatteryFill").style.width = clampedSoc + "%";
+          document.getElementById("carBatteryPercent").textContent = soc + "%";
+          if (clampedSoc <= 20) {
+            document.getElementById("carBatteryFill").style.background = "#ff4444";
+          } else {
+            document.getElementById("carBatteryFill").style.background = "#5cbd68";
+          }
+        }
+        if (hasTemp) {
+          const avgTemp = (tMin + tMax) / 2;
+          document.getElementById("batteryTempText").textContent = avgTemp.toFixed(0) + "°C";
+        }
+
+        // Power bar
+        const voltage = car.packVoltage;
+        const current = car.packCurrent;
+        const maxRegen = car.maxRegenPower;
+        const maxDischarge = car.maxDischargePower;
+        if (voltage > 0 && maxDischarge > 0 && maxRegen > 0) {
+          document.getElementById("powerBar").style.display = "flex";
+          const powerKw = (voltage * current) / 1000;
+          const fill = document.getElementById("powerBarFill");
+          if (powerKw >= 0) {
+            // Discharging — bar goes up from center
+            const pct = Math.min(powerKw / maxDischarge, 1) * 50;
+            fill.style.top = (50 - pct) + "%";
+            fill.style.height = pct + "%";
+            fill.style.background = "#555";
+          } else {
+            // Regenerating — bar goes down from center
+            const pct = Math.min(Math.abs(powerKw) / maxRegen, 1) * 50;
+            fill.style.top = "50%";
+            fill.style.height = pct + "%";
+            fill.style.background = "#5cbd68";
+          }
+        }
+
         // Odometer
         const odo = car.odometer;
         if (odo != null && odo > 0) {
@@ -513,6 +714,15 @@
         laneDepartureWarning: NativeCarState.getLaneDepartureWarning?.() ?? undefined,
         accSetSpeed: NativeCarState.getAccSetSpeed?.() ?? undefined,
         odometer: NativeCarState.getOdometer?.() ?? undefined,
+        fullPackEnergy: NativeCarState.getFullPackEnergy?.() ?? undefined,
+        nominalEnergyRemaining: NativeCarState.getNominalEnergyRemaining?.() ?? undefined,
+        energyBuffer: NativeCarState.getEnergyBuffer?.() ?? undefined,
+        packTMin: NativeCarState.getPackTMin?.() ?? undefined,
+        packTMax: NativeCarState.getPackTMax?.() ?? undefined,
+        maxRegenPower: NativeCarState.getMaxRegenPower?.() ?? undefined,
+        maxDischargePower: NativeCarState.getMaxDischargePower?.() ?? undefined,
+        packVoltage: NativeCarState.getPackVoltage?.() ?? undefined,
+        packCurrent: NativeCarState.getPackCurrent?.() ?? undefined,
       };
       receiveMessage(car);
     }
