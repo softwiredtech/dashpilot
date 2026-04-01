@@ -1,12 +1,13 @@
 package com.softwiredtech.dashpilot.ui
 
 import android.content.Context
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -20,10 +21,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,16 +30,45 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.edit
+import com.softwiredtech.dashpilot.datamodel.DisplaySettings
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
+
+private data class ToggleSetting(
+    val label: String,
+    val key: String,
+    val defaultValue: Boolean
+)
+
+private val vehicleBusToggles = listOf(
+    ToggleSetting("Show car battery", "show_car_battery", true),
+    ToggleSetting("Show odometer", "show_odometer", true),
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(onBack: () -> Unit) {
+fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySettings) -> Unit = {}) {
     val context = LocalContext.current
     val sharedPrefs = remember { context.getSharedPreferences("dash_prefs", Context.MODE_PRIVATE) }
-    var extraBusEnabled by remember {
+
+    val extraBusState = remember {
         mutableStateOf(sharedPrefs.getBoolean("extra_vehicle_bus", false))
     }
+
+    val showPhoneBatteryState = remember {
+        mutableStateOf(sharedPrefs.getBoolean("show_phone_battery", true))
+    }
+
+    val vehicleBusToggleStates = remember {
+        vehicleBusToggles.map { toggle ->
+            toggle to mutableStateOf(sharedPrefs.getBoolean(toggle.key, toggle.defaultValue))
+        }
+    }
+
+    fun buildDisplaySettings() = DisplaySettings(
+        showPhoneBattery = showPhoneBatteryState.value,
+        showCarBattery = vehicleBusToggleStates[0].second.value,
+        showOdometer = vehicleBusToggleStates[1].second.value,
+    )
 
     Scaffold(
         topBar = {
@@ -68,31 +96,74 @@ fun SettingsScreen(onBack: () -> Unit) {
                 .padding(innerPadding)
                 .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
+            val packageInfo = remember {
+                context.packageManager.getPackageInfo(context.packageName, 0)
+            }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                Text(text = "Version", color = Color.White, fontSize = 16.sp)
                 Text(
-                    text = "Extra Vehicle bus",
-                    color = Color.White,
+                    text = "${packageInfo.versionName} (${packageInfo.longVersionCode})",
+                    color = Color(0xFF888888),
                     fontSize = 16.sp
                 )
-                Switch(
-                    checked = extraBusEnabled,
-                    onCheckedChange = { enabled ->
-                        extraBusEnabled = enabled
-                        sharedPrefs.edit { putBoolean("extra_vehicle_bus", enabled) }
-                    },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = Color.White,
-                        checkedTrackColor = AccentColor,
-                        uncheckedThumbColor = Color(0xFF888888),
-                        uncheckedTrackColor = Color(0xFF333333),
-                        uncheckedBorderColor = Color(0xFF555555)
-                    )
-                )
             }
+
+            Spacer(modifier = Modifier.height(24.dp))
+            SettingsToggle("Extra Vehicle bus", extraBusState.value) { enabled ->
+                extraBusState.value = enabled
+                sharedPrefs.edit { putBoolean("extra_vehicle_bus", enabled) }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+            Text("Display", color = Color(0xFF888888), fontSize = 13.sp)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            SettingsToggle("Show phone battery", showPhoneBatteryState.value) { enabled ->
+                showPhoneBatteryState.value = enabled
+                sharedPrefs.edit { putBoolean("show_phone_battery", enabled) }
+                onDisplaySettingsChanged(buildDisplaySettings())
+            }
+
+            if (extraBusState.value) {
+                vehicleBusToggleStates.forEach { (toggle, state) ->
+                    SettingsToggle(toggle.label, state.value) { enabled ->
+                        state.value = enabled
+                        sharedPrefs.edit { putBoolean(toggle.key, enabled) }
+                        onDisplaySettingsChanged(buildDisplaySettings())
+                    }
+                }
+            }
+
         }
+    }
+}
+
+@Composable
+private fun SettingsToggle(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = label,
+            color = Color.White,
+            fontSize = 16.sp
+        )
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = Color.White,
+                checkedTrackColor = AccentColor,
+                uncheckedThumbColor = Color(0xFF888888),
+                uncheckedTrackColor = Color(0xFF333333),
+                uncheckedBorderColor = Color(0xFF555555)
+            )
+        )
     }
 }

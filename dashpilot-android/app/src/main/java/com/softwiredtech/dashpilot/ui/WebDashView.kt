@@ -100,6 +100,7 @@ fun WebDashView(modifier: Modifier = Modifier, url: String, scope: CoroutineScop
                 carStateBridge.update(dashState.carState)
                 carStateBridge.updatePhoneBattery(dashState.phoneBattery)
                 carStateBridge.updateCurrentTime(dashState.currentTime)
+                carStateBridge.updateDisplaySettings(dashState.displaySettings)
                 webView.post {
                     webView.evaluateJavascript("window.onCarStateUpdate && window.onCarStateUpdate()", null)
                 }
