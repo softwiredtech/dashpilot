@@ -393,9 +393,9 @@
     <div class="battery-group" id="phoneBatteryGroup">
       <span class="battery-label">Phone</span>
       <div class="battery-shell">
-        <div class="battery-fill" id="phoneBatteryFill" style="width: 75%; background: #4a90d9;"></div>
+        <div class="battery-fill" id="phoneBatteryFill" style="width: 0%; background: #4a90d9;"></div>
       </div>
-      <span class="battery-percent" id="phoneBatteryPercent">75%</span>
+      <span class="battery-percent" id="phoneBatteryPercent"></span>
     </div>
     <div class="status-separator"></div>
     <div class="battery-group" id="carBatteryGroup" style="display: none;">
@@ -631,6 +631,18 @@
         const door = car.anyDoorOpen;
         doorIcon.style.display = (door != null && door > 0) ? "block" : "none";
 
+        // Phone battery
+        const phoneBat = car.phoneBattery;
+        if (phoneBat != null && phoneBat >= 0) {
+          document.getElementById("phoneBatteryFill").style.width = phoneBat + "%";
+          document.getElementById("phoneBatteryPercent").textContent = phoneBat + "%";
+          if (phoneBat <= 20) {
+            document.getElementById("phoneBatteryFill").style.background = "#ff4444";
+          } else {
+            document.getElementById("phoneBatteryFill").style.background = "#4a90d9";
+          }
+        }
+
         // Battery SOC + temperature widget
         const fullPack = car.fullPackEnergy;
         const remaining = car.nominalEnergyRemaining;
@@ -714,6 +726,7 @@
         laneDepartureWarning: NativeCarState.getLaneDepartureWarning?.() ?? undefined,
         accSetSpeed: NativeCarState.getAccSetSpeed?.() ?? undefined,
         odometer: NativeCarState.getOdometer?.() ?? undefined,
+        phoneBattery: NativeCarState.getPhoneBattery?.() ?? undefined,
         fullPackEnergy: NativeCarState.getFullPackEnergy?.() ?? undefined,
         nominalEnergyRemaining: NativeCarState.getNominalEnergyRemaining?.() ?? undefined,
         energyBuffer: NativeCarState.getEnergyBuffer?.() ?? undefined,

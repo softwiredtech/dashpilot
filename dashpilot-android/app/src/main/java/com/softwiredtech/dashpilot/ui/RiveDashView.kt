@@ -19,7 +19,7 @@ import app.rive.ViewModelSource
 import app.rive.rememberRiveFile
 import app.rive.rememberRiveWorkerOrNull
 import app.rive.rememberViewModelInstance
-import com.softwiredtech.dashpilot.datamodel.CarState
+import com.softwiredtech.dashpilot.datamodel.DashState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -29,7 +29,7 @@ import androidx.core.net.toUri
 @Composable
 fun RiveDashView(
     assetName: String,
-    carStateFlow: Flow<CarState>,
+    dashStateFlow: Flow<DashState>,
     scope: CoroutineScope,
     onError: ((message: String) -> Unit),
     fileUri: String? = null
@@ -89,7 +89,8 @@ fun RiveDashView(
 
                 LaunchedEffect(Unit) {
                     scope.launch {
-                        carStateFlow.collect { message ->
+                        dashStateFlow.collect { dashState ->
+                            val message = dashState.carState
                             vmi.setNumber("speed", message.egoSpeed)
                             vmi.setNumber("speedLimit", message.fusedSpeedLimit)
                             vmi.setNumber("gear", message.gear)

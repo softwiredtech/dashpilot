@@ -17,14 +17,14 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.softwiredtech.dashpilot.R
-import com.softwiredtech.dashpilot.datamodel.CarState
+import com.softwiredtech.dashpilot.datamodel.DashState
 import kotlinx.coroutines.flow.Flow
 
 @Composable
 fun DashboardScreen(
     dashboardType: String,
     dashboardUrl: String,
-    carStateFlow: Flow<CarState>
+    dashStateFlow: Flow<DashState>
 ) {
     val scope = rememberCoroutineScope()
     val configuration = LocalConfiguration.current
@@ -57,13 +57,13 @@ fun DashboardScreen(
                 modifier = Modifier.fillMaxSize(),
                 url = dashboardUrl,
                 scope = scope,
-                carStateFlow = carStateFlow
+                dashStateFlow = dashStateFlow
             )
         }
         "rive", "dev_rive" -> {
             RiveDashView(
                 assetName = if (dashboardType == "dev_rive") "" else dashboardUrl,
-                carStateFlow = carStateFlow,
+                dashStateFlow = dashStateFlow,
                 scope = scope,
                 onError = { message -> Log.d("Rive", message) },
                 fileUri = if (dashboardType == "dev_rive") dashboardUrl else null
