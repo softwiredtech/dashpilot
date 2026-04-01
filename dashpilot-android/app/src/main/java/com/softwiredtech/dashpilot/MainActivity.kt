@@ -63,7 +63,6 @@ class MainActivity : ComponentActivity() {
             DashPilotTheme {
                 val navController = rememberNavController()
                 val context = LocalContext.current
-                val dataSource by connectionVM.dataSource.collectAsState()
                 val connectionStatus by connectionVM.connectionStatus.collectAsState()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val onDashboard = navBackStackEntry?.destination?.route
@@ -116,12 +115,13 @@ class MainActivity : ComponentActivity() {
                         }
                         composable<DashboardRoute> { backStackEntry ->
                             val route = backStackEntry.toRoute<DashboardRoute>()
-                            val ds = dataSource
-                            if (ds != null) {
+                            val dashStateFlow by connectionVM.dashState.collectAsState()
+                            val flow = dashStateFlow
+                            if (flow != null) {
                                 DashboardScreen(
                                     dashboardType = route.dashboardType,
                                     dashboardUrl = route.dashboardUrl,
-                                    carStateFlow = ds.incomingMessages
+                                    dashStateFlow = flow
                                 )
                             }
                         }

@@ -1,8 +1,10 @@
 package com.softwiredtech.dashpilot.viewmodel
 
 import android.content.Context
+import android.os.BatteryManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.softwiredtech.dashpilot.datamodel.DashState
 import com.softwiredtech.dashpilot.datasource.CommaDataSource
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.IDataSource
@@ -12,18 +14,32 @@ import com.softwiredtech.dashpilot.jni.VehicleBridge
 import com.softwiredtech.dashpilot.vehicle.CanFrameDecoder
 import com.softwiredtech.dashpilot.vehicle.VehicleProfileLoader
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
 class ConnectionViewModel : ViewModel() {
-
     private val _dataSource = MutableStateFlow<IDataSource?>(null)
-    val dataSource = _dataSource.asStateFlow()
 
     private val _connectionStatus = MutableStateFlow<ConnectionStatus>(ConnectionStatus.Disconnected)
     val connectionStatus = _connectionStatus.asStateFlow()
+
+    private val _dashState = MutableStateFlow<Flow<DashState>?>(null)
+    val dashState = _dashState.asStateFlow()
+
+    private fun phoneBatteryFlow(context: Context): Flow<Int> = flow {
+        val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
+        while (true) {
+            val level = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
+            emit(level)
+            delay(30_000)
+        }
+    }
 
     fun connect(context: Context, serverAddress: String, dataSourceType: String) {
         if (_connectionStatus.value != ConnectionStatus.Disconnected) return
@@ -45,6 +61,17 @@ class ConnectionViewModel : ViewModel() {
                 else -> CommaDataSource(bridge, profile)
             }
             _dataSource.value = ds
+
+            // Emits everytime any of the flows emits, combining the emission from one with the latest value from the other one.
+            val combined = ds.incomingMessages.combine(phoneBatteryFlow(context)) { carState, battery ->
+                DashState(
+                    carState = carState,
+                    phoneBattery = battery,
+                    currentTime = System.currentTimeMillis()
+                )
+            }
+            _dashState.value = combined
+
             launch(Dispatchers.IO) { ds.connect(serverAddress) }
             ds.incomingMessages.first()
             _connectionStatus.value = ConnectionStatus.Connected
@@ -54,6 +81,7 @@ class ConnectionViewModel : ViewModel() {
     fun disconnect() {
         _dataSource.value?.disconnect()
         _dataSource.value = null
+        _dashState.value = null
         _connectionStatus.value = ConnectionStatus.Disconnected
     }
 }

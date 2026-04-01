@@ -30,6 +30,8 @@ class CarStateBridge {
     @Volatile private var packTMin: Float = 0f
     @Volatile private var packTMax: Float = 0f
     @Volatile private var odometer: Float = 0f
+    @Volatile private var phoneBattery: Int = -1
+    @Volatile private var currentTime: Long = 0L
 
     fun update(state: CarState) {
         egoSteeringAngle = state.egoSteeringAngle
@@ -84,4 +86,14 @@ class CarStateBridge {
     @JavascriptInterface fun getPackTMin(): Float = packTMin
     @JavascriptInterface fun getPackTMax(): Float = packTMax
     @JavascriptInterface fun getOdometer(): Float = odometer
+    @JavascriptInterface fun getPhoneBattery(): Int = phoneBattery
+    @JavascriptInterface fun getCurrentTime(): Long = currentTime
+
+    fun updatePhoneBattery(level: Int) {
+        phoneBattery = level
+    }
+
+    fun updateCurrentTime(time: Long) {
+        currentTime = time
+    }
 }
