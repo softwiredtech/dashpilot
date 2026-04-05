@@ -597,6 +597,7 @@
         showBlinker(rightBlinker, rightBlinkerIcon);
 
         speedText.textContent = speed;
+        speedUnit.textContent = car.isImperial ? "mph" : "km/h";
         if (speedLimit == 31 || speedLimit == 0) {
           speedLimitText.textContent = "";
         } else {
@@ -679,7 +680,7 @@
           }
           if (hasTemp) {
             const avgTemp = (tMin + tMax) / 2;
-            document.getElementById("batteryTempText").textContent = avgTemp.toFixed(0) + "°C";
+            document.getElementById("batteryTempText").textContent = avgTemp.toFixed(0) + (car.isImperial ? "°F" : "°C");
           }
         } else {
           document.getElementById("carBatteryGroup").style.display = "none";
@@ -713,7 +714,7 @@
         if (car.showOdometer) {
           const odo = car.odometer;
           if (odo != null && odo > 0) {
-            document.getElementById("odometer").textContent = Math.round(odo).toLocaleString() + " km";
+            document.getElementById("odometer").textContent = Math.round(odo).toLocaleString() + (car.isImperial ? " mi" : " km");
             document.getElementById("bottomLeft").style.display = "flex";
           }
         } else {
@@ -758,6 +759,7 @@
         showPhoneBattery: NativeCarState.getShowPhoneBattery?.() ?? true,
         showCarBattery: NativeCarState.getShowCarBattery?.() ?? true,
         showOdometer: NativeCarState.getShowOdometer?.() ?? true,
+        isImperial: NativeCarState.isImperial?.() ?? false,
       };
       receiveMessage(car);
     }
