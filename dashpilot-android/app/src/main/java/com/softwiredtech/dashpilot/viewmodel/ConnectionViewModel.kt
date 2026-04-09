@@ -69,7 +69,8 @@ class ConnectionViewModel : ViewModel() {
             _displaySettings.value = DisplaySettings(
                 showPhoneBattery = prefs.getBoolean("show_phone_battery", true),
                 showCarBattery = prefs.getBoolean("show_car_battery", true),
-                showOdometer = prefs.getBoolean("show_odometer", true)
+                showOdometer = prefs.getBoolean("show_odometer", true),
+                useImperial = prefs.getBoolean("use_imperial", false)
             )
 
             val combined = combine(
@@ -77,8 +78,9 @@ class ConnectionViewModel : ViewModel() {
                 phoneBatteryFlow(context),
                 _displaySettings
             ) { carState, battery, settings ->
+                val converted = if (settings.useImperial) carState.toImperial() else carState
                 DashState(
-                    carState = carState,
+                    carState = converted,
                     phoneBattery = battery,
                     currentTime = System.currentTimeMillis(),
                     displaySettings = settings

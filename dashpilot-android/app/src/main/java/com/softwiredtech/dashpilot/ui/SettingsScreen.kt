@@ -58,6 +58,10 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
         mutableStateOf(sharedPrefs.getBoolean("show_phone_battery", true))
     }
 
+    val useImperialState = remember {
+        mutableStateOf(sharedPrefs.getBoolean("use_imperial", false))
+    }
+
     val vehicleBusToggleStates = remember {
         vehicleBusToggles.map { toggle ->
             toggle to mutableStateOf(sharedPrefs.getBoolean(toggle.key, toggle.defaultValue))
@@ -68,6 +72,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
         showPhoneBattery = showPhoneBatteryState.value,
         showCarBattery = vehicleBusToggleStates[0].second.value,
         showOdometer = vehicleBusToggleStates[1].second.value,
+        useImperial = useImperialState.value,
     )
 
     Scaffold(
@@ -121,6 +126,12 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
             Spacer(modifier = Modifier.height(24.dp))
             Text("Display", color = Color(0xFF888888), fontSize = 13.sp)
             Spacer(modifier = Modifier.height(8.dp))
+
+            SettingsToggle("Use imperial units", useImperialState.value) { enabled ->
+                useImperialState.value = enabled
+                sharedPrefs.edit { putBoolean("use_imperial", enabled) }
+                onDisplaySettingsChanged(buildDisplaySettings())
+            }
 
             SettingsToggle("Show phone battery", showPhoneBatteryState.value) { enabled ->
                 showPhoneBatteryState.value = enabled
