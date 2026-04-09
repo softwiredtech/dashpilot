@@ -1,5 +1,7 @@
 package com.softwiredtech.dashpilot.datamodel
 
+import java.util.Locale
+
 data class CarState(
     val egoSteeringAngle: Float = 0f,
     val egoSpeed: Float = 0f,
@@ -33,10 +35,16 @@ data class CarState(
         odometer = odometer * KM_TO_MILES,
         packTMin = if (packTMin != 0f) packTMin * 1.8f + 32f else 0f,
         packTMax = if (packTMax != 0f) packTMax * 1.8f + 32f else 0f,
+        fusedSpeedLimit = if (speedLimitSignsInKm()) fusedSpeedLimit * KM_TO_MILES else fusedSpeedLimit,
     )
 
     companion object {
         const val FIELD_COUNT = 26
         private const val KM_TO_MILES = 0.621371f
+
+        private val MILES_COUNTRIES = setOf("US", "GB", "MM", "LR")
+
+        fun speedLimitSignsInKm(): Boolean =
+            Locale.getDefault().country !in MILES_COUNTRIES
     }
 }
