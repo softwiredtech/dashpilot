@@ -46,8 +46,8 @@ public:
         cs.maxDischargePower = cp.get(1, "BMS_powerAvailable", "BMS_maxDischargePower");
         cs.packVoltage = cp.get(1, "BMS_hvBusStatus", "BMS_packVoltage");
         cs.packCurrent = cp.get(1, "BMS_hvBusStatus", "BMS_packCurrent");
-        cs.packTMin = cp.get(1, "BMS_thermalStatus", "BMS_packTMin");
-        cs.packTMax = cp.get(1, "BMS_thermalStatus", "BMS_packTMax");
+        cs.packTMin = cp.get(1, "BMS_bmbMinMax", "BMS_thermistorTMin");
+        cs.packTMax = cp.get(1, "BMS_bmbMinMax", "BMS_thermistorTMax");
         cs.odometer = cp.get(1, "DI_odometerStatus", "DI_odometer");
     }
 };
