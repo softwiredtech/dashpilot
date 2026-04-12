@@ -724,12 +724,14 @@
         // Rotate the steering wheel
         steeringWheel.style.transform = `rotate(${angle}deg)`;
       } catch (err) {
-        console.error("Failed to parse message", err);
+        if (window._wasmReady) {
+          console.error("Failed to parse message", err);
+        }
       }
     };
 
-    window.onCarStateUpdate = function() {
-      var car = {
+    window.onCarStateUpdate = function(iOSState) {
+      var car = iOSState ?? {
         egoSteeringAngle: NativeCarState.getEgoSteeringAngle(),
         egoSpeed: NativeCarState.getEgoSpeed(),
         leftBlinker: NativeCarState.getLeftBlinker(),
