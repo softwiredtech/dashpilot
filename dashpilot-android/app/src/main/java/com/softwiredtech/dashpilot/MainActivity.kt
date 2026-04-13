@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import androidx.activity.ComponentActivity
@@ -11,6 +12,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.core.content.ContextCompat
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
@@ -21,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -38,11 +42,17 @@ import com.softwiredtech.dashpilot.ui.SettingsScreen
 import com.softwiredtech.dashpilot.ui.SetupScreen
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.ui.theme.DashPilotTheme
+import com.softwiredtech.dashpilot.util.NetworkUtil
 import com.softwiredtech.dashpilot.viewmodel.ConnectionViewModel
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
-
-    private val connectionVM: ConnectionViewModel by viewModels()
+    private val networkUtil by lazy { NetworkUtil(applicationContext) }
+    private val connectionVM: ConnectionViewModel by viewModels {
+        viewModelFactory {
+            initializer { ConnectionViewModel(networkUtil) }
+        }
+    }
 
     private val bluetoothPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
