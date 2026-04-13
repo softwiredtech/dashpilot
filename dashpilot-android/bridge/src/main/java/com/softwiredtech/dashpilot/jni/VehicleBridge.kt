@@ -21,6 +21,15 @@ class VehicleBridge {
 
     external fun nativeDeleteSubSocket(subPtr: Long)
 
+    // Probe a candidate publisher: returns true if a message was received
+    // within `timeoutMs`, false otherwise. Used for endpoint discovery.
+    external fun nativeProbeSubSocket(
+        ctxPtr: Long,
+        endpoint: String,
+        address: String,
+        timeoutMs: Int
+    ): Boolean
+
     // Receive messages using VehicleDecoder
     external fun nativeStartReceiveLoop(decoderHandle: Long, subPtr: Long, buffer: DoubleArray, callback: CanSignalCallback)
     external fun nativeStopReceiveLoop()

@@ -59,7 +59,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.edit
 import com.softwiredtech.dashpilot.BuildConfig
 import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
@@ -88,10 +87,14 @@ fun SetupScreen(
     onSettingsClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
-    val sharedPrefs = remember { context.getSharedPreferences("dash_prefs", Context.MODE_PRIVATE) }
-    var serverAddress by rememberSaveable { mutableStateOf(sharedPrefs.getString("device_ip", "192.168.1.105") ?: "192.168.1.105") }
+    val sharedPrefs = remember {
+        context.getSharedPreferences("dash_prefs", Context.MODE_PRIVATE)
+    }
     var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
     val currentSource = dataSources[selectedIndex]
+    var serverAddress by rememberSaveable {
+        mutableStateOf(sharedPrefs.getString("device_ip", "") ?: "")
+    }
 
     Box(
         modifier = Modifier
@@ -132,13 +135,17 @@ fun SetupScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
         ) {
-            val showIpField = currentSource.key in listOf("comma", "websocket")
+            val showIpField = currentSource.key == "websocket" ||
+                    (currentSource.key == "comma" && connectionStatus is ConnectionStatus.Error)
             OutlinedTextField(
                 value = serverAddress,
                 onValueChange = { serverAddress = it },
                 label = { Text(stringResource(R.string.connection_device_ip)) },
                 singleLine = true,
-                enabled = showIpField && connectionStatus is ConnectionStatus.Disconnected,
+                enabled = showIpField && (
+                        connectionStatus is ConnectionStatus.Disconnected ||
+                                connectionStatus is ConnectionStatus.Error
+                        ),
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedTextColor = Color.White,
@@ -159,11 +166,26 @@ fun SetupScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             when (connectionStatus) {
-                is ConnectionStatus.Disconnected -> {
+                is ConnectionStatus.Disconnected, is ConnectionStatus.Error -> {
+                    if (connectionStatus is ConnectionStatus.Error) {
+                        Text(
+                            text = connectionStatus.message,
+                            color = Color(0xFFFF5252),
+                            fontSize = 14.sp
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
                     Button(
                         onClick = {
-                            onConnect(serverAddress, currentSource.key)
-                            sharedPrefs.edit { putString("device_ip", serverAddress) }
+                            // For comma: pass empty unless the user has overridden via the
+                            // manual field (only shown after a discovery error). The VM takes
+                            // care of seed IP + discovery.
+                            val addressToSend = when (currentSource.key) {
+                                "comma" -> if (connectionStatus is ConnectionStatus.Error) serverAddress else ""
+                                "websocket" -> serverAddress
+                                else -> ""
+                            }
+                            onConnect(addressToSend, currentSource.key)
                         },
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
@@ -258,9 +280,10 @@ private fun ConnectionVisualization(
     onSourceSelected: (Int) -> Unit
 ) {
     val isConnected = connectionStatus is ConnectionStatus.Connected
-    val isDisconnected = connectionStatus is ConnectionStatus.Disconnected
+    val isIdle = connectionStatus is ConnectionStatus.Disconnected ||
+            connectionStatus is ConnectionStatus.Error
     val dashLineColor = if (isConnected) AccentColor else Color(0xFF555555)
-    val animating = !isDisconnected
+    val animating = !isIdle
 
     val infiniteTransition = rememberInfiniteTransition(label = "dashFlow")
     val phase by infiniteTransition.animateFloat(

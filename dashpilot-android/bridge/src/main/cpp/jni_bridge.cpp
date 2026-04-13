@@ -137,6 +137,53 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStopReceiveLoop(JNIEnv*
     receiveLoopRunning = false;
 }
 
+// Probe a zmq address, and wait for messages to arrive.
+// Returns true if we received messages, false otherwise.
+// This is used in automatic Comma discovery.
+JNIEXPORT jboolean JNICALL
+Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeProbeSubSocket(
+        JNIEnv* env, jobject thiz,
+        jlong ctxPtr,
+        jstring endpoint,
+        jstring address,
+        jint timeoutMs) {
+
+    Context* ctx = reinterpret_cast<Context*>(ctxPtr);
+
+    const char* endpointChars = env->GetStringUTFChars(endpoint, nullptr);
+    const char* addressChars = env->GetStringUTFChars(address, nullptr);
+    std::string endpointStr(endpointChars);
+    std::string addressStr(addressChars);
+    env->ReleaseStringUTFChars(endpoint, endpointChars);
+    env->ReleaseStringUTFChars(address, addressChars);
+
+    SubSocket* sub = SubSocket::create(ctx, endpointStr, addressStr, false, true, 0);
+    if (sub == nullptr) {
+        return JNI_FALSE;
+    }
+
+    sub->setTimeout(2);
+
+    bool got = false;
+    auto start = std::chrono::steady_clock::now();
+    while (true) {
+        Message* msg = sub->receive(true);
+        if (msg) {
+            delete msg;
+            got = true;
+            break;
+        }
+        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::steady_clock::now() - start).count();
+        if (elapsed >= timeoutMs) {
+            break;
+        }
+    }
+
+    delete sub;
+    return got ? JNI_TRUE : JNI_FALSE;
+}
+
 JNIEXPORT jbyteArray JNICALL
 Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeGetData(JNIEnv* env, jobject thiz, jlong msgPtr) {
     Message* msg = reinterpret_cast<Message*>(msgPtr);

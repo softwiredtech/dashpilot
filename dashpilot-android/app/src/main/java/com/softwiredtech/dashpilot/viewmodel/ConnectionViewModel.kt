@@ -2,6 +2,7 @@ package com.softwiredtech.dashpilot.viewmodel
 
 import android.content.Context
 import android.os.BatteryManager
+import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.softwiredtech.dashpilot.datamodel.DashState
@@ -12,6 +13,7 @@ import com.softwiredtech.dashpilot.datasource.IDataSource
 import com.softwiredtech.dashpilot.datasource.PandaBleDataSource
 import com.softwiredtech.dashpilot.datasource.WebsocketDataSource
 import com.softwiredtech.dashpilot.jni.VehicleBridge
+import com.softwiredtech.dashpilot.util.NetworkUtil
 import com.softwiredtech.dashpilot.vehicle.CanFrameDecoder
 import com.softwiredtech.dashpilot.vehicle.VehicleProfileLoader
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +26,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
-class ConnectionViewModel : ViewModel() {
+class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     private val _dataSource = MutableStateFlow<IDataSource?>(null)
 
     private val _connectionStatus = MutableStateFlow<ConnectionStatus>(ConnectionStatus.Disconnected)
@@ -44,14 +46,16 @@ class ConnectionViewModel : ViewModel() {
         }
     }
 
-    fun connect(context: Context, serverAddress: String, dataSourceType: String) {
-        if (_connectionStatus.value != ConnectionStatus.Disconnected) return
+    fun connect(context: Context, manualServerAddress: String, dataSourceType: String) {
+        val current = _connectionStatus.value
+        if (current !is ConnectionStatus.Disconnected && current !is ConnectionStatus.Error) return
 
+        var finalServerAddress = manualServerAddress
         _connectionStatus.value = ConnectionStatus.Connecting
         viewModelScope.launch(Dispatchers.IO) {
             val vehicleName = "tesla" // TODO: make configurable via UI
-            val extraBus = context.getSharedPreferences("dash_prefs", Context.MODE_PRIVATE)
-                .getBoolean("extra_vehicle_bus", false)
+            val prefs = context.getSharedPreferences("dash_prefs", Context.MODE_PRIVATE)
+            val extraBus = prefs.getBoolean("extra_vehicle_bus", false)
             val configFile = if (extraBus) "config_comma_extra_bus.json" else "config_comma_normal.json"
             val profile = VehicleProfileLoader.loadProfile(context, vehicleName, configFile)
             val bridge = VehicleBridge()
@@ -63,9 +67,29 @@ class ConnectionViewModel : ViewModel() {
                 "websocket" -> WebsocketDataSource()
                 else -> CommaDataSource(bridge, profile)
             }
+
+            if (finalServerAddress.isEmpty() && dataSourceType == "comma") {
+                val localIp = networkUtil.getWifiIpAddress()
+                val currentSubnet = localIp?.substringBeforeLast('.')
+                val savedIp = prefs.getString("device_ip", "")?.takeIf { it.isNotBlank() }
+                val savedSubnet = prefs.getString("device_ip_subnet", "")?.takeIf { it.isNotBlank() }
+                val sameNetwork = currentSubnet != null && currentSubnet == savedSubnet
+                val seedIp = if (sameNetwork && savedIp != null) savedIp else localIp
+                val found = seedIp?.let { networkUtil.findCanPublisher(initialIp = it) }
+                if (found == null) {
+                    _connectionStatus.value = ConnectionStatus.Error("No device found")
+                    return@launch
+                }
+                finalServerAddress = found
+                prefs.edit {
+                    putString("device_ip", found)
+                    putString("device_ip_subnet", currentSubnet)
+                }
+            }
+
             _dataSource.value = ds
 
-            val prefs = context.getSharedPreferences("dash_prefs", Context.MODE_PRIVATE)
+
             _displaySettings.value = DisplaySettings(
                 showPhoneBattery = prefs.getBoolean("show_phone_battery", true),
                 showCarBattery = prefs.getBoolean("show_car_battery", true),
@@ -88,7 +112,7 @@ class ConnectionViewModel : ViewModel() {
             }
             _dashState.value = combined
 
-            launch(Dispatchers.IO) { ds.connect(serverAddress) }
+            launch(Dispatchers.IO) { ds.connect(finalServerAddress) }
             ds.incomingMessages.first()
             _connectionStatus.value = ConnectionStatus.Connected
         }
