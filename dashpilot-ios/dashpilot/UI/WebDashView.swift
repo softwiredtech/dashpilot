@@ -94,28 +94,46 @@ struct WebDashView: UIViewRepresentable {
             config.setURLSchemeHandler(AppSchemeHandler(bundleDir: bundleDir), forURLScheme: "app")
         }
 
-        let consoleOverride = """
-        (function() {
-            function fwd(level, args) {
-                var msg = Array.from(args).map(function(a) {
-                    try { return (typeof a === 'object') ? JSON.stringify(a) : String(a); }
-                    catch(e) { return String(a); }
-                }).join(' ');
-                window.webkit.messageHandlers.log.postMessage('[' + level + '] ' + msg);
-            }
-            ['log','warn','error','info'].forEach(function(l) {
-                var orig = console[l].bind(console);
-                console[l] = function() { orig.apply(console, arguments); fwd(l, arguments); };
-            });
-            window.addEventListener('error', function(e) {
-                window.webkit.messageHandlers.log.postMessage('[JSERROR] ' + e.message + ' @ ' + e.filename + ':' + e.lineno);
-            });
-            window.addEventListener('unhandledrejection', function(e) {
-                window.webkit.messageHandlers.log.postMessage('[PROMISE] ' + (e.reason?.message || String(e.reason)));
-            });
+        // Inject NativeCarState bridge — mirrors Android's addJavascriptInterface.
+        // Getters read from window._iosCarState which Swift updates on every frame.
+        let nativeBridge = """
+        window.NativeCarState = (function() {
+            var s = function() { return window._iosCarState || {}; };
+            return {
+                getEgoSteeringAngle:      function() { return s().egoSteeringAngle      ?? 0; },
+                getEgoSpeed:              function() { return s().egoSpeed              ?? 0; },
+                getLeftBlinker:           function() { return s().leftBlinker           ?? 0; },
+                getRightBlinker:          function() { return s().rightBlinker          ?? 0; },
+                getGear:                  function() { return s().gear                  ?? 0; },
+                isAdasOn:                 function() { return s().adasOn                ?? false; },
+                getLeftBlindSpot:         function() { return s().leftBlindSpot         ?? 0; },
+                getRightBlindSpot:        function() { return s().rightBlindSpot        ?? 0; },
+                getFusedSpeedLimit:       function() { return s().fusedSpeedLimit       ?? 0; },
+                getStopLineDist:          function() { return s().stopLineDist          ?? 0; },
+                getTrafficLightColor:     function() { return s().trafficLightColor     ?? 0; },
+                getLaneDepartureWarning:  function() { return s().laneDepartureWarning  ?? 0; },
+                getBuckleStatus:          function() { return s().buckleStatus          ?? undefined; },
+                getAnyDoorOpen:           function() { return s().anyDoorOpen           ?? undefined; },
+                getAccSetSpeed:           function() { return s().accSetSpeed           ?? undefined; },
+                getOdometer:              function() { return undefined; },
+                getPhoneBattery:          function() { return undefined; },
+                getFullPackEnergy:        function() { return undefined; },
+                getNominalEnergyRemaining:function() { return undefined; },
+                getEnergyBuffer:          function() { return undefined; },
+                getPackTMin:              function() { return undefined; },
+                getPackTMax:              function() { return undefined; },
+                getMaxRegenPower:         function() { return undefined; },
+                getMaxDischargePower:     function() { return undefined; },
+                getPackVoltage:           function() { return undefined; },
+                getPackCurrent:           function() { return undefined; },
+                getShowPhoneBattery:      function() { return false; },
+                getShowCarBattery:        function() { return false; },
+                getShowOdometer:          function() { return false; },
+                isImperial:               function() { return false; },
+            };
         })();
         """
-        let script = WKUserScript(source: consoleOverride, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        let script = WKUserScript(source: nativeBridge, injectionTime: .atDocumentStart, forMainFrameOnly: true)
         config.userContentController.addUserScript(script)
 
         let webView = WKWebView(frame: .zero, configuration: config)
@@ -154,7 +172,7 @@ struct WebDashView: UIViewRepresentable {
                 for await state in stream {
                     let json = state.toJSONString()
                     webView?.evaluateJavaScript(
-                        "window.onCarStateUpdate && window.onCarStateUpdate(\(json))",
+                        "window._iosCarState = \(json); window.onCarStateUpdate && window.onCarStateUpdate()",
                         completionHandler: nil
                     )
                 }
