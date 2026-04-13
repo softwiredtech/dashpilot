@@ -1,6 +1,7 @@
 package com.softwiredtech.dashpilot
 
 import android.Manifest
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -32,6 +33,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import androidx.startup.AppInitializer
 import app.rive.runtime.kotlin.RiveInitializer
+import com.softwiredtech.dashpilot.datamodel.availableDashboards
 import com.softwiredtech.dashpilot.navigation.DashboardRoute
 import com.softwiredtech.dashpilot.navigation.DashboardSelectionRoute
 import com.softwiredtech.dashpilot.navigation.SettingsRoute
@@ -79,7 +81,13 @@ class MainActivity : ComponentActivity() {
                     ?.contains("DashboardRoute") == true
 
                 LaunchedEffect(onDashboard) {
-                    if (onDashboard) hideSystemBars() else showSystemBars()
+                    if (onDashboard) {
+                        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                        hideSystemBars()
+                    } else {
+                        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+                        showSystemBars()
+                    }
                 }
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { _ ->
@@ -101,7 +109,11 @@ class MainActivity : ComponentActivity() {
                                     connectionVM.disconnect()
                                 },
                                 onNext = {
-                                    navController.navigate(DashboardSelectionRoute)
+                                    val vanillaDashboard = availableDashboards[0]
+                                    navController.navigate(DashboardRoute(
+                                        vanillaDashboard.type.name.lowercase(),
+                                        vanillaDashboard.url)
+                                    )
                                 },
                                 onSettingsClick = {
                                     navController.navigate(SettingsRoute)
