@@ -21,14 +21,14 @@ class VehicleBridge {
 
     external fun nativeDeleteSubSocket(subPtr: Long)
 
-    // Probe a candidate publisher: returns true if a message was received
-    // within `timeoutMs`, false otherwise. Used for endpoint discovery.
-    external fun nativeProbeSubSocket(
+    // Discover a ZMQ publisher on the local subnet.
+    // Returns the IP address of the publisher, or null if not found.
+    external fun nativeDiscoverPublisher(
         ctxPtr: Long,
         endpoint: String,
-        address: String,
+        initialIp: String,
         timeoutMs: Int
-    ): Boolean
+    ): String?
 
     // Receive messages using VehicleDecoder
     external fun nativeStartReceiveLoop(decoderHandle: Long, subPtr: Long, buffer: DoubleArray, callback: CanSignalCallback)

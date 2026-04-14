@@ -2,7 +2,6 @@ package com.softwiredtech.dashpilot.viewmodel
 
 import android.content.Context
 import android.os.BatteryManager
-import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.softwiredtech.dashpilot.datamodel.DashState
@@ -70,21 +69,12 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
 
             if (finalServerAddress.isEmpty() && dataSourceType == "comma") {
                 val localIp = networkUtil.getWifiIpAddress()
-                val currentSubnet = localIp?.substringBeforeLast('.')
-                val savedIp = prefs.getString("device_ip", "")?.takeIf { it.isNotBlank() }
-                val savedSubnet = prefs.getString("device_ip_subnet", "")?.takeIf { it.isNotBlank() }
-                val sameNetwork = currentSubnet != null && currentSubnet == savedSubnet
-                val seedIp = if (sameNetwork && savedIp != null) savedIp else localIp
-                val found = seedIp?.let { networkUtil.findCanPublisher(initialIp = it) }
+                val found = localIp?.let { networkUtil.findCanPublisher(initialIp = it) }
                 if (found == null) {
                     _connectionStatus.value = ConnectionStatus.Error("No device found")
                     return@launch
                 }
                 finalServerAddress = found
-                prefs.edit {
-                    putString("device_ip", found)
-                    putString("device_ip_subnet", currentSubnet)
-                }
             }
 
             _dataSource.value = ds
