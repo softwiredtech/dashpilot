@@ -20,6 +20,8 @@
 #include "log.capnp.h"
 #include <thread>
 #include <chrono>
+#include <vector>
+#include <map>
 
 static std::unique_ptr<CarStateMapper> createMapper(const std::string& vehicleType) {
     if (vehicleType == "tesla_party") return std::make_unique<TeslaCommaPartyMapper>();
@@ -137,51 +139,101 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStopReceiveLoop(JNIEnv*
     receiveLoopRunning = false;
 }
 
-// Probe a zmq address, and wait for messages to arrive.
-// Returns true if we received messages, false otherwise.
-// This is used in automatic Comma discovery.
-JNIEXPORT jboolean JNICALL
-Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeProbeSubSocket(
+// Discover a ZMQ publisher on the local subnet using Poller.
+// Creates SubSockets for all 253 candidate IPs (skipping the self octet),
+// registers them with Pollers (batched to stay within MAX_POLLERS), and polls
+// until one receives a message or the timeout expires.
+JNIEXPORT jstring JNICALL
+Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDiscoverPublisher(
         JNIEnv* env, jobject thiz,
         jlong ctxPtr,
         jstring endpoint,
-        jstring address,
+        jstring initialIp,
         jint timeoutMs) {
 
     Context* ctx = reinterpret_cast<Context*>(ctxPtr);
 
     const char* endpointChars = env->GetStringUTFChars(endpoint, nullptr);
-    const char* addressChars = env->GetStringUTFChars(address, nullptr);
+    const char* ipChars = env->GetStringUTFChars(initialIp, nullptr);
     std::string endpointStr(endpointChars);
-    std::string addressStr(addressChars);
+    std::string ipStr(ipChars);
     env->ReleaseStringUTFChars(endpoint, endpointChars);
-    env->ReleaseStringUTFChars(address, addressChars);
+    env->ReleaseStringUTFChars(initialIp, ipChars);
 
-    SubSocket* sub = SubSocket::create(ctx, endpointStr, addressStr, false, true, 0);
-    if (sub == nullptr) {
-        return JNI_FALSE;
+    // Parse subnet prefix and self octet
+    auto lastDot = ipStr.rfind('.');
+    if (lastDot == std::string::npos) return nullptr;
+    std::string prefix = ipStr.substr(0, lastDot);
+    int selfOctet = std::stoi(ipStr.substr(lastDot + 1));
+
+    // Build candidate list, skipping our own octet
+    std::vector<int> octets;
+    for (int i = 1; i <= 254; i++) {
+        if (i != selfOctet) octets.push_back(i);
     }
 
-    sub->setTimeout(2);
+    // Create all sockets and map them to their IPs
+    std::vector<SubSocket*> allSockets;
+    std::map<SubSocket*, std::string> socketToIp;
+    allSockets.reserve(octets.size());
 
-    bool got = false;
-    auto start = std::chrono::steady_clock::now();
-    while (true) {
-        Message* msg = sub->receive(true);
-        if (msg) {
-            delete msg;
-            got = true;
-            break;
+    for (int octet : octets) {
+        std::string candidate = prefix + "." + std::to_string(octet);
+        SubSocket* sub = SubSocket::create(ctx, endpointStr, candidate, false, true, 0);
+        if (sub) {
+            allSockets.push_back(sub);
+            socketToIp[sub] = candidate;
         }
+    }
+
+    LOGD("Discovery: created %zu sockets on subnet %s.*, timeout %dms",
+         allSockets.size(), prefix.c_str(), timeoutMs);
+
+    std::string foundIp;
+    auto start = std::chrono::steady_clock::now();
+    const size_t batchSize = 127;
+    std::vector<Poller*> pollers;
+
+    for (size_t i = 0; i < allSockets.size(); i += batchSize) {
+        Poller* poller = Poller::create();
+        size_t end = std::min(i + batchSize, allSockets.size());
+        for (size_t j = i; j < end; j++) {
+            poller->registerSocket(allSockets[j]);
+        }
+        pollers.push_back(poller);
+    }
+
+    // Poll all batches in round-robin until timeout or hit
+    while (foundIp.empty()) {
         auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::steady_clock::now() - start).count();
-        if (elapsed >= timeoutMs) {
-            break;
+        if (elapsed >= timeoutMs) break;
+
+        for (auto* poller : pollers) {
+            auto ready = poller->poll(100);
+            for (auto* sub : ready) {
+                Message* msg = sub->receive(true);
+                if (msg) {
+                    delete msg;
+                    foundIp = socketToIp[sub];
+                    break;
+                }
+            }
+            if (!foundIp.empty()) break;
         }
     }
 
-    delete sub;
-    return got ? JNI_TRUE : JNI_FALSE;
+    // Cleanup
+    for (auto* poller : pollers) delete poller;
+    for (auto* sub : allSockets) delete sub;
+
+    if (foundIp.empty()) {
+        LOGD("Discovery: no publisher found");
+        return nullptr;
+    }
+
+    LOGD("Discovery: found publisher at %s", foundIp.c_str());
+    return env->NewStringUTF(foundIp.c_str());
 }
 
 JNIEXPORT jbyteArray JNICALL

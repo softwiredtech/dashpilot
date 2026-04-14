@@ -87,14 +87,9 @@ fun SetupScreen(
     onSettingsClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
-    val sharedPrefs = remember {
-        context.getSharedPreferences("dash_prefs", Context.MODE_PRIVATE)
-    }
     var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
     val currentSource = dataSources[selectedIndex]
-    var serverAddress by rememberSaveable {
-        mutableStateOf(sharedPrefs.getString("device_ip", "") ?: "")
-    }
+    var serverAddress by rememberSaveable { mutableStateOf("") }
 
     Box(
         modifier = Modifier
