@@ -773,7 +773,7 @@
 
     window._onWasmReady = function() {
       if (typeof NativeCarState !== 'undefined') {
-        console.log('[WASM] Running in Android WebView, skipping WebSocket');
+        console.log('[WASM] Running in native WebView, skipping WebSocket');
         return;
       }
       console.log('[WASM] Bevy ready, starting WebSocket');

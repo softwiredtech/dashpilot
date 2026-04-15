@@ -11,7 +11,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		AA00000100000000000000AA /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		AA00000100000000000000AA /* Exceptions for "dashpilot" folder in "dashpilot" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -24,7 +24,7 @@
 		29FF82402F72C9C400D48E9A /* dashpilot */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				AA00000100000000000000AA /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
+				AA00000100000000000000AA /* Exceptions for "dashpilot" folder in "dashpilot" target */,
 			);
 			path = dashpilot;
 			sourceTree = "<group>";
@@ -67,6 +67,7 @@
 			buildPhases = (
 				29FF823A2F72C9C400D48E9A /* Sources */,
 				29FF823B2F72C9C400D48E9A /* Frameworks */,
+				295FE6812F8A498F002E75E9 /* ShellScript */,
 				29FF823C2F72C9C400D48E9A /* Resources */,
 			);
 			buildRules = (
@@ -126,6 +127,26 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		295FE6812F8A498F002E75E9 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cp -R \"${SRCROOT}/../dash-apps/web-vanilla/\" \"${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/web-vanilla/\"\n\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		29FF823A2F72C9C400D48E9A /* Sources */ = {
@@ -268,6 +289,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 2KJTTVU6PU;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = dashpilot/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -295,6 +317,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 2KJTTVU6PU;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = dashpilot/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
