@@ -84,7 +84,8 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
                 showPhoneBattery = prefs.getBoolean("show_phone_battery", true),
                 showCarBattery = prefs.getBoolean("show_car_battery", true),
                 showOdometer = prefs.getBoolean("show_odometer", true),
-                useImperial = prefs.getBoolean("use_imperial", false)
+                useImperial = prefs.getBoolean("use_imperial", false),
+                darkMode = prefs.getBoolean("dark_mode", false)
             )
 
             val combined = combine(
