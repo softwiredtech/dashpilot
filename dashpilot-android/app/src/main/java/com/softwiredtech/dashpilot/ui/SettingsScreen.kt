@@ -62,6 +62,10 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
         mutableStateOf(sharedPrefs.getBoolean("use_imperial", false))
     }
 
+    val darkModeState = remember {
+        mutableStateOf(sharedPrefs.getBoolean("dark_mode", false))
+    }
+
     val vehicleBusToggleStates = remember {
         vehicleBusToggles.map { toggle ->
             toggle to mutableStateOf(sharedPrefs.getBoolean(toggle.key, toggle.defaultValue))
@@ -73,6 +77,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
         showCarBattery = vehicleBusToggleStates[0].second.value,
         showOdometer = vehicleBusToggleStates[1].second.value,
         useImperial = useImperialState.value,
+        darkMode = darkModeState.value,
     )
 
     Scaffold(
@@ -130,6 +135,12 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
             SettingsToggle("Use imperial units", useImperialState.value) { enabled ->
                 useImperialState.value = enabled
                 sharedPrefs.edit { putBoolean("use_imperial", enabled) }
+                onDisplaySettingsChanged(buildDisplaySettings())
+            }
+
+            SettingsToggle("Dark mode", darkModeState.value) { enabled ->
+                darkModeState.value = enabled
+                sharedPrefs.edit { putBoolean("dark_mode", enabled) }
                 onDisplaySettingsChanged(buildDisplaySettings())
             }
 
