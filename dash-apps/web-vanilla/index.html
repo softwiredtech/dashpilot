@@ -40,19 +40,20 @@
 
     #canvas-container {
       position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 85vw;
-      height: 85vh;
+      inset: 0;
+      overflow: hidden;
       border: none !important;
       outline: none !important;
       z-index: 1;
     }
 
     #bevy-canvas {
-      width: 100% !important;
-      height: 100% !important;
+      position: absolute !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      width: max(100vw, 177.78vh) !important;
+      height: max(100vh, 56.25vw) !important;
       display: block !important;
       outline: none !important;
       border: none !important;
