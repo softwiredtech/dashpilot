@@ -38,6 +38,7 @@ class CarStateBridge {
     @Volatile private var showOdometer: Boolean = true
     @Volatile private var useImperial: Boolean = false
     @Volatile private var darkMode: Boolean = false
+    @Volatile private var alwaysOnBlindSpotMonitor: Boolean = true
 
     fun update(state: CarState) {
         egoSteeringAngle = state.egoSteeringAngle
@@ -99,6 +100,7 @@ class CarStateBridge {
     @JavascriptInterface fun getShowOdometer(): Boolean = showOdometer
     @JavascriptInterface fun isImperial(): Boolean = useImperial
     @JavascriptInterface fun isDarkMode(): Boolean = darkMode
+    @JavascriptInterface fun isAlwaysOnBlindSpotMonitor(): Boolean = alwaysOnBlindSpotMonitor
 
     fun updatePhoneBattery(level: Int) {
         phoneBattery = level
@@ -114,5 +116,6 @@ class CarStateBridge {
         showOdometer = settings.showOdometer
         useImperial = settings.useImperial
         darkMode = settings.darkMode
+        alwaysOnBlindSpotMonitor = settings.alwaysOnBlindSpotMonitor
     }
 }

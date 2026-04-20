@@ -505,7 +505,11 @@
     function buildBlindSpotState(car, world) {
       const objects = (world.objects || []).filter(o => o.id !== BS_LEFT_ID && o.id !== BS_RIGHT_ID);
 
-      if (car.leftBlindSpot > 0) {
+      const alwaysOn = car.alwaysOnBlindSpotMonitor !== false;
+      const leftBlinkerOn = parseInt(car.leftBlinker) > 0;
+      const rightBlinkerOn = parseInt(car.rightBlinker) > 0;
+
+      if (car.leftBlindSpot > 0 && (alwaysOn || leftBlinkerOn)) {
         objects.push({
           id: BS_LEFT_ID,
           Dx: BS_DX,
@@ -516,7 +520,7 @@
         });
       }
 
-      if (car.rightBlindSpot > 0) {
+      if (car.rightBlindSpot > 0 && (alwaysOn || rightBlinkerOn)) {
         objects.push({
           id: BS_RIGHT_ID,
           Dx: BS_DX,
@@ -771,6 +775,7 @@
         showOdometer: NativeCarState.getShowOdometer?.() ?? true,
         isImperial: NativeCarState.isImperial?.() ?? false,
         darkMode: NativeCarState.isDarkMode?.() ?? false,
+        alwaysOnBlindSpotMonitor: NativeCarState.isAlwaysOnBlindSpotMonitor?.() ?? true,
       };
       receiveMessage(car);
     }

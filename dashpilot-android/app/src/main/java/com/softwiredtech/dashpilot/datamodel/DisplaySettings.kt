@@ -5,5 +5,6 @@ data class DisplaySettings(
     val showCarBattery: Boolean = true,
     val showOdometer: Boolean = true,
     val useImperial: Boolean = false,
-    val darkMode: Boolean = false
+    val darkMode: Boolean = false,
+    val alwaysOnBlindSpotMonitor: Boolean = true
 )

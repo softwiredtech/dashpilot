@@ -66,6 +66,10 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
         mutableStateOf(sharedPrefs.getBoolean("dark_mode", false))
     }
 
+    val alwaysOnBlindSpotMonitorState = remember {
+        mutableStateOf(sharedPrefs.getBoolean("always_on_blind_spot_monitor", true))
+    }
+
     val vehicleBusToggleStates = remember {
         vehicleBusToggles.map { toggle ->
             toggle to mutableStateOf(sharedPrefs.getBoolean(toggle.key, toggle.defaultValue))
@@ -78,6 +82,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
         showOdometer = vehicleBusToggleStates[1].second.value,
         useImperial = useImperialState.value,
         darkMode = darkModeState.value,
+        alwaysOnBlindSpotMonitor = alwaysOnBlindSpotMonitorState.value,
     )
 
     Scaffold(
@@ -147,6 +152,12 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
             SettingsToggle("Show phone battery", showPhoneBatteryState.value) { enabled ->
                 showPhoneBatteryState.value = enabled
                 sharedPrefs.edit { putBoolean("show_phone_battery", enabled) }
+                onDisplaySettingsChanged(buildDisplaySettings())
+            }
+
+            SettingsToggle("Always on blind-spot monitor", alwaysOnBlindSpotMonitorState.value) { enabled ->
+                alwaysOnBlindSpotMonitorState.value = enabled
+                sharedPrefs.edit { putBoolean("always_on_blind_spot_monitor", enabled) }
                 onDisplaySettingsChanged(buildDisplaySettings())
             }
 
