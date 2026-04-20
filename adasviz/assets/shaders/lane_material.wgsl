@@ -7,7 +7,7 @@
 
 const SOFTNESS: f32 = 1.0;
 const PULSE_AMPLITUDE: f32 = 0.5;
-const PULSE_FREQUENCY: f32 = 1.0;
+const PULSE_FREQUENCY: f32 = 0.6981;
 
 @fragment
 fn fragment(
