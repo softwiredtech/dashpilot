@@ -20,24 +20,6 @@
       color: #111;
     }
 
-    #outerBorder {
-      position: fixed;
-      inset: 0;
-      background: #5cbd68;
-      padding: 8px;
-      box-sizing: border-box;
-    }
-
-    /* This inner container makes the outer border rounded in the inside*/
-    #innerContainer {
-      width: 100%;
-      height: 100%;
-      background: #fff;
-      border-radius: 18px;
-      overflow: hidden;
-      box-sizing: border-box;
-    }
-
     #canvas-container {
       position: fixed;
       inset: 0;
@@ -366,8 +348,6 @@
   </style>
 </head>
 <body>
-   <div id="outerBorder">
-    <div id="innerContainer">
   <div id="canvas-container">
     <canvas id="bevy-canvas"></canvas>
   </div>
@@ -438,8 +418,6 @@
     <div id="bottomLeft">
       <div id="odometer"></div>
     </div>
-    </div>
-  </div>
 
   <script>
     const leftBlinkerIcon = document.getElementById("leftBlinkerIcon");
@@ -588,13 +566,13 @@
         gearText.textContent = gearMap[gear] || "-";
 
         if (gearMap[gear] == "D") {
-          world.camera_view = { view: "back", zoom: 0.8 };
+          world.camera_view = { view: "back", zoom: 1.0 };
         } else if (gearMap[gear] == "P") {
-          world.camera_view = { view: "left_side", zoom: 0.8 };
+          world.camera_view = { view: "left_side", zoom: 0.9 };
         } else if (gearMap[gear] == "R") {
-          world.camera_view = { view: "top", zoom: 0.8 };
+          world.camera_view = { view: "top", zoom: 0.9 };
         } else {
-          world.camera_view = { view: "back", zoom: 0.8 };
+          world.camera_view = { view: "back", zoom: 0.9 };
         }
 
         window._setWorldModel?.(world);
@@ -625,12 +603,6 @@
 
         applyBlindSpotBorderEffect(car.leftBlindSpot, leftBlindSpot);
         applyBlindSpotBorderEffect(car.rightBlindSpot, rightBlindSpot);
-
-        if (car.adasOn) {
-          outerBorder.style.background = "#5cbd68";
-        } else {
-          outerBorder.style.background = "#C1E7C8";
-        }
 
         const buckle = car.buckleStatus;
         seatbeltIcon.style.display = (buckle != null && buckle == 0) ? "block" : "none";
