@@ -345,6 +345,35 @@
       color: #777;
       font-size: 13px;
     }
+
+    /* Dark mode overrides: brighten text so it stands out on the dark scene */
+    body.dark-mode {
+      color: #f2f2f2;
+    }
+
+    body.dark-mode #speedUnit {
+      color: #cfcfcf;
+    }
+
+    body.dark-mode #bottomLeft {
+      color: #cfcfcf;
+    }
+
+    body.dark-mode .battery-label {
+      color: #cfcfcf;
+    }
+
+    body.dark-mode .battery-percent {
+      color: #ffffff;
+    }
+
+    body.dark-mode #batteryTempText {
+      color: #cfcfcf;
+    }
+
+    body.dark-mode #speedLimitSign {
+      color: #ffffff;
+    }
   </style>
 </head>
 <body>
@@ -503,6 +532,8 @@
 
     var receiveMessage = function(car) {
       try {
+        document.body.classList.toggle("dark-mode", !!car.darkMode);
+
         const angle = car.egoSteeringAngle;
         const speed = parseInt(car.egoSpeed);
         const gear = parseInt(car.gear);
