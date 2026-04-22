@@ -168,7 +168,7 @@
     }
 
     #speedText {
-      font-size: 72px;
+      font-size: 84px;
       font-weight: 300;
       line-height: 1;
     }
@@ -349,6 +349,10 @@
     /* Dark mode overrides: brighten text so it stands out on the dark scene */
     body.dark-mode {
       color: #f2f2f2;
+    }
+
+    body.dark-mode #speedText {
+      color: #ffffff;
     }
 
     body.dark-mode #speedUnit {
@@ -562,8 +566,6 @@
         const world = {
           ego_steering_angle: angle,
           ego_speed: car.egoSpeed,
-          leftBlinker: car.leftBlinker,
-          rightBlinker: car.rightBlinker,
           gear: car.gear,
           adas_on: car.adasOn,
           objects: [],
@@ -646,7 +648,8 @@
           accMax.textContent = "";
         }
 
-        accSetSpeed.style.color = car.adasOn ? "#5cbd68" : "#d3d3d3";
+        const activeColor = car.darkMode ? "#1ab3e6" : "#5cbd68";
+        accSetSpeed.style.color = car.adasOn ? activeColor : "#d3d3d3";
 
         applyBlindSpotBorderEffect(car.leftBlindSpot, leftBlindSpot);
         applyBlindSpotBorderEffect(car.rightBlindSpot, rightBlindSpot);
@@ -750,9 +753,11 @@
         // Experimental mode icon
         document.getElementById("experimentalIcon").style.display = car.experimentalMode ? "block" : "none";
 
-        // Steering wheel: colorize green (#5cbd68) when ADAS or MADS is active
+        // Steering wheel: colorize when ADAS or MADS is active (blue in dark mode, green in light)
         if (car.adasOn || car.madsActive) {
-          steeringWheel.style.filter = "brightness(0) saturate(100%) invert(68%) sepia(52%) saturate(405%) hue-rotate(88deg) brightness(92%) contrast(87%)";
+          steeringWheel.style.filter = car.darkMode
+            ? "brightness(0) saturate(100%) invert(60%) sepia(90%) saturate(500%) hue-rotate(160deg) brightness(95%) contrast(90%)"
+            : "brightness(0) saturate(100%) invert(68%) sepia(52%) saturate(405%) hue-rotate(88deg) brightness(92%) contrast(87%)";
         } else {
           steeringWheel.style.filter = "";
         }
