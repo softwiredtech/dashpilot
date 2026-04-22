@@ -51,7 +51,11 @@ class CanFrameDecoder(
                 packCurrent = values[22].toFloat(),
                 packTMin = values[23].toFloat(),
                 packTMax = values[24].toFloat(),
-                odometer = values[25].toFloat()
+                odometer = values[25].toFloat(),
+                //Openpilot
+                selfdriveActive = values[26] > 0,
+                experimentalMode = values[27] > 0,
+                madsActive = values[28] > 0
             )
         }
     }
