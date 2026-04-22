@@ -46,6 +46,7 @@ import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.ui.theme.DashPilotTheme
 import com.softwiredtech.dashpilot.util.NetworkUtil
 import com.softwiredtech.dashpilot.viewmodel.ConnectionViewModel
+import com.softwiredtech.dashpilot.viewmodel.SpeedCameraViewModel
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -55,6 +56,8 @@ class MainActivity : ComponentActivity() {
             initializer { ConnectionViewModel(networkUtil) }
         }
     }
+
+    private val speedCameraVM: SpeedCameraViewModel by viewModels()
 
     private val bluetoothPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -100,6 +103,7 @@ class MainActivity : ComponentActivity() {
                         popExitTransition = { ExitTransition.None }
                     ) {
                         composable<SetupRoute> {
+                            LaunchedEffect(Unit) { speedCameraVM.startWithMocks() }
                             SetupScreen(
                                 connectionStatus = connectionStatus,
                                 onConnect = { serverAddress, dataSourceType ->
