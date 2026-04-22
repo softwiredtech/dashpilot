@@ -20,7 +20,7 @@ class CommaDataSource(
 
     @OptIn(FlowPreview::class)
     // Change sample ms to throttle up or down the flow.
-    override val incomingMessages: Flow<CarState> = _incoming.sample(16)
+    override val incomingMessages: Flow<CarState> = _incoming.sample(25)
 
     private val ctx = bridge.nativeCreateContext()
     private val decoderHandle = bridge.nativeCreateVehicleDecoder(
@@ -28,12 +28,14 @@ class CommaDataSource(
     )
     private val reusableBuffer = DoubleArray(CarState.FIELD_COUNT)
 
-    private var subSocketHandle: Long = 0
+    private var groupHandle: Long = 0
 
     override fun connect(address: String) {
-        subSocketHandle = bridge.nativeCreateSubSocket(ctx, "can", address)
+        groupHandle = bridge.nativeCreateSubSockets(
+            ctx, arrayOf("can", "selfdriveState", "selfdriveStateSP"), address
+        )
         bridge.nativeStartReceiveLoop(
-            decoderHandle, subSocketHandle, reusableBuffer
+            decoderHandle, groupHandle, reusableBuffer
         ) { values ->
             _incoming.tryEmit(CanFrameDecoder.arrayToCarState(values))
         }
@@ -41,7 +43,7 @@ class CommaDataSource(
 
     override fun disconnect() {
         bridge.nativeStopReceiveLoop()
-        bridge.nativeDeleteSubSocket(subSocketHandle)
+        bridge.nativeDeleteSubSockets(groupHandle)
         bridge.nativeDestroyVehicleDecoder(decoderHandle)
         bridge.nativeDeleteContext(ctx)
     }

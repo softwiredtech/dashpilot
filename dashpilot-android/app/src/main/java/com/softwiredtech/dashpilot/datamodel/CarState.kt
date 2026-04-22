@@ -29,7 +29,11 @@ data class CarState(
     val packCurrent: Float = 0f,
     val packTMin: Float = 0f,
     val packTMax: Float = 0f,
-    val odometer: Float = 0f
+    val odometer: Float = 0f,
+    // Openpilot
+    val selfdriveActive: Boolean = false,
+    val experimentalMode: Boolean = false,
+    val madsActive: Boolean = false
 ) {
     fun toImperial(): CarState = copy(
         odometer = odometer * KM_TO_MILES,
@@ -39,7 +43,7 @@ data class CarState(
     )
 
     companion object {
-        const val FIELD_COUNT = 26
+        const val FIELD_COUNT = 29
         private const val KM_TO_MILES = 0.621371f
 
         private val MILES_COUNTRIES = setOf("US", "GB", "MM", "LR")

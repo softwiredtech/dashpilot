@@ -48,10 +48,6 @@ public:
         }
     }
 
-    long long storeAccum = 0;
-    long long mapAccum = 0;
-    int frameCount = 0;
-
     // Feed a CAN frame, update internal state
     void updateFrame(int bus, uint32_t address, const uint8_t *data, size_t len) {
         parsers_.updateFrame(bus, address, data, len);
@@ -63,7 +59,7 @@ public:
         }
     }
 
-    const CarState& state() const { return state_; }
+    CarState& state() { return state_; }
 
 private:
     CANParsers parsers_;
@@ -72,6 +68,10 @@ private:
 };
 
 extern "C" {
+
+struct SubSocketGroup {
+    std::vector<SubSocket*> sockets;
+};
 
 static bool receiveLoopRunning = false;
 static JavaVM* g_vm = nullptr;
@@ -132,6 +132,47 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDeleteSubSocket(JNIEnv*
     }
     SubSocket* sub = reinterpret_cast<SubSocket*>(subPtr);
     delete sub;
+}
+
+// === SubSocketGroup (multiple endpoints) ===
+JNIEXPORT jlong JNICALL
+Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeCreateSubSockets(
+        JNIEnv* env, jobject thiz,
+        jlong ctxPtr,
+        jobjectArray endpoints,
+        jstring address) {
+
+    Context* ctx = reinterpret_cast<Context*>(ctxPtr);
+    const char* addrChars = env->GetStringUTFChars(address, nullptr);
+    std::string addressStr(addrChars);
+    env->ReleaseStringUTFChars(address, addrChars);
+
+    int count = env->GetArrayLength(endpoints);
+    auto* group = new SubSocketGroup();
+
+    for (int i = 0; i < count; i++) {
+        auto jstr = (jstring) env->GetObjectArrayElement(endpoints, i);
+        const char* chars = env->GetStringUTFChars(jstr, nullptr);
+        std::string endpointStr(chars);
+        env->ReleaseStringUTFChars(jstr, chars);
+
+        SubSocket* sub = SubSocket::create(ctx, endpointStr, addressStr, false, true, 0);
+        if (sub) {
+            group->sockets.push_back(sub);
+            LOGD("SubSocketGroup: subscribed to '%s' at %s", endpointStr.c_str(), addressStr.c_str());
+        }
+    }
+
+    return reinterpret_cast<jlong>(group);
+}
+
+JNIEXPORT void JNICALL
+Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDeleteSubSockets(
+        JNIEnv* env, jobject thiz, jlong groupPtr) {
+    if (groupPtr == 0) return;
+    auto* group = reinterpret_cast<SubSocketGroup*>(groupPtr);
+    for (auto* sub : group->sockets) delete sub;
+    delete group;
 }
 
 JNIEXPORT void JNICALL
@@ -330,17 +371,18 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDestroyVehicleDecoder(
     delete decoder;
 }
 
-// Receive loop using VehicleDecoder (for CommaDataSource / ZMQ)
+// Receive loop using VehicleDecoder + SubSocketGroup (for CommaDataSource / ZMQ)
 JNIEXPORT void JNICALL
 Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStartReceiveLoop(
         JNIEnv* env,
         jobject thiz,
         jlong decoderHandle,
-        jlong subPtr,
+        jlong groupPtr,
         jdoubleArray buffer,
         jobject callback) {
 
     auto* decoder = reinterpret_cast<VehicleDecoder*>(decoderHandle);
+    auto* group = reinterpret_cast<SubSocketGroup*>(groupPtr);
 
     g_callback = env->NewGlobalRef(callback);
     g_buffer = (jdoubleArray) env->NewGlobalRef(buffer);
@@ -348,15 +390,24 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStartReceiveLoop(
     jclass callbackClass = env->GetObjectClass(callback);
     g_onCanDataMethod = env->GetMethodID(callbackClass, "onCanData", "([D)V");
 
-    auto sub = reinterpret_cast<SubSocket*>(subPtr);
     receiveLoopRunning = true;
 
     long long msgTimeAccum = 0;
     int msgCount = 0;
 
+    // Extra state properties from SunnyPilot
+    double madsActive = 0.0;
+    double experimentalMode = 0.0;
+    double selfdriveActive = 0.0;
+
     while (receiveLoopRunning) {
-        Message *msg = sub->receive(true);
-        if (msg) {
+        bool gotAny = false;
+
+        for (auto* sub : group->sockets) {
+            Message *msg = sub->receive(true);
+            if (!msg) continue;
+            gotAny = true;
+
             auto t0 = std::chrono::high_resolution_clock::now();
 
             kj::ArrayPtr<capnp::word> canArray = kj::ArrayPtr<capnp::word>(
@@ -374,11 +425,23 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStartReceiveLoop(
                 }
 
                 decoder->updateMapper();
+
                 double output[CarState::FIELD_COUNT];
-                decoder->state().toArray(output);
+                auto& state = decoder->state();
+                state.experimentalMode = experimentalMode;
+                state.selfdriveActive = selfdriveActive;
+                state.madsActive = madsActive;
+                state.toArray(output);
                 env->SetDoubleArrayRegion(g_buffer, 0, CarState::FIELD_COUNT, output);
                 env->CallVoidMethod(g_callback, g_onCanDataMethod, g_buffer);
+            } else if (event.which() == cereal::Event::Which::SELFDRIVE_STATE_S_P) {
+                madsActive = event.getSelfdriveStateSP().getMads().getActive();
+            } else if (event.which() == cereal::Event::Which::SELFDRIVE_STATE) {
+                auto selfdriveState = event.getSelfdriveState();
+                experimentalMode = selfdriveState.getExperimentalMode();
+                selfdriveActive = selfdriveState.getActive();
             }
+
             delete msg;
 
             auto t1 = std::chrono::high_resolution_clock::now();
@@ -389,8 +452,10 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStartReceiveLoop(
                 msgTimeAccum = 0;
                 msgCount = 0;
             }
-        } else {
-            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        }
+
+        if (!gotAny) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
     }
 }
