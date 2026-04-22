@@ -32,6 +32,7 @@ class CarStateBridge {
     @Volatile private var packTMax: Float = 0f
     @Volatile private var odometer: Float = 0f
     @Volatile private var experimentalMode: Boolean = false
+    @Volatile private var madsActive: Boolean = false
     @Volatile private var phoneBattery: Int = -1
     @Volatile private var currentTime: Long = 0L
     @Volatile private var showPhoneBattery: Boolean = true
@@ -68,6 +69,7 @@ class CarStateBridge {
         packTMax = state.packTMax
         odometer = state.odometer
         experimentalMode = state.experimentalMode
+        madsActive = state.madsActive
     }
 
     @JavascriptInterface fun getEgoSteeringAngle(): Float = egoSteeringAngle
@@ -96,6 +98,7 @@ class CarStateBridge {
     @JavascriptInterface fun getPackTMax(): Float = packTMax
     @JavascriptInterface fun getOdometer(): Float = odometer
     @JavascriptInterface fun isExperimentalMode(): Boolean = experimentalMode
+    @JavascriptInterface fun isMadsActive(): Boolean = madsActive
     @JavascriptInterface fun getPhoneBattery(): Int = phoneBattery
     @JavascriptInterface fun getCurrentTime(): Long = currentTime
     @JavascriptInterface fun getShowPhoneBattery(): Boolean = showPhoneBattery

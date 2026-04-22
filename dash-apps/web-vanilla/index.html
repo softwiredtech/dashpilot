@@ -196,8 +196,8 @@
 
     #steeringContainer {
       position: relative;
-      width: 70px;
-      height: 70px;
+      width: 55px;
+      height: 55px;
       margin-top: 12px;
       color: rgb(94,95,97);
     }
@@ -750,6 +750,13 @@
         // Experimental mode icon
         document.getElementById("experimentalIcon").style.display = car.experimentalMode ? "block" : "none";
 
+        // Steering wheel: colorize green (#5cbd68) when ADAS or MADS is active
+        if (car.adasOn || car.madsActive) {
+          steeringWheel.style.filter = "brightness(0) saturate(100%) invert(68%) sepia(52%) saturate(405%) hue-rotate(88deg) brightness(92%) contrast(87%)";
+        } else {
+          steeringWheel.style.filter = "";
+        }
+
         // Rotate the steering wheel
         steeringWheel.style.transform = `rotate(${angle}deg)`;
       } catch (err) {
@@ -792,6 +799,7 @@
         darkMode: NativeCarState.isDarkMode?.() ?? false,
         alwaysOnBlindSpotMonitor: NativeCarState.isAlwaysOnBlindSpotMonitor?.() ?? true,
         experimentalMode: NativeCarState.isExperimentalMode?.() ?? false,
+        madsActive: NativeCarState.isMadsActive?.() ?? false,
       };
       receiveMessage(car);
     }
