@@ -374,6 +374,16 @@
     body.dark-mode #speedLimitSign {
       color: #ffffff;
     }
+
+    #experimentalIcon {
+      position: fixed;
+      bottom: 30px;
+      right: 40px;
+      width: 48px;
+      height: 48px;
+      z-index: 2000;
+      display: none;
+    }
   </style>
 </head>
 <body>
@@ -447,6 +457,8 @@
     <div id="bottomLeft">
       <div id="odometer"></div>
     </div>
+
+    <img id="experimentalIcon" src="experimental.png" alt="Experimental mode" />
 
   <script>
     const leftBlinkerIcon = document.getElementById("leftBlinkerIcon");
@@ -735,6 +747,9 @@
           document.getElementById("bottomLeft").style.display = "none";
         }
 
+        // Experimental mode icon
+        document.getElementById("experimentalIcon").style.display = car.experimentalMode ? "block" : "none";
+
         // Rotate the steering wheel
         steeringWheel.style.transform = `rotate(${angle}deg)`;
       } catch (err) {
@@ -776,6 +791,7 @@
         isImperial: NativeCarState.isImperial?.() ?? false,
         darkMode: NativeCarState.isDarkMode?.() ?? false,
         alwaysOnBlindSpotMonitor: NativeCarState.isAlwaysOnBlindSpotMonitor?.() ?? true,
+        experimentalMode: NativeCarState.isExperimentalMode?.() ?? false,
       };
       receiveMessage(car);
     }
