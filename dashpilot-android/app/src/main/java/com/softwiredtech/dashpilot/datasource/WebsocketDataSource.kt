@@ -1,11 +1,10 @@
 package com.softwiredtech.dashpilot.datasource
 
 import com.google.gson.Gson
-import com.softwiredtech.dashpilot.datamodel.CarState
+import com.softwiredtech.dashpilot.datamodel.dash.CarState
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.map
 import okhttp3.*
 import okio.ByteString

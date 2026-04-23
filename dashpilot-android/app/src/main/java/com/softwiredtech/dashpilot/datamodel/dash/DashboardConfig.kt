@@ -1,4 +1,4 @@
-package com.softwiredtech.dashpilot.datamodel
+package com.softwiredtech.dashpilot.datamodel.dash
 
 import com.softwiredtech.dashpilot.BuildConfig
 import com.softwiredtech.dashpilot.R

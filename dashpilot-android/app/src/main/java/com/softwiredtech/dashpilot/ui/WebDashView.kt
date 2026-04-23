@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.webkit.WebViewAssetLoader
-import com.softwiredtech.dashpilot.datamodel.DashState
+import com.softwiredtech.dashpilot.datamodel.dash.DashState
 import com.softwiredtech.dashpilot.js.CarStateBridge
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -29,7 +29,12 @@ const val LOCAL_ASSET_BASE_URL = "https://$ASSET_LOADER_DOMAIN/assets/"
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-fun WebDashView(modifier: Modifier = Modifier, url: String, scope: CoroutineScope, dashStateFlow: Flow<DashState>) {
+fun WebDashView(
+    modifier: Modifier = Modifier,
+    url: String,
+    scope: CoroutineScope,
+    dashStateFlow: Flow<DashState>
+) {
     val carStateBridge = remember { CarStateBridge() }
     val context = LocalContext.current
     val webView = remember { WebView(context) }
@@ -101,6 +106,7 @@ fun WebDashView(modifier: Modifier = Modifier, url: String, scope: CoroutineScop
                 carStateBridge.updatePhoneBattery(dashState.phoneBattery)
                 carStateBridge.updateCurrentTime(dashState.currentTime)
                 carStateBridge.updateDisplaySettings(dashState.displaySettings)
+                carStateBridge.updateSpeedCameraDistance(dashState.speedCameraDistance)
                 webView.post {
                     webView.evaluateJavascript("window.onCarStateUpdate && window.onCarStateUpdate()", null)
                 }

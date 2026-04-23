@@ -1,11 +1,10 @@
 package com.softwiredtech.dashpilot.datasource
 
-import com.softwiredtech.dashpilot.datamodel.CarState
+import com.softwiredtech.dashpilot.datamodel.dash.CarState
 import com.softwiredtech.dashpilot.jni.VehicleBridge
 import com.softwiredtech.dashpilot.vehicle.CanFrameDecoder
 import com.softwiredtech.dashpilot.vehicle.VehicleProfile
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.sample

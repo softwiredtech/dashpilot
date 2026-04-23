@@ -11,7 +11,7 @@ import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.util.Log
-import com.softwiredtech.dashpilot.datamodel.CarState
+import com.softwiredtech.dashpilot.datamodel.dash.CarState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import java.nio.ByteBuffer
