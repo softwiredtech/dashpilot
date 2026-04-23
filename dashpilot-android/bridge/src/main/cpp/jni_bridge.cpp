@@ -399,6 +399,7 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStartReceiveLoop(
     double madsActive = 0.0;
     double experimentalMode = 0.0;
     double selfdriveActive = 0.0;
+    double changingLane = 0.0;
 
     while (receiveLoopRunning) {
         bool gotAny = false;
@@ -431,6 +432,7 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStartReceiveLoop(
                 state.experimentalMode = experimentalMode;
                 state.selfdriveActive = selfdriveActive;
                 state.madsActive = madsActive;
+                state.changingLane = changingLane;
                 state.toArray(output);
                 env->SetDoubleArrayRegion(g_buffer, 0, CarState::FIELD_COUNT, output);
                 env->CallVoidMethod(g_callback, g_onCanDataMethod, g_buffer);
@@ -440,6 +442,8 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStartReceiveLoop(
                 auto selfdriveState = event.getSelfdriveState();
                 experimentalMode = selfdriveState.getExperimentalMode();
                 selfdriveActive = selfdriveState.getActive();
+                std::string alertType = selfdriveState.getAlertType().cStr();
+                changingLane = (alertType == "laneChange/warning") ? 1.0 : 0.0;
             }
 
             delete msg;

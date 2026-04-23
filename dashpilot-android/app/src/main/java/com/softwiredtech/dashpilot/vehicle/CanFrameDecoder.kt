@@ -55,7 +55,8 @@ class CanFrameDecoder(
                 //Openpilot
                 selfdriveActive = values[26] > 0,
                 experimentalMode = values[27] > 0,
-                madsActive = values[28] > 0
+                madsActive = values[28] > 0,
+                changingLane = values[29] > 0
             )
         }
     }
