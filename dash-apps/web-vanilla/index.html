@@ -256,6 +256,21 @@
       display: none;
     }
 
+    #speedCameraAlert {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.72);
+      color: #ffffff;
+      padding: 8px 22px;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: bold;
+      z-index: 3000;
+      display: none;
+    }
+
     #bottomLeft {
       position: fixed;
       bottom: 30px;
@@ -380,6 +395,8 @@
   <div id="canvas-container">
     <canvas id="bevy-canvas"></canvas>
   </div>
+
+  <div id="speedCameraAlert"></div>
 
   <div id="leftBlindSpot"></div>
   <div id="rightBlindSpot"></div>
@@ -737,6 +754,16 @@
 
         // Rotate the steering wheel
         steeringWheel.style.transform = `rotate(${angle}deg)`;
+
+        // Speed camera alert
+        const camDist = NativeCarState?.getSpeedCameraDistance?.() ?? -1;
+        const alertEl = document.getElementById('speedCameraAlert');
+        if (camDist > 0) {
+          alertEl.textContent = 'Speed camera ' + camDist + 'm ahead';
+          alertEl.style.display = 'block';
+        } else {
+          alertEl.style.display = 'none';
+        }
       } catch (err) {
         console.error("Failed to parse message", err);
       }

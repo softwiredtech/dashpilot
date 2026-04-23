@@ -1,6 +1,7 @@
 package com.softwiredtech.dashpilot.viewmodel
 
 import android.content.Context
+import android.location.Location
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,42 +14,34 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 class SpeedCameraViewModel : ViewModel() {
 
     private val _nearbyCameras = MutableStateFlow<List<SpeedCamera>>(emptyList())
     val nearbyCameras: StateFlow<List<SpeedCamera>> = _nearbyCameras.asStateFlow()
 
+    private val _nearestApproachingCamera = MutableStateFlow<Pair<SpeedCamera, Int>?>(null)
+    val nearestApproachingCamera: StateFlow<Pair<SpeedCamera, Int>?> = _nearestApproachingCamera.asStateFlow()
+
+    private val previousDistances = mutableMapOf<String, Float>()
     private var locationJob: Job? = null
 
     fun startUpdating(context: Context) {
         if (locationJob?.isActive == true) return
-
         locationJob = viewModelScope.launch {
             LocationProvider.locationFlow(context).collect { location ->
-                fetchAndLog(location.latitude, location.longitude, "GPS")
+                processLocation(location)
             }
         }
     }
 
-    fun startWithMocks() {
-        locationJob?.cancel()
-        locationJob = viewModelScope.launch {
-            val mocks = listOf(
-                Triple(46.0727, 18.2323, "Pécs"),
-                Triple(50.1109, 8.6821, "Frankfurt")
-            )
-            for ((lat, lng, name) in mocks) {
-                fetchAndLog(lat, lng, name)
-            }
-        }
-    }
-
-    private suspend fun fetchAndLog(lat: Double, lng: Double, label: String = "") {
+    private suspend fun processLocation(location: Location) {
         try {
-            val cameras = BlitzerRepository.fetchNearby(lat, lng)
+            val cameras = BlitzerRepository.fetchNearby(location.latitude, location.longitude)
             _nearbyCameras.value = cameras
-            Log.d("SpeedCameraVM", "[$label] Fetched ${cameras.size} cameras near $lat, $lng")
+            Log.d("SpeedCameraVM", "Fetched ${cameras.size} cameras near ${location.latitude}, ${location.longitude}")
+            updateApproaching(location, cameras)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -56,10 +49,44 @@ class SpeedCameraViewModel : ViewModel() {
         }
     }
 
+    private fun updateApproaching(location: Location, cameras: List<SpeedCamera>) {
+        val results = FloatArray(2)
+        val nearest = cameras
+            .mapNotNull { cam ->
+                Location.distanceBetween(location.latitude, location.longitude, cam.lat, cam.lng, results)
+                val dist = results[0]
+                if (dist > 1000f) return@mapNotNull null
+
+                val camBearing = results[1]
+                val key = "${cam.lat},${cam.lng}"
+
+                val approaching = if (location.hasBearing()) {
+                    var diff = abs((camBearing - location.bearing + 360f) % 360f)
+                    if (diff > 180f) diff = 360f - diff
+                    diff < 60f
+                } else {
+                    val prev = previousDistances[key]
+                    prev != null && dist < prev
+                }
+
+                previousDistances[key] = dist
+
+                if (approaching && dist <= 200f) cam to dist.toInt() else null
+            }
+            .minByOrNull { (_, d) -> d }
+
+        _nearestApproachingCamera.value = nearest
+        if (nearest != null) {
+            Log.d("SpeedCameraVM", "Alert: ${nearest.second}m ahead")
+        }
+    }
+
     fun stopUpdating() {
         locationJob?.cancel()
         locationJob = null
         _nearbyCameras.value = emptyList()
+        _nearestApproachingCamera.value = null
+        previousDistances.clear()
     }
 
     override fun onCleared() {
