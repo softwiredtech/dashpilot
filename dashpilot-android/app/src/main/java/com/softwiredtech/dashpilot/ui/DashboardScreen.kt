@@ -17,7 +17,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.softwiredtech.dashpilot.R
-import com.softwiredtech.dashpilot.datamodel.DashState
+import com.softwiredtech.dashpilot.datamodel.dash.DashState
 import kotlinx.coroutines.flow.Flow
 
 @Composable

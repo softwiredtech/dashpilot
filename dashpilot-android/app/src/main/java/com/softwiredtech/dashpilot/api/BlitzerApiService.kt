@@ -1,6 +1,6 @@
 package com.softwiredtech.dashpilot.api
 
-import com.softwiredtech.dashpilot.datamodel.BlitzerResponse
+import com.softwiredtech.dashpilot.datamodel.api.BlitzerResponse
 import retrofit2.http.GET
 import retrofit2.http.Query
 

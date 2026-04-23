@@ -1,4 +1,4 @@
-package com.softwiredtech.dashpilot.datamodel
+package com.softwiredtech.dashpilot.datamodel.api
 
 import com.google.gson.JsonElement
 import com.google.gson.annotations.SerializedName

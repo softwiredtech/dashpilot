@@ -4,8 +4,8 @@ import android.content.Context
 import android.os.BatteryManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.softwiredtech.dashpilot.datamodel.DashState
-import com.softwiredtech.dashpilot.datamodel.DisplaySettings
+import com.softwiredtech.dashpilot.datamodel.dash.DashState
+import com.softwiredtech.dashpilot.datamodel.dash.DisplaySettings
 import com.softwiredtech.dashpilot.datasource.CommaDataSource
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.IDataSource

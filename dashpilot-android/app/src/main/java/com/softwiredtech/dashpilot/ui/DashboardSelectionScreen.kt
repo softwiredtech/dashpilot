@@ -37,9 +37,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.softwiredtech.dashpilot.R
-import com.softwiredtech.dashpilot.datamodel.DashboardConfig
-import com.softwiredtech.dashpilot.datamodel.DashboardType
-import com.softwiredtech.dashpilot.datamodel.availableDashboards
+import com.softwiredtech.dashpilot.datamodel.dash.DashboardConfig
+import com.softwiredtech.dashpilot.datamodel.dash.DashboardType
+import com.softwiredtech.dashpilot.datamodel.dash.availableDashboards
 
 @Composable
 fun DashboardSelectionScreen(

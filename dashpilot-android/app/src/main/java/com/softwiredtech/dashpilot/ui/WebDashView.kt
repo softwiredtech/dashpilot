@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.webkit.WebViewAssetLoader
-import com.softwiredtech.dashpilot.datamodel.DashState
+import com.softwiredtech.dashpilot.datamodel.dash.DashState
 import com.softwiredtech.dashpilot.js.CarStateBridge
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow

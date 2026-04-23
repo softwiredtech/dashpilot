@@ -2,7 +2,7 @@ package com.softwiredtech.dashpilot.api
 
 import android.location.Location
 import android.util.Log
-import com.softwiredtech.dashpilot.datamodel.SpeedCamera
+import com.softwiredtech.dashpilot.datamodel.api.SpeedCamera
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import kotlin.math.cos

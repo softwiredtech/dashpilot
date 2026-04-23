@@ -6,7 +6,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.softwiredtech.dashpilot.api.BlitzerRepository
-import com.softwiredtech.dashpilot.datamodel.SpeedCamera
+import com.softwiredtech.dashpilot.datamodel.api.SpeedCamera
 import com.softwiredtech.dashpilot.util.LocationProvider
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -19,7 +19,6 @@ import kotlin.math.abs
 class SpeedCameraViewModel : ViewModel() {
 
     private val _nearbyCameras = MutableStateFlow<List<SpeedCamera>>(emptyList())
-    val nearbyCameras: StateFlow<List<SpeedCamera>> = _nearbyCameras.asStateFlow()
 
     private val _nearestApproachingCamera = MutableStateFlow<Pair<SpeedCamera, Int>?>(null)
     val nearestApproachingCamera: StateFlow<Pair<SpeedCamera, Int>?> = _nearestApproachingCamera.asStateFlow()
