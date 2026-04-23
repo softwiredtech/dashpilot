@@ -21,6 +21,15 @@ class VehicleBridge {
 
     external fun nativeDeleteSubSocket(subPtr: Long)
 
+    // SubSocketGroup (multi-endpoint subscription)
+    external fun nativeCreateSubSockets(
+        ctxPtr: Long,
+        endpoints: Array<String>,
+        address: String
+    ): Long
+
+    external fun nativeDeleteSubSockets(groupPtr: Long)
+
     // Discover a ZMQ publisher on the local subnet.
     // Returns the IP address of the publisher, or null if not found.
     external fun nativeDiscoverPublisher(
@@ -30,8 +39,8 @@ class VehicleBridge {
         timeoutMs: Int
     ): String?
 
-    // Receive messages using VehicleDecoder
-    external fun nativeStartReceiveLoop(decoderHandle: Long, subPtr: Long, buffer: DoubleArray, callback: CanSignalCallback)
+    // Receive messages using VehicleDecoder + SubSocketGroup
+    external fun nativeStartReceiveLoop(decoderHandle: Long, groupPtr: Long, buffer: DoubleArray, callback: CanSignalCallback)
     external fun nativeStopReceiveLoop()
 
     // VehicleDecoder
