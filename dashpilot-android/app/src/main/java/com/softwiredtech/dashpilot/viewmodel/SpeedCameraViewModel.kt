@@ -24,13 +24,14 @@ class SpeedCameraViewModel : ViewModel() {
     private val _nearestApproachingCamera = MutableStateFlow<Pair<SpeedCamera, Int>?>(null)
     val nearestApproachingCamera: StateFlow<Pair<SpeedCamera, Int>?> = _nearestApproachingCamera.asStateFlow()
 
+    private val locationInterval = MutableStateFlow(LocationProvider.INTERVAL_NORMAL)
     private val previousDistances = mutableMapOf<String, Float>()
     private var locationJob: Job? = null
 
     fun startUpdating(context: Context) {
         if (locationJob?.isActive == true) return
         locationJob = viewModelScope.launch {
-            LocationProvider.locationFlow(context).collect { location ->
+            LocationProvider.locationFlow(context, locationInterval).collect { location ->
                 processLocation(location)
             }
         }
@@ -40,7 +41,6 @@ class SpeedCameraViewModel : ViewModel() {
         try {
             val cameras = BlitzerRepository.fetchNearby(location.latitude, location.longitude)
             _nearbyCameras.value = cameras
-            Log.d("SpeedCameraVM", "Fetched ${cameras.size} cameras near ${location.latitude}, ${location.longitude}")
             updateApproaching(location, cameras)
         } catch (e: CancellationException) {
             throw e
@@ -51,12 +51,15 @@ class SpeedCameraViewModel : ViewModel() {
 
     private fun updateApproaching(location: Location, cameras: List<SpeedCamera>) {
         val results = FloatArray(2)
+        var anyCameraWithinRange = false
+
         val nearest = cameras
             .mapNotNull { cam ->
                 Location.distanceBetween(location.latitude, location.longitude, cam.lat, cam.lng, results)
                 val dist = results[0]
                 if (dist > 1000f) return@mapNotNull null
 
+                anyCameraWithinRange = true
                 val camBearing = results[1]
                 val key = "${cam.lat},${cam.lng}"
 
@@ -76,6 +79,14 @@ class SpeedCameraViewModel : ViewModel() {
             .minByOrNull { (_, d) -> d }
 
         _nearestApproachingCamera.value = nearest
+
+        val newInterval = if (anyCameraWithinRange) LocationProvider.INTERVAL_ALERT
+                          else LocationProvider.INTERVAL_NORMAL
+        if (locationInterval.value != newInterval) {
+            Log.d("SpeedCameraVM", "Switching to ${if (anyCameraWithinRange) "alert" else "normal"} interval")
+        }
+        locationInterval.value = newInterval
+
         if (nearest != null) {
             Log.d("SpeedCameraVM", "Alert: ${nearest.second}m ahead")
         }
@@ -86,7 +97,9 @@ class SpeedCameraViewModel : ViewModel() {
         locationJob = null
         _nearbyCameras.value = emptyList()
         _nearestApproachingCamera.value = null
+        locationInterval.value = LocationProvider.INTERVAL_NORMAL
         previousDistances.clear()
+        BlitzerRepository.clearCache()
     }
 
     override fun onCleared() {
