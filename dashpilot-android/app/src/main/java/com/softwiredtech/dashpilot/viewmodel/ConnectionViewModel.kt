@@ -19,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -32,6 +33,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     val connectionStatus = _connectionStatus.asStateFlow()
 
     private val _displaySettings = MutableStateFlow(DisplaySettings())
+    private val _speedCameraDistance = MutableStateFlow(-1)
 
     private val _dashState = MutableStateFlow<Flow<DashState>?>(null)
     val dashState = _dashState.asStateFlow()
@@ -92,14 +94,16 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
             val combined = combine(
                 ds.incomingMessages,
                 phoneBatteryFlow(context),
-                _displaySettings
-            ) { carState, battery, settings ->
+                _displaySettings,
+                _speedCameraDistance
+            ) { carState, battery, settings, camDist ->
                 val converted = if (settings.useImperial) carState.toImperial() else carState
                 DashState(
                     carState = converted,
                     phoneBattery = battery,
                     currentTime = System.currentTimeMillis(),
-                    displaySettings = settings
+                    displaySettings = settings,
+                    speedCameraDistance = camDist
                 )
             }
             _dashState.value = combined
@@ -112,6 +116,12 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
 
     fun updateDisplaySettings(settings: DisplaySettings) {
         _displaySettings.value = settings
+    }
+
+    fun bindSpeedCamera(flow: StateFlow<Pair<*, Int>?>) {
+        viewModelScope.launch {
+            flow.collect { _speedCameraDistance.value = it?.second ?: -1 }
+        }
     }
 
     fun disconnect() {

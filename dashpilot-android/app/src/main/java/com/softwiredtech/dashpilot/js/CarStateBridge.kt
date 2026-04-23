@@ -110,7 +110,7 @@ class CarStateBridge {
     @JavascriptInterface fun isAlwaysOnBlindSpotMonitor(): Boolean = alwaysOnBlindSpotMonitor
     @JavascriptInterface fun getSpeedCameraDistance(): Int = speedCameraDistance
 
-    fun updateSpeedCamera(distanceMeters: Int) {
+    fun updateSpeedCameraDistance(distanceMeters: Int) {
         speedCameraDistance = distanceMeters
     }
 

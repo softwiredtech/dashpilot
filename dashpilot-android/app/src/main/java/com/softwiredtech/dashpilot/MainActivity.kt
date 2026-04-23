@@ -103,7 +103,10 @@ class MainActivity : ComponentActivity() {
                         popExitTransition = { ExitTransition.None }
                     ) {
                         composable<SetupRoute> {
-                            LaunchedEffect(Unit) { speedCameraVM.startUpdating(context) }
+                            LaunchedEffect(Unit) {
+                                speedCameraVM.startUpdating(context)
+                                connectionVM.bindSpeedCamera(speedCameraVM.nearestApproachingCamera)
+                            }
                             SetupScreen(
                                 connectionStatus = connectionStatus,
                                 onConnect = { serverAddress, dataSourceType ->
@@ -150,8 +153,7 @@ class MainActivity : ComponentActivity() {
                                 DashboardScreen(
                                     dashboardType = route.dashboardType,
                                     dashboardUrl = route.dashboardUrl,
-                                    dashStateFlow = flow,
-                                    speedCameraFlow = speedCameraVM.nearestApproachingCamera
+                                    dashStateFlow = flow
                                 )
                             }
                         }

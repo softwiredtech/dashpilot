@@ -18,17 +18,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.datamodel.DashState
-import com.softwiredtech.dashpilot.datamodel.SpeedCamera
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
 fun DashboardScreen(
     dashboardType: String,
     dashboardUrl: String,
-    dashStateFlow: Flow<DashState>,
-    speedCameraFlow: Flow<Pair<SpeedCamera, Int>?> = emptyFlow()
+    dashStateFlow: Flow<DashState>
 ) {
     val scope = rememberCoroutineScope()
     val configuration = LocalConfiguration.current
@@ -61,8 +57,7 @@ fun DashboardScreen(
                 modifier = Modifier.fillMaxSize(),
                 url = dashboardUrl,
                 scope = scope,
-                dashStateFlow = dashStateFlow,
-                speedCameraFlow = speedCameraFlow
+                dashStateFlow = dashStateFlow
             )
         }
         "rive", "dev_rive" -> {

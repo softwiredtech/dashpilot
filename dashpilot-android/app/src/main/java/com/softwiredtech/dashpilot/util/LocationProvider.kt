@@ -4,10 +4,14 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
-import android.location.LocationListener
-import android.location.LocationManager
-import androidx.core.content.ContextCompat
+import android.os.Looper
 import android.util.Log
+import androidx.core.content.ContextCompat
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -32,42 +36,32 @@ object LocationProvider {
             return@callbackFlow
         }
 
-        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val client = LocationServices.getFusedLocationProviderClient(context)
 
-        val listener = LocationListener { location ->
-            Log.d(TAG, "Location update: ${location.latitude}, ${location.longitude} provider=${location.provider}")
-            trySend(location)
+        val priority = if (hasFine) Priority.PRIORITY_HIGH_ACCURACY
+                       else Priority.PRIORITY_BALANCED_POWER_ACCURACY
+
+        val request = LocationRequest.Builder(priority, 30_000L).build()
+
+        val callback = object : LocationCallback() {
+            override fun onLocationResult(result: LocationResult) {
+                val location = result.lastLocation ?: return
+                Log.d(TAG, "Location update: ${location.latitude}, ${location.longitude}")
+                trySend(location)
+            }
         }
 
-        val gpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
-        val networkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-        Log.d(TAG, "GPS enabled=$gpsEnabled, Network enabled=$networkEnabled")
+        client.requestLocationUpdates(request, callback, Looper.getMainLooper())
+            .addOnSuccessListener {
+                Log.d(TAG, "Registered for fused location updates (interval=30s)")
+            }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Failed to register location updates: ${e.message}", e)
+                close(e)
+            }
 
-        val provider = when {
-            hasFine && gpsEnabled -> LocationManager.GPS_PROVIDER
-            networkEnabled -> LocationManager.NETWORK_PROVIDER
-            else -> null
+        awaitClose {
+            client.removeLocationUpdates(callback)
         }
-
-        if (provider == null) {
-            Log.e(TAG, "No location provider available")
-            close()
-            return@callbackFlow
-        }
-
-        Log.d(TAG, "Using provider: $provider")
-
-        val lastKnown = locationManager.getLastKnownLocation(provider)
-        if (lastKnown != null) {
-            Log.d(TAG, "Last known location: ${lastKnown.latitude}, ${lastKnown.longitude}")
-            trySend(lastKnown)
-        } else {
-            Log.w(TAG, "No last known location for $provider — waiting for first fix")
-        }
-
-        // minTime 30s, minDistance 500m
-        locationManager.requestLocationUpdates(provider, 30_000L, 500f, listener)
-
-        awaitClose { locationManager.removeUpdates(listener) }
     }
 }
