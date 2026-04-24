@@ -9,7 +9,7 @@ import com.softwiredtech.dashpilot.datamodel.dash.DisplaySettings
 import com.softwiredtech.dashpilot.datasource.CommaDataSource
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.IDataSource
-import com.softwiredtech.dashpilot.datasource.PandaBleDataSource
+import com.softwiredtech.dashpilot.datasource.DashKitDataSource
 import com.softwiredtech.dashpilot.datasource.WebsocketDataSource
 import com.softwiredtech.dashpilot.jni.VehicleBridge
 import com.softwiredtech.dashpilot.util.NetworkUtil
@@ -63,7 +63,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
             val ds = when (dataSourceType) {
                 "ble" -> {
                     val decoder = CanFrameDecoder(bridge, profile)
-                    PandaBleDataSource(context, decoder)
+                    DashKitDataSource(context, decoder)
                 }
                 "websocket" -> WebsocketDataSource()
                 else -> CommaDataSource(bridge, profile)

@@ -10,6 +10,7 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Context
+import android.os.Build
 import android.util.Log
 import com.softwiredtech.dashpilot.datamodel.dash.CarState
 import kotlinx.coroutines.flow.Flow
@@ -18,23 +19,26 @@ import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.util.UUID
 import com.softwiredtech.dashpilot.vehicle.CanFrameDecoder
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.sample
 
 @SuppressLint("MissingPermission")
-class PandaBleDataSource(
+class DashKitDataSource(
     private val context: Context,
     private val decoder: CanFrameDecoder
 ) : IDataSource {
 
     companion object {
-        private const val TAG = "PandaBleDataSource"
-        private const val DEVICE_NAME = "PandaCAN"
+        private const val TAG = "DashKitDataSource"
+        private const val DEVICE_NAME = "DashKit"
         private val SERVICE_UUID = UUID.fromString("CADA0000-CA00-B1E0-B0D6-C000AA0100A1")
         private val CHAR_UUID = UUID.fromString("CADA0001-CA00-B1E0-B0D6-C000AA0100A1")
         private val CCCD_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
     }
 
     private val _incoming = MutableSharedFlow<CarState>(replay = 1)
-    override val incomingMessages: Flow<CarState> = _incoming
+    @OptIn(FlowPreview::class)
+    override val incomingMessages: Flow<CarState> = _incoming.sample(16)
 
     private var gatt: BluetoothGatt? = null
     private var scanning = false
@@ -104,18 +108,41 @@ class PandaBleDataSource(
             g.setCharacteristicNotification(characteristic, true)
             val descriptor = characteristic.getDescriptor(CCCD_UUID)
             if (descriptor != null) {
-                descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                g.writeDescriptor(descriptor)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    g.writeDescriptor(descriptor, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
+                } else {
+                    @Suppress("DEPRECATION")
+                    descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                    @Suppress("DEPRECATION")
+                    g.writeDescriptor(descriptor)
+                }
             }
             Log.d(TAG, "Subscribed to CAN notifications")
         }
 
+        override fun onDescriptorWrite(g: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
+            Log.d(TAG, "onDescriptorWrite status=${if (status == BluetoothGatt.GATT_SUCCESS) "SUCCESS" else status.toString()}")
+        }
+
+        // API 33+
+        override fun onCharacteristicChanged(
+            g: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            value: ByteArray
+        ) {
+            Log.d(TAG, "onCharacteristicChanged (new) ${value.size} bytes")
+            parseAndEmit(value)
+        }
+
+        // API < 33
         @Deprecated("Deprecated in API 33")
         override fun onCharacteristicChanged(
             g: BluetoothGatt,
             characteristic: BluetoothGattCharacteristic
         ) {
+            @Suppress("DEPRECATION")
             val value = characteristic.value ?: return
+            Log.d(TAG, "onCharacteristicChanged (legacy) ${value.size} bytes")
             parseAndEmit(value)
         }
     }
