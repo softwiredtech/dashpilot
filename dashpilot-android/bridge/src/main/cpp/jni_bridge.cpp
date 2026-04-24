@@ -348,6 +348,7 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDecodeCanFrame(
 
     decoder->updateFrame(bus, static_cast<uint32_t>(address),
                          reinterpret_cast<const uint8_t*>(dataBytes), dataLen);
+    decoder->updateMapper();
 
     env->ReleaseByteArrayElements(data, dataBytes, 0);
 
