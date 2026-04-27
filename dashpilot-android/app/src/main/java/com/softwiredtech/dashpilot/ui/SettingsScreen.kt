@@ -21,14 +21,20 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.core.content.edit
 import com.softwiredtech.dashpilot.datamodel.dash.DisplaySettings
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
@@ -70,6 +76,10 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
         mutableStateOf(sharedPrefs.getBoolean("always_on_blind_spot_monitor", true))
     }
 
+    val renderQualityState = remember {
+        mutableIntStateOf(sharedPrefs.getInt("render_quality", 3))
+    }
+
     val vehicleBusToggleStates = remember {
         vehicleBusToggles.map { toggle ->
             toggle to mutableStateOf(sharedPrefs.getBoolean(toggle.key, toggle.defaultValue))
@@ -83,6 +93,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
         useImperial = useImperialState.value,
         darkMode = darkModeState.value,
         alwaysOnBlindSpotMonitor = alwaysOnBlindSpotMonitorState.value,
+        renderQuality = renderQualityState.intValue,
     )
 
     Scaffold(
@@ -134,7 +145,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
             }
 
             Spacer(modifier = Modifier.height(24.dp))
-            Text("Display", color = Color(0xFF888888), fontSize = 13.sp)
+            Text("Display", color = Color(0xFF888888), fontSize = 16.sp)
             Spacer(modifier = Modifier.height(8.dp))
 
             SettingsToggle("Use imperial units", useImperialState.value) { enabled ->
@@ -155,12 +166,6 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                 onDisplaySettingsChanged(buildDisplaySettings())
             }
 
-            SettingsToggle("Always on blind-spot monitor", alwaysOnBlindSpotMonitorState.value) { enabled ->
-                alwaysOnBlindSpotMonitorState.value = enabled
-                sharedPrefs.edit { putBoolean("always_on_blind_spot_monitor", enabled) }
-                onDisplaySettingsChanged(buildDisplaySettings())
-            }
-
             if (extraBusState.value) {
                 vehicleBusToggleStates.forEach { (toggle, state) ->
                     SettingsToggle(toggle.label, state.value) { enabled ->
@@ -171,6 +176,61 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                 }
             }
 
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text("3D visualizer", color = Color(0xFF888888), fontSize = 16.sp)
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+
+            SettingsToggle("Always on blind-spot monitor", alwaysOnBlindSpotMonitorState.value) { enabled ->
+                alwaysOnBlindSpotMonitorState.value = enabled
+                sharedPrefs.edit { putBoolean("always_on_blind_spot_monitor", enabled) }
+                onDisplaySettingsChanged(buildDisplaySettings())
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+            RenderQualitySelector(renderQualityState.intValue) { quality ->
+                renderQualityState.intValue = quality
+                sharedPrefs.edit { putInt("render_quality", quality) }
+                onDisplaySettingsChanged(buildDisplaySettings())
+            }
+
+        }
+    }
+}
+
+@Composable
+private fun RenderQualitySelector(selected: Int, onSelected: (Int) -> Unit) {
+    val options = listOf(1 to "Low", 2 to "Medium", 3 to "High")
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = "Render quality", color = Color.White, fontSize = 16.sp)
+        Row(
+            modifier = Modifier
+                .clip(RoundedCornerShape(8.dp))
+                .background(Color(0xFF333333))
+        ) {
+            options.forEach { (value, label) ->
+                val isSelected = value == selected
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(if (isSelected) AccentColor else Color.Transparent)
+                        .clickable { onSelected(value) }
+                        .padding(horizontal = 14.dp, vertical = 8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = label,
+                        color = if (isSelected) Color.White else Color(0xFF888888),
+                        fontSize = 13.sp
+                    )
+                }
+            }
         }
     }
 }
