@@ -1,4 +1,4 @@
-package com.softwiredtech.dashpilot.datamodel
+package com.softwiredtech.dashpilot.datamodel.dash
 
 data class DisplaySettings(
     val showPhoneBattery: Boolean = true,
@@ -6,5 +6,6 @@ data class DisplaySettings(
     val showOdometer: Boolean = true,
     val useImperial: Boolean = false,
     val darkMode: Boolean = false,
-    val alwaysOnBlindSpotMonitor: Boolean = true
+    val alwaysOnBlindSpotMonitor: Boolean = true,
+    val renderQuality: Int = 3
 )

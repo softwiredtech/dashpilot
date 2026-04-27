@@ -51,15 +51,20 @@ class NetworkUtil(private val context: Context) {
     suspend fun findCanPublisher(
         initialIp: String,
         endpoint: String = "can",
-        timeoutMs: Int = 5000
+        timeoutMs: Int = 5000,
+        maxRetries: Int = 3
     ): String? {
         val bridge = VehicleBridge()
         val ctx = bridge.nativeCreateContext()
 
         return try {
-            withContext(Dispatchers.IO) {
-                bridge.nativeDiscoverPublisher(ctx, endpoint, initialIp, timeoutMs)
+            repeat(maxRetries) {
+                val result = withContext(Dispatchers.IO) {
+                    bridge.nativeDiscoverPublisher(ctx, endpoint, initialIp, timeoutMs)
+                }
+                if (result != null) return result
             }
+            null
         } finally {
             bridge.nativeDeleteContext(ctx)
         }

@@ -1,4 +1,4 @@
-package com.softwiredtech.dashpilot.datamodel
+package com.softwiredtech.dashpilot.datamodel.dash
 
 import java.util.Locale
 

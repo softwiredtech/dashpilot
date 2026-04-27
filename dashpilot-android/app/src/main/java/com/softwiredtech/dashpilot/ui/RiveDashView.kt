@@ -19,7 +19,7 @@ import app.rive.ViewModelSource
 import app.rive.rememberRiveFile
 import app.rive.rememberRiveWorkerOrNull
 import app.rive.rememberViewModelInstance
-import com.softwiredtech.dashpilot.datamodel.DashState
+import com.softwiredtech.dashpilot.datamodel.dash.DashState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch

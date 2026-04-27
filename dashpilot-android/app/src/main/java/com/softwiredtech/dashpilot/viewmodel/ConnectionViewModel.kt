@@ -4,12 +4,12 @@ import android.content.Context
 import android.os.BatteryManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.softwiredtech.dashpilot.datamodel.DashState
-import com.softwiredtech.dashpilot.datamodel.DisplaySettings
+import com.softwiredtech.dashpilot.datamodel.dash.DashState
+import com.softwiredtech.dashpilot.datamodel.dash.DisplaySettings
 import com.softwiredtech.dashpilot.datasource.CommaDataSource
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.IDataSource
-import com.softwiredtech.dashpilot.datasource.PandaBleDataSource
+import com.softwiredtech.dashpilot.datasource.DashKitDataSource
 import com.softwiredtech.dashpilot.datasource.WebsocketDataSource
 import com.softwiredtech.dashpilot.jni.VehicleBridge
 import com.softwiredtech.dashpilot.util.NetworkUtil
@@ -19,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -32,6 +33,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     val connectionStatus = _connectionStatus.asStateFlow()
 
     private val _displaySettings = MutableStateFlow(DisplaySettings())
+    private val _speedCameraDistance = MutableStateFlow(-1)
 
     private val _dashState = MutableStateFlow<Flow<DashState>?>(null)
     val dashState = _dashState.asStateFlow()
@@ -61,7 +63,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
             val ds = when (dataSourceType) {
                 "ble" -> {
                     val decoder = CanFrameDecoder(bridge, profile)
-                    PandaBleDataSource(context, decoder)
+                    DashKitDataSource(context, decoder)
                 }
                 "websocket" -> WebsocketDataSource()
                 else -> CommaDataSource(bridge, profile)
@@ -86,20 +88,23 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
                 showOdometer = prefs.getBoolean("show_odometer", true),
                 useImperial = prefs.getBoolean("use_imperial", false),
                 darkMode = prefs.getBoolean("dark_mode", false),
-                alwaysOnBlindSpotMonitor = prefs.getBoolean("always_on_blind_spot_monitor", true)
+                alwaysOnBlindSpotMonitor = prefs.getBoolean("always_on_blind_spot_monitor", true),
+                renderQuality = prefs.getInt("render_quality", 3)
             )
 
             val combined = combine(
                 ds.incomingMessages,
                 phoneBatteryFlow(context),
-                _displaySettings
-            ) { carState, battery, settings ->
+                _displaySettings,
+                _speedCameraDistance
+            ) { carState, battery, settings, camDist ->
                 val converted = if (settings.useImperial) carState.toImperial() else carState
                 DashState(
                     carState = converted,
                     phoneBattery = battery,
                     currentTime = System.currentTimeMillis(),
-                    displaySettings = settings
+                    displaySettings = settings,
+                    speedCameraDistance = camDist
                 )
             }
             _dashState.value = combined
@@ -112,6 +117,12 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
 
     fun updateDisplaySettings(settings: DisplaySettings) {
         _displaySettings.value = settings
+    }
+
+    fun bindSpeedCamera(flow: StateFlow<Pair<*, Int>?>) {
+        viewModelScope.launch {
+            flow.collect { _speedCameraDistance.value = it?.second ?: -1 }
+        }
     }
 
     fun disconnect() {

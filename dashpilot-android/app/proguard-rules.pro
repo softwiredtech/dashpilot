@@ -11,9 +11,9 @@
 }
 
 # --- CarState data class (used by JS bridge and Gson) ---
--keep class com.softwiredtech.dashpilot.datamodel.CarState { *; }
--keep class com.softwiredtech.dashpilot.datamodel.DashboardConfig { *; }
--keep class com.softwiredtech.dashpilot.datamodel.DashboardConfig$* { *; }
+-keep class com.softwiredtech.dashpilot.datamodel.dash.CarState { *; }
+-keep class com.softwiredtech.dashpilot.datamodel.dash.DashboardConfig { *; }
+-keep class com.softwiredtech.dashpilot.datamodel.dash.DashboardConfig$* { *; }
 
 # --- Kotlinx Serialization ---
 -keepattributes *Annotation*, InnerClasses

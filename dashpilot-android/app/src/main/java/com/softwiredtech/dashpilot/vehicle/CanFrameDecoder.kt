@@ -1,6 +1,6 @@
 package com.softwiredtech.dashpilot.vehicle
 
-import com.softwiredtech.dashpilot.datamodel.CarState
+import com.softwiredtech.dashpilot.datamodel.dash.CarState
 import com.softwiredtech.dashpilot.jni.VehicleBridge
 
 // This is a wrapper for the C++ VehicleDecoder so that DataSources that are

@@ -1,8 +1,8 @@
 package com.softwiredtech.dashpilot.js
 
 import android.webkit.JavascriptInterface
-import com.softwiredtech.dashpilot.datamodel.CarState
-import com.softwiredtech.dashpilot.datamodel.DisplaySettings
+import com.softwiredtech.dashpilot.datamodel.dash.CarState
+import com.softwiredtech.dashpilot.datamodel.dash.DisplaySettings
 
 class CarStateBridge {
 
@@ -42,6 +42,8 @@ class CarStateBridge {
     @Volatile private var useImperial: Boolean = false
     @Volatile private var darkMode: Boolean = false
     @Volatile private var alwaysOnBlindSpotMonitor: Boolean = true
+    @Volatile private var renderQuality: Int = 3
+    @Volatile private var speedCameraDistance: Int = -1
 
     fun update(state: CarState) {
         egoSteeringAngle = state.egoSteeringAngle
@@ -110,6 +112,12 @@ class CarStateBridge {
     @JavascriptInterface fun isImperial(): Boolean = useImperial
     @JavascriptInterface fun isDarkMode(): Boolean = darkMode
     @JavascriptInterface fun isAlwaysOnBlindSpotMonitor(): Boolean = alwaysOnBlindSpotMonitor
+    @JavascriptInterface fun getRenderQuality(): Int = renderQuality
+    @JavascriptInterface fun getSpeedCameraDistance(): Int = speedCameraDistance
+
+    fun updateSpeedCameraDistance(distanceMeters: Int) {
+        speedCameraDistance = distanceMeters
+    }
 
     fun updatePhoneBattery(level: Int) {
         phoneBattery = level
@@ -126,5 +134,6 @@ class CarStateBridge {
         useImperial = settings.useImperial
         darkMode = settings.darkMode
         alwaysOnBlindSpotMonitor = settings.alwaysOnBlindSpotMonitor
+        renderQuality = settings.renderQuality
     }
 }
