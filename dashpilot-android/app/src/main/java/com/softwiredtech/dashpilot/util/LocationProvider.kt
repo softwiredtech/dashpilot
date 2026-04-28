@@ -21,7 +21,7 @@ import kotlinx.coroutines.launch
 object LocationProvider {
 
     private const val TAG = "LocationProvider"
-    const val INTERVAL_NORMAL = 30_000L
+    const val INTERVAL_NORMAL = 20_000L
     const val INTERVAL_ALERT = 2_000L
 
     fun locationFlow(
