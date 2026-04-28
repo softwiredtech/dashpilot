@@ -42,6 +42,7 @@ class CarStateBridge {
     @Volatile private var darkMode: Boolean = false
     @Volatile private var alwaysOnBlindSpotMonitor: Boolean = true
     @Volatile private var renderQuality: Int = 3
+    @Volatile private var changingLane: Boolean = false
     @Volatile private var speedCameraDistance: Int = -1
 
     fun update(state: CarState) {
@@ -72,6 +73,7 @@ class CarStateBridge {
         odometer = state.odometer
         experimentalMode = state.experimentalMode
         madsActive = state.madsActive
+        changingLane = state.changingLane
     }
 
     @JavascriptInterface fun getEgoSteeringAngle(): Float = egoSteeringAngle
@@ -110,6 +112,7 @@ class CarStateBridge {
     @JavascriptInterface fun isDarkMode(): Boolean = darkMode
     @JavascriptInterface fun isAlwaysOnBlindSpotMonitor(): Boolean = alwaysOnBlindSpotMonitor
     @JavascriptInterface fun getRenderQuality(): Int = renderQuality
+    @JavascriptInterface fun isChangingLane(): Boolean = changingLane
     @JavascriptInterface fun getSpeedCameraDistance(): Int = speedCameraDistance
 
     fun updateSpeedCameraDistance(distanceMeters: Int) {
