@@ -650,7 +650,7 @@
 
         speedText.textContent = speed;
         speedUnit.textContent = car.isImperial ? "mph" : "km/h";
-        if (speedLimit == 31 || speedLimit == 0) {
+        if (speedLimit == 0) {
           speedLimitText.textContent = "";
         } else {
           speedLimitText.textContent = speedLimit;
