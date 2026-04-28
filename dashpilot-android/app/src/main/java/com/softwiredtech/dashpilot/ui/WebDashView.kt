@@ -10,6 +10,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -98,6 +99,15 @@ fun WebDashView(
         },
         modifier = modifier
     )
+
+    DisposableEffect(webView) {
+        onDispose {
+            webView.stopLoading()
+            webView.loadUrl("about:blank")
+            webView.removeJavascriptInterface("NativeCarState")
+            webView.destroy()
+        }
+    }
 
     LaunchedEffect(pageLoaded) {
         if (pageLoaded) {
