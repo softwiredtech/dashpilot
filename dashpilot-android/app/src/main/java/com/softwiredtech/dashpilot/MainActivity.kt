@@ -55,14 +55,14 @@ class MainActivity : ComponentActivity() {
 
     private val speedCameraVM: SpeedCameraViewModel by viewModels()
 
-    private val bluetoothPermissionLauncher = registerForActivityResult(
+    private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
-    ) { /* permissions granted or denied — BLE will fail gracefully if denied */ }
+    ) { /* location permissions granted or denied */ }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        requestBluetoothPermissions()
+        requestLocationPermission()
 
         AppInitializer.getInstance(applicationContext)
             .initializeComponent(RiveInitializer::class.java)
@@ -159,25 +159,16 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun requestBluetoothPermissions() {
-        val needed = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            arrayOf(
-                Manifest.permission.BLUETOOTH_SCAN,
-                Manifest.permission.BLUETOOTH_CONNECT,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            )
-        } else {
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            )
-        }.filter {
+    private fun requestLocationPermission() {
+        val needed = arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ).filter {
             ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
         }.toTypedArray()
 
         if (needed.isNotEmpty()) {
-            bluetoothPermissionLauncher.launch(needed)
+            locationPermissionLauncher.launch(needed)
         }
     }
 
