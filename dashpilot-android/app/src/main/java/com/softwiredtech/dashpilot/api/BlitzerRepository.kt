@@ -5,6 +5,7 @@ import android.util.Log
 import com.softwiredtech.dashpilot.datamodel.api.SpeedCamera
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.Locale
 import kotlin.math.cos
 import kotlin.math.PI
 
@@ -38,7 +39,7 @@ object BlitzerRepository {
 
         val latDelta = SEARCH_RADIUS_KM / 111.0
         val lngDelta = SEARCH_RADIUS_KM / (111.0 * cos(lat * PI / 180.0))
-        val box = "%.6f,%.6f,%.6f,%.6f".format(lat - latDelta, lng - lngDelta, lat + latDelta, lng + lngDelta)
+        val box = String.format(Locale.US, "%.6f,%.6f,%.6f,%.6f", lat - latDelta, lng - lngDelta, lat + latDelta, lng + lngDelta)
 
         val response = api.getPois(type = POI_TYPES, box = box)
 
