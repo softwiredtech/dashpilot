@@ -9,7 +9,6 @@ import com.softwiredtech.dashpilot.api.BlitzerRepository
 import com.softwiredtech.dashpilot.datamodel.api.SpeedCamera
 import com.softwiredtech.dashpilot.util.LocationProvider
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,7 +29,7 @@ class SpeedCameraViewModel : ViewModel() {
 
     fun startUpdating(context: Context) {
         if (locationJob?.isActive == true) return
-        locationJob = viewModelScope.launch(Dispatchers.IO) {
+        locationJob = viewModelScope.launch {
             LocationProvider.locationFlow(context, locationInterval).collect { location ->
                 processLocation(location)
             }
