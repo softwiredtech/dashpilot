@@ -620,7 +620,9 @@
 
         const remappedDeg = (angle - IN_MIN) * (OUT_MAX - OUT_MIN) / (IN_MAX - IN_MIN) + OUT_MIN;
         const remappedRad = -remappedDeg * Math.PI / 180;
-        const speedMs     = roundedSpeed / 3.6;
+        const speedKmh    = car.isImperial ? roundedSpeed * 1.60934 : roundedSpeed;
+        const cappedKmh   = Math.min(speedKmh, 70);
+        const speedMs     = cappedKmh / 3.6;
 
         world.ego_steering_angle = remappedRad;
         world.ego_speed = speedMs;
