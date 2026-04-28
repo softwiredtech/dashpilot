@@ -256,7 +256,7 @@
       display: none;
     }
 
-    #speedCameraAlert {
+    #driverAlert {
       position: fixed;
       bottom: 30px;
       left: 50%;
@@ -410,7 +410,7 @@
     <canvas id="bevy-canvas"></canvas>
   </div>
 
-  <div id="speedCameraAlert"></div>
+  <div id="driverAlert"></div>
 
   <div id="leftBlindSpot"></div>
   <div id="rightBlindSpot"></div>
@@ -783,10 +783,14 @@
         // Rotate the steering wheel
         steeringWheel.style.transform = `rotate(${angle}deg)`;
 
-        // Speed camera alert
+        // Driver alerts
         const camDist = NativeCarState?.getSpeedCameraDistance?.() ?? -1;
-        const alertEl = document.getElementById('speedCameraAlert');
-        if (camDist > 0) {
+        const isChangingLane = NativeCarState?.isChangingLane?.() ?? false;
+        const alertEl = document.getElementById('driverAlert');
+        if (isChangingLane) {
+          alertEl.textContent = 'Changing lane';
+          alertEl.style.display = 'block';
+        } else if (camDist > 0) {
           alertEl.textContent = 'Speed camera ' + camDist + 'm ahead';
           alertEl.style.display = 'block';
         } else {
