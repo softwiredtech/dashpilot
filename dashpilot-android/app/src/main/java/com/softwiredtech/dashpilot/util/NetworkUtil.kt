@@ -4,7 +4,10 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import com.softwiredtech.dashpilot.jni.VehicleBridge
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.net.Inet4Address
 import java.net.NetworkInterface
@@ -14,6 +17,8 @@ class NetworkUtil(private val context: Context) {
         return getIpFromConnectivityManager() ?: getHotspotIpAddress()
     }
 
+    // Returns the IP when the device is a hotspot, because in that case getIpFromConnectivityManager
+    // won't work.
     private fun getIpFromConnectivityManager(): String? {
         val connectivityManager = context.applicationContext
             .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -51,20 +56,23 @@ class NetworkUtil(private val context: Context) {
     suspend fun findCanPublisher(
         initialIp: String,
         endpoint: String = "can",
-        timeoutMs: Int = 5000,
-        maxRetries: Int = 3
-    ): String? {
+        timeoutMs: Int = 5000
+    ): String {
         val bridge = VehicleBridge()
         val ctx = bridge.nativeCreateContext()
 
-        return try {
-            repeat(maxRetries) {
+        try {
+            while (true) {
+                currentCoroutineContext().ensureActive()
                 val result = withContext(Dispatchers.IO) {
                     bridge.nativeDiscoverPublisher(ctx, endpoint, initialIp, timeoutMs)
                 }
-                if (result != null) return result
+                if (result == null) {
+                    delay(700)
+                } else {
+                    return result
+                }
             }
-            null
         } finally {
             bridge.nativeDeleteContext(ctx)
         }
