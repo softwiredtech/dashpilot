@@ -70,6 +70,11 @@ class MainActivity : ComponentActivity() {
         // Enable edge-to-edge for Compose
         enableEdgeToEdge()
 
+        // Start comma discovery as soon as we launch the app.
+        if (!BuildConfig.DEBUG) {
+            connectionVM.connect(this, "", "comma")
+        }
+
         setContent {
             DashPilotTheme {
                 val navController = rememberNavController()

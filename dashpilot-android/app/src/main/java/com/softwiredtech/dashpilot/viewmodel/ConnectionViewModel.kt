@@ -16,6 +16,7 @@ import com.softwiredtech.dashpilot.util.NetworkUtil
 import com.softwiredtech.dashpilot.vehicle.CanFrameDecoder
 import com.softwiredtech.dashpilot.vehicle.VehicleProfileLoader
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +29,7 @@ import kotlinx.coroutines.launch
 
 class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     private val _dataSource = MutableStateFlow<IDataSource?>(null)
+    private var connectionJob: Job? = null
 
     private val _connectionStatus = MutableStateFlow<ConnectionStatus>(ConnectionStatus.Disconnected)
     val connectionStatus = _connectionStatus.asStateFlow()
@@ -53,7 +55,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
 
         var finalServerAddress = manualServerAddress
         _connectionStatus.value = ConnectionStatus.Connecting
-        viewModelScope.launch(Dispatchers.IO) {
+        connectionJob = viewModelScope.launch(Dispatchers.IO) {
             val vehicleName = "tesla" // TODO: make configurable via UI
             val prefs = context.getSharedPreferences("dash_prefs", Context.MODE_PRIVATE)
             val extraBus = prefs.getBoolean("extra_vehicle_bus", false)
@@ -70,17 +72,15 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
             }
 
             if (finalServerAddress.isEmpty() && dataSourceType == "comma") {
-                val localIp = networkUtil.getWifiIpAddress()
-                val found = localIp?.let { networkUtil.findCanPublisher(initialIp = it) }
-                if (found == null) {
-                    _connectionStatus.value = ConnectionStatus.Error("No device found")
-                    return@launch
+                var localIp = networkUtil.getWifiIpAddress()
+                while (localIp == null) {
+                    delay(1000)
+                    localIp = networkUtil.getWifiIpAddress()
                 }
-                finalServerAddress = found
+                finalServerAddress = networkUtil.findCanPublisher(initialIp = localIp)
             }
 
             _dataSource.value = ds
-
 
             _displaySettings.value = DisplaySettings(
                 showPhoneBattery = prefs.getBoolean("show_phone_battery", true),
@@ -126,9 +126,16 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     }
 
     fun disconnect() {
+        val wasConnecting = _connectionStatus.value is ConnectionStatus.Connecting
+        connectionJob?.cancel()
+        connectionJob = null
         _dataSource.value?.disconnect()
         _dataSource.value = null
         _dashState.value = null
-        _connectionStatus.value = ConnectionStatus.Disconnected
+        _connectionStatus.value = if (wasConnecting) {
+            ConnectionStatus.Error("Discovery cancelled")
+        } else {
+            ConnectionStatus.Disconnected
+        }
     }
 }
