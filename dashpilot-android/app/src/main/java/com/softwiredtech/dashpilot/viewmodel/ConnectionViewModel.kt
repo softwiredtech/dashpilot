@@ -89,7 +89,8 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
                 useImperial = prefs.getBoolean("use_imperial", false),
                 darkMode = prefs.getBoolean("dark_mode", false),
                 alwaysOnBlindSpotMonitor = prefs.getBoolean("always_on_blind_spot_monitor", true),
-                renderQuality = prefs.getInt("render_quality", 3)
+                renderQuality = prefs.getInt("render_quality", 3),
+                darkModeBackgroundGray = prefs.getInt("dark_mode_background_gray", 0)
             )
 
             val combined = combine(
