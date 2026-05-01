@@ -42,6 +42,7 @@ class CarStateBridge {
     @Volatile private var darkMode: Boolean = false
     @Volatile private var alwaysOnBlindSpotMonitor: Boolean = true
     @Volatile private var renderQuality: Int = 3
+    @Volatile private var darkModeBackgroundGray: Int = 0
     @Volatile private var changingLane: Boolean = false
     @Volatile private var speedCameraDistance: Int = -1
 
@@ -112,6 +113,7 @@ class CarStateBridge {
     @JavascriptInterface fun isDarkMode(): Boolean = darkMode
     @JavascriptInterface fun isAlwaysOnBlindSpotMonitor(): Boolean = alwaysOnBlindSpotMonitor
     @JavascriptInterface fun getRenderQuality(): Int = renderQuality
+    @JavascriptInterface fun getDarkModeBackgroundGray(): Int = darkModeBackgroundGray
     @JavascriptInterface fun isChangingLane(): Boolean = changingLane
     @JavascriptInterface fun getSpeedCameraDistance(): Int = speedCameraDistance
 
@@ -135,5 +137,6 @@ class CarStateBridge {
         darkMode = settings.darkMode
         alwaysOnBlindSpotMonitor = settings.alwaysOnBlindSpotMonitor
         renderQuality = settings.renderQuality
+        darkModeBackgroundGray = settings.darkModeBackgroundGray
     }
 }

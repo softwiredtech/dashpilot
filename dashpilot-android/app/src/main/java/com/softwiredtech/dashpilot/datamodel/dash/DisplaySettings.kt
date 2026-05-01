@@ -7,5 +7,6 @@ data class DisplaySettings(
     val useImperial: Boolean = false,
     val darkMode: Boolean = false,
     val alwaysOnBlindSpotMonitor: Boolean = true,
-    val renderQuality: Int = 3
+    val renderQuality: Int = 3,
+    val darkModeBackgroundGray: Int = 0
 )

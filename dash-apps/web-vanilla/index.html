@@ -598,7 +598,7 @@
             lane_boundary_color: [1.0, 1.0, 1.0, 1.0],
             lane_fill_color: [0.1, 0.7, 0.9, 0.55],
             use_dark_ego_model: car.darkMode,
-            dark_mode_background_color: [0.0, 0.0, 0.0],
+            dark_mode_background_color: [car.darkModeBackgroundGray / 255.0, car.darkModeBackgroundGray / 255.0, car.darkModeBackgroundGray / 255.0],
             render_quality: car.renderQuality
           },
         };
@@ -842,6 +842,7 @@
         experimentalMode: NativeCarState.isExperimentalMode?.() ?? false,
         madsActive: NativeCarState.isMadsActive?.() ?? false,
         renderQuality: NativeCarState.getRenderQuality?.() ?? 3,
+        darkModeBackgroundGray: NativeCarState.getDarkModeBackgroundGray?.() ?? 0,
       };
       receiveMessage(car);
     }

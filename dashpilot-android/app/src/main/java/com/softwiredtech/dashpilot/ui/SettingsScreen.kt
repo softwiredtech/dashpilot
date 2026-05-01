@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +32,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -80,6 +83,10 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
         mutableIntStateOf(sharedPrefs.getInt("render_quality", 3))
     }
 
+    val darkModeBackgroundGrayState = remember {
+        mutableFloatStateOf(sharedPrefs.getInt("dark_mode_background_gray", 0).toFloat())
+    }
+
     val vehicleBusToggleStates = remember {
         vehicleBusToggles.map { toggle ->
             toggle to mutableStateOf(sharedPrefs.getBoolean(toggle.key, toggle.defaultValue))
@@ -94,6 +101,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
         darkMode = darkModeState.value,
         alwaysOnBlindSpotMonitor = alwaysOnBlindSpotMonitorState.value,
         renderQuality = renderQualityState.intValue,
+        darkModeBackgroundGray = darkModeBackgroundGrayState.floatValue.toInt(),
     )
 
     Scaffold(
@@ -154,12 +162,6 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                 onDisplaySettingsChanged(buildDisplaySettings())
             }
 
-            SettingsToggle("Dark mode", darkModeState.value) { enabled ->
-                darkModeState.value = enabled
-                sharedPrefs.edit { putBoolean("dark_mode", enabled) }
-                onDisplaySettingsChanged(buildDisplaySettings())
-            }
-
             SettingsToggle("Show phone battery", showPhoneBatteryState.value) { enabled ->
                 showPhoneBatteryState.value = enabled
                 sharedPrefs.edit { putBoolean("show_phone_battery", enabled) }
@@ -182,14 +184,59 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
 
             Spacer(modifier = Modifier.height(8.dp))
 
-
             SettingsToggle("Always on blind-spot monitor", alwaysOnBlindSpotMonitorState.value) { enabled ->
                 alwaysOnBlindSpotMonitorState.value = enabled
                 sharedPrefs.edit { putBoolean("always_on_blind_spot_monitor", enabled) }
                 onDisplaySettingsChanged(buildDisplaySettings())
             }
 
+            SettingsToggle("Dark mode", darkModeState.value) { enabled ->
+                darkModeState.value = enabled
+                sharedPrefs.edit { putBoolean("dark_mode", enabled) }
+                onDisplaySettingsChanged(buildDisplaySettings())
+            }
+
+            if (darkModeState.value) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = "Background brightness", color = Color.White, fontSize = 16.sp)
+                    val grayVal = darkModeBackgroundGrayState.floatValue.toInt()
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(Color(grayVal, grayVal, grayVal))
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = "$grayVal",
+                            color = Color.White,
+                            fontSize = 13.sp
+                        )
+                    }
+                }
+                Slider(
+                    value = darkModeBackgroundGrayState.floatValue,
+                    onValueChange = { darkModeBackgroundGrayState.floatValue = it },
+                    onValueChangeFinished = {
+                        val v = darkModeBackgroundGrayState.floatValue.toInt()
+                        sharedPrefs.edit { putInt("dark_mode_background_gray", v) }
+                        onDisplaySettingsChanged(buildDisplaySettings())
+                    },
+                    valueRange = 0f..30f,
+                    colors = SliderDefaults.colors(
+                        thumbColor = AccentColor,
+                        activeTrackColor = AccentColor,
+                        inactiveTrackColor = Color(0xFF333333)
+                    )
+                )
+            }
+
             Spacer(modifier = Modifier.height(8.dp))
+
             RenderQualitySelector(renderQualityState.intValue) { quality ->
                 renderQualityState.intValue = quality
                 sharedPrefs.edit { putInt("render_quality", quality) }
