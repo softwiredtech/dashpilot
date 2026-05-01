@@ -6,6 +6,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="$REPO_ROOT/dash-apps/web-vanilla"
+ADASVIZ="$REPO_ROOT/adasviz"
 DST="$REPO_ROOT/dashpilot-android/app/src/main/assets/web-vanilla"
 
 if [ ! -d "$SRC" ]; then
@@ -24,17 +25,26 @@ rsync -av --delete \
   --exclude='.gitignore' \
   --exclude='serve.sh' \
   --exclude='*.d.ts' \
+  --exclude='car-visualization*' \
+  --exclude='assets/' \
   --exclude='fonts/' \
   "$SRC/" "$DST/"
 
-# Patch Google Fonts -> local fonts for offline use
-sed -i '' \
+# Detect sed in-place flag (BSD vs GNU)
+if sed --version 2>/dev/null | grep -q GNU; then
+  SED_IN_PLACE=(-i)
+else
+  SED_IN_PLACE=(-i '')
+fi
+
+# Remove Google Fonts preconnect/stylesheet links
+sed "${SED_IN_PLACE[@]}" \
   '/rel="preconnect"/d; /fonts\.googleapis\.com\/css2/d' \
   "$DST/index.html"
 
 # Insert local @font-face declarations if not already present
 if ! grep -q 'fonts/inter-' "$DST/index.html"; then
-  sed -i '' '/<meta charset="UTF-8"/a\
+  sed "${SED_IN_PLACE[@]}" '/<meta charset="UTF-8"/a\
   <style>\
     @font-face { font-family: '"'"'Inter'"'"'; font-style: normal; font-weight: 300; font-display: swap; src: url('"'"'fonts/inter-300.ttf'"'"') format('"'"'truetype'"'"'); }\
     @font-face { font-family: '"'"'Inter'"'"'; font-style: normal; font-weight: 400; font-display: swap; src: url('"'"'fonts/inter-400.ttf'"'"') format('"'"'truetype'"'"'); }\
@@ -58,5 +68,12 @@ for weight in 300 400 500 600; do
       "https://fonts.gstatic.com/s/inter/v20/${slug}.ttf"
   fi
 done
+
+# Sync WASM files and Bevy assets from adasviz build output
+if [ -d "$ADASVIZ" ]; then
+  cp "$ADASVIZ/car-visualization.js" "$DST/" 2>/dev/null || true
+  cp "$ADASVIZ/car-visualization_bg.wasm" "$DST/" 2>/dev/null || true
+  rsync -av --delete "$ADASVIZ/assets/" "$DST/assets/"
+fi
 
 echo "Done. Synced web-vanilla -> $DST"
