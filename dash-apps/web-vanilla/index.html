@@ -653,15 +653,19 @@
 
         speedText.textContent = speed;
         speedUnit.textContent = car.isImperial ? "mph" : "km/h";
-        if (speedLimit == 0) {
+
+        const isParked = gearMap[gear] == "P";
+
+        if (isParked || speedLimit == 0) {
           speedLimitText.textContent = "";
         } else {
           speedLimitText.textContent = speedLimit;
         }
+        document.getElementById("speedSignRow").style.display = isParked ? "none" : "flex";
 
         const accSet = parseInt(car.accSetSpeed);
 
-        if (accSet > 0) {
+        if (!isParked && accSet > 0) {
           accValue.textContent = accSet;
           accMax.textContent = "max";
         } else {
