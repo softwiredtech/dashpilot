@@ -70,10 +70,39 @@ for weight in 300 400 500 600; do
 done
 
 # Sync WASM files and Bevy assets from adasviz build output
-if [ -d "$ADASVIZ" ]; then
-  cp "$ADASVIZ/car-visualization.js" "$DST/" 2>/dev/null || true
-  cp "$ADASVIZ/car-visualization_bg.wasm" "$DST/" 2>/dev/null || true
-  rsync -av --delete "$ADASVIZ/assets/" "$DST/assets/"
+if [ ! -d "$ADASVIZ" ]; then
+  echo "Error: adasviz directory not found at $ADASVIZ" >&2
+  exit 1
 fi
+
+REQUIRED_ADASVIZ_FILES=(
+  "$ADASVIZ/car-visualization.js"
+  "$ADASVIZ/car-visualization_bg.wasm"
+  "$ADASVIZ/assets/models/tesla.glb"
+)
+
+for file in "${REQUIRED_ADASVIZ_FILES[@]}"; do
+  if [ ! -f "$file" ]; then
+    echo "Error: required adasviz artifact missing: $file" >&2
+    exit 1
+  fi
+done
+
+cp "$ADASVIZ/car-visualization.js" "$DST/"
+cp "$ADASVIZ/car-visualization_bg.wasm" "$DST/"
+rsync -av --delete "$ADASVIZ/assets/" "$DST/assets/"
+
+REQUIRED_DST_FILES=(
+  "$DST/car-visualization.js"
+  "$DST/car-visualization_bg.wasm"
+  "$DST/assets/models/tesla.glb"
+)
+
+for file in "${REQUIRED_DST_FILES[@]}"; do
+  if [ ! -f "$file" ]; then
+    echo "Error: sync verification failed, missing output: $file" >&2
+    exit 1
+  fi
+done
 
 echo "Done. Synced web-vanilla -> $DST"
