@@ -43,7 +43,13 @@ object LocationProvider {
             return@callbackFlow
         }
 
-        val client = LocationServices.getFusedLocationProviderClient(context)
+        val client = try {
+            LocationServices.getFusedLocationProviderClient(context)
+        } catch (e: Exception) {
+            Log.e(TAG, "GMS LocationServices not available: ${e.message}")
+            close()
+            return@callbackFlow
+        }
 
         val priority = if (hasFine) Priority.PRIORITY_HIGH_ACCURACY
                        else Priority.PRIORITY_BALANCED_POWER_ACCURACY

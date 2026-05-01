@@ -30,8 +30,14 @@ class SpeedCameraViewModel : ViewModel() {
     fun startUpdating(context: Context) {
         if (locationJob?.isActive == true) return
         locationJob = viewModelScope.launch {
-            LocationProvider.locationFlow(context, locationInterval).collect { location ->
-                processLocation(location)
+            try {
+                LocationProvider.locationFlow(context, locationInterval).collect { location ->
+                    processLocation(location)
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.e("SpeedCameraVM", "Location unavailable (GMS missing?): ${e.message}")
             }
         }
     }
