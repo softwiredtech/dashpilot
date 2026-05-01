@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <title>DashPilot Minimal Ambient (Dev Mock)</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #0a0b0d;
+    }
+    iframe {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    #panel {
+      position: fixed;
+      left: 28px;
+      top: 28px;
+      z-index: 9999;
+      background: rgba(10, 11, 13, 0.85);
+      border: 1px solid #2a2a27;
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      font-size: 12px;
+      color: #f1efe9;
+      user-select: none;
+      min-width: 240px;
+      backdrop-filter: blur(6px);
+    }
+    #status {
+      font-size: 11px;
+      color: #888;
+      letter-spacing: 0.04em;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #2a2a27;
+    }
+    .group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .group-label {
+      font-size: 10px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .row button {
+      background: #1a1a17;
+      color: #ccc;
+      border: 1px solid #333;
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 11px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s;
+    }
+    .row button:hover {
+      background: #2a2a27;
+      color: #fff;
+    }
+    .row button.active {
+      background: #3a3a37;
+      border-color: #777;
+      color: #fff;
+    }
+    #footer {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-top: 4px;
+      border-top: 1px solid #2a2a27;
+    }
+    #footer button {
+      background: #1a1a17;
+      color: #ccc;
+      border: 1px solid #333;
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 11px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    #footer button:hover {
+      background: #2a2a27;
+      color: #fff;
+    }
+    #autoLabel {
+      font-size: 11px;
+      color: #888;
+      cursor: pointer;
+    }
+    #autoLabel:hover {
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <iframe id="dashFrame" src="index.html"></iframe>
+
+  <div id="panel">
+    <div id="status">Standby</div>
+
+    <div class="group">
+      <div class="group-label">Assist</div>
+      <div class="row">
+        <button data-assist="off" onclick="applyAssist('off')">Manual</button>
+        <button data-assist="mads" onclick="applyAssist('mads')">MADS</button>
+        <button data-assist="full" onclick="applyAssist('full')">AUTO</button>
+      </div>
+    </div>
+
+    <div class="group">
+      <div class="group-label">Scenarios</div>
+      <div class="row">
+        <button data-scenario="cruising" onclick="setScenario('cruising')">Cruising</button>
+        <button data-scenario="limit" onclick="setScenario('limit')">+Limit</button>
+        <button data-scenario="speeding" onclick="setScenario('speeding')">Speeding</button>
+        <button data-scenario="park" onclick="setScenario('park')">Park</button>
+        <button data-scenario="reverse" onclick="setScenario('reverse')">Reverse</button>
+        <button data-scenario="park_limit" onclick="setScenario('park_limit')">Park+Lmt</button>
+      </div>
+    </div>
+
+    <div class="group">
+      <div class="group-label">Alerts</div>
+      <div class="row">
+        <button data-scenario="door_belt" onclick="setScenario('door_belt')">Door</button>
+        <button data-scenario="camera" onclick="setScenario('camera')">Camera</button>
+        <button data-scenario="blind_spot" onclick="setScenario('blind_spot')">Blind</button>
+        <button data-scenario="lane_dep" onclick="setScenario('lane_dep')">LaneDep</button>
+      </div>
+    </div>
+
+    <div id="footer">
+      <button onclick="toggleUnits()">Toggle Units</button>
+      <span id="autoLabel" onclick="toggleAuto()">Auto: OFF</span>
+    </div>
+  </div>
+
+  <script>
+    const frame = document.getElementById("dashFrame");
+    const statusEl = document.getElementById("status");
+    const autoLabel = document.getElementById("autoLabel");
+
+    let mock = {};
+    let autoTimer = null;
+    let autoIndex = 0;
+    let currentScenarioId = "cruising";
+    let currentAssistMode = "off";
+
+    const AUTO_SCENARIOS = ["cruising", "limit", "speeding", "park", "reverse", "park_limit", "door_belt", "camera", "blind_spot", "lane_dep"];
+
+    const SCENARIOS = {
+      cruising: { label: "Cruising", car: { egoSpeed: 55 } },
+      limit: { label: "+Limit", car: { egoSpeed: 55, fusedSpeedLimit: 65 } },
+      speeding: { label: "Speeding", car: { egoSpeed: 78, adasOn: true, accSetSpeed: 72, fusedSpeedLimit: 65 } },
+      park: { label: "Park", car: { gear: 1 } },
+      reverse: { label: "Reverse", car: { gear: 2 } },
+      park_limit: { label: "Park+Lmt", car: { gear: 1, fusedSpeedLimit: 55 } },
+      door_belt: { label: "Door", car: { gear: 1, anyDoorOpen: 1, buckleStatus: 0 } },
+      camera: { label: "Camera", car: { speedCameraDistance: 280 } },
+      blind_spot: { label: "Blind", car: { leftBlindSpot: 1, egoSpeed: 60 } },
+      lane_dep: { label: "LaneDep", car: { laneDepartureWarning: 2, rightBlinker: 1, egoSpeed: 55 } },
+    };
+
+    function resetMock() {
+      mock = {
+        egoSpeed: 0,
+        leftBlinker: 0,
+        rightBlinker: 0,
+        gear: 4,
+        adasOn: false,
+        madsActive: false,
+        leftBlindSpot: 0,
+        rightBlindSpot: 0,
+        laneDepartureWarning: 0,
+        anyDoorOpen: 0,
+        buckleStatus: 1,
+        accSetSpeed: 0,
+        fusedSpeedLimit: 0,
+        speedCameraDistance: -1,
+        isImperial: true,
+      };
+    }
+
+    function setAssistOnMock(mode) {
+      currentAssistMode = mode;
+      if (mode === "full") {
+        mock.adasOn = true;
+        mock.madsActive = false;
+        if (mock.accSetSpeed <= 0) mock.accSetSpeed = 68;
+      } else if (mode === "mads") {
+        mock.adasOn = false;
+        mock.madsActive = true;
+        mock.accSetSpeed = 0;
+      } else {
+        mock.adasOn = false;
+        mock.madsActive = false;
+        mock.accSetSpeed = 0;
+      }
+    }
+
+    function inferAssistModeFromMock() {
+      if (mock.adasOn) return "full";
+      if (mock.madsActive) return "mads";
+      return "off";
+    }
+
+    function refreshActiveButtons() {
+      document.querySelectorAll("button[data-scenario]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.scenario === currentScenarioId);
+      });
+      document.querySelectorAll("button[data-assist]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.assist === currentAssistMode);
+      });
+    }
+
+    function push() {
+      if (frame.contentWindow && typeof frame.contentWindow.receiveMessage === "function") {
+        frame.contentWindow.receiveMessage({ ...mock });
+      }
+
+      const modeLabel = currentAssistMode === "full" ? "AUTO" : currentAssistMode === "mads" ? "MADS" : "Manual";
+      const scenarioLabel = SCENARIOS[currentScenarioId]?.label || "Custom";
+      statusEl.textContent = scenarioLabel + " - " + modeLabel + " - " + (mock.isImperial ? "MPH" : "KM/H");
+      refreshActiveButtons();
+    }
+
+    function applyAssist(mode) {
+      setAssistOnMock(mode);
+      push();
+    }
+
+    function setScenario(id) {
+      const scenario = SCENARIOS[id];
+      if (!scenario) return;
+
+      const keepAssistMode = currentAssistMode;
+      const keepUnits = mock.isImperial;
+
+      resetMock();
+      mock.isImperial = keepUnits;
+      Object.assign(mock, scenario.car);
+
+      const scenarioOverridesAssist =
+        Object.prototype.hasOwnProperty.call(scenario.car, "adasOn") ||
+        Object.prototype.hasOwnProperty.call(scenario.car, "madsActive") ||
+        Object.prototype.hasOwnProperty.call(scenario.car, "accSetSpeed");
+
+      if (scenarioOverridesAssist) {
+        currentAssistMode = inferAssistModeFromMock();
+      } else {
+        setAssistOnMock(keepAssistMode);
+      }
+
+      currentScenarioId = id;
+      push();
+    }
+
+    function toggleUnits() {
+      mock.isImperial = !mock.isImperial;
+      push();
+    }
+
+    function toggleAuto() {
+      if (autoTimer) {
+        clearInterval(autoTimer);
+        autoTimer = null;
+        autoLabel.textContent = "Auto: OFF";
+        return;
+      }
+
+      setScenario(AUTO_SCENARIOS[autoIndex % AUTO_SCENARIOS.length]);
+      autoIndex++;
+
+      autoTimer = setInterval(() => {
+        setScenario(AUTO_SCENARIOS[autoIndex % AUTO_SCENARIOS.length]);
+        autoIndex++;
+      }, 4000);
+      autoLabel.textContent = "Auto: ON";
+    }
+
+    frame.onload = () => {
+      autoLabel.textContent = "Auto: OFF";
+      resetMock();
+      setScenario("cruising");
+    };
+  </script>
+</body>
+</html>
