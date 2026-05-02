@@ -31,7 +31,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import androidx.startup.AppInitializer
 import app.rive.runtime.kotlin.RiveInitializer
-import com.softwiredtech.dashpilot.datamodel.dash.availableDashboards
+import com.softwiredtech.dashpilot.datamodel.dash.getSelectedDashboard
+import com.softwiredtech.dashpilot.datamodel.dash.saveSelectedDashboard
 import com.softwiredtech.dashpilot.navigation.DashboardRoute
 import com.softwiredtech.dashpilot.navigation.DashboardSelectionRoute
 import com.softwiredtech.dashpilot.navigation.SettingsRoute
@@ -117,10 +118,10 @@ class MainActivity : ComponentActivity() {
                                     connectionVM.disconnect()
                                 },
                                 onNext = {
-                                    val vanillaDashboard = availableDashboards[0]
+                                    val dashboard = getSelectedDashboard(context)
                                     navController.navigate(DashboardRoute(
-                                        vanillaDashboard.type.name.lowercase(),
-                                        vanillaDashboard.url)
+                                        dashboard.type.name.lowercase(),
+                                        dashboard.url)
                                     )
                                 },
                                 onSettingsClick = {
@@ -137,6 +138,7 @@ class MainActivity : ComponentActivity() {
                         composable<DashboardSelectionRoute> {
                             DashboardSelectionScreen(
                                 onSelect = { dashboard ->
+                                    saveSelectedDashboard(context, dashboard)
                                     navController.navigate(
                                         DashboardRoute(
                                             dashboardType = dashboard.type.name.lowercase(),
