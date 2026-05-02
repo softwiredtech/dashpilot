@@ -1,8 +1,26 @@
 __pycache__
 .DS_Store
 venv
+
+# Android / Gradle / Android Studio
+.gradle/
+**/build/
+**/.cxx/
+**/.externalNativeBuild/
+local.properties
+captures/
+
+# JetBrains IDE
+.idea/
+*.iml
+
+# Android packaging outputs
+*.apk
+*.aab
+
 dash-apps/web-vanilla/assets
 dash-apps/web-vanilla/*.wasm
 dash-apps/web-vanilla/*.d.ts
 dash-apps/web-vanilla/car-visualization.js
 dashpilot-android/app/src/main/assets/web-vanilla
+dashpilot-android/app/src/main/assets/web-ambient
