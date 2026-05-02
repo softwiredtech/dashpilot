@@ -10,5 +10,9 @@
     <string name="setup_next">Next</string>
     <string name="dashboard_select_title">Select Dashboard</string>
     <string name="dashboard_select_subtitle">Choose a dashboard to display</string>
+    <string name="dashboard_name_vanilla">Vanilla</string>
+    <string name="dashboard_name_ambient">Ambient</string>
+    <string name="dashboard_name_expo">Expo</string>
+    <string name="dashboard_name_rive">Rive</string>
     <string name="dashboard_rotate_prompt">Rotate your phone to landscape</string>
 </resources>
