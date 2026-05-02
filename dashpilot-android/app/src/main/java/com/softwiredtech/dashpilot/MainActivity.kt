@@ -57,6 +57,13 @@ class MainActivity : ComponentActivity() {
         ActivityResultContracts.RequestMultiplePermissions()
     ) { /* location permissions granted or denied */ }
 
+    private val dashboardRoutePrefix = DashboardRoute::class.qualifiedName
+
+    private fun isDashboardRoute(route: String?): Boolean {
+        val prefix = dashboardRoutePrefix ?: return false
+        return route?.startsWith(prefix) == true
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -79,8 +86,7 @@ class MainActivity : ComponentActivity() {
                 val context = LocalContext.current
                 val connectionStatus by connectionVM.connectionStatus.collectAsState()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val onDashboard = navBackStackEntry?.destination?.route
-                    ?.contains("DashboardRoute") == true
+                val onDashboard = isDashboardRoute(navBackStackEntry?.destination?.route)
 
                 LaunchedEffect(onDashboard) {
                     if (onDashboard) {
@@ -128,7 +134,24 @@ class MainActivity : ComponentActivity() {
                         }
                         composable<SettingsRoute> {
                             SettingsScreen(
-                                onBack = { navController.popBackStack() },
+                                onBack = {
+                                    val isPreviousDashboard = navController.previousBackStackEntry
+                                        ?.destination?.route
+                                        .let(::isDashboardRoute)
+                                    if (isPreviousDashboard) {
+                                        val dashboard = getSelectedDashboard(context)
+                                        navController.navigate(
+                                            DashboardRoute(
+                                                dashboardType = dashboard.type.name.lowercase(),
+                                                dashboardUrl = dashboard.url
+                                            )
+                                        ) {
+                                            popUpTo(navController.graph.id) { inclusive = false }
+                                        }
+                                    } else {
+                                        navController.popBackStack()
+                                    }
+                                },
                                 onDisplaySettingsChanged = { connectionVM.updateDisplaySettings(it) }
                             )
                         }
@@ -140,7 +163,8 @@ class MainActivity : ComponentActivity() {
                                 DashboardScreen(
                                     dashboardType = route.dashboardType,
                                     dashboardUrl = route.dashboardUrl,
-                                    dashStateFlow = flow
+                                    dashStateFlow = flow,
+                                    onSettingsClick = { navController.navigate(SettingsRoute) }
                                 )
                             }
                         }

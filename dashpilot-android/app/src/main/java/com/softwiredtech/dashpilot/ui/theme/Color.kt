@@ -11,3 +11,6 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 val AccentColor = Color(0xFF5CBD68)
+
+val OverlayScrimBase = Color(0xFF808080)
+const val OverlayScrimAlpha = 0.40f

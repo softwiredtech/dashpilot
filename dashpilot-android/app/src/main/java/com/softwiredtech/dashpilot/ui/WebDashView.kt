@@ -1,6 +1,7 @@
 package com.softwiredtech.dashpilot.ui
 
 import android.annotation.SuppressLint
+import android.view.MotionEvent
 import android.util.Log
 import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
@@ -34,7 +35,8 @@ fun WebDashView(
     modifier: Modifier = Modifier,
     url: String,
     scope: CoroutineScope,
-    dashStateFlow: Flow<DashState>
+    dashStateFlow: Flow<DashState>,
+    onTap: () -> Unit = {}
 ) {
     val carStateBridge = remember { CarStateBridge() }
     val context = LocalContext.current
@@ -95,6 +97,14 @@ fun WebDashView(
                 settings.cacheMode = WebSettings.LOAD_DEFAULT
                 addJavascriptInterface(carStateBridge, "NativeCarState")
                 loadUrl(url)
+            }
+        },
+        update = { view ->
+            view.setOnTouchListener { _, event ->
+                if (event.action == MotionEvent.ACTION_UP) {
+                    onTap()
+                }
+                false
             }
         },
         modifier = modifier
