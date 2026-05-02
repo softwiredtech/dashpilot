@@ -1,9 +1,13 @@
 package com.softwiredtech.dashpilot.ui
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -18,6 +22,10 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,12 +38,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.datamodel.dash.DashboardConfig
+import com.softwiredtech.dashpilot.datamodel.dash.DashboardType
 import com.softwiredtech.dashpilot.datamodel.dash.availableDashboards
 
 @Composable
 fun DashboardSelectionScreen(
     onSelect: (DashboardConfig) -> Unit
 ) {
+    var pendingDevRive by remember { mutableStateOf<DashboardConfig?>(null) }
+
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri: Uri? ->
+        val config = pendingDevRive
+        if (uri != null && config != null) {
+            onSelect(config.copy(url = uri.toString()))
+        }
+        pendingDevRive = null
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -69,7 +90,14 @@ fun DashboardSelectionScreen(
             items(availableDashboards) { dashboard ->
                 DashboardCard(
                     dashboard = dashboard,
-                    onClick = { onSelect(dashboard) }
+                    onClick = {
+                        if (dashboard.type == DashboardType.DEV_RIVE) {
+                            pendingDevRive = dashboard
+                            filePickerLauncher.launch(arrayOf("*/*"))
+                        } else {
+                            onSelect(dashboard)
+                        }
+                    }
                 )
             }
         }
@@ -90,15 +118,25 @@ private fun DashboardCard(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val dashboardName = stringResource(dashboard.nameRes)
-        Image(
-            painter = painterResource(id = dashboard.screenshotRes),
-            contentDescription = dashboardName,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(16f / 9f)
-                .clip(RoundedCornerShape(12.dp))
-        )
+        if (dashboard.type == DashboardType.DEV_RIVE) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(16f / 9f)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color(0xFF2A2A2A))
+            )
+        } else {
+            Image(
+                painter = painterResource(id = dashboard.screenshotRes),
+                contentDescription = dashboardName,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(16f / 9f)
+                    .clip(RoundedCornerShape(12.dp))
+            )
+        }
 
         Spacer(modifier = Modifier.height(10.dp))
 

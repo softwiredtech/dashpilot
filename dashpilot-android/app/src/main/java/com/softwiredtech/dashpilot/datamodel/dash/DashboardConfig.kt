@@ -7,7 +7,7 @@ import com.softwiredtech.dashpilot.ui.LOCAL_ASSET_BASE_URL
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class DashboardType { WEB, RIVE }
+enum class DashboardType { WEB, RIVE, DEV_RIVE }
 
 data class DashboardCapabilities(
     val supports3dVisualizerSettings: Boolean = false,
@@ -50,24 +50,32 @@ val availableDashboards = buildList {
             )
         )
     )
+    add(
+        DashboardConfig(
+            id = "expo",
+            nameRes = R.string.dashboard_name_expo,
+            url = "https://dashpilot-expo.web.app",
+            type = DashboardType.WEB,
+            screenshotRes = R.drawable.preview_expo
+        )
+    )
+    add(
+        DashboardConfig(
+            id = "rive",
+            nameRes = R.string.dashboard_name_rive,
+            url = "dashboard_test",
+            type = DashboardType.RIVE,
+            screenshotRes = R.drawable.preview_rive
+        )
+    )
 
     if (BuildConfig.DEBUG) {
         add(
             DashboardConfig(
-                id = "expo",
-                nameRes = R.string.dashboard_name_expo,
-                url = "https://dashpilot-expo.web.app",
-                type = DashboardType.WEB,
-                screenshotRes = R.drawable.preview_expo
-            )
-        )
-        add(
-            DashboardConfig(
-                id = "rive",
-                nameRes = R.string.dashboard_name_rive,
-                url = "dashboard_test",
-                type = DashboardType.RIVE,
-                screenshotRes = R.drawable.preview_rive
+                id = "dev_rive",
+                nameRes = R.string.dashboard_name_dev_rive,
+                url = "",
+                type = DashboardType.DEV_RIVE
             )
         )
     }
