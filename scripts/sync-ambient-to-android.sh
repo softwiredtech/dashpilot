@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Syncs the web-ambient dash-app into the Android assets folder.
+# Run from anywhere inside the dashpilot repo.
 
 set -euo pipefail
 
@@ -16,7 +18,6 @@ mkdir -p "$DST"
 rsync -av --delete \
   --exclude='.DS_Store' \
   --exclude='.gitignore' \
-  --exclude='dev.html' \
   "$SRC/" "$DST/"
 
 echo "Done. Synced web-ambient -> $DST"
