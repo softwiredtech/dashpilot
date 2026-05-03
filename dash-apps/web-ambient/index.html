@@ -17,10 +17,10 @@
       --bg: #0a0b0d;
       --fg: #f1efe9;
       --muted: #aaa79d;
-      --off: #f1efe9;
-      --mads: #3dd6ec;
-      --full: #5cd47a;
-      --red: #ff8a8a;
+      --off: #d8c39a;
+      --mads: #00C8C8;
+      --full: #00FF26;
+      --red: #ff7575;
       --edge: var(--off);
       --accent: var(--off);
     }
@@ -48,11 +48,9 @@
       left: 0;
       right: 0;
       bottom: 0;
-      height: 3px;
-      background: var(--edge);
-      opacity: 0.85;
-      box-shadow: 0 0 30px rgba(241,239,233,0.35), 0 0 70px rgba(241,239,233,0.15);
-      transition: background 0.25s ease, box-shadow 0.25s ease;
+      height: 2px;
+      animation: edgeBreathe 4.5s ease-in-out infinite;
+      transition: background 0.4s ease;
     }
 
     #edgeAccentTop {
@@ -60,11 +58,41 @@
       left: 0;
       right: 0;
       top: 0;
-      height: 3px;
-      background: var(--edge);
-      opacity: 0.85;
-      box-shadow: 0 0 30px rgba(241,239,233,0.35), 0 0 70px rgba(241,239,233,0.15);
-      transition: background 0.25s ease, box-shadow 0.25s ease;
+      height: 2px;
+      animation: edgeBreathe 4.5s ease-in-out infinite;
+      transition: background 0.4s ease;
+    }
+
+    #breathLayer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      animation: ambientBreathe 4.5s ease-in-out infinite;
+      transition: background 0.6s ease;
+    }
+
+    #ambientLayer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      animation: ambientWash 6.5s ease-in-out infinite;
+      animation-delay: -2.1s;
+      transition: background 0.6s ease;
+    }
+
+    @keyframes ambientWash {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 0.12; }
+    }
+
+    @keyframes ambientBreathe {
+      0%, 100% { opacity: 0.55; }
+      50% { opacity: 1; }
+    }
+
+    @keyframes edgeBreathe {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
     }
 
     #speedLayer {
@@ -87,7 +115,6 @@
       letter-spacing: -0.06em;
       color: var(--fg);
       font-variant-numeric: tabular-nums;
-      text-shadow: 0 0 32px rgba(241, 239, 233, 0.35), 0 0 64px rgba(241, 239, 233, 0.18);
       transition: color 0.25s ease, text-shadow 0.25s ease;
       user-select: none;
     }
@@ -115,7 +142,7 @@
     }
 
     #setSpeedLabel {
-      font-size: 16px;
+      font-size: 20px;
       color: var(--muted);
       letter-spacing: 0.1em;
       text-transform: uppercase;
@@ -123,14 +150,12 @@
     }
 
     #assistLabel {
-      position: absolute;
-      left: 50%;
-      bottom: 0;
-      transform: translateX(-50%);
+      grid-column: 2;
       display: none;
       align-items: center;
-      gap: 10px;
-      font-size: 16px;
+      justify-content: center;
+      gap: 12px;
+      font-size: 22px;
       line-height: 1;
       letter-spacing: 0.1em;
       text-transform: uppercase;
@@ -140,12 +165,12 @@
     }
 
     #assistDot {
-      width: 8px;
-      height: 8px;
+      width: 10px;
+      height: 10px;
       border-radius: 50%;
       background: var(--accent);
-      box-shadow: 0 0 6px var(--accent);
-      animation: breathe 2.7s ease-in-out infinite;
+      box-shadow: 0 0 8px var(--accent);
+      animation: breathe 4.5s ease-in-out infinite;
     }
 
     @keyframes breathe {
@@ -158,12 +183,12 @@
       left: 50%;
       top: 18px;
       transform: translateX(-50%);
-      padding: 6px 18px;
+      padding: 8px 22px;
       border-radius: 4px;
       background: #1a1a17;
       color: var(--fg);
       font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 28px;
+      font-size: 32px;
       font-weight: 600;
       letter-spacing: 0.18em;
       display: none;
@@ -172,13 +197,13 @@
 
     #warningChips {
       position: absolute;
-      top: 52px;
+      top: 60px;
       left: 50%;
       transform: translateX(-50%);
       display: flex;
       flex-direction: row;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       user-select: none;
     }
 
@@ -186,16 +211,17 @@
       position: absolute;
       left: 28px;
       right: 28px;
-      bottom: 38px;
-      display: flex;
-      align-items: baseline;
+      bottom: 44px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: end;
       text-shadow: 0 0 10px rgba(241,239,233,0.25), 0 0 24px rgba(241,239,233,0.12);
     }
 
     .chip {
-      padding: 7px 16px;
+      padding: 9px 18px;
       border-radius: 4px;
-      font-size: 16px;
+      font-size: 20px;
       letter-spacing: 0.08em;
       font-weight: 600;
       text-transform: uppercase;
@@ -203,8 +229,8 @@
     }
 
     .chip-red {
-      background: rgba(255, 92, 92, 0.18);
-      color: #ff8a8a;
+      background: rgba(255, 60, 60, 0.22);
+      color: #ff7575;
     }
 
     .chip-amber {
@@ -220,57 +246,66 @@
       width: 80px;
       pointer-events: none;
       display: none;
-      animation: flashPulse 1.2s ease-in-out infinite;
+      animation: flashPulse 0.85s ease-in-out infinite;
     }
 
     #leftFlash {
       left: 0;
-      background: linear-gradient(to right, rgba(255, 70, 70, 0.55), rgba(255, 70, 70, 0));
+      background: linear-gradient(to right, rgba(255, 48, 48, 0.62), rgba(255, 48, 48, 0));
     }
 
     #rightFlash {
       right: 0;
-      background: linear-gradient(to left, rgba(255, 70, 70, 0.55), rgba(255, 70, 70, 0));
+      background: linear-gradient(to left, rgba(255, 48, 48, 0.62), rgba(255, 48, 48, 0));
     }
 
     @keyframes flashPulse {
-      0%, 100% { opacity: 0.65; }
+      0%, 100% { opacity: 0.55; }
       50% { opacity: 1; }
     }
 
-    #blinkerLeft, #blinkerRight {
+    #leftBlink, #rightBlink {
       position: absolute;
-      top: 22px;
-      width: 32px;
-      height: 32px;
+      top: 0;
+      bottom: 0;
+      width: 200px;
+      pointer-events: none;
       opacity: 0;
-      transition: opacity 0.05s linear;
+      transition: opacity 0.18s ease-out;
     }
 
-    #blinkerLeft { left: 24px; }
-    #blinkerRight { right: 24px; transform: scaleX(-1); }
+    #leftBlink {
+      left: 0;
+      background: linear-gradient(to right, rgba(77, 214, 106, 0.80), rgba(77, 214, 106, 0));
+    }
+
+    #rightBlink {
+      right: 0;
+      background: linear-gradient(to left, rgba(77, 214, 106, 0.80), rgba(77, 214, 106, 0));
+    }
 
     #units {
-      margin-left: auto;
-      font-size: 18px;
+      grid-column: 3;
+      font-size: 24px;
       line-height: 1;
       color: var(--muted);
       letter-spacing: 0.1em;
       text-transform: uppercase;
       font-weight: 500;
       user-select: none;
+      text-align: right;
     }
 
     #speedLimit {
       display: none;
       align-items: baseline;
-      gap: 6px;
+      gap: 10px;
       font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       user-select: none;
     }
 
     #speedLimitLabel {
-      font-size: 15px;
+      font-size: 20px;
       line-height: 1;
       color: var(--muted);
       letter-spacing: 0.1em;
@@ -279,7 +314,7 @@
     }
 
     #speedLimitValue {
-      font-size: 52px;
+      font-size: 62px;
       line-height: 1;
       color: var(--fg);
       font-weight: 400;
@@ -289,15 +324,13 @@
 </head>
 <body>
   <div id="app">
+    <div id="breathLayer"></div>
+    <div id="ambientLayer"></div>
     <div id="leftFlash"></div>
     <div id="rightFlash"></div>
 
-    <svg id="blinkerLeft" viewBox="0 0 22 22" aria-hidden="true">
-      <path d="M14 3 L6 11 L14 19 L14 13 L20 13 L20 9 L14 9 Z" fill="#4dd66a"></path>
-    </svg>
-    <svg id="blinkerRight" viewBox="0 0 22 22" aria-hidden="true">
-      <path d="M14 3 L6 11 L14 19 L14 13 L20 13 L20 9 L14 9 Z" fill="#4dd66a"></path>
-    </svg>
+    <div id="leftBlink"></div>
+    <div id="rightBlink"></div>
 
     <div id="gearChip"></div>
     <div id="warningChips"></div>
@@ -334,26 +367,26 @@
       off: {
         short: "OFF",
         long: "Manual",
-        accent: "#f1efe9",
-        tint: "rgba(241, 239, 233, 0.07)",
-        glow24: "rgba(241, 239, 233, 0.35)",
-        glow48: "rgba(241, 239, 233, 0.18)",
+        accent: "#d8c39a",
+        tint: "rgba(216, 195, 154, 0.13)",
+        dimGlow24: "rgba(216, 195, 154, 0.20)",
+        dimGlow48: "rgba(216, 195, 154, 0.10)",
       },
       mads: {
         short: "MADS",
         long: "Lane Assist",
-        accent: "#3dd6ec",
-        tint: "rgba(61, 214, 236, 0.12)",
-        glow24: "rgba(61, 214, 236, 0.35)",
-        glow48: "rgba(61, 214, 236, 0.2)",
+        accent: "#00C8C8",
+        tint: "rgba(0, 200, 200, 0.20)",
+        dimGlow24: "rgba(0, 200, 200, 0.20)",
+        dimGlow48: "rgba(0, 200, 200, 0.10)",
       },
       full: {
         short: "AUTO",
         long: "Full Assist",
-        accent: "#5cd47a",
-        tint: "rgba(92, 212, 122, 0.12)",
-        glow24: "rgba(92, 212, 122, 0.35)",
-        glow48: "rgba(92, 212, 122, 0.2)",
+        accent: "#00FF26",
+        tint: "rgba(0, 255, 38, 0.18)",
+        dimGlow24: "rgba(0, 255, 38, 0.20)",
+        dimGlow48: "rgba(0, 255, 38, 0.10)",
       },
     };
 
@@ -372,13 +405,15 @@
     const warningChips = document.getElementById("warningChips");
     const leftFlash = document.getElementById("leftFlash");
     const rightFlash = document.getElementById("rightFlash");
-    const blinkerLeft = document.getElementById("blinkerLeft");
-    const blinkerRight = document.getElementById("blinkerRight");
+    const leftBlink = document.getElementById("leftBlink");
+    const rightBlink = document.getElementById("rightBlink");
     const speedLimit = document.getElementById("speedLimit");
     const speedLimitValue = document.getElementById("speedLimitValue");
     const speedLimitLabel = document.getElementById("speedLimitLabel");
     const unitsEl = document.getElementById("units");
     const bottomRow = document.getElementById("bottomRow");
+    const breathLayer = document.getElementById("breathLayer");
+    const ambientLayer = document.getElementById("ambientLayer");
 
     function mapAssist(car) {
       if (car.adasOn) return "full";
@@ -415,14 +450,13 @@
       }
     }
 
-    function applySpeedStyle({ speed, isAssistOn, assistMeta }) {
+    const BG_KNOCKOUT = "0 0 3px rgba(10, 11, 13, 0.97), 0 0 8px rgba(10, 11, 13, 0.92), 0 0 12px rgba(10, 11, 13, 0.5)";
+    const BG_KNOCKOUT_SMALL = "0 0 1px rgba(10, 11, 13, 0.98), 0 0 4px rgba(10, 11, 13, 0.94), 0 0 8px rgba(10, 11, 13, 0.72)";
+
+    function applySpeedStyle({ speed, assistMeta }) {
       speedEl.textContent = String(speed);
       speedEl.style.color = "var(--fg)";
-      if (isAssistOn) {
-        speedEl.style.textShadow = "0 0 24px " + assistMeta.glow24 + ", 0 0 48px " + assistMeta.glow48;
-      } else {
-        speedEl.style.textShadow = "0 0 32px rgba(241, 239, 233, 0.35), 0 0 64px rgba(241, 239, 233, 0.18)";
-      }
+      speedEl.style.textShadow = BG_KNOCKOUT + ", 0 -1px 0 rgba(241, 239, 233, 0.15)";
     }
 
     function applySpeedLimitStyle({ overLimit, speedLimitValueNum }) {
@@ -432,9 +466,15 @@
         if (overLimit) {
           speedLimitValue.style.color = "var(--red)";
           speedLimitLabel.style.color = "var(--red)";
+          speedLimitValue.style.textShadow =
+            BG_KNOCKOUT + ", 0 0 28px rgba(255, 60, 60, 0.7), 0 0 64px rgba(255, 60, 60, 0.4)";
+          speedLimitLabel.style.textShadow =
+            BG_KNOCKOUT_SMALL + ", 0 0 16px rgba(255, 60, 60, 0.7), 0 0 32px rgba(255, 60, 60, 0.35)";
         } else {
           speedLimitValue.style.color = "var(--fg)";
           speedLimitLabel.style.color = "var(--muted)";
+          speedLimitValue.style.textShadow = "";
+          speedLimitLabel.style.textShadow = "";
         }
       } else {
         speedLimit.style.display = "none";
@@ -451,24 +491,25 @@
       const accent = assistMeta.accent;
 
       document.documentElement.style.setProperty("--accent", accent);
-      document.documentElement.style.setProperty("--edge", isAssistOn ? accent : "#f1efe9");
 
-      app.style.background = isAssistOn
-        ? "radial-gradient(ellipse at 50% 50%, " + assistMeta.tint + " 0%, var(--bg) 70%)"
-        : "radial-gradient(ellipse at 50% 50%, " + ASSIST_META.off.tint + " 0%, var(--bg) 70%)";
+      breathLayer.style.background =
+        "radial-gradient(ellipse at 50% 78%, " + assistMeta.tint + " 0%, transparent 72%)";
+      ambientLayer.style.background = accent;
 
       const gear = gearMap[Math.round(Number(car.gear) || 0)] || "-";
       const isDrive = gear === "D";
       const overLimit = isDrive && speedLimitValueNum > 0 && speed > speedLimitValueNum + 5;
-      applySpeedStyle({ speed, isAssistOn, assistMeta });
+      applySpeedStyle({ speed, assistMeta });
 
       const showSetSpeed = assist === "full" && setSpeed > 0;
       setSpeedWrap.style.display = showSetSpeed ? "flex" : "none";
       if (showSetSpeed) {
         setSpeedEl.textContent = String(setSpeed);
         setSpeedLabel.textContent = "Set · " + assistMeta.short;
-        setSpeedEl.style.textShadow = "0 0 18px " + assistMeta.glow24 + ", 0 0 36px " + assistMeta.glow48;
-        setSpeedLabel.style.textShadow = "0 0 12px " + assistMeta.glow24 + ", 0 0 24px " + assistMeta.glow48;
+        setSpeedEl.style.textShadow =
+          BG_KNOCKOUT + ", 0 0 18px " + assistMeta.dimGlow24 + ", 0 0 36px " + assistMeta.dimGlow48;
+        setSpeedLabel.style.textShadow =
+          BG_KNOCKOUT_SMALL + ", 0 0 12px " + assistMeta.dimGlow24 + ", 0 0 24px " + assistMeta.dimGlow48;
       }
 
       assistLabel.style.display = isAssistOn ? "flex" : "none";
@@ -491,17 +532,18 @@
       leftFlash.style.display = leftActive ? "block" : "none";
       rightFlash.style.display = rightActive ? "block" : "none";
 
-      setBlinker(blinkerLeft, car.leftBlinker);
-      setBlinker(blinkerRight, car.rightBlinker);
+      setBlinker(leftBlink, leftActive ? 0 : car.leftBlinker);
+      setBlinker(rightBlink, rightActive ? 0 : car.rightBlinker);
 
       applySpeedLimitStyle({ overLimit, speedLimitValueNum });
 
       unitsEl.textContent = car.isImperial ? "mph" : "km/h";
-      edgeAccent.style.background = isAssistOn ? accent : "var(--off)";
-      edgeAccent.style.boxShadow = "0 0 30px " + assistMeta.glow24 + ", 0 0 70px " + assistMeta.glow48;
-      edgeAccentTop.style.background = isAssistOn ? accent : "var(--off)";
-      edgeAccentTop.style.boxShadow = "0 0 30px " + assistMeta.glow24 + ", 0 0 70px " + assistMeta.glow48;
-      bottomRow.style.textShadow = "0 0 10px " + assistMeta.glow24 + ", 0 0 24px " + assistMeta.glow48;
+      const edgeGradient =
+        "linear-gradient(to right, transparent 0%, " +
+        accent + " 50%, transparent 100%)";
+      edgeAccent.style.background = edgeGradient;
+      edgeAccentTop.style.background = edgeGradient;
+      bottomRow.style.textShadow = BG_KNOCKOUT_SMALL;
     }
 
     window.receiveMessage = receiveMessage;

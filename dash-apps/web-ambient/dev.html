@@ -40,12 +40,29 @@
       backdrop-filter: blur(6px);
     }
     #status {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       font-size: 11px;
       color: #888;
       letter-spacing: 0.04em;
       padding-bottom: 4px;
       border-bottom: 1px solid #2a2a27;
     }
+    #minimizeBtn {
+      background: none;
+      border: none;
+      color: #555;
+      cursor: pointer;
+      font-size: 16px;
+      line-height: 1;
+      padding: 0;
+      font-family: inherit;
+      flex-shrink: 0;
+    }
+    #minimizeBtn:hover { color: #aaa; }
+    #panel.minimized .group,
+    #panel.minimized #footer { display: none; }
     .group {
       display: flex;
       flex-direction: column;
@@ -117,7 +134,10 @@
   <iframe id="dashFrame" src="index.html"></iframe>
 
   <div id="panel">
-    <div id="status">Standby</div>
+    <div id="status">
+      <span id="statusText">Standby</span>
+      <button id="minimizeBtn" onclick="togglePanel()" title="Minimize">−</button>
+    </div>
 
     <div class="group">
       <div class="group-label">Assist</div>
@@ -150,6 +170,15 @@
       </div>
     </div>
 
+    <div class="group">
+      <div class="group-label">Blinkers</div>
+      <div class="row">
+        <button data-scenario="blink_left" onclick="setScenario('blink_left')">Left</button>
+        <button data-scenario="blink_right" onclick="setScenario('blink_right')">Right</button>
+        <button data-scenario="hazard" onclick="setScenario('hazard')">Hazard</button>
+      </div>
+    </div>
+
     <div id="footer">
       <button onclick="toggleUnits()">Toggle Units</button>
       <span id="autoLabel" onclick="toggleAuto()">Auto: OFF</span>
@@ -158,8 +187,15 @@
 
   <script>
     const frame = document.getElementById("dashFrame");
-    const statusEl = document.getElementById("status");
+    const statusEl = document.getElementById("statusText");
     const autoLabel = document.getElementById("autoLabel");
+
+    let panelMinimized = false;
+    function togglePanel() {
+      panelMinimized = !panelMinimized;
+      document.getElementById("panel").classList.toggle("minimized", panelMinimized);
+      document.getElementById("minimizeBtn").textContent = panelMinimized ? "+" : "−";
+    }
 
     let mock = {};
     let autoTimer = null;
@@ -180,6 +216,9 @@
       camera: { label: "Camera", car: { speedCameraDistance: 280 } },
       blind_spot: { label: "Blind", car: { leftBlindSpot: 1, egoSpeed: 60 } },
       lane_dep: { label: "LaneDep", car: { laneDepartureWarning: 2, rightBlinker: 1, egoSpeed: 55 } },
+      blink_left: { label: "L Blink", car: { leftBlinker: 2, egoSpeed: 45 } },
+      blink_right: { label: "R Blink", car: { rightBlinker: 2, egoSpeed: 45 } },
+      hazard: { label: "Hazard", car: { leftBlinker: 2, rightBlinker: 2, egoSpeed: 0 } },
     };
 
     function resetMock() {
