@@ -117,6 +117,7 @@ private fun DashboardCard(
             .padding(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        val dashboardName = stringResource(dashboard.nameRes)
         if (dashboard.type == DashboardType.DEV_RIVE) {
             Box(
                 modifier = Modifier
@@ -128,7 +129,7 @@ private fun DashboardCard(
         } else {
             Image(
                 painter = painterResource(id = dashboard.screenshotRes),
-                contentDescription = dashboard.name,
+                contentDescription = dashboardName,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -140,7 +141,7 @@ private fun DashboardCard(
         Spacer(modifier = Modifier.height(10.dp))
 
         Text(
-            text = dashboard.name,
+            text = dashboardName,
             color = Color.White,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium

@@ -1,30 +1,59 @@
 package com.softwiredtech.dashpilot.datamodel.dash
 
+import androidx.annotation.StringRes
 import com.softwiredtech.dashpilot.BuildConfig
 import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.ui.LOCAL_ASSET_BASE_URL
+import kotlinx.serialization.Serializable
 
+@Serializable
 enum class DashboardType { WEB, RIVE, DEV_RIVE }
 
+data class DashboardCapabilities(
+    val supports3dVisualizerSettings: Boolean = false,
+    val supportsVehicleBusWidgets: Boolean = false,
+    val supportsPhoneBatteryToggle: Boolean = true
+)
+
 data class DashboardConfig(
-    val name: String,
+    val id: String,
+    @StringRes val nameRes: Int,
     val url: String,
     val type: DashboardType,
-    val screenshotRes: Int = 0
+    val screenshotRes: Int = 0,
+    val capabilities: DashboardCapabilities = DashboardCapabilities()
 )
 
 val availableDashboards = buildList {
     add(
         DashboardConfig(
-            name = "Vanilla",
+            id = "vanilla",
+            nameRes = R.string.dashboard_name_vanilla,
             url = "${LOCAL_ASSET_BASE_URL}web-vanilla/index.html",
             type = DashboardType.WEB,
-            screenshotRes = R.drawable.preview_vanilla
+            screenshotRes = R.drawable.preview_vanilla,
+            capabilities = DashboardCapabilities(
+                supports3dVisualizerSettings = true,
+                supportsVehicleBusWidgets = true
+            )
         )
     )
     add(
         DashboardConfig(
-            name = "Expo",
+            id = "ambient",
+            nameRes = R.string.dashboard_name_ambient,
+            url = "${LOCAL_ASSET_BASE_URL}web-ambient/index.html",
+            type = DashboardType.WEB,
+            screenshotRes = R.drawable.preview_ambient,
+            capabilities = DashboardCapabilities(
+                supportsPhoneBatteryToggle = false
+            )
+        )
+    )
+    add(
+        DashboardConfig(
+            id = "expo",
+            nameRes = R.string.dashboard_name_expo,
             url = "https://dashpilot-expo.web.app",
             type = DashboardType.WEB,
             screenshotRes = R.drawable.preview_expo
@@ -32,7 +61,8 @@ val availableDashboards = buildList {
     )
     add(
         DashboardConfig(
-            name = "Rive",
+            id = "rive",
+            nameRes = R.string.dashboard_name_rive,
             url = "dashboard_test",
             type = DashboardType.RIVE,
             screenshotRes = R.drawable.preview_rive
@@ -42,7 +72,8 @@ val availableDashboards = buildList {
     if (BuildConfig.DEBUG) {
         add(
             DashboardConfig(
-                name = "Load Rive File",
+                id = "dev_rive",
+                nameRes = R.string.dashboard_name_dev_rive,
                 url = "",
                 type = DashboardType.DEV_RIVE
             )
