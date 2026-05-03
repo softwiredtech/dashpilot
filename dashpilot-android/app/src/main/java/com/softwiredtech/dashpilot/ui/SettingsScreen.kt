@@ -260,10 +260,10 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                 Spacer(modifier = Modifier.height(24.dp))
             }
 
-            Text("Display", color = Color(0xFF888888), fontSize = 16.sp)
+            Text(stringResource(R.string.settings_section_display), color = Color(0xFF888888), fontSize = 16.sp)
             Spacer(modifier = Modifier.height(8.dp))
 
-            SettingsToggle("Use imperial units", useImperialState.value) { enabled ->
+            SettingsToggle(stringResource(R.string.settings_toggle_use_imperial), useImperialState.value) { enabled ->
                 useImperialState.value = enabled
                 sharedPrefs.edit { putBoolean("use_imperial", enabled) }
                 onDisplaySettingsChanged(buildDisplaySettings())
@@ -280,17 +280,17 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
             Spacer(modifier = Modifier.height(8.dp))
 
             if (showVanillaSettings) {
-                Text("3D visualizer", color = Color(0xFF888888), fontSize = 16.sp)
+                Text(stringResource(R.string.settings_section_3d_visualizer), color = Color(0xFF888888), fontSize = 16.sp)
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                SettingsToggle("Always on blind-spot monitor", alwaysOnBlindSpotMonitorState.value) { enabled ->
+                SettingsToggle(stringResource(R.string.settings_toggle_always_on_blind_spot_monitor), alwaysOnBlindSpotMonitorState.value) { enabled ->
                     alwaysOnBlindSpotMonitorState.value = enabled
                     sharedPrefs.edit { putBoolean("always_on_blind_spot_monitor", enabled) }
                     onDisplaySettingsChanged(buildDisplaySettings())
                 }
 
-                SettingsToggle("Dark mode", darkModeState.value) { enabled ->
+                SettingsToggle(stringResource(R.string.settings_toggle_dark_mode), darkModeState.value) { enabled ->
                     darkModeState.value = enabled
                     sharedPrefs.edit { putBoolean("dark_mode", enabled) }
                     onDisplaySettingsChanged(buildDisplaySettings())
@@ -303,7 +303,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(text = "Background brightness", color = Color.White, fontSize = 16.sp)
+                        Text(text = stringResource(R.string.settings_dark_mode_background_brightness), color = Color.White, fontSize = 16.sp)
                         val grayVal = darkModeBackgroundGrayState.floatValue.toInt()
                         Box(
                             modifier = Modifier
@@ -351,7 +351,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "Version", color = Color.White, fontSize = 16.sp)
+                Text(text = stringResource(R.string.settings_version), color = Color.White, fontSize = 16.sp)
                 Text(
                     text = "${packageInfo.versionName} (${packageInfo.longVersionCode})",
                     color = Color(0xFF888888),
@@ -373,13 +373,13 @@ private fun SectionHeader(title: String) {
 
 @Composable
 private fun RenderQualitySelector(selected: Int, onSelected: (Int) -> Unit) {
-    val options = listOf(1 to "Low", 2 to "Medium", 3 to "High")
+    val options = listOf(1 to stringResource(R.string.settings_render_low), 2 to stringResource(R.string.settings_render_med), 3 to stringResource(R.string.settings_render_high))
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = "Render quality", color = Color.White, fontSize = 16.sp)
+        Text(text = stringResource(R.string.settings_render_quality_title), color = Color.White, fontSize = 16.sp)
         Row(
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))

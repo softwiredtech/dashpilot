@@ -27,6 +27,7 @@
     <string name="settings_toggle_show_car_battery">Show car battery</string>
     <string name="settings_toggle_show_odometer">Show odometer</string>
     <string name="settings_units_title">Units</string>
+    <string name="settings_toggle_use_imperial">Use imperial units</string>
     <string name="settings_units_km">km</string>
     <string name="settings_units_mi">mi</string>
     <string name="settings_render_quality_title">Render quality</string>
