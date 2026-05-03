@@ -31,7 +31,7 @@
     <string name="settings_units_mi">mi</string>
     <string name="settings_render_quality_title">Render quality</string>
     <string name="settings_render_low">Low</string>
-    <string name="settings_render_med">Med</string>
+    <string name="settings_render_med">Medium</string>
     <string name="settings_render_high">High</string>
     <string name="settings_toggle_extra_vehicle_bus">Extra Vehicle bus</string>
     <string name="settings_vehicle_bus_requires_extra">Enable Extra Vehicle bus to edit these.</string>
