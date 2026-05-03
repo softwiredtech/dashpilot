@@ -54,6 +54,7 @@ import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.datamodel.dash.DASH_PREFS_NAME
 import com.softwiredtech.dashpilot.datamodel.dash.DisplaySettings
 import com.softwiredtech.dashpilot.datamodel.dash.availableDashboards
+import com.softwiredtech.dashpilot.datamodel.dash.dashboardById
 import com.softwiredtech.dashpilot.datamodel.dash.getSelectedDashboard
 import com.softwiredtech.dashpilot.datamodel.dash.saveSelectedDashboard
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
@@ -107,7 +108,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
         mutableStateOf(getSelectedDashboard(context).id)
     }
     val selectedDashboardCapabilities = remember(selectedDashboardId.value) {
-        availableDashboards.firstOrNull { it.id == selectedDashboardId.value }?.capabilities
+        dashboardById(selectedDashboardId.value)?.capabilities
     }
     val showVanillaSettings = selectedDashboardCapabilities?.supports3dVisualizerSettings ?: false
     val showPhoneBatteryToggle = selectedDashboardCapabilities?.supportsPhoneBatteryToggle ?: true
@@ -233,7 +234,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
             Spacer(modifier = Modifier.height(20.dp))
 
             if (supportsVehicleBusWidgets) {
-                SettingsToggle("Extra Vehicle bus", extraBusState.value) { enabled ->
+                SettingsToggle(stringResource(R.string.settings_toggle_extra_vehicle_bus), extraBusState.value) { enabled ->
                     extraBusState.value = enabled
                     sharedPrefs.edit { putBoolean("extra_vehicle_bus", enabled) }
                 }
@@ -269,7 +270,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
             }
 
             if (showPhoneBatteryToggle) {
-                SettingsToggle("Show phone battery", showPhoneBatteryState.value) { enabled ->
+                SettingsToggle(stringResource(R.string.settings_toggle_show_phone_battery), showPhoneBatteryState.value) { enabled ->
                     showPhoneBatteryState.value = enabled
                     sharedPrefs.edit { putBoolean("show_phone_battery", enabled) }
                     onDisplaySettingsChanged(buildDisplaySettings())
