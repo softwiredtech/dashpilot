@@ -6,7 +6,6 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="$REPO_ROOT/dash-apps/web-vanilla"
-ADASVIZ="$REPO_ROOT/adasviz"
 DST="$REPO_ROOT/dashpilot-android/app/src/main/assets/web-vanilla"
 
 if [ ! -d "$SRC" ]; then
@@ -25,26 +24,17 @@ rsync -av --delete \
   --exclude='.gitignore' \
   --exclude='serve.sh' \
   --exclude='*.d.ts' \
-  --exclude='car-visualization*' \
-  --exclude='assets/' \
   --exclude='fonts/' \
   "$SRC/" "$DST/"
 
-# Detect sed in-place flag (BSD vs GNU)
-if sed --version 2>/dev/null | grep -q GNU; then
-  SED_IN_PLACE=(-i)
-else
-  SED_IN_PLACE=(-i '')
-fi
-
-# Remove Google Fonts preconnect/stylesheet links
-sed "${SED_IN_PLACE[@]}" \
+# Patch Google Fonts -> local fonts for offline use
+sed -i '' \
   '/rel="preconnect"/d; /fonts\.googleapis\.com\/css2/d' \
   "$DST/index.html"
 
 # Insert local @font-face declarations if not already present
 if ! grep -q 'fonts/inter-' "$DST/index.html"; then
-  sed "${SED_IN_PLACE[@]}" '/<meta charset="UTF-8"/a\
+  sed -i '' '/<meta charset="UTF-8"/a\
   <style>\
     @font-face { font-family: '"'"'Inter'"'"'; font-style: normal; font-weight: 300; font-display: swap; src: url('"'"'fonts/inter-300.ttf'"'"') format('"'"'truetype'"'"'); }\
     @font-face { font-family: '"'"'Inter'"'"'; font-style: normal; font-weight: 400; font-display: swap; src: url('"'"'fonts/inter-400.ttf'"'"') format('"'"'truetype'"'"'); }\
@@ -66,42 +56,6 @@ for weight in 300 400 500 600; do
     esac
     curl -sfo "$DST/fonts/inter-${weight}.ttf" \
       "https://fonts.gstatic.com/s/inter/v20/${slug}.ttf"
-  fi
-done
-
-# Sync WASM files and Bevy assets from adasviz build output
-if [ ! -d "$ADASVIZ" ]; then
-  echo "Error: adasviz directory not found at $ADASVIZ" >&2
-  exit 1
-fi
-
-REQUIRED_ADASVIZ_FILES=(
-  "$ADASVIZ/car-visualization.js"
-  "$ADASVIZ/car-visualization_bg.wasm"
-  "$ADASVIZ/assets/models/tesla.glb"
-)
-
-for file in "${REQUIRED_ADASVIZ_FILES[@]}"; do
-  if [ ! -f "$file" ]; then
-    echo "Error: required adasviz artifact missing: $file" >&2
-    exit 1
-  fi
-done
-
-cp "$ADASVIZ/car-visualization.js" "$DST/"
-cp "$ADASVIZ/car-visualization_bg.wasm" "$DST/"
-rsync -av --delete "$ADASVIZ/assets/" "$DST/assets/"
-
-REQUIRED_DST_FILES=(
-  "$DST/car-visualization.js"
-  "$DST/car-visualization_bg.wasm"
-  "$DST/assets/models/tesla.glb"
-)
-
-for file in "${REQUIRED_DST_FILES[@]}"; do
-  if [ ! -f "$file" ]; then
-    echo "Error: sync verification failed, missing output: $file" >&2
-    exit 1
   fi
 done
 
