@@ -64,6 +64,7 @@ import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.DataSourceType
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
+import com.softwiredtech.dashpilot.ui.theme.DarkColors
 
 private data class DataSource(
     val key: String,
@@ -95,7 +96,7 @@ fun SetupScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0D0D0D))
+            .background(DarkColors.Background)
     ) {
     Column(
         modifier = Modifier
@@ -115,7 +116,7 @@ fun SetupScreen(
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = if (BuildConfig.DEBUG) stringResource(R.string.setup_select_data_source) else stringResource(R.string.setup_connect_your_comma_device),
-                color = Color(0xFF888888),
+                color = DarkColors.TextMuted,
                 fontSize = 14.sp
             )
         }
@@ -146,14 +147,14 @@ fun SetupScreen(
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedTextColor = Color.White,
                     focusedTextColor = Color.White,
-                    unfocusedBorderColor = Color(0xFF333333),
+                    unfocusedBorderColor = DarkColors.Border,
                     focusedBorderColor = Color.White,
-                    unfocusedLabelColor = Color(0xFF888888),
+                    unfocusedLabelColor = DarkColors.TextMuted,
                     focusedLabelColor = Color.White,
                     cursorColor = Color.White,
-                    disabledTextColor = Color(0xFF888888),
-                    disabledBorderColor = Color(0xFF333333),
-                    disabledLabelColor = Color(0xFF666666)
+                    disabledTextColor = DarkColors.TextMuted,
+                    disabledBorderColor = DarkColors.Border,
+                    disabledLabelColor = DarkColors.TextSubtle
                 ),
                 modifier = Modifier
                     .fillMaxWidth(0.7f)
@@ -166,7 +167,7 @@ fun SetupScreen(
                     if (connectionStatus is ConnectionStatus.Error) {
                         Text(
                             text = connectionStatus.message,
-                            color = Color(0xFFFF5252),
+                            color = DarkColors.Error,
                             fontSize = 14.sp
                         )
                         Spacer(modifier = Modifier.height(12.dp))
@@ -206,7 +207,7 @@ fun SetupScreen(
                         onClick = { onDisconnect() },
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = Color(0xFFFF5252)
+                            contentColor = DarkColors.Error
                         ),
                         modifier = Modifier
                             .fillMaxWidth(0.7f)
@@ -231,8 +232,8 @@ fun SetupScreen(
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color.White,
                             contentColor = Color.Black,
-                            disabledContainerColor = Color(0xFF555555),
-                            disabledContentColor = Color(0xFFAAAAAA)
+                            disabledContainerColor = DarkColors.Disabled,
+                            disabledContentColor = DarkColors.ContentDisabled
                         ),
                         modifier = Modifier
                             .fillMaxWidth(0.7f)
@@ -261,7 +262,7 @@ fun SetupScreen(
             Icon(
                 imageVector = Icons.Rounded.Settings,
                 contentDescription = "Settings",
-                tint = Color(0xFF888888),
+                tint = DarkColors.TextMuted,
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -278,7 +279,7 @@ private fun ConnectionVisualization(
     val isConnected = connectionStatus is ConnectionStatus.Connected
     val isIdle = connectionStatus is ConnectionStatus.Disconnected ||
             connectionStatus is ConnectionStatus.Error
-    val dashLineColor = if (isConnected) AccentColor else Color(0xFF555555)
+    val dashLineColor = if (isConnected) AccentColor else DarkColors.Disabled
     val animating = !isIdle
 
     val infiniteTransition = rememberInfiniteTransition(label = "dashFlow")
@@ -306,7 +307,7 @@ private fun ConnectionVisualization(
                 .size(80.dp)
                 .then(circleBorderModifier)
                 .clip(CircleShape)
-                .background(Color(0xFF1A1A1A)),
+                .background(DarkColors.Surface),
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -355,7 +356,7 @@ private fun ConnectionVisualization(
                     modifier = Modifier
                         .size(48.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFF1A1A1A)),
+                        .background(DarkColors.Surface),
                     contentAlignment = Alignment.Center
                 ) {
                     DataSourceIcon(currentSource, size = 24, tint = Color.White)
@@ -363,7 +364,7 @@ private fun ConnectionVisualization(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = currentSource.label,
-                    color = Color(0xFF888888),
+                    color = DarkColors.TextMuted,
                     fontSize = 12.sp
                 )
             }
@@ -376,7 +377,7 @@ private fun ConnectionVisualization(
                 .size(80.dp)
                 .then(circleBorderModifier)
                 .clip(CircleShape)
-                .background(Color(0xFF1A1A1A)),
+                .background(DarkColors.Surface),
             contentAlignment = Alignment.Center
         ) {
             Icon(

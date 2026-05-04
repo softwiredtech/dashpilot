@@ -76,6 +76,7 @@ import com.softwiredtech.dashpilot.datamodel.dash.dashboardById
 import com.softwiredtech.dashpilot.datamodel.dash.getSelectedDashboard
 import com.softwiredtech.dashpilot.datamodel.dash.saveSelectedDashboard
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
+import com.softwiredtech.dashpilot.ui.theme.DarkColors
 
 private data class ToggleSetting(
     @StringRes val labelRes: Int,
@@ -163,11 +164,11 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF0D0D0D)
+                    containerColor = DarkColors.Background
                 )
             )
         },
-        containerColor = Color(0xFF0D0D0D)
+        containerColor = DarkColors.Background
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -184,7 +185,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 stringResource(R.string.settings_dashboard_subtitle),
-                color = Color(0xFF666666),
+                color = DarkColors.TextSubtle,
                 fontSize = 13.sp
             )
             Spacer(modifier = Modifier.height(10.dp))
@@ -204,7 +205,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                                     if (isSelected) Modifier.border(2.dp, AccentColor, RoundedCornerShape(12.dp))
                                     else Modifier
                                 )
-                                .background(Color(0xFF1A1A1A))
+                                .background(DarkColors.Surface)
                                 .clickable {
                                     selectedDashboardId.value = dashboard.id
                                     saveSelectedDashboard(context, dashboard)
@@ -228,12 +229,12 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                                         .fillMaxWidth()
                                         .aspectRatio(16f / 9f)
                                         .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
-                                        .background(Color(0xFF2A2A2A))
+                                        .background(DarkColors.SurfaceSelected)
                                 )
                             }
                             Text(
                                 text = dashboardName,
-                                color = if (isSelected) AccentColor else Color(0xFFAAAAAA),
+                                color = if (isSelected) AccentColor else DarkColors.ContentDisabled,
                                 fontSize = 13.sp,
                                 modifier = Modifier.padding(vertical = 10.dp)
                             )
@@ -245,7 +246,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = stringResource(R.string.settings_theme_availability_note),
-                color = Color(0xFF666666),
+                color = DarkColors.TextSubtle,
                 fontSize = 13.sp
             )
 
@@ -260,7 +261,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                 if (!extraBusState.value) {
                     Text(
                         text = stringResource(R.string.settings_vehicle_bus_requires_extra),
-                        color = Color(0xFF666666),
+                        color = DarkColors.TextSubtle,
                         fontSize = 13.sp,
                     )
                 }
@@ -278,7 +279,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                 Spacer(modifier = Modifier.height(24.dp))
             }
 
-            Text(stringResource(R.string.settings_section_display), color = Color(0xFF888888), fontSize = 16.sp)
+            Text(stringResource(R.string.settings_section_display), color = DarkColors.TextMuted, fontSize = 16.sp)
             Spacer(modifier = Modifier.height(8.dp))
 
             SettingsToggle(stringResource(R.string.settings_toggle_use_imperial), useImperialState.value) { enabled ->
@@ -298,7 +299,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
             Spacer(modifier = Modifier.height(8.dp))
 
             if (showVanillaSettings) {
-                Text(stringResource(R.string.settings_section_3d_visualizer), color = Color(0xFF888888), fontSize = 16.sp)
+                Text(stringResource(R.string.settings_section_3d_visualizer), color = DarkColors.TextMuted, fontSize = 16.sp)
 
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -348,7 +349,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                         colors = SliderDefaults.colors(
                             thumbColor = AccentColor,
                             activeTrackColor = AccentColor,
-                            inactiveTrackColor = Color(0xFF333333)
+                            inactiveTrackColor = DarkColors.Border
                         )
                     )
                 }
@@ -372,7 +373,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                 Text(text = stringResource(R.string.settings_version), color = Color.White, fontSize = 16.sp)
                 Text(
                     text = "${packageInfo.versionName} (${packageInfo.longVersionCode})",
-                    color = Color(0xFF888888),
+                    color = DarkColors.TextMuted,
                     fontSize = 16.sp
                 )
             }
@@ -384,7 +385,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
 private fun SectionHeader(title: String) {
     Text(
         text = title,
-        color = Color(0xFF888888),
+        color = DarkColors.TextMuted,
         fontSize = 16.sp
     )
 }
@@ -401,7 +402,7 @@ private fun RenderQualitySelector(selected: Int, onSelected: (Int) -> Unit) {
         Row(
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
-                .background(Color(0xFF333333))
+                .background(DarkColors.Border)
         ) {
             options.forEach { (value, label) ->
                 val isSelected = value == selected
@@ -415,7 +416,7 @@ private fun RenderQualitySelector(selected: Int, onSelected: (Int) -> Unit) {
                 ) {
                     Text(
                         text = label,
-                        color = if (isSelected) Color.White else Color(0xFF888888),
+                        color = if (isSelected) Color.White else DarkColors.TextMuted,
                         fontSize = 13.sp
                     )
                 }
@@ -442,9 +443,9 @@ private fun SettingsToggle(label: String, checked: Boolean, onCheckedChange: (Bo
             colors = SwitchDefaults.colors(
                 checkedThumbColor = Color.White,
                 checkedTrackColor = AccentColor,
-                uncheckedThumbColor = Color(0xFF888888),
-                uncheckedTrackColor = Color(0xFF333333),
-                uncheckedBorderColor = Color(0xFF555555)
+                uncheckedThumbColor = DarkColors.TextMuted,
+                uncheckedTrackColor = DarkColors.Border,
+                uncheckedBorderColor = DarkColors.Disabled
             )
         )
     }
