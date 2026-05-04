@@ -12,15 +12,7 @@ final class ConnectionViewModel {
     func connect(serverAddress: String) {
         guard connectionStatus == .disconnected else { return }
         
-        
-        let context = zmq_ctx_new()
-        let socket = zmq_socket(context, ZMQ_SUB)
-        zmq_connect(socket, "tcp://192.168.1.1:5555")
-        // ...
-        zmq_close(socket)
-        zmq_ctx_destroy(context)
-
-        /*let ds = WebsocketDataSource()
+        let ds = CommaDataSource()
         dataSource = ds
         connectionStatus = .connecting
 
@@ -32,7 +24,7 @@ final class ConnectionViewModel {
                 self.connectionStatus = .connected
                 break
             }
-        }*/
+        }
     }
 
     func disconnect() {

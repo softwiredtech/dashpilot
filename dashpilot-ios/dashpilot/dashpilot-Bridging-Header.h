@@ -6,3 +6,4 @@
 //
 
 #include <zmq.h>
+#include "bridge_ios.h"

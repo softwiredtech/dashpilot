@@ -7,48 +7,78 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "BBFBB3EC-C2CD-477D-BA03-F1AB6EC2EA45"
+            uuid = "53D0F770-5A0F-49AC-AD68-B869DE2BF609"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "dashpilot/ViewModel/ConnectionViewModel.swift"
+            filePath = "../bridge/bridge_ios.cpp"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "21"
-            endingLineNumber = "21"
-            landmarkName = "connect(serverAddress:)"
-            landmarkType = "7">
+            startingLineNumber = "32"
+            endingLineNumber = "32"
+            landmarkName = "bridge_create_sub_sockets(ctx, endpoints, count, address)"
+            landmarkType = "9">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "9A1FA65E-24F5-41CD-9DA0-588C20AD4A30"
+            uuid = "03F3311A-E614-4597-BDCE-23457A0C093A"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "dashpilot/ViewModel/ConnectionViewModel.swift"
+            filePath = "dashpilot/DataSource/CommaDataSource.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "17"
-            endingLineNumber = "17"
-            landmarkName = "connect(serverAddress:)"
+            startingLineNumber = "31"
+            endingLineNumber = "31"
+            landmarkName = "connect(address:)"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "03F3311A-E614-4597-BDCE-23457A0C093A - e6cf4f6e053a52c0"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Optional&lt;Swift.UnsafePointer&lt;Swift.UInt8&gt;&gt;, Swift.Int32) -&gt; () in closure #2 @Sendable () -&gt; () in dashpilot.CommaDataSource.connect(address: Swift.String) -&gt; ()"
+                  moduleName = "dashpilot.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/ahmedharmouche/Documents/dashpilot/dashpilot-ios/dashpilot/DataSource/CommaDataSource.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "31"
+                  endingLineNumber = "31">
+               </Location>
+               <Location
+                  uuid = "03F3311A-E614-4597-BDCE-23457A0C093A - e6cf4f6e053a52c0"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Optional&lt;Swift.UnsafePointer&lt;Swift.UInt8&gt;&gt;, Swift.Int32) -&gt; () in closure #2 @Sendable () -&gt; () in dashpilot.CommaDataSource.connect(address: Swift.String) -&gt; ()"
+                  moduleName = "dashpilot.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/ahmedharmouche/Documents/dashpilot/dashpilot-ios/dashpilot/DataSource/CommaDataSource.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "31"
+                  endingLineNumber = "31">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "7E849207-2761-4811-9A99-26C109409AE5"
+            uuid = "F04AC610-959A-436A-B215-2244AF8F71BE"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "dashpilot/ViewModel/ConnectionViewModel.swift"
+            filePath = "dashpilot/DataSource/CommaDataSource.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "18"
-            endingLineNumber = "18"
-            landmarkName = "connect(serverAddress:)"
+            startingLineNumber = "33"
+            endingLineNumber = "33"
+            landmarkName = "connect(address:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

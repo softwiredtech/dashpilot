@@ -46,7 +46,7 @@ struct SetupView: View {
     private var controlsSection: some View {
         VStack(spacing: 0) {
             TextField("Device IP", text: $serverAddress)
-                .keyboardType(.decimalPad)
+                .keyboardType(.default)
                 .foregroundColor(connectionVM.connectionStatus == .disconnected ? .white : Color(white: 0.53))
                 .disabled(connectionVM.connectionStatus != .disconnected)
                 .padding(.horizontal, 14)

@@ -9,12 +9,36 @@
 /* Begin PBXBuildFile section */
 		809087262FA61F2500D10891 /* libzmq.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 809087252FA61F2500D10891 /* libzmq.xcframework */; };
 		8090872B2FA6313200D10891 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 8090872A2FA6312800D10891 /* libc++.tbd */; };
+		809087812FA87C8100D10891 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 809087732FA87C8100D10891 /* .gitignore */; };
+		809087822FA87C8100D10891 /* msgq.cc in Sources */ = {isa = PBXBuildFile; fileRef = 8090877F2FA87C8100D10891 /* msgq.cc */; };
+		809087832FA87C8100D10891 /* impl_fake.cc in Sources */ = {isa = PBXBuildFile; fileRef = 809087772FA87C8100D10891 /* impl_fake.cc */; };
+		809087842FA87C8100D10891 /* bridge_ios.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 809087702FA87C8100D10891 /* bridge_ios.cpp */; };
+		809087852FA87C8100D10891 /* impl_zmq.cc in Sources */ = {isa = PBXBuildFile; fileRef = 8090877B2FA87C8100D10891 /* impl_zmq.cc */; };
+		809087862FA87C8100D10891 /* impl_msgq.cc in Sources */ = {isa = PBXBuildFile; fileRef = 809087792FA87C8100D10891 /* impl_msgq.cc */; };
+		809087872FA87C8100D10891 /* ipc.cc in Sources */ = {isa = PBXBuildFile; fileRef = 8090877D2FA87C8100D10891 /* ipc.cc */; };
+		809087882FA87C8100D10891 /* event.cc in Sources */ = {isa = PBXBuildFile; fileRef = 809087752FA87C8100D10891 /* event.cc */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		29FF823E2F72C9C400D48E9A /* dashpilot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = dashpilot.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		809087252FA61F2500D10891 /* libzmq.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = libzmq.xcframework; path = Libraries/libzmq.xcframework; sourceTree = "<group>"; };
 		8090872A2FA6312800D10891 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
+		8090876F2FA87C8100D10891 /* bridge_ios.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = bridge_ios.h; path = ../bridge/bridge_ios.h; sourceTree = SOURCE_ROOT; };
+		809087702FA87C8100D10891 /* bridge_ios.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = bridge_ios.cpp; path = ../bridge/bridge_ios.cpp; sourceTree = SOURCE_ROOT; };
+		809087712FA87C8100D10891 /* logger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = logger.h; sourceTree = "<group>"; };
+		809087732FA87C8100D10891 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		809087742FA87C8100D10891 /* event.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = event.h; sourceTree = "<group>"; };
+		809087752FA87C8100D10891 /* event.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = event.cc; sourceTree = "<group>"; };
+		809087762FA87C8100D10891 /* impl_fake.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = impl_fake.h; sourceTree = "<group>"; };
+		809087772FA87C8100D10891 /* impl_fake.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = impl_fake.cc; sourceTree = "<group>"; };
+		809087782FA87C8100D10891 /* impl_msgq.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = impl_msgq.h; sourceTree = "<group>"; };
+		809087792FA87C8100D10891 /* impl_msgq.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = impl_msgq.cc; sourceTree = "<group>"; };
+		8090877A2FA87C8100D10891 /* impl_zmq.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = impl_zmq.h; sourceTree = "<group>"; };
+		8090877B2FA87C8100D10891 /* impl_zmq.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = impl_zmq.cc; sourceTree = "<group>"; };
+		8090877C2FA87C8100D10891 /* ipc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ipc.h; sourceTree = "<group>"; };
+		8090877D2FA87C8100D10891 /* ipc.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ipc.cc; sourceTree = "<group>"; };
+		8090877E2FA87C8100D10891 /* msgq.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = msgq.h; sourceTree = "<group>"; };
+		8090877F2FA87C8100D10891 /* msgq.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = msgq.cc; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -54,6 +78,9 @@
 		29FF82352F72C9C400D48E9A = {
 			isa = PBXGroup;
 			children = (
+				8090876F2FA87C8100D10891 /* bridge_ios.h */,
+				809087702FA87C8100D10891 /* bridge_ios.cpp */,
+				809087802FA87C8100D10891 /* msgq */,
 				29FF82402F72C9C400D48E9A /* dashpilot */,
 				809087242FA61F2500D10891 /* Frameworks */,
 				29FF823F2F72C9C400D48E9A /* Products */,
@@ -76,6 +103,36 @@
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
+		};
+		809087722FA87C8100D10891 /* logger */ = {
+			isa = PBXGroup;
+			children = (
+				809087712FA87C8100D10891 /* logger.h */,
+			);
+			path = logger;
+			sourceTree = "<group>";
+		};
+		809087802FA87C8100D10891 /* msgq */ = {
+			isa = PBXGroup;
+			children = (
+				809087722FA87C8100D10891 /* logger */,
+				809087732FA87C8100D10891 /* .gitignore */,
+				809087742FA87C8100D10891 /* event.h */,
+				809087752FA87C8100D10891 /* event.cc */,
+				809087762FA87C8100D10891 /* impl_fake.h */,
+				809087772FA87C8100D10891 /* impl_fake.cc */,
+				809087782FA87C8100D10891 /* impl_msgq.h */,
+				809087792FA87C8100D10891 /* impl_msgq.cc */,
+				8090877A2FA87C8100D10891 /* impl_zmq.h */,
+				8090877B2FA87C8100D10891 /* impl_zmq.cc */,
+				8090877C2FA87C8100D10891 /* ipc.h */,
+				8090877D2FA87C8100D10891 /* ipc.cc */,
+				8090877E2FA87C8100D10891 /* msgq.h */,
+				8090877F2FA87C8100D10891 /* msgq.cc */,
+			);
+			name = msgq;
+			path = ../bridge/msgq;
+			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXGroup section */
 
@@ -142,6 +199,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				809087812FA87C8100D10891 /* .gitignore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -172,6 +230,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				809087822FA87C8100D10891 /* msgq.cc in Sources */,
+				809087832FA87C8100D10891 /* impl_fake.cc in Sources */,
+				809087842FA87C8100D10891 /* bridge_ios.cpp in Sources */,
+				809087852FA87C8100D10891 /* impl_zmq.cc in Sources */,
+				809087862FA87C8100D10891 /* impl_msgq.cc in Sources */,
+				809087872FA87C8100D10891 /* ipc.cc in Sources */,
+				809087882FA87C8100D10891 /* event.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -309,7 +374,10 @@
 				DEVELOPMENT_TEAM = UDUCCCVUWB;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"HEADER_SEARCH_PATHS[arch=*]" = "$(SRCROOT)/Libraries/include ";
+				"HEADER_SEARCH_PATHS[arch=*]" = (
+					"$(SRCROOT)/Libraries/include",
+					"$(SRCROOT)/../bridge/**",
+				);
 				INFOPLIST_FILE = dashpilot/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -339,7 +407,10 @@
 				DEVELOPMENT_TEAM = UDUCCCVUWB;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				"HEADER_SEARCH_PATHS[arch=*]" = "$(SRCROOT)/Libraries/include ";
+				"HEADER_SEARCH_PATHS[arch=*]" = (
+					"$(SRCROOT)/Libraries/include",
+					"$(SRCROOT)/../bridge/**",
+				);
 				INFOPLIST_FILE = dashpilot/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
