@@ -6,6 +6,10 @@
 #include <capnp/generated-header-support.h>
 #include <kj/windows-sanity.h>
 
+#ifdef DEBUG
+#undef DEBUG
+#endif
+
 #ifndef CAPNP_VERSION
 #error "CAPNP_VERSION is not defined, is capnp/generated-header-support.h missing?"
 #elif CAPNP_VERSION != 1003000

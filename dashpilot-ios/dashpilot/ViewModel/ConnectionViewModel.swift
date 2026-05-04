@@ -11,8 +11,8 @@ final class ConnectionViewModel {
 
     func connect(serverAddress: String) {
         guard connectionStatus == .disconnected else { return }
-
-        let ds = WebsocketDataSource()
+        
+        let ds = CommaDataSource()
         dataSource = ds
         connectionStatus = .connecting
 

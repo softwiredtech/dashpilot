@@ -6,8 +6,73 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		809087262FA61F2500D10891 /* libzmq.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 809087252FA61F2500D10891 /* libzmq.xcframework */; };
+		8090872B2FA6313200D10891 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 8090872A2FA6312800D10891 /* libc++.tbd */; };
+		809087812FA87C8100D10891 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 809087732FA87C8100D10891 /* .gitignore */; };
+		809087822FA87C8100D10891 /* msgq.cc in Sources */ = {isa = PBXBuildFile; fileRef = 8090877F2FA87C8100D10891 /* msgq.cc */; };
+		809087832FA87C8100D10891 /* impl_fake.cc in Sources */ = {isa = PBXBuildFile; fileRef = 809087772FA87C8100D10891 /* impl_fake.cc */; };
+		809087842FA87C8100D10891 /* bridge_ios.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 809087702FA87C8100D10891 /* bridge_ios.cpp */; };
+		809087852FA87C8100D10891 /* impl_zmq.cc in Sources */ = {isa = PBXBuildFile; fileRef = 8090877B2FA87C8100D10891 /* impl_zmq.cc */; };
+		809087862FA87C8100D10891 /* impl_msgq.cc in Sources */ = {isa = PBXBuildFile; fileRef = 809087792FA87C8100D10891 /* impl_msgq.cc */; };
+		809087872FA87C8100D10891 /* ipc.cc in Sources */ = {isa = PBXBuildFile; fileRef = 8090877D2FA87C8100D10891 /* ipc.cc */; };
+		809087882FA87C8100D10891 /* event.cc in Sources */ = {isa = PBXBuildFile; fileRef = 809087752FA87C8100D10891 /* event.cc */; };
+		809087992FA88E5E00D10891 /* deprecated.capnp in Resources */ = {isa = PBXBuildFile; fileRef = 809087962FA88E5E00D10891 /* deprecated.capnp */; };
+		8090879A2FA88E5E00D10891 /* c++.capnp in Resources */ = {isa = PBXBuildFile; fileRef = 809087922FA88E5E00D10891 /* c++.capnp */; };
+		8090879B2FA88E5E00D10891 /* custom.capnp in Resources */ = {isa = PBXBuildFile; fileRef = 809087952FA88E5E00D10891 /* custom.capnp */; };
+		8090879C2FA88E5E00D10891 /* log.capnp in Resources */ = {isa = PBXBuildFile; fileRef = 809087972FA88E5E00D10891 /* log.capnp */; };
+		8090879D2FA88E5E00D10891 /* car.capnp in Resources */ = {isa = PBXBuildFile; fileRef = 809087942FA88E5E00D10891 /* car.capnp */; };
+		809087A32FA8983F00D10891 /* libcapnp.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 809087A22FA8983F00D10891 /* libcapnp.xcframework */; };
+		809087A72FA8984F00D10891 /* libcapnpc.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 809087A62FA8984F00D10891 /* libcapnpc.xcframework */; };
+		809087AB2FA8985A00D10891 /* libkj.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 809087AA2FA8985A00D10891 /* libkj.xcframework */; };
+		809087C32FA89FA500D10891 /* custom.capnp.c++ in Sources */ = {isa = PBXBuildFile; fileRef = 809087BE2FA89FA500D10891 /* custom.capnp.c++ */; };
+		809087C42FA89FA500D10891 /* deprecated.capnp.c++ in Sources */ = {isa = PBXBuildFile; fileRef = 809087C02FA89FA500D10891 /* deprecated.capnp.c++ */; };
+		809087C52FA89FA500D10891 /* log.capnp.c++ in Sources */ = {isa = PBXBuildFile; fileRef = 809087C22FA89FA500D10891 /* log.capnp.c++ */; };
+		809087C62FA89FA500D10891 /* car.capnp.c++ in Sources */ = {isa = PBXBuildFile; fileRef = 809087BC2FA89FA500D10891 /* car.capnp.c++ */; };
+		809088AB2FA8A61600D10891 /* dbc.cc in Sources */ = {isa = PBXBuildFile; fileRef = 809088A72FA8A61600D10891 /* dbc.cc */; };
+		809088AC2FA8A61600D10891 /* dbcfile.cc in Sources */ = {isa = PBXBuildFile; fileRef = 809088A92FA8A61600D10891 /* dbcfile.cc */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		29FF823E2F72C9C400D48E9A /* dashpilot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = dashpilot.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		809087252FA61F2500D10891 /* libzmq.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = libzmq.xcframework; path = Libraries/libzmq.xcframework; sourceTree = "<group>"; };
+		8090872A2FA6312800D10891 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
+		8090876F2FA87C8100D10891 /* bridge_ios.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = bridge_ios.h; path = ../bridge/bridge_ios.h; sourceTree = SOURCE_ROOT; };
+		809087702FA87C8100D10891 /* bridge_ios.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = bridge_ios.cpp; path = ../bridge/bridge_ios.cpp; sourceTree = SOURCE_ROOT; };
+		809087712FA87C8100D10891 /* logger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = logger.h; sourceTree = "<group>"; };
+		809087732FA87C8100D10891 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
+		809087742FA87C8100D10891 /* event.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = event.h; sourceTree = "<group>"; };
+		809087752FA87C8100D10891 /* event.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = event.cc; sourceTree = "<group>"; };
+		809087762FA87C8100D10891 /* impl_fake.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = impl_fake.h; sourceTree = "<group>"; };
+		809087772FA87C8100D10891 /* impl_fake.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = impl_fake.cc; sourceTree = "<group>"; };
+		809087782FA87C8100D10891 /* impl_msgq.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = impl_msgq.h; sourceTree = "<group>"; };
+		809087792FA87C8100D10891 /* impl_msgq.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = impl_msgq.cc; sourceTree = "<group>"; };
+		8090877A2FA87C8100D10891 /* impl_zmq.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = impl_zmq.h; sourceTree = "<group>"; };
+		8090877B2FA87C8100D10891 /* impl_zmq.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = impl_zmq.cc; sourceTree = "<group>"; };
+		8090877C2FA87C8100D10891 /* ipc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ipc.h; sourceTree = "<group>"; };
+		8090877D2FA87C8100D10891 /* ipc.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ipc.cc; sourceTree = "<group>"; };
+		8090877E2FA87C8100D10891 /* msgq.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = msgq.h; sourceTree = "<group>"; };
+		8090877F2FA87C8100D10891 /* msgq.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = msgq.cc; sourceTree = "<group>"; };
+		809087922FA88E5E00D10891 /* c++.capnp */ = {isa = PBXFileReference; lastKnownFileType = text; path = "c++.capnp"; sourceTree = "<group>"; };
+		809087942FA88E5E00D10891 /* car.capnp */ = {isa = PBXFileReference; lastKnownFileType = text; path = car.capnp; sourceTree = "<group>"; };
+		809087952FA88E5E00D10891 /* custom.capnp */ = {isa = PBXFileReference; lastKnownFileType = text; path = custom.capnp; sourceTree = "<group>"; };
+		809087962FA88E5E00D10891 /* deprecated.capnp */ = {isa = PBXFileReference; lastKnownFileType = text; path = deprecated.capnp; sourceTree = "<group>"; };
+		809087972FA88E5E00D10891 /* log.capnp */ = {isa = PBXFileReference; lastKnownFileType = text; path = log.capnp; sourceTree = "<group>"; };
+		809087A22FA8983F00D10891 /* libcapnp.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = libcapnp.xcframework; path = Libraries/libcapnp.xcframework; sourceTree = "<group>"; };
+		809087A62FA8984F00D10891 /* libcapnpc.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = libcapnpc.xcframework; path = Libraries/libcapnpc.xcframework; sourceTree = "<group>"; };
+		809087AA2FA8985A00D10891 /* libkj.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = libkj.xcframework; path = Libraries/libkj.xcframework; sourceTree = "<group>"; };
+		809087BC2FA89FA500D10891 /* car.capnp.c++ */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "car.capnp.c++"; sourceTree = "<group>"; };
+		809087BE2FA89FA500D10891 /* custom.capnp.c++ */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "custom.capnp.c++"; sourceTree = "<group>"; };
+		809087C02FA89FA500D10891 /* deprecated.capnp.c++ */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "deprecated.capnp.c++"; sourceTree = "<group>"; };
+		809087C22FA89FA500D10891 /* log.capnp.c++ */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "log.capnp.c++"; sourceTree = "<group>"; };
+		809088992FA8A3E500D10891 /* tesla.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tesla.h; sourceTree = "<group>"; };
+		8090889B2FA8A3E500D10891 /* can_parsers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = can_parsers.h; sourceTree = "<group>"; };
+		8090889C2FA8A3E500D10891 /* car_state.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = car_state.h; sourceTree = "<group>"; };
+		8090889D2FA8A3E500D10891 /* car_state_mapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = car_state_mapper.h; sourceTree = "<group>"; };
+		809088A62FA8A61600D10891 /* dbc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dbc.h; sourceTree = "<group>"; };
+		809088A72FA8A61600D10891 /* dbc.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dbc.cc; sourceTree = "<group>"; };
+		809088A82FA8A61600D10891 /* dbcfile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dbcfile.h; sourceTree = "<group>"; };
+		809088A92FA8A61600D10891 /* dbcfile.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dbcfile.cc; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -36,6 +101,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				809087A72FA8984F00D10891 /* libcapnpc.xcframework in Frameworks */,
+				8090872B2FA6313200D10891 /* libc++.tbd in Frameworks */,
+				809087A32FA8983F00D10891 /* libcapnp.xcframework in Frameworks */,
+				809087262FA61F2500D10891 /* libzmq.xcframework in Frameworks */,
+				809087AB2FA8985A00D10891 /* libkj.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -45,7 +115,14 @@
 		29FF82352F72C9C400D48E9A = {
 			isa = PBXGroup;
 			children = (
+				809088AA2FA8A61600D10891 /* dbc */,
+				8090889E2FA8A3E500D10891 /* car */,
+				809087982FA88E5E00D10891 /* capnp */,
+				8090876F2FA87C8100D10891 /* bridge_ios.h */,
+				809087702FA87C8100D10891 /* bridge_ios.cpp */,
+				809087802FA87C8100D10891 /* msgq */,
 				29FF82402F72C9C400D48E9A /* dashpilot */,
+				809087242FA61F2500D10891 /* Frameworks */,
 				29FF823F2F72C9C400D48E9A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -57,6 +134,113 @@
 			);
 			name = Products;
 			sourceTree = "<group>";
+		};
+		809087242FA61F2500D10891 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				809087AA2FA8985A00D10891 /* libkj.xcframework */,
+				809087A62FA8984F00D10891 /* libcapnpc.xcframework */,
+				809087A22FA8983F00D10891 /* libcapnp.xcframework */,
+				8090872A2FA6312800D10891 /* libc++.tbd */,
+				809087252FA61F2500D10891 /* libzmq.xcframework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		809087722FA87C8100D10891 /* logger */ = {
+			isa = PBXGroup;
+			children = (
+				809087712FA87C8100D10891 /* logger.h */,
+			);
+			path = logger;
+			sourceTree = "<group>";
+		};
+		809087802FA87C8100D10891 /* msgq */ = {
+			isa = PBXGroup;
+			children = (
+				809087722FA87C8100D10891 /* logger */,
+				809087732FA87C8100D10891 /* .gitignore */,
+				809087742FA87C8100D10891 /* event.h */,
+				809087752FA87C8100D10891 /* event.cc */,
+				809087762FA87C8100D10891 /* impl_fake.h */,
+				809087772FA87C8100D10891 /* impl_fake.cc */,
+				809087782FA87C8100D10891 /* impl_msgq.h */,
+				809087792FA87C8100D10891 /* impl_msgq.cc */,
+				8090877A2FA87C8100D10891 /* impl_zmq.h */,
+				8090877B2FA87C8100D10891 /* impl_zmq.cc */,
+				8090877C2FA87C8100D10891 /* ipc.h */,
+				8090877D2FA87C8100D10891 /* ipc.cc */,
+				8090877E2FA87C8100D10891 /* msgq.h */,
+				8090877F2FA87C8100D10891 /* msgq.cc */,
+			);
+			name = msgq;
+			path = ../bridge/msgq;
+			sourceTree = SOURCE_ROOT;
+		};
+		809087912FA88E5E00D10891 /* gen */ = {
+			isa = PBXGroup;
+			children = (
+				809087BC2FA89FA500D10891 /* car.capnp.c++ */,
+				809087BE2FA89FA500D10891 /* custom.capnp.c++ */,
+				809087C02FA89FA500D10891 /* deprecated.capnp.c++ */,
+				809087C22FA89FA500D10891 /* log.capnp.c++ */,
+			);
+			path = gen;
+			sourceTree = "<group>";
+		};
+		809087932FA88E5E00D10891 /* include */ = {
+			isa = PBXGroup;
+			children = (
+				809087922FA88E5E00D10891 /* c++.capnp */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		809087982FA88E5E00D10891 /* capnp */ = {
+			isa = PBXGroup;
+			children = (
+				809087912FA88E5E00D10891 /* gen */,
+				809087932FA88E5E00D10891 /* include */,
+				809087942FA88E5E00D10891 /* car.capnp */,
+				809087952FA88E5E00D10891 /* custom.capnp */,
+				809087962FA88E5E00D10891 /* deprecated.capnp */,
+				809087972FA88E5E00D10891 /* log.capnp */,
+			);
+			name = capnp;
+			path = ../bridge/capnp;
+			sourceTree = SOURCE_ROOT;
+		};
+		8090889A2FA8A3E500D10891 /* cars */ = {
+			isa = PBXGroup;
+			children = (
+				809088992FA8A3E500D10891 /* tesla.h */,
+			);
+			path = cars;
+			sourceTree = "<group>";
+		};
+		8090889E2FA8A3E500D10891 /* car */ = {
+			isa = PBXGroup;
+			children = (
+				8090889A2FA8A3E500D10891 /* cars */,
+				8090889B2FA8A3E500D10891 /* can_parsers.h */,
+				8090889C2FA8A3E500D10891 /* car_state.h */,
+				8090889D2FA8A3E500D10891 /* car_state_mapper.h */,
+			);
+			name = car;
+			path = ../bridge/car;
+			sourceTree = SOURCE_ROOT;
+		};
+		809088AA2FA8A61600D10891 /* dbc */ = {
+			isa = PBXGroup;
+			children = (
+				809088A62FA8A61600D10891 /* dbc.h */,
+				809088A72FA8A61600D10891 /* dbc.cc */,
+				809088A82FA8A61600D10891 /* dbcfile.h */,
+				809088A92FA8A61600D10891 /* dbcfile.cc */,
+			);
+			name = dbc;
+			path = ../bridge/dbc;
+			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXGroup section */
 
@@ -123,6 +307,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				809087812FA87C8100D10891 /* .gitignore in Resources */,
+				809087992FA88E5E00D10891 /* deprecated.capnp in Resources */,
+				8090879A2FA88E5E00D10891 /* c++.capnp in Resources */,
+				8090879B2FA88E5E00D10891 /* custom.capnp in Resources */,
+				8090879C2FA88E5E00D10891 /* log.capnp in Resources */,
+				8090879D2FA88E5E00D10891 /* car.capnp in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -153,6 +343,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				809087C32FA89FA500D10891 /* custom.capnp.c++ in Sources */,
+				809087C42FA89FA500D10891 /* deprecated.capnp.c++ in Sources */,
+				809087C52FA89FA500D10891 /* log.capnp.c++ in Sources */,
+				809087C62FA89FA500D10891 /* car.capnp.c++ in Sources */,
+				809087822FA87C8100D10891 /* msgq.cc in Sources */,
+				809087832FA87C8100D10891 /* impl_fake.cc in Sources */,
+				809087842FA87C8100D10891 /* bridge_ios.cpp in Sources */,
+				809087852FA87C8100D10891 /* impl_zmq.cc in Sources */,
+				809088AB2FA8A61600D10891 /* dbc.cc in Sources */,
+				809088AC2FA8A61600D10891 /* dbcfile.cc in Sources */,
+				809087862FA87C8100D10891 /* impl_msgq.cc in Sources */,
+				809087872FA87C8100D10891 /* ipc.cc in Sources */,
+				809087882FA87C8100D10891 /* event.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -167,7 +370,7 @@
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_MODULES = NO;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
@@ -217,6 +420,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -231,7 +435,7 @@
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_MODULES = NO;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
@@ -274,6 +478,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
@@ -287,9 +492,14 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 2KJTTVU6PU;
+				DEVELOPMENT_TEAM = UDUCCCVUWB;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				"HEADER_SEARCH_PATHS[arch=*]" = (
+					"$(SRCROOT)/../bridge/include/zmq",
+					"$(SRCROOT)/../bridge",
+					"$(SRCROOT)/../bridge/include",
+				);
 				INFOPLIST_FILE = dashpilot/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -302,9 +512,11 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				"SWIFT_OBJC_BRIDGING_HEADER[arch=*]" = "$(SRCROOT)/dashpilot/dashpilot-Bridging-Header.h";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				"USER_HEADER_SEARCH_PATHS[arch=*]" = "";
 			};
 			name = Debug;
 		};
@@ -315,9 +527,14 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 2KJTTVU6PU;
+				DEVELOPMENT_TEAM = UDUCCCVUWB;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				"HEADER_SEARCH_PATHS[arch=*]" = (
+					"$(SRCROOT)/../bridge",
+					"$(SRCROOT)/../bridge/include/zmq",
+					"$(SRCROOT)/../bridge/include",
+				);
 				INFOPLIST_FILE = dashpilot/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -330,9 +547,11 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				"SWIFT_OBJC_BRIDGING_HEADER[arch=*]" = "$(SRCROOT)/dashpilot/dashpilot-Bridging-Header.h";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				"USER_HEADER_SEARCH_PATHS[arch=*]" = "";
 			};
 			name = Release;
 		};

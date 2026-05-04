@@ -20,13 +20,13 @@ file(GLOB_RECURSE GENERATED_CAPNP_HEADERS
 add_library(capnp STATIC IMPORTED)
 set_target_properties(capnp PROPERTIES
         IMPORTED_LOCATION ${CAPNP_ROOT}/lib/${ANDROID_ABI}/libcapnp.a
-        INTERFACE_INCLUDE_DIRECTORIES ${CAPNP_ROOT}/include
+        INTERFACE_INCLUDE_DIRECTORIES ${MSGQ_ROOT}/include
 )
 
 add_library(kj STATIC IMPORTED)
 set_target_properties(kj PROPERTIES
         IMPORTED_LOCATION ${CAPNP_ROOT}/lib/${ANDROID_ABI}/libkj.a
-        INTERFACE_INCLUDE_DIRECTORIES ${CAPNP_ROOT}/include
+        INTERFACE_INCLUDE_DIRECTORIES ${MSGQ_ROOT}/include
 )
 
 # Import ZeroMQ static library
@@ -35,7 +35,7 @@ set_target_properties(zmq PROPERTIES
         IMPORTED_LOCATION
         ${ZMQ_ROOT}/lib/${ANDROID_ABI}/libzmq.a
         INTERFACE_INCLUDE_DIRECTORIES
-        ${ZMQ_ROOT}/include
+        ${MSGQ_ROOT}/include/zmq
 )
 
 set(MSGQ_SOURCES
