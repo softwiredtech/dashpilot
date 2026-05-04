@@ -29,6 +29,8 @@
 		809087C42FA89FA500D10891 /* deprecated.capnp.c++ in Sources */ = {isa = PBXBuildFile; fileRef = 809087C02FA89FA500D10891 /* deprecated.capnp.c++ */; };
 		809087C52FA89FA500D10891 /* log.capnp.c++ in Sources */ = {isa = PBXBuildFile; fileRef = 809087C22FA89FA500D10891 /* log.capnp.c++ */; };
 		809087C62FA89FA500D10891 /* car.capnp.c++ in Sources */ = {isa = PBXBuildFile; fileRef = 809087BC2FA89FA500D10891 /* car.capnp.c++ */; };
+		809088AB2FA8A61600D10891 /* dbc.cc in Sources */ = {isa = PBXBuildFile; fileRef = 809088A72FA8A61600D10891 /* dbc.cc */; };
+		809088AC2FA8A61600D10891 /* dbcfile.cc in Sources */ = {isa = PBXBuildFile; fileRef = 809088A92FA8A61600D10891 /* dbcfile.cc */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -63,6 +65,14 @@
 		809087BE2FA89FA500D10891 /* custom.capnp.c++ */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "custom.capnp.c++"; sourceTree = "<group>"; };
 		809087C02FA89FA500D10891 /* deprecated.capnp.c++ */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "deprecated.capnp.c++"; sourceTree = "<group>"; };
 		809087C22FA89FA500D10891 /* log.capnp.c++ */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "log.capnp.c++"; sourceTree = "<group>"; };
+		809088992FA8A3E500D10891 /* tesla.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tesla.h; sourceTree = "<group>"; };
+		8090889B2FA8A3E500D10891 /* can_parsers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = can_parsers.h; sourceTree = "<group>"; };
+		8090889C2FA8A3E500D10891 /* car_state.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = car_state.h; sourceTree = "<group>"; };
+		8090889D2FA8A3E500D10891 /* car_state_mapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = car_state_mapper.h; sourceTree = "<group>"; };
+		809088A62FA8A61600D10891 /* dbc.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dbc.h; sourceTree = "<group>"; };
+		809088A72FA8A61600D10891 /* dbc.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dbc.cc; sourceTree = "<group>"; };
+		809088A82FA8A61600D10891 /* dbcfile.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = dbcfile.h; sourceTree = "<group>"; };
+		809088A92FA8A61600D10891 /* dbcfile.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = dbcfile.cc; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -105,6 +115,8 @@
 		29FF82352F72C9C400D48E9A = {
 			isa = PBXGroup;
 			children = (
+				809088AA2FA8A61600D10891 /* dbc */,
+				8090889E2FA8A3E500D10891 /* car */,
 				809087982FA88E5E00D10891 /* capnp */,
 				8090876F2FA87C8100D10891 /* bridge_ios.h */,
 				809087702FA87C8100D10891 /* bridge_ios.cpp */,
@@ -196,6 +208,38 @@
 			);
 			name = capnp;
 			path = ../bridge/capnp;
+			sourceTree = SOURCE_ROOT;
+		};
+		8090889A2FA8A3E500D10891 /* cars */ = {
+			isa = PBXGroup;
+			children = (
+				809088992FA8A3E500D10891 /* tesla.h */,
+			);
+			path = cars;
+			sourceTree = "<group>";
+		};
+		8090889E2FA8A3E500D10891 /* car */ = {
+			isa = PBXGroup;
+			children = (
+				8090889A2FA8A3E500D10891 /* cars */,
+				8090889B2FA8A3E500D10891 /* can_parsers.h */,
+				8090889C2FA8A3E500D10891 /* car_state.h */,
+				8090889D2FA8A3E500D10891 /* car_state_mapper.h */,
+			);
+			name = car;
+			path = ../bridge/car;
+			sourceTree = SOURCE_ROOT;
+		};
+		809088AA2FA8A61600D10891 /* dbc */ = {
+			isa = PBXGroup;
+			children = (
+				809088A62FA8A61600D10891 /* dbc.h */,
+				809088A72FA8A61600D10891 /* dbc.cc */,
+				809088A82FA8A61600D10891 /* dbcfile.h */,
+				809088A92FA8A61600D10891 /* dbcfile.cc */,
+			);
+			name = dbc;
+			path = ../bridge/dbc;
 			sourceTree = SOURCE_ROOT;
 		};
 /* End PBXGroup section */
@@ -307,6 +351,8 @@
 				809087832FA87C8100D10891 /* impl_fake.cc in Sources */,
 				809087842FA87C8100D10891 /* bridge_ios.cpp in Sources */,
 				809087852FA87C8100D10891 /* impl_zmq.cc in Sources */,
+				809088AB2FA8A61600D10891 /* dbc.cc in Sources */,
+				809088AC2FA8A61600D10891 /* dbcfile.cc in Sources */,
 				809087862FA87C8100D10891 /* impl_msgq.cc in Sources */,
 				809087872FA87C8100D10891 /* ipc.cc in Sources */,
 				809087882FA87C8100D10891 /* event.cc in Sources */,
