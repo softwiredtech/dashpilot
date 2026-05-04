@@ -496,9 +496,9 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				"HEADER_SEARCH_PATHS[arch=*]" = (
-					"$(SRCROOT)/Libraries/include",
-					"$(SRCROOT)/Libraries/include/zmq",
+					"$(SRCROOT)/../bridge/include/zmq",
 					"$(SRCROOT)/../bridge",
+					"$(SRCROOT)/../bridge/include",
 				);
 				INFOPLIST_FILE = dashpilot/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -531,9 +531,9 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				"HEADER_SEARCH_PATHS[arch=*]" = (
-					"$(SRCROOT)/Libraries/include",
-					"$(SRCROOT)/Libraries/include/zmq",
 					"$(SRCROOT)/../bridge",
+					"$(SRCROOT)/../bridge/include/zmq",
+					"$(SRCROOT)/../bridge/include",
 				);
 				INFOPLIST_FILE = dashpilot/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
