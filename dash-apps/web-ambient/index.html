@@ -43,24 +43,23 @@
       transition: background 0.4s ease;
     }
 
+    #app::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.06;
+      background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+    }
+
     #edgeAccent {
       position: absolute;
       left: 0;
       right: 0;
       bottom: 0;
       height: 2px;
-      animation: edgeBreathe 4.5s ease-in-out infinite;
-      transition: background 0.4s ease;
-    }
-
-    #edgeAccentTop {
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 0;
-      height: 2px;
-      animation: edgeBreathe 4.5s ease-in-out infinite;
-      transition: background 0.4s ease;
+      transition: background 0.8s ease;
     }
 
     #breathLayer {
@@ -90,11 +89,6 @@
       50% { opacity: 1; }
     }
 
-    @keyframes edgeBreathe {
-      0%, 100% { opacity: 0.5; }
-      50% { opacity: 1; }
-    }
-
     #speedLayer {
       position: absolute;
       inset: 0;
@@ -110,7 +104,7 @@
 
     #speed {
       font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: clamp(150px, 33vw, 280px);
+      font-size: clamp(150px, min(33vw, 65vh), 280px);
       font-weight: 200;
       letter-spacing: -0.06em;
       color: var(--fg);
@@ -139,14 +133,6 @@
       letter-spacing: -0.04em;
       font-variant-numeric: tabular-nums;
       color: var(--accent);
-    }
-
-    #setSpeedLabel {
-      font-size: 20px;
-      color: var(--muted);
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      font-weight: 500;
     }
 
     #assistLabel {
@@ -178,11 +164,18 @@
       50% { opacity: 1; }
     }
 
-    #gearChip {
+    #topRow {
       position: absolute;
-      left: 50%;
       top: 18px;
+      left: 50%;
       transform: translateX(-50%);
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #gearChip {
       padding: 8px 22px;
       border-radius: 4px;
       background: #1a1a17;
@@ -196,10 +189,6 @@
     }
 
     #warningChips {
-      position: absolute;
-      top: 60px;
-      left: 50%;
-      transform: translateX(-50%);
       display: flex;
       flex-direction: row;
       align-items: center;
@@ -245,8 +234,14 @@
       bottom: 0;
       width: 80px;
       pointer-events: none;
-      display: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #leftFlash.urgent,
+    #rightFlash.urgent {
       animation: flashPulse 0.85s ease-in-out infinite;
+      transition: none;
     }
 
     #leftFlash {
@@ -257,6 +252,21 @@
     #rightFlash {
       right: 0;
       background: linear-gradient(to left, rgba(255, 48, 48, 0.62), rgba(255, 48, 48, 0));
+    }
+
+    #leftFlash.passive,
+    #rightFlash.passive {
+      animation: none;
+      width: 56px;
+      opacity: 0.45;
+    }
+
+    #leftFlash.passive {
+      background: linear-gradient(to right, rgba(245, 185, 66, 0.55), rgba(245, 185, 66, 0));
+    }
+
+    #rightFlash.passive {
+      background: linear-gradient(to left, rgba(245, 185, 66, 0.55), rgba(245, 185, 66, 0));
     }
 
     @keyframes flashPulse {
@@ -319,6 +329,11 @@
       color: var(--fg);
       font-weight: 400;
       font-variant-numeric: tabular-nums;
+      transition: color 0.4s ease;
+    }
+
+    #speedLimitLabel {
+      transition: color 0.4s ease;
     }
   </style>
 </head>
@@ -332,15 +347,16 @@
     <div id="leftBlink"></div>
     <div id="rightBlink"></div>
 
-    <div id="gearChip"></div>
-    <div id="warningChips"></div>
+    <div id="topRow">
+      <div id="gearChip"></div>
+      <div id="warningChips"></div>
+    </div>
 
     <div id="speedLayer">
       <div id="speedWrap">
         <div id="speed">0</div>
         <div id="setSpeedWrap">
           <div id="setSpeed">0</div>
-          <div id="setSpeedLabel"></div>
         </div>
       </div>
     </div>
@@ -358,7 +374,6 @@
 
       <div id="units">mph</div>
     </div>
-    <div id="edgeAccentTop"></div>
     <div id="edgeAccent"></div>
   </div>
 
@@ -394,11 +409,9 @@
 
     const app = document.getElementById("app");
     const edgeAccent = document.getElementById("edgeAccent");
-    const edgeAccentTop = document.getElementById("edgeAccentTop");
     const speedEl = document.getElementById("speed");
     const setSpeedWrap = document.getElementById("setSpeedWrap");
     const setSpeedEl = document.getElementById("setSpeed");
-    const setSpeedLabel = document.getElementById("setSpeedLabel");
     const assistLabel = document.getElementById("assistLabel");
     const assistText = document.getElementById("assistText");
     const gearChip = document.getElementById("gearChip");
@@ -436,10 +449,13 @@
     }
 
     function drawWarningChips(car) {
+      const gear = gearMap[Math.round(Number(car.gear) || 0)] || "-";
+      const isParked = gear === "P";
+      const isDrive = gear === "D";
       const chips = [];
       if ((Number(car.anyDoorOpen) || 0) > 0) chips.push({ text: "Door open", tone: "red" });
-      if ((Number(car.buckleStatus) || 0) === 0) chips.push({ text: "Buckle up", tone: "red" });
-      if ((Number(car.speedCameraDistance) || 0) > 0) chips.push({ text: "Speed camera " + Math.round(car.speedCameraDistance) + "m", tone: "amber" });
+      if (!isParked && (Number(car.buckleStatus) || 0) === 0) chips.push({ text: "Buckle up", tone: "red" });
+      if (isDrive && (Number(car.speedCameraDistance) || 0) > 0) chips.push({ text: "Speed camera " + Math.round(car.speedCameraDistance) + "m", tone: "amber" });
 
       warningChips.innerHTML = "";
       for (const chip of chips) {
@@ -453,23 +469,30 @@
     const BG_KNOCKOUT = "0 0 3px rgba(10, 11, 13, 0.97), 0 0 8px rgba(10, 11, 13, 0.92), 0 0 12px rgba(10, 11, 13, 0.5)";
     const BG_KNOCKOUT_SMALL = "0 0 1px rgba(10, 11, 13, 0.98), 0 0 4px rgba(10, 11, 13, 0.94), 0 0 8px rgba(10, 11, 13, 0.72)";
 
+    const FG_RGB = [241, 239, 233];
+    const RED_RGB = [255, 117, 117];
+
+    function lerpColor(a, b, t) {
+      return `rgb(${Math.round(a[0]+(b[0]-a[0])*t)},${Math.round(a[1]+(b[1]-a[1])*t)},${Math.round(a[2]+(b[2]-a[2])*t)})`;
+    }
+
     function applySpeedStyle({ speed, assistMeta }) {
       speedEl.textContent = String(speed);
       speedEl.style.color = "var(--fg)";
       speedEl.style.textShadow = BG_KNOCKOUT + ", 0 -1px 0 rgba(241, 239, 233, 0.15)";
     }
 
-    function applySpeedLimitStyle({ overLimit, speedLimitValueNum }) {
+    function applySpeedLimitStyle({ overT, speedLimitValueNum }) {
       if (speedLimitValueNum > 0) {
         speedLimit.style.display = "flex";
         speedLimitValue.textContent = String(speedLimitValueNum);
-        if (overLimit) {
-          speedLimitValue.style.color = "var(--red)";
-          speedLimitLabel.style.color = "var(--red)";
+        if (overT > 0) {
+          speedLimitValue.style.color = lerpColor(FG_RGB, RED_RGB, overT);
+          speedLimitLabel.style.color = lerpColor(FG_RGB, RED_RGB, overT);
           speedLimitValue.style.textShadow =
-            BG_KNOCKOUT + ", 0 0 28px rgba(255, 60, 60, 0.7), 0 0 64px rgba(255, 60, 60, 0.4)";
+            BG_KNOCKOUT + `, 0 0 28px rgba(255,60,60,${(0.7 * overT).toFixed(2)}), 0 0 64px rgba(255,60,60,${(0.4 * overT).toFixed(2)})`;
           speedLimitLabel.style.textShadow =
-            BG_KNOCKOUT_SMALL + ", 0 0 16px rgba(255, 60, 60, 0.7), 0 0 32px rgba(255, 60, 60, 0.35)";
+            BG_KNOCKOUT_SMALL + `, 0 0 16px rgba(255,60,60,${(0.7 * overT).toFixed(2)}), 0 0 32px rgba(255,60,60,${(0.35 * overT).toFixed(2)})`;
         } else {
           speedLimitValue.style.color = "var(--fg)";
           speedLimitLabel.style.color = "var(--muted)";
@@ -494,26 +517,25 @@
 
       breathLayer.style.background =
         "radial-gradient(ellipse at 50% 78%, " + assistMeta.tint + " 0%, transparent 72%)";
-      ambientLayer.style.background = accent;
+      ambientLayer.style.background =
+        "radial-gradient(ellipse at 50% 78%, " + assistMeta.tint + " 0%, transparent 72%)";
 
       const gear = gearMap[Math.round(Number(car.gear) || 0)] || "-";
       const isDrive = gear === "D";
-      const overLimit = isDrive && speedLimitValueNum > 0 && speed > speedLimitValueNum + 5;
+      const pctOver = isDrive && speedLimitValueNum > 0 ? (speed - speedLimitValueNum) / speedLimitValueNum : 0;
+      const overT = Math.min(1, Math.max(0, (pctOver - 0.15) / 0.10));
       applySpeedStyle({ speed, assistMeta });
 
       const showSetSpeed = assist === "full" && setSpeed > 0;
       setSpeedWrap.style.display = showSetSpeed ? "flex" : "none";
       if (showSetSpeed) {
         setSpeedEl.textContent = String(setSpeed);
-        setSpeedLabel.textContent = "Set · " + assistMeta.short;
         setSpeedEl.style.textShadow =
           BG_KNOCKOUT + ", 0 0 18px " + assistMeta.dimGlow24 + ", 0 0 36px " + assistMeta.dimGlow48;
-        setSpeedLabel.style.textShadow =
-          BG_KNOCKOUT_SMALL + ", 0 0 12px " + assistMeta.dimGlow24 + ", 0 0 24px " + assistMeta.dimGlow48;
       }
 
       assistLabel.style.display = isAssistOn ? "flex" : "none";
-      assistText.textContent = assistMeta.short + " · " + assistMeta.long;
+      assistText.textContent = assistMeta.long;
 
       if (isDrive) {
         gearChip.style.display = "none";
@@ -527,22 +549,36 @@
       drawWarningChips(car);
 
       const laneDeparture = mapLaneDeparture(car.laneDepartureWarning);
-      const leftActive = (Number(car.leftBlindSpot) || 0) > 0 || laneDeparture === "left";
-      const rightActive = (Number(car.rightBlindSpot) || 0) > 0 || laneDeparture === "right";
-      leftFlash.style.display = leftActive ? "block" : "none";
-      rightFlash.style.display = rightActive ? "block" : "none";
+      const leftBlind = (Number(car.leftBlindSpot) || 0) > 0;
+      const rightBlind = (Number(car.rightBlindSpot) || 0) > 0;
+      const leftBlinkerOn = (Number(car.leftBlinker) || 0) > 0;
+      const rightBlinkerOn = (Number(car.rightBlinker) || 0) > 0;
+      const leftLaneDep = laneDeparture === "left";
+      const rightLaneDep = laneDeparture === "right";
+
+      const leftUrgent = (leftBlind && leftBlinkerOn) || leftLaneDep;
+      const rightUrgent = (rightBlind && rightBlinkerOn) || rightLaneDep;
+      const leftPassive = leftBlind && !leftBlinkerOn && !leftLaneDep;
+      const rightPassive = rightBlind && !rightBlinkerOn && !rightLaneDep;
+
+      const leftActive = leftUrgent || leftPassive;
+      const rightActive = rightUrgent || rightPassive;
+
+      leftFlash.classList.toggle("urgent", leftUrgent);
+      leftFlash.classList.toggle("passive", leftPassive);
+      rightFlash.classList.toggle("urgent", rightUrgent);
+      rightFlash.classList.toggle("passive", rightPassive);
 
       setBlinker(leftBlink, leftActive ? 0 : car.leftBlinker);
       setBlinker(rightBlink, rightActive ? 0 : car.rightBlinker);
 
-      applySpeedLimitStyle({ overLimit, speedLimitValueNum });
+      applySpeedLimitStyle({ overT, speedLimitValueNum });
 
       unitsEl.textContent = car.isImperial ? "mph" : "km/h";
       const edgeGradient =
         "linear-gradient(to right, transparent 0%, " +
         accent + " 50%, transparent 100%)";
       edgeAccent.style.background = edgeGradient;
-      edgeAccentTop.style.background = edgeGradient;
       bottomRow.style.textShadow = BG_KNOCKOUT_SMALL;
     }
 
