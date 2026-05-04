@@ -62,6 +62,7 @@ import androidx.compose.ui.unit.sp
 import com.softwiredtech.dashpilot.BuildConfig
 import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
+import com.softwiredtech.dashpilot.datasource.DataSourceType
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
 
 private data class DataSource(
@@ -71,10 +72,10 @@ private data class DataSource(
 )
 
 private val dataSources = buildList {
-    add(DataSource("comma", "comma", null))
+    add(DataSource(DataSourceType.COMMA, "comma", null))
     if (BuildConfig.DEBUG) {
-        add(DataSource("ble", "BLE", Icons.Rounded.Bluetooth))
-        add(DataSource("websocket", "WebSocket", Icons.Rounded.Lan))
+        add(DataSource(DataSourceType.BLE, "BLE", Icons.Rounded.Bluetooth))
+        add(DataSource(DataSourceType.WEBSOCKET, "WebSocket", Icons.Rounded.Lan))
     }
 }
 
@@ -130,8 +131,8 @@ fun SetupScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
         ) {
-            val showIpField = currentSource.key == "websocket" ||
-                    (currentSource.key == "comma" && connectionStatus is ConnectionStatus.Error)
+            val showIpField = currentSource.key == DataSourceType.WEBSOCKET ||
+                    (currentSource.key == DataSourceType.COMMA && connectionStatus is ConnectionStatus.Error)
             OutlinedTextField(
                 value = serverAddress,
                 onValueChange = { serverAddress = it },
@@ -176,8 +177,8 @@ fun SetupScreen(
                             // manual field (only shown after a discovery error). The VM takes
                             // care of seed IP + discovery.
                             val addressToSend = when (currentSource.key) {
-                                "comma" -> if (connectionStatus is ConnectionStatus.Error) serverAddress else ""
-                                "websocket" -> serverAddress
+                                DataSourceType.COMMA -> if (connectionStatus is ConnectionStatus.Error) serverAddress else ""
+                                DataSourceType.WEBSOCKET -> serverAddress
                                 else -> ""
                             }
                             onConnect(addressToSend, currentSource.key)

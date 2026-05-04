@@ -53,6 +53,24 @@ import androidx.core.content.edit
 import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.datamodel.dash.DASH_PREFS_NAME
 import com.softwiredtech.dashpilot.datamodel.dash.DisplaySettings
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_ALWAYS_ON_BLIND_SPOT_MONITOR
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_DARK_MODE
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_DARK_MODE_BACKGROUND_GRAY
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_EXTRA_VEHICLE_BUS
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_RENDER_QUALITY
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_SHOW_CAR_BATTERY
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_SHOW_ODOMETER
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_SHOW_PHONE_BATTERY
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_USE_IMPERIAL
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_ALWAYS_ON_BLIND_SPOT_MONITOR
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_DARK_MODE
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_DARK_MODE_BACKGROUND_GRAY
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_EXTRA_VEHICLE_BUS
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_RENDER_QUALITY
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_CAR_BATTERY
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_ODOMETER
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_PHONE_BATTERY
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_USE_IMPERIAL
 import com.softwiredtech.dashpilot.datamodel.dash.availableDashboards
 import com.softwiredtech.dashpilot.datamodel.dash.dashboardById
 import com.softwiredtech.dashpilot.datamodel.dash.getSelectedDashboard
@@ -66,8 +84,8 @@ private data class ToggleSetting(
 )
 
 private val vehicleBusToggles = listOf(
-    ToggleSetting(R.string.settings_toggle_show_car_battery, "show_car_battery", true),
-    ToggleSetting(R.string.settings_toggle_show_odometer, "show_odometer", true),
+    ToggleSetting(R.string.settings_toggle_show_car_battery, PREF_SHOW_CAR_BATTERY, DEFAULT_SHOW_CAR_BATTERY),
+    ToggleSetting(R.string.settings_toggle_show_odometer, PREF_SHOW_ODOMETER, DEFAULT_SHOW_ODOMETER),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -77,31 +95,31 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
     val sharedPrefs = remember { context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE) }
 
     val extraBusState = remember {
-        mutableStateOf(sharedPrefs.getBoolean("extra_vehicle_bus", false))
+        mutableStateOf(sharedPrefs.getBoolean(PREF_EXTRA_VEHICLE_BUS, DEFAULT_EXTRA_VEHICLE_BUS))
     }
 
     val showPhoneBatteryState = remember {
-        mutableStateOf(sharedPrefs.getBoolean("show_phone_battery", true))
+        mutableStateOf(sharedPrefs.getBoolean(PREF_SHOW_PHONE_BATTERY, DEFAULT_SHOW_PHONE_BATTERY))
     }
 
     val useImperialState = remember {
-        mutableStateOf(sharedPrefs.getBoolean("use_imperial", false))
+        mutableStateOf(sharedPrefs.getBoolean(PREF_USE_IMPERIAL, DEFAULT_USE_IMPERIAL))
     }
 
     val darkModeState = remember {
-        mutableStateOf(sharedPrefs.getBoolean("dark_mode", false))
+        mutableStateOf(sharedPrefs.getBoolean(PREF_DARK_MODE, DEFAULT_DARK_MODE))
     }
 
     val alwaysOnBlindSpotMonitorState = remember {
-        mutableStateOf(sharedPrefs.getBoolean("always_on_blind_spot_monitor", true))
+        mutableStateOf(sharedPrefs.getBoolean(PREF_ALWAYS_ON_BLIND_SPOT_MONITOR, DEFAULT_ALWAYS_ON_BLIND_SPOT_MONITOR))
     }
 
     val renderQualityState = remember {
-        mutableIntStateOf(sharedPrefs.getInt("render_quality", 3))
+        mutableIntStateOf(sharedPrefs.getInt(PREF_RENDER_QUALITY, DEFAULT_RENDER_QUALITY))
     }
 
     val darkModeBackgroundGrayState = remember {
-        mutableFloatStateOf(sharedPrefs.getInt("dark_mode_background_gray", 0).toFloat())
+        mutableFloatStateOf(sharedPrefs.getInt(PREF_DARK_MODE_BACKGROUND_GRAY, DEFAULT_DARK_MODE_BACKGROUND_GRAY).toFloat())
     }
 
     val selectedDashboardId = remember {
@@ -122,8 +140,8 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
 
     fun buildDisplaySettings() = DisplaySettings(
         showPhoneBattery = showPhoneBatteryState.value,
-        showCarBattery = vehicleBusToggleStates.getValue("show_car_battery").value,
-        showOdometer = vehicleBusToggleStates.getValue("show_odometer").value,
+        showCarBattery = vehicleBusToggleStates.getValue(PREF_SHOW_CAR_BATTERY).value,
+        showOdometer = vehicleBusToggleStates.getValue(PREF_SHOW_ODOMETER).value,
         useImperial = useImperialState.value,
         darkMode = darkModeState.value,
         alwaysOnBlindSpotMonitor = alwaysOnBlindSpotMonitorState.value,
@@ -183,7 +201,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                                 .width(160.dp)
                                 .clip(RoundedCornerShape(12.dp))
                                 .then(
-                                    if (isSelected) Modifier.border(2.dp, Color(0xFF5CBD68), RoundedCornerShape(12.dp))
+                                    if (isSelected) Modifier.border(2.dp, AccentColor, RoundedCornerShape(12.dp))
                                     else Modifier
                                 )
                                 .background(Color(0xFF1A1A1A))
@@ -215,7 +233,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                             }
                             Text(
                                 text = dashboardName,
-                                color = if (isSelected) Color(0xFF5CBD68) else Color(0xFFAAAAAA),
+                                color = if (isSelected) AccentColor else Color(0xFFAAAAAA),
                                 fontSize = 13.sp,
                                 modifier = Modifier.padding(vertical = 10.dp)
                             )
@@ -236,7 +254,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
             if (supportsVehicleBusWidgets) {
                 SettingsToggle(stringResource(R.string.settings_toggle_extra_vehicle_bus), extraBusState.value) { enabled ->
                     extraBusState.value = enabled
-                    sharedPrefs.edit { putBoolean("extra_vehicle_bus", enabled) }
+                    sharedPrefs.edit { putBoolean(PREF_EXTRA_VEHICLE_BUS, enabled) }
                 }
 
                 if (!extraBusState.value) {
@@ -265,14 +283,14 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
 
             SettingsToggle(stringResource(R.string.settings_toggle_use_imperial), useImperialState.value) { enabled ->
                 useImperialState.value = enabled
-                sharedPrefs.edit { putBoolean("use_imperial", enabled) }
+                sharedPrefs.edit { putBoolean(PREF_USE_IMPERIAL, enabled) }
                 onDisplaySettingsChanged(buildDisplaySettings())
             }
 
             if (showPhoneBatteryToggle) {
                 SettingsToggle(stringResource(R.string.settings_toggle_show_phone_battery), showPhoneBatteryState.value) { enabled ->
                     showPhoneBatteryState.value = enabled
-                    sharedPrefs.edit { putBoolean("show_phone_battery", enabled) }
+                    sharedPrefs.edit { putBoolean(PREF_SHOW_PHONE_BATTERY, enabled) }
                     onDisplaySettingsChanged(buildDisplaySettings())
                 }
             }
@@ -286,13 +304,13 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
 
                 SettingsToggle(stringResource(R.string.settings_toggle_always_on_blind_spot_monitor), alwaysOnBlindSpotMonitorState.value) { enabled ->
                     alwaysOnBlindSpotMonitorState.value = enabled
-                    sharedPrefs.edit { putBoolean("always_on_blind_spot_monitor", enabled) }
+                    sharedPrefs.edit { putBoolean(PREF_ALWAYS_ON_BLIND_SPOT_MONITOR, enabled) }
                     onDisplaySettingsChanged(buildDisplaySettings())
                 }
 
                 SettingsToggle(stringResource(R.string.settings_toggle_dark_mode), darkModeState.value) { enabled ->
                     darkModeState.value = enabled
-                    sharedPrefs.edit { putBoolean("dark_mode", enabled) }
+                    sharedPrefs.edit { putBoolean(PREF_DARK_MODE, enabled) }
                     onDisplaySettingsChanged(buildDisplaySettings())
                 }
 
@@ -323,7 +341,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                         onValueChange = { darkModeBackgroundGrayState.floatValue = it },
                         onValueChangeFinished = {
                             val v = darkModeBackgroundGrayState.floatValue.toInt()
-                            sharedPrefs.edit { putInt("dark_mode_background_gray", v) }
+                            sharedPrefs.edit { putInt(PREF_DARK_MODE_BACKGROUND_GRAY, v) }
                             onDisplaySettingsChanged(buildDisplaySettings())
                         },
                         valueRange = 0f..30f,
@@ -339,7 +357,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
 
                 RenderQualitySelector(renderQualityState.intValue) { quality ->
                     renderQualityState.intValue = quality
-                    sharedPrefs.edit { putInt("render_quality", quality) }
+                    sharedPrefs.edit { putInt(PREF_RENDER_QUALITY, quality) }
                     onDisplaySettingsChanged(buildDisplaySettings())
                 }
 
