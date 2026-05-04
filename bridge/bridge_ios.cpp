@@ -4,6 +4,9 @@
 #include <thread>
 #include <chrono>
 #include <cstdio>
+#include <capnp/message.h>
+#include <capnp/serialize.h>
+#include "capnp/gen/log.capnp.h"
 
 struct SubSocketGroup {
     std::vector<SubSocket*> sockets;
@@ -47,6 +50,12 @@ void bridge_start_receive_loop(void* groupPtr, bridge_callback_t callback) {
     auto* group = static_cast<SubSocketGroup*>(groupPtr);
     receiveLoopRunning = true;
 
+    double egoSpeed = 0;
+    double egoSteeringAngle = 0;
+    double selfdriveActive = 0;
+    double experimentalMode = 0;
+    double madsActive = 0;
+
     while (receiveLoopRunning) {
         bool gotAny = false;
 
@@ -55,6 +64,35 @@ void bridge_start_receive_loop(void* groupPtr, bridge_callback_t callback) {
             if (!msg) continue;
             gotAny = true;
 
+            kj::ArrayPtr<capnp::word> words(
+                reinterpret_cast<capnp::word*>(msg->getData()),
+                msg->getSize() / sizeof(capnp::word));
+            capnp::FlatArrayMessageReader reader(words);
+            auto event = reader.getRoot<cereal::Event>();
+
+            if (event.which() == cereal::Event::CAN) {
+                auto canList = event.getCan();
+                for (const auto& c : canList) {
+                    (void)c.getSrc();
+                    (void)c.getAddress();
+                    (void)c.getDat();
+                }
+                // TODO: feed CAN frames into vehicle decoder
+                printf("[bridge_ios] CAN: %d frames\n", canList.size());
+
+            } else if (event.which() == cereal::Event::SELFDRIVE_STATE) {
+                auto state = event.getSelfdriveState();
+                experimentalMode = state.getExperimentalMode() ? 1.0 : 0.0;
+                selfdriveActive = state.getActive() ? 1.0 : 0.0;
+                printf("[bridge_ios] selfdriveState: active=%d experimental=%d\n",
+                       (int)selfdriveActive, (int)experimentalMode);
+
+            } else if (event.which() == cereal::Event::SELFDRIVE_STATE_S_P) {
+                madsActive = event.getSelfdriveStateSP().getMads().getActive() ? 1.0 : 0.0;
+                printf("[bridge_ios] selfdriveStateSP: madsActive=%d\n", (int)madsActive);
+            }
+
+            // Pass raw bytes to Swift callback for now
             callback(reinterpret_cast<const uint8_t*>(msg->getData()), static_cast<int>(msg->getSize()));
             delete msg;
         }
