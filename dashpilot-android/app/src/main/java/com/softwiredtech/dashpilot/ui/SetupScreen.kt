@@ -20,6 +20,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -101,9 +103,10 @@ fun SetupScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(horizontal = 32.dp, vertical = 48.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween
+        verticalArrangement = Arrangement.Top
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
@@ -121,6 +124,7 @@ fun SetupScreen(
             )
         }
 
+        Spacer(modifier = Modifier.height(32.dp))
         ConnectionVisualization(
             connectionStatus = connectionStatus,
             currentSource = currentSource,
@@ -128,6 +132,7 @@ fun SetupScreen(
             onSourceSelected = { selectedIndex = it }
         )
 
+        Spacer(modifier = Modifier.height(32.dp))
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
