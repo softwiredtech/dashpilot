@@ -31,13 +31,11 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import androidx.startup.AppInitializer
 import app.rive.runtime.kotlin.RiveInitializer
-import com.softwiredtech.dashpilot.datamodel.dash.availableDashboards
+import com.softwiredtech.dashpilot.datamodel.dash.getSelectedDashboard
 import com.softwiredtech.dashpilot.navigation.DashboardRoute
-import com.softwiredtech.dashpilot.navigation.DashboardSelectionRoute
 import com.softwiredtech.dashpilot.navigation.SettingsRoute
 import com.softwiredtech.dashpilot.navigation.SetupRoute
 import com.softwiredtech.dashpilot.ui.DashboardScreen
-import com.softwiredtech.dashpilot.ui.DashboardSelectionScreen
 import com.softwiredtech.dashpilot.ui.SettingsScreen
 import com.softwiredtech.dashpilot.ui.SetupScreen
 import com.softwiredtech.dashpilot.ui.theme.DashPilotTheme
@@ -117,10 +115,10 @@ class MainActivity : ComponentActivity() {
                                     connectionVM.disconnect()
                                 },
                                 onNext = {
-                                    val vanillaDashboard = availableDashboards[0]
+                                    val dashboard = getSelectedDashboard(context)
                                     navController.navigate(DashboardRoute(
-                                        vanillaDashboard.type.name.lowercase(),
-                                        vanillaDashboard.url)
+                                        dashboard.type.name.lowercase(),
+                                        dashboard.url)
                                     )
                                 },
                                 onSettingsClick = {
@@ -132,18 +130,6 @@ class MainActivity : ComponentActivity() {
                             SettingsScreen(
                                 onBack = { navController.popBackStack() },
                                 onDisplaySettingsChanged = { connectionVM.updateDisplaySettings(it) }
-                            )
-                        }
-                        composable<DashboardSelectionRoute> {
-                            DashboardSelectionScreen(
-                                onSelect = { dashboard ->
-                                    navController.navigate(
-                                        DashboardRoute(
-                                            dashboardType = dashboard.type.name.lowercase(),
-                                            dashboardUrl = dashboard.url
-                                        )
-                                    )
-                                }
                             )
                         }
                         composable<DashboardRoute> { backStackEntry ->

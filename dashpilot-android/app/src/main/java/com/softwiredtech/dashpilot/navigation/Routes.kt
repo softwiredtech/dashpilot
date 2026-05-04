@@ -6,9 +6,6 @@ import kotlinx.serialization.Serializable
 object SetupRoute
 
 @Serializable
-object DashboardSelectionRoute
-
-@Serializable
 object SettingsRoute
 
 @Serializable

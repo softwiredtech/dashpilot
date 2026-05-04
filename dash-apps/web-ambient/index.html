@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <title>DashPilot Minimal Ambient</title>
+  <style>
+    @font-face {
+      font-family: "Geist Mono";
+      font-style: normal;
+      font-weight: 200;
+      font-display: swap;
+      src: url("fonts/geist-mono-200.woff2") format("woff2");
+    }
+
+    :root {
+      --bg: #0a0b0d;
+      --fg: #f1efe9;
+      --muted: #aaa79d;
+      --off: #d8c39a;
+      --mads: #00C8C8;
+      --full: #00FF26;
+      --red: #ff7575;
+      --edge: var(--off);
+      --accent: var(--off);
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    #app {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 50%, rgba(241, 239, 233, 0.07) 0%, var(--bg) 70%);
+      transition: background 0.4s ease;
+    }
+
+    #edgeAccent {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 2px;
+      animation: edgeBreathe 4.5s ease-in-out infinite;
+      transition: background 0.4s ease;
+    }
+
+    #edgeAccentTop {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 2px;
+      animation: edgeBreathe 4.5s ease-in-out infinite;
+      transition: background 0.4s ease;
+    }
+
+    #breathLayer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      animation: ambientBreathe 4.5s ease-in-out infinite;
+      transition: background 0.6s ease;
+    }
+
+    #ambientLayer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      animation: ambientWash 6.5s ease-in-out infinite;
+      animation-delay: -2.1s;
+      transition: background 0.6s ease;
+    }
+
+    @keyframes ambientWash {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 0.12; }
+    }
+
+    @keyframes ambientBreathe {
+      0%, 100% { opacity: 0.55; }
+      50% { opacity: 1; }
+    }
+
+    @keyframes edgeBreathe {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    #speedLayer {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #speedWrap {
+      position: relative;
+      line-height: 0.82;
+    }
+
+    #speed {
+      font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: clamp(150px, 33vw, 280px);
+      font-weight: 200;
+      letter-spacing: -0.06em;
+      color: var(--fg);
+      font-variant-numeric: tabular-nums;
+      transition: color 0.25s ease, text-shadow 0.25s ease;
+      user-select: none;
+    }
+
+    #setSpeedWrap {
+      position: absolute;
+      left: 100%;
+      top: 18px;
+      margin-left: 24px;
+      display: none;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      user-select: none;
+    }
+
+    #setSpeed {
+      font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: clamp(58px, 10.5vw, 96px);
+      font-weight: 200;
+      line-height: 0.85;
+      letter-spacing: -0.04em;
+      font-variant-numeric: tabular-nums;
+      color: var(--accent);
+    }
+
+    #setSpeedLabel {
+      font-size: 20px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    #assistLabel {
+      grid-column: 2;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-size: 22px;
+      line-height: 1;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--accent);
+      user-select: none;
+    }
+
+    #assistDot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      animation: breathe 4.5s ease-in-out infinite;
+    }
+
+    @keyframes breathe {
+      0%, 100% { opacity: 0.55; }
+      50% { opacity: 1; }
+    }
+
+    #gearChip {
+      position: absolute;
+      left: 50%;
+      top: 18px;
+      transform: translateX(-50%);
+      padding: 8px 22px;
+      border-radius: 4px;
+      background: #1a1a17;
+      color: var(--fg);
+      font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 32px;
+      font-weight: 600;
+      letter-spacing: 0.18em;
+      display: none;
+      user-select: none;
+    }
+
+    #warningChips {
+      position: absolute;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      user-select: none;
+    }
+
+    #bottomRow {
+      position: absolute;
+      left: 28px;
+      right: 28px;
+      bottom: 44px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: end;
+      text-shadow: 0 0 10px rgba(241,239,233,0.25), 0 0 24px rgba(241,239,233,0.12);
+    }
+
+    .chip {
+      padding: 9px 18px;
+      border-radius: 4px;
+      font-size: 20px;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .chip-red {
+      background: rgba(255, 60, 60, 0.22);
+      color: #ff7575;
+    }
+
+    .chip-amber {
+      background: rgba(245, 185, 66, 0.18);
+      color: #f5b942;
+    }
+
+    #leftFlash,
+    #rightFlash {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 80px;
+      pointer-events: none;
+      display: none;
+      animation: flashPulse 0.85s ease-in-out infinite;
+    }
+
+    #leftFlash {
+      left: 0;
+      background: linear-gradient(to right, rgba(255, 48, 48, 0.62), rgba(255, 48, 48, 0));
+    }
+
+    #rightFlash {
+      right: 0;
+      background: linear-gradient(to left, rgba(255, 48, 48, 0.62), rgba(255, 48, 48, 0));
+    }
+
+    @keyframes flashPulse {
+      0%, 100% { opacity: 0.55; }
+      50% { opacity: 1; }
+    }
+
+    #leftBlink, #rightBlink {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 200px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.18s ease-out;
+    }
+
+    #leftBlink {
+      left: 0;
+      background: linear-gradient(to right, rgba(77, 214, 106, 0.80), rgba(77, 214, 106, 0));
+    }
+
+    #rightBlink {
+      right: 0;
+      background: linear-gradient(to left, rgba(77, 214, 106, 0.80), rgba(77, 214, 106, 0));
+    }
+
+    #units {
+      grid-column: 3;
+      font-size: 24px;
+      line-height: 1;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 500;
+      user-select: none;
+      text-align: right;
+    }
+
+    #speedLimit {
+      display: none;
+      align-items: baseline;
+      gap: 10px;
+      font-family: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      user-select: none;
+    }
+
+    #speedLimitLabel {
+      font-size: 20px;
+      line-height: 1;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    #speedLimitValue {
+      font-size: 62px;
+      line-height: 1;
+      color: var(--fg);
+      font-weight: 400;
+      font-variant-numeric: tabular-nums;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div id="breathLayer"></div>
+    <div id="ambientLayer"></div>
+    <div id="leftFlash"></div>
+    <div id="rightFlash"></div>
+
+    <div id="leftBlink"></div>
+    <div id="rightBlink"></div>
+
+    <div id="gearChip"></div>
+    <div id="warningChips"></div>
+
+    <div id="speedLayer">
+      <div id="speedWrap">
+        <div id="speed">0</div>
+        <div id="setSpeedWrap">
+          <div id="setSpeed">0</div>
+          <div id="setSpeedLabel"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="bottomRow">
+      <div id="speedLimit">
+        <span id="speedLimitLabel">Limit</span>
+        <span id="speedLimitValue">0</span>
+      </div>
+
+      <div id="assistLabel">
+        <span id="assistDot"></span>
+        <span id="assistText"></span>
+      </div>
+
+      <div id="units">mph</div>
+    </div>
+    <div id="edgeAccentTop"></div>
+    <div id="edgeAccent"></div>
+  </div>
+
+  <script>
+    const ASSIST_META = {
+      off: {
+        short: "OFF",
+        long: "Manual",
+        accent: "#d8c39a",
+        tint: "rgba(216, 195, 154, 0.13)",
+        dimGlow24: "rgba(216, 195, 154, 0.20)",
+        dimGlow48: "rgba(216, 195, 154, 0.10)",
+      },
+      mads: {
+        short: "MADS",
+        long: "Lane Assist",
+        accent: "#00C8C8",
+        tint: "rgba(0, 200, 200, 0.20)",
+        dimGlow24: "rgba(0, 200, 200, 0.20)",
+        dimGlow48: "rgba(0, 200, 200, 0.10)",
+      },
+      full: {
+        short: "AUTO",
+        long: "Full Assist",
+        accent: "#00FF26",
+        tint: "rgba(0, 255, 38, 0.18)",
+        dimGlow24: "rgba(0, 255, 38, 0.20)",
+        dimGlow48: "rgba(0, 255, 38, 0.10)",
+      },
+    };
+
+    const gearMap = { 1: "P", 2: "R", 3: "N", 4: "D" };
+
+    const app = document.getElementById("app");
+    const edgeAccent = document.getElementById("edgeAccent");
+    const edgeAccentTop = document.getElementById("edgeAccentTop");
+    const speedEl = document.getElementById("speed");
+    const setSpeedWrap = document.getElementById("setSpeedWrap");
+    const setSpeedEl = document.getElementById("setSpeed");
+    const setSpeedLabel = document.getElementById("setSpeedLabel");
+    const assistLabel = document.getElementById("assistLabel");
+    const assistText = document.getElementById("assistText");
+    const gearChip = document.getElementById("gearChip");
+    const warningChips = document.getElementById("warningChips");
+    const leftFlash = document.getElementById("leftFlash");
+    const rightFlash = document.getElementById("rightFlash");
+    const leftBlink = document.getElementById("leftBlink");
+    const rightBlink = document.getElementById("rightBlink");
+    const speedLimit = document.getElementById("speedLimit");
+    const speedLimitValue = document.getElementById("speedLimitValue");
+    const speedLimitLabel = document.getElementById("speedLimitLabel");
+    const unitsEl = document.getElementById("units");
+    const bottomRow = document.getElementById("bottomRow");
+    const breathLayer = document.getElementById("breathLayer");
+    const ambientLayer = document.getElementById("ambientLayer");
+
+    function mapAssist(car) {
+      if (car.adasOn) return "full";
+      if (car.madsActive) return "mads";
+      return "off";
+    }
+
+    function mapLaneDeparture(value) {
+      const ldw = Number(value) || 0;
+      if (ldw === 1 || ldw === 3) return "left";
+      if (ldw === 2 || ldw === 4) return "right";
+      return null;
+    }
+
+    function setBlinker(el, state) {
+      const s = Number(state) || 0;
+      if (s === 2) el.style.opacity = "1";
+      else if (s === 1) el.style.opacity = "0.25";
+      else el.style.opacity = "0";
+    }
+
+    function drawWarningChips(car) {
+      const chips = [];
+      if ((Number(car.anyDoorOpen) || 0) > 0) chips.push({ text: "Door open", tone: "red" });
+      if ((Number(car.buckleStatus) || 0) === 0) chips.push({ text: "Buckle up", tone: "red" });
+      if ((Number(car.speedCameraDistance) || 0) > 0) chips.push({ text: "Speed camera " + Math.round(car.speedCameraDistance) + "m", tone: "amber" });
+
+      warningChips.innerHTML = "";
+      for (const chip of chips) {
+        const el = document.createElement("div");
+        el.className = "chip " + (chip.tone === "red" ? "chip-red" : "chip-amber");
+        el.textContent = chip.text;
+        warningChips.appendChild(el);
+      }
+    }
+
+    const BG_KNOCKOUT = "0 0 3px rgba(10, 11, 13, 0.97), 0 0 8px rgba(10, 11, 13, 0.92), 0 0 12px rgba(10, 11, 13, 0.5)";
+    const BG_KNOCKOUT_SMALL = "0 0 1px rgba(10, 11, 13, 0.98), 0 0 4px rgba(10, 11, 13, 0.94), 0 0 8px rgba(10, 11, 13, 0.72)";
+
+    function applySpeedStyle({ speed, assistMeta }) {
+      speedEl.textContent = String(speed);
+      speedEl.style.color = "var(--fg)";
+      speedEl.style.textShadow = BG_KNOCKOUT + ", 0 -1px 0 rgba(241, 239, 233, 0.15)";
+    }
+
+    function applySpeedLimitStyle({ overLimit, speedLimitValueNum }) {
+      if (speedLimitValueNum > 0) {
+        speedLimit.style.display = "flex";
+        speedLimitValue.textContent = String(speedLimitValueNum);
+        if (overLimit) {
+          speedLimitValue.style.color = "var(--red)";
+          speedLimitLabel.style.color = "var(--red)";
+          speedLimitValue.style.textShadow =
+            BG_KNOCKOUT + ", 0 0 28px rgba(255, 60, 60, 0.7), 0 0 64px rgba(255, 60, 60, 0.4)";
+          speedLimitLabel.style.textShadow =
+            BG_KNOCKOUT_SMALL + ", 0 0 16px rgba(255, 60, 60, 0.7), 0 0 32px rgba(255, 60, 60, 0.35)";
+        } else {
+          speedLimitValue.style.color = "var(--fg)";
+          speedLimitLabel.style.color = "var(--muted)";
+          speedLimitValue.style.textShadow = "";
+          speedLimitLabel.style.textShadow = "";
+        }
+      } else {
+        speedLimit.style.display = "none";
+      }
+    }
+
+    function receiveMessage(car) {
+      const speed = Math.max(0, Math.round(Number(car.egoSpeed) || 0));
+      const setSpeed = Math.max(0, Math.round(Number(car.accSetSpeed) || 0));
+      const speedLimitValueNum = Math.max(0, Math.round(Number(car.fusedSpeedLimit) || 0));
+      const assist = mapAssist(car);
+      const assistMeta = ASSIST_META[assist];
+      const isAssistOn = assist !== "off";
+      const accent = assistMeta.accent;
+
+      document.documentElement.style.setProperty("--accent", accent);
+
+      breathLayer.style.background =
+        "radial-gradient(ellipse at 50% 78%, " + assistMeta.tint + " 0%, transparent 72%)";
+      ambientLayer.style.background = accent;
+
+      const gear = gearMap[Math.round(Number(car.gear) || 0)] || "-";
+      const isDrive = gear === "D";
+      const overLimit = isDrive && speedLimitValueNum > 0 && speed > speedLimitValueNum + 5;
+      applySpeedStyle({ speed, assistMeta });
+
+      const showSetSpeed = assist === "full" && setSpeed > 0;
+      setSpeedWrap.style.display = showSetSpeed ? "flex" : "none";
+      if (showSetSpeed) {
+        setSpeedEl.textContent = String(setSpeed);
+        setSpeedLabel.textContent = "Set · " + assistMeta.short;
+        setSpeedEl.style.textShadow =
+          BG_KNOCKOUT + ", 0 0 18px " + assistMeta.dimGlow24 + ", 0 0 36px " + assistMeta.dimGlow48;
+        setSpeedLabel.style.textShadow =
+          BG_KNOCKOUT_SMALL + ", 0 0 12px " + assistMeta.dimGlow24 + ", 0 0 24px " + assistMeta.dimGlow48;
+      }
+
+      assistLabel.style.display = isAssistOn ? "flex" : "none";
+      assistText.textContent = assistMeta.short + " · " + assistMeta.long;
+
+      if (isDrive) {
+        gearChip.style.display = "none";
+      } else {
+        gearChip.style.display = "block";
+        gearChip.textContent = gear;
+        gearChip.style.background = gear === "R" ? "#c43838" : "#1a1a17";
+        gearChip.style.color = "#f1efe9";
+      }
+
+      drawWarningChips(car);
+
+      const laneDeparture = mapLaneDeparture(car.laneDepartureWarning);
+      const leftActive = (Number(car.leftBlindSpot) || 0) > 0 || laneDeparture === "left";
+      const rightActive = (Number(car.rightBlindSpot) || 0) > 0 || laneDeparture === "right";
+      leftFlash.style.display = leftActive ? "block" : "none";
+      rightFlash.style.display = rightActive ? "block" : "none";
+
+      setBlinker(leftBlink, leftActive ? 0 : car.leftBlinker);
+      setBlinker(rightBlink, rightActive ? 0 : car.rightBlinker);
+
+      applySpeedLimitStyle({ overLimit, speedLimitValueNum });
+
+      unitsEl.textContent = car.isImperial ? "mph" : "km/h";
+      const edgeGradient =
+        "linear-gradient(to right, transparent 0%, " +
+        accent + " 50%, transparent 100%)";
+      edgeAccent.style.background = edgeGradient;
+      edgeAccentTop.style.background = edgeGradient;
+      bottomRow.style.textShadow = BG_KNOCKOUT_SMALL;
+    }
+
+    window.receiveMessage = receiveMessage;
+
+    function readNative(method, fallback) {
+      try {
+        if (!window.NativeCarState) return fallback;
+        const fn = window.NativeCarState[method];
+        if (typeof fn !== "function") return fallback;
+        return fn.call(window.NativeCarState);
+      } catch (_err) {
+        return fallback;
+      }
+    }
+
+    window.onCarStateUpdate = function() {
+      const car = {
+        egoSpeed: readNative("getEgoSpeed", 0),
+        leftBlinker: readNative("getLeftBlinker", 0),
+        rightBlinker: readNative("getRightBlinker", 0),
+        gear: readNative("getGear", 0),
+        adasOn: readNative("isAdasOn", false),
+        madsActive: readNative("isMadsActive", false),
+        leftBlindSpot: readNative("getLeftBlindSpot", 0),
+        rightBlindSpot: readNative("getRightBlindSpot", 0),
+        laneDepartureWarning: readNative("getLaneDepartureWarning", 0),
+        anyDoorOpen: readNative("getAnyDoorOpen", 0),
+        buckleStatus: readNative("getBuckleStatus", 1),
+        accSetSpeed: readNative("getAccSetSpeed", 0),
+        fusedSpeedLimit: readNative("getFusedSpeedLimit", 0),
+        speedCameraDistance: readNative("getSpeedCameraDistance", -1),
+        isImperial: readNative("isImperial", false),
+      };
+      receiveMessage(car);
+    };
+
+    receiveMessage({
+      egoSpeed: 0,
+      leftBlinker: 0,
+      rightBlinker: 0,
+      gear: 4,
+      adasOn: false,
+      madsActive: false,
+      leftBlindSpot: 0,
+      rightBlindSpot: 0,
+      laneDepartureWarning: 0,
+      anyDoorOpen: 0,
+      buckleStatus: 1,
+      accSetSpeed: 0,
+      fusedSpeedLimit: 0,
+      speedCameraDistance: -1,
+      isImperial: true,
+    });
+  </script>
+</body>
+</html>
