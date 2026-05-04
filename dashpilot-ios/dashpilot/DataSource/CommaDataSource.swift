@@ -29,10 +29,7 @@ final class CommaDataSource: IDataSource {
         var dbcContents: [String] = []
         var busIndices: [CInt] = []
         for (busIndex, resourceName) in dbcFiles {
-            // Try multiple subdirectory paths — Xcode's file system sync may vary
-            let url = Bundle.main.url(forResource: resourceName, withExtension: "dbc", subdirectory: "Resources/vehicles/tesla")
-                   ?? Bundle.main.url(forResource: resourceName, withExtension: "dbc", subdirectory: "vehicles/tesla")
-                   ?? Bundle.main.url(forResource: resourceName, withExtension: "dbc")
+            let url = Bundle.main.url(forResource: resourceName, withExtension: "dbc")
             guard let url, let content = try? String(contentsOf: url) else {
                 print("[CommaDataSource] failed to load \(resourceName).dbc — bundle path: \(Bundle.main.bundlePath)")
                 continue
@@ -52,7 +49,7 @@ final class CommaDataSource: IDataSource {
         let ctx = bridge_create_context()
         self.context = ctx
 
-        var endpoints: [String] = ["can", "selfdriveState", "selfdriveStateSP"]
+        let endpoints: [String] = ["can", "selfdriveState", "selfdriveStateSP"]
         let grp = endpoints.withCStringArray { ptrs in
             bridge_create_sub_sockets(ctx, ptrs, Int32(endpoints.count), address)
         }
