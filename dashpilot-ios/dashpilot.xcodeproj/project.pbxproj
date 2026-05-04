@@ -6,8 +6,15 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		809087262FA61F2500D10891 /* libzmq.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 809087252FA61F2500D10891 /* libzmq.xcframework */; };
+		8090872B2FA6313200D10891 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 8090872A2FA6312800D10891 /* libc++.tbd */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		29FF823E2F72C9C400D48E9A /* dashpilot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = dashpilot.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		809087252FA61F2500D10891 /* libzmq.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = libzmq.xcframework; path = Libraries/libzmq.xcframework; sourceTree = "<group>"; };
+		8090872A2FA6312800D10891 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -36,6 +43,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8090872B2FA6313200D10891 /* libc++.tbd in Frameworks */,
+				809087262FA61F2500D10891 /* libzmq.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -46,6 +55,7 @@
 			isa = PBXGroup;
 			children = (
 				29FF82402F72C9C400D48E9A /* dashpilot */,
+				809087242FA61F2500D10891 /* Frameworks */,
 				29FF823F2F72C9C400D48E9A /* Products */,
 			);
 			sourceTree = "<group>";
@@ -56,6 +66,15 @@
 				29FF823E2F72C9C400D48E9A /* dashpilot.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		809087242FA61F2500D10891 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				8090872A2FA6312800D10891 /* libc++.tbd */,
+				809087252FA61F2500D10891 /* libzmq.xcframework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -287,9 +306,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 2KJTTVU6PU;
+				DEVELOPMENT_TEAM = UDUCCCVUWB;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				"HEADER_SEARCH_PATHS[arch=*]" = "$(SRCROOT)/Libraries/include ";
 				INFOPLIST_FILE = dashpilot/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -302,6 +322,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				"SWIFT_OBJC_BRIDGING_HEADER[arch=*]" = "$(SRCROOT)/dashpilot/dashpilot-Bridging-Header.h";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -315,9 +336,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 2KJTTVU6PU;
+				DEVELOPMENT_TEAM = UDUCCCVUWB;
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				"HEADER_SEARCH_PATHS[arch=*]" = "$(SRCROOT)/Libraries/include ";
 				INFOPLIST_FILE = dashpilot/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -330,6 +352,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				"SWIFT_OBJC_BRIDGING_HEADER[arch=*]" = "$(SRCROOT)/Libraries/include";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
