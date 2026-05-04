@@ -291,7 +291,6 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                     }
                 }
             }
-
             SettingsToggle(stringResource(R.string.settings_toggle_use_imperial), useImperialState.value) { enabled ->
                 useImperialState.value = enabled
                 sharedPrefs.edit { putBoolean(PREF_USE_IMPERIAL, enabled) }
