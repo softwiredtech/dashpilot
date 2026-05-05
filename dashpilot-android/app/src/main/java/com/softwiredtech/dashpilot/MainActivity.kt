@@ -32,6 +32,7 @@ import androidx.navigation.toRoute
 import androidx.startup.AppInitializer
 import app.rive.runtime.kotlin.RiveInitializer
 import com.softwiredtech.dashpilot.datamodel.dash.getSelectedDashboard
+import com.softwiredtech.dashpilot.datasource.DataSourceType
 import com.softwiredtech.dashpilot.navigation.DashboardRoute
 import com.softwiredtech.dashpilot.navigation.SettingsRoute
 import com.softwiredtech.dashpilot.navigation.SetupRoute
@@ -70,7 +71,7 @@ class MainActivity : ComponentActivity() {
 
         // Start comma discovery as soon as we launch the app.
         if (!BuildConfig.DEBUG) {
-            connectionVM.connect(this, "", "comma")
+            connectionVM.connect(this, "", DataSourceType.COMMA)
         }
 
         setContent {

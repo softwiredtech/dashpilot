@@ -4,8 +4,28 @@ import android.content.Context
 import android.os.BatteryManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.softwiredtech.dashpilot.datamodel.dash.DASH_PREFS_NAME
 import com.softwiredtech.dashpilot.datamodel.dash.DashState
 import com.softwiredtech.dashpilot.datamodel.dash.DisplaySettings
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_ALWAYS_ON_BLIND_SPOT_MONITOR
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_DARK_MODE
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_DARK_MODE_BACKGROUND_GRAY
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_EXTRA_VEHICLE_BUS
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_RENDER_QUALITY
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_SHOW_CAR_BATTERY
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_SHOW_ODOMETER
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_SHOW_PHONE_BATTERY
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_USE_IMPERIAL
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_ALWAYS_ON_BLIND_SPOT_MONITOR
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_DARK_MODE
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_DARK_MODE_BACKGROUND_GRAY
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_EXTRA_VEHICLE_BUS
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_RENDER_QUALITY
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_CAR_BATTERY
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_ODOMETER
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_PHONE_BATTERY
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_USE_IMPERIAL
+import com.softwiredtech.dashpilot.datasource.DataSourceType
 import com.softwiredtech.dashpilot.datasource.CommaDataSource
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.IDataSource
@@ -57,21 +77,21 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         _connectionStatus.value = ConnectionStatus.Connecting
         connectionJob = viewModelScope.launch(Dispatchers.IO) {
             val vehicleName = "tesla" // TODO: make configurable via UI
-            val prefs = context.getSharedPreferences("dash_prefs", Context.MODE_PRIVATE)
-            val extraBus = prefs.getBoolean("extra_vehicle_bus", false)
+            val prefs = context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
+            val extraBus = prefs.getBoolean(PREF_EXTRA_VEHICLE_BUS, DEFAULT_EXTRA_VEHICLE_BUS)
             val configFile = if (extraBus) "config_comma_extra_bus.json" else "config_comma_normal.json"
             val profile = VehicleProfileLoader.loadProfile(context, vehicleName, configFile)
             val bridge = VehicleBridge()
             val ds = when (dataSourceType) {
-                "ble" -> {
+                DataSourceType.BLE -> {
                     val decoder = CanFrameDecoder(bridge, profile)
                     DashKitDataSource(context, decoder)
                 }
-                "websocket" -> WebsocketDataSource()
+                DataSourceType.WEBSOCKET -> WebsocketDataSource()
                 else -> CommaDataSource(bridge, profile)
             }
 
-            if (finalServerAddress.isEmpty() && dataSourceType == "comma") {
+            if (finalServerAddress.isEmpty() && dataSourceType == DataSourceType.COMMA) {
                 var localIp = networkUtil.getWifiIpAddress()
                 while (localIp == null) {
                     delay(1000)
@@ -83,14 +103,14 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
             _dataSource.value = ds
 
             _displaySettings.value = DisplaySettings(
-                showPhoneBattery = prefs.getBoolean("show_phone_battery", true),
-                showCarBattery = prefs.getBoolean("show_car_battery", true),
-                showOdometer = prefs.getBoolean("show_odometer", true),
-                useImperial = prefs.getBoolean("use_imperial", false),
-                darkMode = prefs.getBoolean("dark_mode", false),
-                alwaysOnBlindSpotMonitor = prefs.getBoolean("always_on_blind_spot_monitor", true),
-                renderQuality = prefs.getInt("render_quality", 3),
-                darkModeBackgroundGray = prefs.getInt("dark_mode_background_gray", 0)
+                showPhoneBattery = prefs.getBoolean(PREF_SHOW_PHONE_BATTERY, DEFAULT_SHOW_PHONE_BATTERY),
+                showCarBattery = prefs.getBoolean(PREF_SHOW_CAR_BATTERY, DEFAULT_SHOW_CAR_BATTERY),
+                showOdometer = prefs.getBoolean(PREF_SHOW_ODOMETER, DEFAULT_SHOW_ODOMETER),
+                useImperial = prefs.getBoolean(PREF_USE_IMPERIAL, DEFAULT_USE_IMPERIAL),
+                darkMode = prefs.getBoolean(PREF_DARK_MODE, DEFAULT_DARK_MODE),
+                alwaysOnBlindSpotMonitor = prefs.getBoolean(PREF_ALWAYS_ON_BLIND_SPOT_MONITOR, DEFAULT_ALWAYS_ON_BLIND_SPOT_MONITOR),
+                renderQuality = prefs.getInt(PREF_RENDER_QUALITY, DEFAULT_RENDER_QUALITY),
+                darkModeBackgroundGray = prefs.getInt(PREF_DARK_MODE_BACKGROUND_GRAY, DEFAULT_DARK_MODE_BACKGROUND_GRAY),
             )
 
             val combined = combine(

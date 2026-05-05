@@ -56,12 +56,31 @@ import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.datamodel.dash.DASH_PREFS_NAME
 import com.softwiredtech.dashpilot.datamodel.dash.DashboardType
 import com.softwiredtech.dashpilot.datamodel.dash.DisplaySettings
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_ALWAYS_ON_BLIND_SPOT_MONITOR
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_DARK_MODE
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_DARK_MODE_BACKGROUND_GRAY
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_EXTRA_VEHICLE_BUS
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_RENDER_QUALITY
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_SHOW_CAR_BATTERY
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_SHOW_ODOMETER
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_SHOW_PHONE_BATTERY
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_USE_IMPERIAL
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_ALWAYS_ON_BLIND_SPOT_MONITOR
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_DARK_MODE
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_DARK_MODE_BACKGROUND_GRAY
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_EXTRA_VEHICLE_BUS
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_RENDER_QUALITY
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_CAR_BATTERY
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_ODOMETER
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_PHONE_BATTERY
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_USE_IMPERIAL
 import com.softwiredtech.dashpilot.datamodel.dash.availableDashboards
 import com.softwiredtech.dashpilot.datamodel.dash.dashboardById
 import com.softwiredtech.dashpilot.datamodel.dash.getSelectedDashboard
 import com.softwiredtech.dashpilot.datamodel.dash.saveDevRiveFileUri
 import com.softwiredtech.dashpilot.datamodel.dash.saveSelectedDashboard
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
+import com.softwiredtech.dashpilot.ui.theme.DarkColors
 
 private data class ToggleSetting(
     @StringRes val labelRes: Int,
@@ -70,8 +89,8 @@ private data class ToggleSetting(
 )
 
 private val vehicleBusToggles = listOf(
-    ToggleSetting(R.string.settings_toggle_show_car_battery, "show_car_battery", true),
-    ToggleSetting(R.string.settings_toggle_show_odometer, "show_odometer", true),
+    ToggleSetting(R.string.settings_toggle_show_car_battery, PREF_SHOW_CAR_BATTERY, DEFAULT_SHOW_CAR_BATTERY),
+    ToggleSetting(R.string.settings_toggle_show_odometer, PREF_SHOW_ODOMETER, DEFAULT_SHOW_ODOMETER),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -81,31 +100,31 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
     val sharedPrefs = remember { context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE) }
 
     val extraBusState = remember {
-        mutableStateOf(sharedPrefs.getBoolean("extra_vehicle_bus", false))
+        mutableStateOf(sharedPrefs.getBoolean(PREF_EXTRA_VEHICLE_BUS, DEFAULT_EXTRA_VEHICLE_BUS))
     }
 
     val showPhoneBatteryState = remember {
-        mutableStateOf(sharedPrefs.getBoolean("show_phone_battery", true))
+        mutableStateOf(sharedPrefs.getBoolean(PREF_SHOW_PHONE_BATTERY, DEFAULT_SHOW_PHONE_BATTERY))
     }
 
     val useImperialState = remember {
-        mutableStateOf(sharedPrefs.getBoolean("use_imperial", false))
+        mutableStateOf(sharedPrefs.getBoolean(PREF_USE_IMPERIAL, DEFAULT_USE_IMPERIAL))
     }
 
     val darkModeState = remember {
-        mutableStateOf(sharedPrefs.getBoolean("dark_mode", false))
+        mutableStateOf(sharedPrefs.getBoolean(PREF_DARK_MODE, DEFAULT_DARK_MODE))
     }
 
     val alwaysOnBlindSpotMonitorState = remember {
-        mutableStateOf(sharedPrefs.getBoolean("always_on_blind_spot_monitor", true))
+        mutableStateOf(sharedPrefs.getBoolean(PREF_ALWAYS_ON_BLIND_SPOT_MONITOR, DEFAULT_ALWAYS_ON_BLIND_SPOT_MONITOR))
     }
 
     val renderQualityState = remember {
-        mutableIntStateOf(sharedPrefs.getInt("render_quality", 3))
+        mutableIntStateOf(sharedPrefs.getInt(PREF_RENDER_QUALITY, DEFAULT_RENDER_QUALITY))
     }
 
     val darkModeBackgroundGrayState = remember {
-        mutableFloatStateOf(sharedPrefs.getInt("dark_mode_background_gray", 0).toFloat())
+        mutableFloatStateOf(sharedPrefs.getInt(PREF_DARK_MODE_BACKGROUND_GRAY, DEFAULT_DARK_MODE_BACKGROUND_GRAY).toFloat())
     }
 
     val selectedDashboardId = remember {
@@ -136,8 +155,8 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
 
     fun buildDisplaySettings() = DisplaySettings(
         showPhoneBattery = showPhoneBatteryState.value,
-        showCarBattery = vehicleBusToggleStates.getValue("show_car_battery").value,
-        showOdometer = vehicleBusToggleStates.getValue("show_odometer").value,
+        showCarBattery = vehicleBusToggleStates.getValue(PREF_SHOW_CAR_BATTERY).value,
+        showOdometer = vehicleBusToggleStates.getValue(PREF_SHOW_ODOMETER).value,
         useImperial = useImperialState.value,
         darkMode = darkModeState.value,
         alwaysOnBlindSpotMonitor = alwaysOnBlindSpotMonitorState.value,
@@ -159,11 +178,11 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF0D0D0D)
+                    containerColor = DarkColors.Background
                 )
             )
         },
-        containerColor = Color(0xFF0D0D0D)
+        containerColor = DarkColors.Background
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -180,7 +199,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 stringResource(R.string.settings_dashboard_subtitle),
-                color = Color(0xFF666666),
+                color = DarkColors.TextSubtle,
                 fontSize = 13.sp
             )
             Spacer(modifier = Modifier.height(10.dp))
@@ -197,10 +216,10 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                                 .width(160.dp)
                                 .clip(RoundedCornerShape(12.dp))
                                 .then(
-                                    if (isSelected) Modifier.border(2.dp, Color(0xFF5CBD68), RoundedCornerShape(12.dp))
+                                    if (isSelected) Modifier.border(2.dp, AccentColor, RoundedCornerShape(12.dp))
                                     else Modifier
                                 )
-                                .background(Color(0xFF1A1A1A))
+                                .background(DarkColors.Surface)
                                 .clickable {
                                     if (dashboard.type == DashboardType.DEV_RIVE) {
                                         filePickerLauncher.launch(arrayOf("*/*"))
@@ -228,12 +247,12 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                                         .fillMaxWidth()
                                         .aspectRatio(16f / 9f)
                                         .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
-                                        .background(Color(0xFF2A2A2A))
+                                        .background(DarkColors.SurfaceSelected)
                                 )
                             }
                             Text(
                                 text = dashboardName,
-                                color = if (isSelected) Color(0xFF5CBD68) else Color(0xFFAAAAAA),
+                                color = if (isSelected) AccentColor else DarkColors.ContentDisabled,
                                 fontSize = 13.sp,
                                 modifier = Modifier.padding(vertical = 10.dp)
                             )
@@ -245,7 +264,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = stringResource(R.string.settings_theme_availability_note),
-                color = Color(0xFF666666),
+                color = DarkColors.TextSubtle,
                 fontSize = 13.sp
             )
 
@@ -255,7 +274,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
             if (supportsVehicleBusWidgets) {
                 SettingsToggle(stringResource(R.string.settings_toggle_extra_vehicle_bus), extraBusState.value) { enabled ->
                     extraBusState.value = enabled
-                    sharedPrefs.edit { putBoolean("extra_vehicle_bus", enabled) }
+                    sharedPrefs.edit { putBoolean(PREF_EXTRA_VEHICLE_BUS, enabled) }
                 }
 
                 if (extraBusState.value) {
@@ -273,16 +292,19 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                 Spacer(modifier = Modifier.height(12.dp))
             }
 
+            Text(stringResource(R.string.settings_section_display), color = DarkColors.TextMuted, fontSize = 16.sp)
+            Spacer(modifier = Modifier.height(8.dp))
+
             SettingsToggle(stringResource(R.string.settings_toggle_use_imperial), useImperialState.value) { enabled ->
                 useImperialState.value = enabled
-                sharedPrefs.edit { putBoolean("use_imperial", enabled) }
+                sharedPrefs.edit { putBoolean(PREF_USE_IMPERIAL, enabled) }
                 onDisplaySettingsChanged(buildDisplaySettings())
             }
 
             if (showPhoneBatteryToggle) {
                 SettingsToggle(stringResource(R.string.settings_toggle_show_phone_battery), showPhoneBatteryState.value) { enabled ->
                     showPhoneBatteryState.value = enabled
-                    sharedPrefs.edit { putBoolean("show_phone_battery", enabled) }
+                    sharedPrefs.edit { putBoolean(PREF_SHOW_PHONE_BATTERY, enabled) }
                     onDisplaySettingsChanged(buildDisplaySettings())
                 }
             }
@@ -290,19 +312,19 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
             Spacer(modifier = Modifier.height(8.dp))
 
             if (showVanillaSettings) {
-                Text(stringResource(R.string.settings_section_3d_visualizer), color = Color(0xFF888888), fontSize = 16.sp)
+                Text(stringResource(R.string.settings_section_3d_visualizer), color = DarkColors.TextMuted, fontSize = 16.sp)
 
                 Spacer(modifier = Modifier.height(8.dp))
 
                 SettingsToggle(stringResource(R.string.settings_toggle_always_on_blind_spot_monitor), alwaysOnBlindSpotMonitorState.value) { enabled ->
                     alwaysOnBlindSpotMonitorState.value = enabled
-                    sharedPrefs.edit { putBoolean("always_on_blind_spot_monitor", enabled) }
+                    sharedPrefs.edit { putBoolean(PREF_ALWAYS_ON_BLIND_SPOT_MONITOR, enabled) }
                     onDisplaySettingsChanged(buildDisplaySettings())
                 }
 
                 SettingsToggle(stringResource(R.string.settings_toggle_dark_mode), darkModeState.value) { enabled ->
                     darkModeState.value = enabled
-                    sharedPrefs.edit { putBoolean("dark_mode", enabled) }
+                    sharedPrefs.edit { putBoolean(PREF_DARK_MODE, enabled) }
                     onDisplaySettingsChanged(buildDisplaySettings())
                 }
 
@@ -333,14 +355,14 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                         onValueChange = { darkModeBackgroundGrayState.floatValue = it },
                         onValueChangeFinished = {
                             val v = darkModeBackgroundGrayState.floatValue.toInt()
-                            sharedPrefs.edit { putInt("dark_mode_background_gray", v) }
+                            sharedPrefs.edit { putInt(PREF_DARK_MODE_BACKGROUND_GRAY, v) }
                             onDisplaySettingsChanged(buildDisplaySettings())
                         },
                         valueRange = 0f..30f,
                         colors = SliderDefaults.colors(
                             thumbColor = AccentColor,
                             activeTrackColor = AccentColor,
-                            inactiveTrackColor = Color(0xFF333333)
+                            inactiveTrackColor = DarkColors.Border
                         )
                     )
                 }
@@ -349,7 +371,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
 
                 RenderQualitySelector(renderQualityState.intValue) { quality ->
                     renderQualityState.intValue = quality
-                    sharedPrefs.edit { putInt("render_quality", quality) }
+                    sharedPrefs.edit { putInt(PREF_RENDER_QUALITY, quality) }
                     onDisplaySettingsChanged(buildDisplaySettings())
                 }
 
@@ -364,7 +386,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                 Text(text = stringResource(R.string.settings_version), color = Color.White, fontSize = 16.sp)
                 Text(
                     text = "${packageInfo.versionName} (${packageInfo.longVersionCode})",
-                    color = Color(0xFF888888),
+                    color = DarkColors.TextMuted,
                     fontSize = 16.sp
                 )
             }
@@ -376,7 +398,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
 private fun SectionHeader(title: String) {
     Text(
         text = title,
-        color = Color(0xFF888888),
+        color = DarkColors.TextMuted,
         fontSize = 16.sp
     )
 }
@@ -393,7 +415,7 @@ private fun RenderQualitySelector(selected: Int, onSelected: (Int) -> Unit) {
         Row(
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
-                .background(Color(0xFF333333))
+                .background(DarkColors.Border)
         ) {
             options.forEach { (value, label) ->
                 val isSelected = value == selected
@@ -407,7 +429,7 @@ private fun RenderQualitySelector(selected: Int, onSelected: (Int) -> Unit) {
                 ) {
                     Text(
                         text = label,
-                        color = if (isSelected) Color.White else Color(0xFF888888),
+                        color = if (isSelected) Color.White else DarkColors.TextMuted,
                         fontSize = 13.sp
                     )
                 }
@@ -434,9 +456,9 @@ private fun SettingsToggle(label: String, checked: Boolean, onCheckedChange: (Bo
             colors = SwitchDefaults.colors(
                 checkedThumbColor = Color.White,
                 checkedTrackColor = AccentColor,
-                uncheckedThumbColor = Color(0xFF888888),
-                uncheckedTrackColor = Color(0xFF333333),
-                uncheckedBorderColor = Color(0xFF555555)
+                uncheckedThumbColor = DarkColors.TextMuted,
+                uncheckedTrackColor = DarkColors.Border,
+                uncheckedBorderColor = DarkColors.Disabled
             )
         )
     }
