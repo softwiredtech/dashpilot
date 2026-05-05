@@ -3,75 +3,16 @@
 #include <iostream>
 #include <cmath>
 #include <memory>
-#include "msgq/ipc.h"
-#include "dbc/dbcfile.h"
-#include "car/car_state.h"
-#include "car/can_parsers.h"
-#include "car/car_state_mapper.h"
-#include "car/cars/tesla.h"
 #include <android/log.h>
+
+#include "common/vehicle_decoder.h"
+#include "common/receive_loop.h"
+
 #define LOG_TAG "MsgQNative"
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
-#ifdef ANDROID
-#undef ANDROID
-#endif
-#include <capnp/message.h>
-#include <capnp/serialize.h>
-#include "log.capnp.h"
-#include <thread>
-#include <chrono>
-#include <vector>
 #include <map>
 
-static std::unique_ptr<CarStateMapper> createMapper(const std::string& vehicleType) {
-    if (vehicleType == "tesla_party") return std::make_unique<TeslaCommaPartyMapper>();
-    if (vehicleType == "tesla_extra") return std::make_unique<TeslaCommaExtraMapper>();
-    // Add new vehicles here:
-    // if (vehicleType == "honda") return std::make_unique<HondaCarState>();
-    return nullptr;
-}
-
-class VehicleDecoder {
-public:
-    VehicleDecoder(const std::vector<std::string> &dbcContents,
-                   const std::vector<int> &busIndices,
-                   const std::string &vehicleType) {
-
-        for (size_t i = 0; i < dbcContents.size(); i++) {
-            parsers_.addBus(busIndices[i], dbcContents[i]);
-        }
-        parsers_.buildCache();
-
-        mapper_ = createMapper(vehicleType);
-        if (!mapper_) {
-            LOGD("VehicleDecoder: unknown vehicle type '%s'", vehicleType.c_str());
-        }
-    }
-
-    // Feed a CAN frame, update internal state
-    void updateFrame(int bus, uint32_t address, const uint8_t *data, size_t len) {
-        parsers_.updateFrame(bus, address, data, len);
-    }
-
-    void updateMapper() {
-        if (mapper_) {
-            mapper_->update(parsers_, state_);
-        }
-    }
-
-    CarState& state() { return state_; }
-
-private:
-    CANParsers parsers_;
-    std::unique_ptr<CarStateMapper> mapper_;
-    CarState state_;
-};
-
 extern "C" {
-
-struct SubSocketGroup {
-    std::vector<SubSocket*> sockets;
-};
 
 static bool receiveLoopRunning = false;
 static JavaVM* g_vm = nullptr;
@@ -181,9 +122,6 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStopReceiveLoop(JNIEnv*
 }
 
 // Discover a ZMQ publisher on the local subnet using Poller.
-// Creates SubSockets for all 253 candidate IPs (skipping the self octet),
-// registers them with Pollers (batched to stay within MAX_POLLERS), and polls
-// until one receives a message or the timeout expires.
 JNIEXPORT jstring JNICALL
 Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDiscoverPublisher(
         JNIEnv* env, jobject thiz,
@@ -396,7 +334,6 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStartReceiveLoop(
     long long msgTimeAccum = 0;
     int msgCount = 0;
 
-    // Extra state properties from SunnyPilot
     double madsActive = 0.0;
     double experimentalMode = 0.0;
     double selfdriveActive = 0.0;
@@ -412,39 +349,11 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStartReceiveLoop(
 
             auto t0 = std::chrono::high_resolution_clock::now();
 
-            kj::ArrayPtr<capnp::word> canArray = kj::ArrayPtr<capnp::word>(
-                (capnp::word*)msg->getData(), msg->getSize() / sizeof(capnp::word));
-            capnp::FlatArrayMessageReader reader(canArray);
-            auto event = reader.getRoot<cereal::Event>();
-
-            if (event.which() == cereal::Event::Which::CAN) {
-                auto canList = event.getCan();
-
-                for (const auto &c : canList) {
-                    decoder->updateFrame(c.getSrc(), c.getAddress(),
-                                         reinterpret_cast<const uint8_t*>(c.getDat().begin()),
-                                         c.getDat().size());
-                }
-
-                decoder->updateMapper();
-
+            if (processMessage(msg, decoder, madsActive, experimentalMode, selfdriveActive, changingLane)) {
                 double output[CarState::FIELD_COUNT];
-                auto& state = decoder->state();
-                state.experimentalMode = experimentalMode;
-                state.selfdriveActive = selfdriveActive;
-                state.madsActive = madsActive;
-                state.changingLane = changingLane;
-                state.toArray(output);
+                decoder->state().toArray(output);
                 env->SetDoubleArrayRegion(g_buffer, 0, CarState::FIELD_COUNT, output);
                 env->CallVoidMethod(g_callback, g_onCanDataMethod, g_buffer);
-            } else if (event.which() == cereal::Event::Which::SELFDRIVE_STATE_S_P) {
-                madsActive = event.getSelfdriveStateSP().getMads().getActive();
-            } else if (event.which() == cereal::Event::Which::SELFDRIVE_STATE) {
-                auto selfdriveState = event.getSelfdriveState();
-                experimentalMode = selfdriveState.getExperimentalMode();
-                selfdriveActive = selfdriveState.getActive();
-                std::string alertType = selfdriveState.getAlertType().cStr();
-                changingLane = (alertType == "laneChange/warning") ? 1.0 : 0.0;
             }
 
             delete msg;
