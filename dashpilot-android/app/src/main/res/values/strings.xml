@@ -15,6 +15,7 @@
     <string name="settings_dashboard_subtitle">Choose what opens after connection</string>
     <string name="dashboard_name_vanilla">Vanilla</string>
     <string name="dashboard_name_ambient">Ambient</string>
+    <string name="dashboard_name_retro">Retro</string>
     <string name="dashboard_name_expo">Expo</string>
     <string name="dashboard_name_rive">Rive</string>
     <string name="dashboard_name_dev_rive">Load Rive File</string>

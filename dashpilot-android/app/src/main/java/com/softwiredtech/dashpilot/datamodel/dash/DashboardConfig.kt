@@ -50,6 +50,18 @@ val availableDashboards = buildList {
     )
     add(
         DashboardConfig(
+            id = "retro",
+            nameRes = R.string.dashboard_name_retro,
+            url = "${LOCAL_ASSET_BASE_URL}web-retro/index.html",
+            type = DashboardType.WEB,
+            screenshotRes = R.drawable.preview_retro,
+            capabilities = DashboardCapabilities(
+                supportsPhoneBatteryToggle = false
+            )
+        )
+    )
+    add(
+        DashboardConfig(
             id = "expo",
             nameRes = R.string.dashboard_name_expo,
             url = "https://dashpilot-expo.web.app",
