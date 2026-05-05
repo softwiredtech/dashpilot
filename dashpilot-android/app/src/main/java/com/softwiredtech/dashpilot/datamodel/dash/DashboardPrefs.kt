@@ -1,6 +1,7 @@
 package com.softwiredtech.dashpilot.datamodel.dash
 
 import android.content.Context
+import androidx.core.content.edit
 
 const val DASH_PREFS_NAME = "dash_prefs"
 const val PREF_SELECTED_DASHBOARD_ID = "selected_dashboard_id"
@@ -54,19 +55,14 @@ fun getSelectedDashboard(context: Context): DashboardConfig {
 
 fun saveSelectedDashboard(context: Context, dashboard: DashboardConfig) {
     context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
-        .edit()
-        .putString(PREF_SELECTED_DASHBOARD_ID, dashboard.id)
-        .apply()
-}
-
-fun getDevRiveFileUri(context: Context): String? {
-    return context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
-        .getString(PREF_DEV_RIVE_FILE_URI, null)
+        .edit {
+            putString(PREF_SELECTED_DASHBOARD_ID, dashboard.id)
+        }
 }
 
 fun saveDevRiveFileUri(context: Context, uri: String) {
     context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
-        .edit()
-        .putString(PREF_DEV_RIVE_FILE_URI, uri)
-        .apply()
+        .edit {
+            putString(PREF_DEV_RIVE_FILE_URI, uri)
+        }
 }
