@@ -81,11 +81,11 @@
 
     @keyframes ambientWash {
       0%, 100% { opacity: 0; }
-      50% { opacity: 0.12; }
+      50% { opacity: 0.50; }
     }
 
     @keyframes ambientBreathe {
-      0%, 100% { opacity: 0.55; }
+      0%, 100% { opacity: 0.65; }
       50% { opacity: 1; }
     }
 
@@ -246,27 +246,27 @@
 
     #leftFlash {
       left: 0;
-      background: linear-gradient(to right, rgba(255, 48, 48, 0.62), rgba(255, 48, 48, 0));
+      background: linear-gradient(to right, rgba(255, 48, 48, 0.85), rgba(255, 48, 48, 0));
     }
 
     #rightFlash {
       right: 0;
-      background: linear-gradient(to left, rgba(255, 48, 48, 0.62), rgba(255, 48, 48, 0));
+      background: linear-gradient(to left, rgba(255, 48, 48, 0.85), rgba(255, 48, 48, 0));
     }
 
     #leftFlash.passive,
     #rightFlash.passive {
       animation: none;
-      width: 56px;
-      opacity: 0.45;
+      width: 80px;
+      opacity: 0.75;
     }
 
     #leftFlash.passive {
-      background: linear-gradient(to right, rgba(245, 185, 66, 0.55), rgba(245, 185, 66, 0));
+      background: linear-gradient(to right, rgba(245, 185, 66, 1.0), rgba(245, 185, 66, 0));
     }
 
     #rightFlash.passive {
-      background: linear-gradient(to left, rgba(245, 185, 66, 0.55), rgba(245, 185, 66, 0));
+      background: linear-gradient(to left, rgba(245, 185, 66, 1.0), rgba(245, 185, 66, 0));
     }
 
     @keyframes flashPulse {
@@ -383,25 +383,25 @@
         short: "OFF",
         long: "Manual",
         accent: "#d8c39a",
-        tint: "rgba(216, 195, 154, 0.13)",
-        dimGlow24: "rgba(216, 195, 154, 0.20)",
-        dimGlow48: "rgba(216, 195, 154, 0.10)",
+        tint: "rgba(216, 195, 154, 0.28)",
+        dimGlow24: "rgba(216, 195, 154, 0.30)",
+        dimGlow48: "rgba(216, 195, 154, 0.20)",
       },
       mads: {
         short: "MADS",
         long: "Lane Assist",
         accent: "#00C8C8",
-        tint: "rgba(0, 200, 200, 0.20)",
-        dimGlow24: "rgba(0, 200, 200, 0.20)",
-        dimGlow48: "rgba(0, 200, 200, 0.10)",
+        tint: "rgba(0, 200, 200, 0.28)",
+        dimGlow24: "rgba(0, 200, 200, 0.30)",
+        dimGlow48: "rgba(0, 200, 200, 0.20)",
       },
       full: {
         short: "AUTO",
         long: "Full Assist",
         accent: "#00FF26",
-        tint: "rgba(0, 255, 38, 0.18)",
-        dimGlow24: "rgba(0, 255, 38, 0.20)",
-        dimGlow48: "rgba(0, 255, 38, 0.10)",
+        tint: "rgba(0, 255, 38, 0.28)",
+        dimGlow24: "rgba(0, 255, 38, 0.30)",
+        dimGlow48: "rgba(0, 255, 38, 0.20)",
       },
     };
 
@@ -516,9 +516,9 @@
       document.documentElement.style.setProperty("--accent", accent);
 
       breathLayer.style.background =
-        "radial-gradient(ellipse at 50% 78%, " + assistMeta.tint + " 0%, transparent 72%)";
+        "radial-gradient(ellipse at 50% 78%, " + assistMeta.tint + " 0%, transparent 100%)";
       ambientLayer.style.background =
-        "radial-gradient(ellipse at 50% 78%, " + assistMeta.tint + " 0%, transparent 72%)";
+        "radial-gradient(ellipse at 50% 78%, " + assistMeta.tint + " 0%, transparent 100%)";
 
       const gear = gearMap[Math.round(Number(car.gear) || 0)] || "-";
       const isDrive = gear === "D";

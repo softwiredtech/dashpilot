@@ -31,6 +31,8 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -52,6 +54,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.core.content.edit
 import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.datamodel.dash.DASH_PREFS_NAME
+import com.softwiredtech.dashpilot.datamodel.dash.DashboardType
 import com.softwiredtech.dashpilot.datamodel.dash.DisplaySettings
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_ALWAYS_ON_BLIND_SPOT_MONITOR
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_DARK_MODE
@@ -74,6 +77,7 @@ import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_USE_IMPERIAL
 import com.softwiredtech.dashpilot.datamodel.dash.availableDashboards
 import com.softwiredtech.dashpilot.datamodel.dash.dashboardById
 import com.softwiredtech.dashpilot.datamodel.dash.getSelectedDashboard
+import com.softwiredtech.dashpilot.datamodel.dash.saveDevRiveFileUri
 import com.softwiredtech.dashpilot.datamodel.dash.saveSelectedDashboard
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
 import com.softwiredtech.dashpilot.ui.theme.DarkColors
@@ -125,6 +129,16 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
 
     val selectedDashboardId = remember {
         mutableStateOf(getSelectedDashboard(context).id)
+    }
+
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) {
+            saveDevRiveFileUri(context, uri.toString())
+            selectedDashboardId.value = "dev_rive"
+            saveSelectedDashboard(context, dashboardById("dev_rive")!!)
+        }
     }
     val selectedDashboardCapabilities = remember(selectedDashboardId.value) {
         dashboardById(selectedDashboardId.value)?.capabilities
@@ -207,8 +221,12 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                                 )
                                 .background(DarkColors.Surface)
                                 .clickable {
-                                    selectedDashboardId.value = dashboard.id
-                                    saveSelectedDashboard(context, dashboard)
+                                    if (dashboard.type == DashboardType.DEV_RIVE) {
+                                        filePickerLauncher.launch(arrayOf("*/*"))
+                                    } else {
+                                        selectedDashboardId.value = dashboard.id
+                                        saveSelectedDashboard(context, dashboard)
+                                    }
                                 },
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
@@ -250,7 +268,8 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                 fontSize = 13.sp
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Text(stringResource(R.string.settings_section_display), color = Color(0xFF888888), fontSize = 16.sp)
+            Spacer(modifier = Modifier.height(8.dp))
 
             if (supportsVehicleBusWidgets) {
                 SettingsToggle(stringResource(R.string.settings_toggle_extra_vehicle_bus), extraBusState.value) { enabled ->
@@ -258,25 +277,19 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                     sharedPrefs.edit { putBoolean(PREF_EXTRA_VEHICLE_BUS, enabled) }
                 }
 
-                if (!extraBusState.value) {
-                    Text(
-                        text = stringResource(R.string.settings_vehicle_bus_requires_extra),
-                        color = DarkColors.TextSubtle,
-                        fontSize = 13.sp,
-                    )
-                }
-
                 if (extraBusState.value) {
-                    vehicleBusToggleStates.forEach { (key, state) ->
-                        SettingsToggle(stringResource(vehicleBusToggles.first { it.key == key }.labelRes), state.value) { enabled ->
-                            state.value = enabled
-                            sharedPrefs.edit { putBoolean(key, enabled) }
-                            onDisplaySettingsChanged(buildDisplaySettings())
+                    Column(modifier = Modifier.padding(start = 24.dp)) {
+                        vehicleBusToggleStates.forEach { (key, state) ->
+                            SettingsToggle(stringResource(vehicleBusToggles.first { it.key == key }.labelRes), state.value) { enabled ->
+                                state.value = enabled
+                                sharedPrefs.edit { putBoolean(key, enabled) }
+                                onDisplaySettingsChanged(buildDisplaySettings())
+                            }
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(12.dp))
             }
 
             Text(stringResource(R.string.settings_section_display), color = DarkColors.TextMuted, fontSize = 16.sp)
