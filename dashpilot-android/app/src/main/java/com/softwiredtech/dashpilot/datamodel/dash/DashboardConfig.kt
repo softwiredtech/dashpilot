@@ -12,7 +12,7 @@ enum class DashboardType { WEB, RIVE, DEV_RIVE }
 data class DashboardCapabilities(
     val supports3dVisualizerSettings: Boolean = false,
     val supportsVehicleBusWidgets: Boolean = false,
-    val supportsPhoneBatteryToggle: Boolean = true
+    val supportsPhoneBatteryToggle: Boolean = false
 )
 
 data class DashboardConfig(
@@ -34,7 +34,8 @@ val availableDashboards = buildList {
             screenshotRes = R.drawable.preview_vanilla,
             capabilities = DashboardCapabilities(
                 supports3dVisualizerSettings = true,
-                supportsVehicleBusWidgets = true
+                supportsVehicleBusWidgets = true,
+                supportsPhoneBatteryToggle = true
             )
         )
     )
@@ -44,10 +45,7 @@ val availableDashboards = buildList {
             nameRes = R.string.dashboard_name_ambient,
             url = "${LOCAL_ASSET_BASE_URL}web-ambient/index.html",
             type = DashboardType.WEB,
-            screenshotRes = R.drawable.preview_ambient,
-            capabilities = DashboardCapabilities(
-                supportsPhoneBatteryToggle = false
-            )
+            screenshotRes = R.drawable.preview_ambient
         )
     )
     add(
