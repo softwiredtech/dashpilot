@@ -31,6 +31,8 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -52,10 +54,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.core.content.edit
 import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.datamodel.dash.DASH_PREFS_NAME
+import com.softwiredtech.dashpilot.datamodel.dash.DashboardType
 import com.softwiredtech.dashpilot.datamodel.dash.DisplaySettings
 import com.softwiredtech.dashpilot.datamodel.dash.availableDashboards
 import com.softwiredtech.dashpilot.datamodel.dash.dashboardById
 import com.softwiredtech.dashpilot.datamodel.dash.getSelectedDashboard
+import com.softwiredtech.dashpilot.datamodel.dash.saveDevRiveFileUri
 import com.softwiredtech.dashpilot.datamodel.dash.saveSelectedDashboard
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
 
@@ -106,6 +110,16 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
 
     val selectedDashboardId = remember {
         mutableStateOf(getSelectedDashboard(context).id)
+    }
+
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        if (uri != null) {
+            saveDevRiveFileUri(context, uri.toString())
+            selectedDashboardId.value = "dev_rive"
+            saveSelectedDashboard(context, dashboardById("dev_rive")!!)
+        }
     }
     val selectedDashboardCapabilities = remember(selectedDashboardId.value) {
         dashboardById(selectedDashboardId.value)?.capabilities
@@ -188,8 +202,12 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                                 )
                                 .background(Color(0xFF1A1A1A))
                                 .clickable {
-                                    selectedDashboardId.value = dashboard.id
-                                    saveSelectedDashboard(context, dashboard)
+                                    if (dashboard.type == DashboardType.DEV_RIVE) {
+                                        filePickerLauncher.launch(arrayOf("*/*"))
+                                    } else {
+                                        selectedDashboardId.value = dashboard.id
+                                        saveSelectedDashboard(context, dashboard)
+                                    }
                                 },
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {

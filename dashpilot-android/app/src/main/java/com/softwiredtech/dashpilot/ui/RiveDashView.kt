@@ -49,7 +49,7 @@ fun RiveDashView(
         val myFile: MutableState<RiveFile?> = remember { mutableStateOf(null) }
 
         val riveSource = remember(assetName, fileUri) {
-            if (fileUri != null) {
+            if (!fileUri.isNullOrEmpty()) {
                 try {
                     val uri = fileUri.toUri()
                     val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
