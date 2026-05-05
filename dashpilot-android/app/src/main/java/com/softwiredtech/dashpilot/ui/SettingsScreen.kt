@@ -231,7 +231,8 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                 fontSize = 13.sp
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Text(stringResource(R.string.settings_section_display), color = Color(0xFF888888), fontSize = 16.sp)
+            Spacer(modifier = Modifier.height(8.dp))
 
             if (supportsVehicleBusWidgets) {
                 SettingsToggle(stringResource(R.string.settings_toggle_extra_vehicle_bus), extraBusState.value) { enabled ->
@@ -239,29 +240,20 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                     sharedPrefs.edit { putBoolean("extra_vehicle_bus", enabled) }
                 }
 
-                if (!extraBusState.value) {
-                    Text(
-                        text = stringResource(R.string.settings_vehicle_bus_requires_extra),
-                        color = Color(0xFF666666),
-                        fontSize = 13.sp,
-                    )
-                }
-
                 if (extraBusState.value) {
-                    vehicleBusToggleStates.forEach { (key, state) ->
-                        SettingsToggle(stringResource(vehicleBusToggles.first { it.key == key }.labelRes), state.value) { enabled ->
-                            state.value = enabled
-                            sharedPrefs.edit { putBoolean(key, enabled) }
-                            onDisplaySettingsChanged(buildDisplaySettings())
+                    Column(modifier = Modifier.padding(start = 24.dp)) {
+                        vehicleBusToggleStates.forEach { (key, state) ->
+                            SettingsToggle(stringResource(vehicleBusToggles.first { it.key == key }.labelRes), state.value) { enabled ->
+                                state.value = enabled
+                                sharedPrefs.edit { putBoolean(key, enabled) }
+                                onDisplaySettingsChanged(buildDisplaySettings())
+                            }
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(12.dp))
             }
-
-            Text(stringResource(R.string.settings_section_display), color = Color(0xFF888888), fontSize = 16.sp)
-            Spacer(modifier = Modifier.height(8.dp))
 
             SettingsToggle(stringResource(R.string.settings_toggle_use_imperial), useImperialState.value) { enabled ->
                 useImperialState.value = enabled
