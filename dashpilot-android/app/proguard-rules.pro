@@ -34,10 +34,11 @@
     kotlinx.serialization.KSerializer serializer(...);
 }
 
-# --- Gson (used by WebsocketDataSource) ---
+# --- Gson (used by WebsocketDataSource and Retrofit/BlitzerApi) ---
 -keepattributes Signature
 -keep class com.google.gson.reflect.TypeToken { *; }
 -keep class * extends com.google.gson.reflect.TypeToken
+-keep class com.softwiredtech.dashpilot.datamodel.api.** { *; }
 
 # --- OkHttp ---
 -dontwarn okhttp3.internal.platform.**

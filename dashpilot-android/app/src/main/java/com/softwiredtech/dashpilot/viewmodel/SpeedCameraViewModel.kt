@@ -73,7 +73,7 @@ class SpeedCameraViewModel : ViewModel() {
                 val approaching = if (location.hasBearing()) {
                     var diff = abs((camBearing - location.bearing + 360f) % 360f)
                     if (diff > 180f) diff = 360f - diff
-                    diff < 60f
+                    diff < 90f
                 } else {
                     val prev = previousDistances[key]
                     prev != null && dist < prev
@@ -81,7 +81,8 @@ class SpeedCameraViewModel : ViewModel() {
 
                 previousDistances[key] = dist
 
-                if (approaching && dist <= 200f) cam to dist.toInt() else null
+                // Alert if approaching within 500m, or unconditionally within 100m
+                if (dist <= 100f || (approaching && dist <= 500f)) cam to dist.toInt() else null
             }
             .minByOrNull { (_, d) -> d }
 
