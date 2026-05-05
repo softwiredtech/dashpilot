@@ -268,32 +268,29 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                 fontSize = 13.sp
             )
 
-            Text(stringResource(R.string.settings_section_display), color = Color(0xFF888888), fontSize = 16.sp)
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (supportsVehicleBusWidgets) {
-                SettingsToggle(stringResource(R.string.settings_toggle_extra_vehicle_bus), extraBusState.value) { enabled ->
-                    extraBusState.value = enabled
-                    sharedPrefs.edit { putBoolean(PREF_EXTRA_VEHICLE_BUS, enabled) }
-                }
+            Text(stringResource(R.string.settings_section_configuration), color = DarkColors.TextMuted, fontSize = 16.sp)
 
-                if (extraBusState.value) {
-                    Column(modifier = Modifier.padding(start = 24.dp)) {
-                        vehicleBusToggleStates.forEach { (key, state) ->
-                            SettingsToggle(stringResource(vehicleBusToggles.first { it.key == key }.labelRes), state.value) { enabled ->
-                                state.value = enabled
-                                sharedPrefs.edit { putBoolean(key, enabled) }
-                                onDisplaySettingsChanged(buildDisplaySettings())
-                            }
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
+            SettingsToggle(stringResource(R.string.settings_toggle_extra_vehicle_bus), extraBusState.value) { enabled ->
+                extraBusState.value = enabled
+                sharedPrefs.edit { putBoolean(PREF_EXTRA_VEHICLE_BUS, enabled) }
             }
 
             Text(stringResource(R.string.settings_section_display), color = DarkColors.TextMuted, fontSize = 16.sp)
             Spacer(modifier = Modifier.height(8.dp))
+
+            if (supportsVehicleBusWidgets) {
+                if (extraBusState.value) {
+                    vehicleBusToggleStates.forEach { (key, state) ->
+                        SettingsToggle(stringResource(vehicleBusToggles.first { it.key == key }.labelRes), state.value) { enabled ->
+                            state.value = enabled
+                            sharedPrefs.edit { putBoolean(key, enabled) }
+                            onDisplaySettingsChanged(buildDisplaySettings())
+                        }
+                    }
+                }
+            }
 
             SettingsToggle(stringResource(R.string.settings_toggle_use_imperial), useImperialState.value) { enabled ->
                 useImperialState.value = enabled

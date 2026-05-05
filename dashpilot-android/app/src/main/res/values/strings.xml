@@ -19,6 +19,7 @@
     <string name="dashboard_name_rive">Rive</string>
     <string name="dashboard_name_dev_rive">Load Rive File</string>
     <string name="settings_section_display">Display</string>
+    <string name="settings_section_configuration">Configuration</string>
     <string name="settings_theme_availability_note">Some settings depend on the selected theme</string>
     <string name="settings_section_3d_visualizer">3D Visualizer</string>
     <string name="settings_toggle_show_phone_battery">Show phone battery</string>
