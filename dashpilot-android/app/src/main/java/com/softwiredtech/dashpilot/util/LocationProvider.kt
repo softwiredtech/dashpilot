@@ -56,7 +56,11 @@ object LocationProvider {
 
         val callback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
-                val location = result.lastLocation ?: return
+                val location = result.lastLocation
+                if (location == null) {
+                    Log.w(TAG, "LocationResult received but lastLocation is null (${result.locations.size} locations)")
+                    return
+                }
                 Log.d(TAG, "Location update: ${location.latitude}, ${location.longitude}")
                 trySend(location)
             }

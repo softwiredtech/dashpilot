@@ -56,12 +56,23 @@ class MainActivity : ComponentActivity() {
 
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
-    ) { /* location permissions granted or denied */ }
+    ) { permissions ->
+        val granted = permissions.any { it.value }
+        if (granted) {
+            speedCameraVM.startUpdating(this)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        requestLocationPermission()
+        connectionVM.bindSpeedCamera(speedCameraVM.nearestApproachingCamera)
+
+        if (hasLocationPermission()) {
+            speedCameraVM.startUpdating(this)
+        } else {
+            requestLocationPermission()
+        }
 
         AppInitializer.getInstance(applicationContext)
             .initializeComponent(RiveInitializer::class.java)
@@ -103,10 +114,6 @@ class MainActivity : ComponentActivity() {
                         popExitTransition = { ExitTransition.None }
                     ) {
                         composable<SetupRoute> {
-                            LaunchedEffect(Unit) {
-                                speedCameraVM.startUpdating(context)
-                                connectionVM.bindSpeedCamera(speedCameraVM.nearestApproachingCamera)
-                            }
                             SetupScreen(
                                 connectionStatus = connectionStatus,
                                 onConnect = { serverAddress, dataSourceType ->
@@ -149,6 +156,13 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun hasLocationPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED
     }
 
     private fun requestLocationPermission() {

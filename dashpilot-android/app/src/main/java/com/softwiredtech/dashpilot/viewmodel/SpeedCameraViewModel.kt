@@ -29,15 +29,17 @@ class SpeedCameraViewModel : ViewModel() {
 
     fun startUpdating(context: Context) {
         if (locationJob?.isActive == true) return
+        locationJob?.cancel()
         locationJob = viewModelScope.launch {
             try {
                 LocationProvider.locationFlow(context, locationInterval).collect { location ->
                     processLocation(location)
                 }
+                Log.w("SpeedCameraVM", "Location flow completed (permissions missing or GMS unavailable)")
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                Log.e("SpeedCameraVM", "Location unavailable (GMS missing?): ${e.message}")
+                Log.e("SpeedCameraVM", "Location flow error: ${e.message}", e)
             }
         }
     }
