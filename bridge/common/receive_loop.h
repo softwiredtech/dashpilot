@@ -19,7 +19,7 @@
 
 // Processes one message from a SubSocket, updating decoder state.
 // Returns true if a CAN event was processed (caller should emit state to platform).
-inline bool processMessage(Messae* msg, VehicleDecoder* decoder,
+inline bool processMessage(Message* msg, VehicleDecoder* decoder,
                            double& madsActive, double& experimentalMode,
                            double& selfdriveActive, double& changingLane) {
     kj::ArrayPtr<capnp::word> words(
