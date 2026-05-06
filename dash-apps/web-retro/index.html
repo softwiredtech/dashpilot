@@ -39,66 +39,69 @@ body {
 .viewport {
   position: fixed;
   inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding-top: max(8px, env(safe-area-inset-top), var(--safe-top));
-  padding-right: max(12px, env(safe-area-inset-right), var(--safe-right));
-  padding-bottom: max(8px, env(safe-area-inset-bottom), var(--safe-bottom));
-  padding-left: max(12px, env(safe-area-inset-left), var(--safe-left));
+  padding-top: max(env(safe-area-inset-top), var(--safe-top));
+  padding-right: max(env(safe-area-inset-right), var(--safe-right));
+  padding-bottom: max(env(safe-area-inset-bottom), var(--safe-bottom));
+  padding-left: max(env(safe-area-inset-left), var(--safe-left));
 }
 
 .stage {
-  width: 580px;
-  flex: 0 0 auto;
-  transform-origin: center center;
-  will-change: transform;
+  width: 100%;
+  height: 100%;
+  container-type: size;
+  --u: min(calc(100cqw / 580), calc(100cqh / 216));
 }
 
 /* ── BEZEL ───────────────────────────────── */
 .bezel {
   width: 100%;
-  background: #0d120b;
-  border-radius: 6px;
-  padding: 8px;
-  box-shadow:
-    0 0 0 1px #1a2118,
-    0 20px 70px rgba(0,0,0,0.9),
-    inset 0 1px 0 rgba(255,255,255,0.03);
-}
-
-body.compact-chrome .viewport {
-  padding-top: max(4px, env(safe-area-inset-top), var(--safe-top));
-  padding-right: max(28px, env(safe-area-inset-right), var(--safe-right));
-  padding-bottom: max(4px, env(safe-area-inset-bottom), var(--safe-bottom));
-  padding-left: max(28px, env(safe-area-inset-left), var(--safe-left));
-}
-
-body.compact-chrome .bezel {
-  background: transparent;
-  border-radius: 4px;
-  padding: 3px;
-  box-shadow: none;
+  height: 100%;
 }
 
 /* ── FACE ────────────────────────────────── */
 .face {
   --on:     #5ce845;
-  --bright: #8fff74;
-  --ghost:  rgba(92,232,69,0.15);
-  --label:  rgba(92,232,69,0.60);
+  --bright: #b8ff8e;
+  --ghost:  rgba(124,255,109,0.12);
+  --label:  rgba(184,255,142,0.56);
   --border: rgba(92,232,69,0.12);
   --warn:   #ff6418;
   --urgent: #ff2200;
   --set-c:  #38b8ff;
   --mads-c: #28d8c0;
   --bg:     #030604;
+  --mid-c:  #c8b020;
+  --glow-core: rgba(3,6,4,0.9);
+  --glow-on: rgba(92,232,69,0.35);
+  --glow-warn: rgba(255,100,24,0.35);
+  --glow-urgent: rgba(255,34,0,0.38);
+  --glow-set: rgba(56,184,255,0.35);
+  --glow-mads: rgba(40,216,192,0.35);
+  --glow-mid: rgba(200,176,32,0.35);
 
-  background: var(--bg);
-  border-radius: 2px;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(124,255,109,0.05), transparent 54%),
+    linear-gradient(180deg, rgba(8,16,10,0.98), var(--bg) 66%);
+  border-radius: 0;
   box-shadow: inset 0 0 0 1px rgba(92,232,69,0.06);
   overflow: hidden;
   position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-between;
+}
+
+.face::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  background:
+    radial-gradient(140% 110% at 50% 42%, transparent 54%, rgba(0,0,0,0.18) 76%, rgba(0,0,0,0.42) 100%),
+    linear-gradient(180deg, rgba(255,255,255,0.045), transparent 18%, transparent 82%, rgba(255,255,255,0.018));
 }
 
 .face::after {
@@ -107,8 +110,11 @@ body.compact-chrome .bezel {
   inset: 0;
   pointer-events: none;
   z-index: 9999;
-  opacity: 0.04;
-  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/></filter><rect width='200' height='200' filter='url(%23n)'/></svg>");
+  opacity: 0.18;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025), rgba(255,255,255,0.008)),
+    repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 6px);
 }
 
 
@@ -117,39 +123,42 @@ body.compact-chrome .bezel {
    ═══════════════════════════════════════════ */
 
 .bs-tape {
+  flex: 1;
   display: flex;
   align-items: stretch;
-  padding: 11px 14px 10px;
-  border-bottom: 1px solid var(--border);
+  padding: calc(11 * var(--u)) calc(14 * var(--u)) calc(10 * var(--u));
 }
 
-.bs-side { display: flex; gap: 3px; flex: 1; }
+.bs-side { display: flex; gap: calc(3 * var(--u)); flex: 1; }
 .bs-left  { flex-direction: row-reverse; }
 .bs-right { flex-direction: row; }
 
 .bs-cell {
   flex: 1;
-  height: 18px;
+  height: 100%;
+  min-height: calc(18 * var(--u));
+  max-height: calc(22 * var(--u));
+  margin-block: auto;
   background: var(--ghost);
-  border-radius: 1px;
+  border-radius: calc(1 * var(--u));
 }
 
 .bs-cell.blink {
   background: var(--on);
   animation: bs-blink 0.75s step-end infinite;
-  box-shadow: 0 0 2px rgba(3,6,4,0.9), 0 0 4px var(--on), 0 0 12px rgba(92,232,69,0.3);
+  box-shadow: 0 0 1px var(--glow-core), 0 0 7px var(--glow-on);
 }
 @keyframes bs-blink { 0%,49%{opacity:1} 50%,100%{opacity:0.12} }
 
 .bs-cell.blind {
   background: var(--warn);
-  box-shadow: 0 0 2px rgba(3,6,4,0.9), 0 0 4px var(--warn), 0 0 12px rgba(255,100,24,0.3);
+  box-shadow: 0 0 1px var(--glow-core), 0 0 7px var(--glow-warn);
 }
 
 .bs-cell.urgent {
   background: var(--urgent);
   animation: bs-urgent 0.55s ease-in-out infinite;
-  box-shadow: 0 0 2px rgba(3,6,4,0.9), 0 0 6px var(--urgent), 0 0 14px rgba(255,34,0,0.4);
+  box-shadow: 0 0 1px var(--glow-core), 0 0 7px var(--glow-urgent);
 }
 @keyframes bs-urgent {
   0%,100% { opacity:0.4; background:var(--warn); }
@@ -157,7 +166,7 @@ body.compact-chrome .bezel {
 }
 
 .tape-divider {
-  width: 14px; flex-shrink: 0;
+  width: calc(14 * var(--u)); flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
 }
 .tape-divider-line {
@@ -173,58 +182,89 @@ body.compact-chrome .bezel {
 .data-row {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
+  grid-template-areas: 'gear speed right';
   align-items: center;
-  padding: 16px 24px 15px;
+  padding: calc(24 * var(--u)) calc(24 * var(--u));
 }
 
 /* LEFT: gear */
 .left-zone {
+  grid-area: gear;
   display: flex;
   align-items: flex-start;
 }
 
 /* CENTER: speed */
 .speed-zone {
+  grid-area: speed;
   display: flex; flex-direction: row;
-  align-items: flex-end; gap: 12px;
-  transform: translateX(-19px);
+  align-items: flex-end; gap: calc(12 * var(--u));
+  transform: translateX(calc(-19 * var(--u)));
 }
 
 .speed-aside {
   display: flex; flex-direction: column;
   align-items: flex-start; justify-content: space-between;
-  height: 108px;
+  height: calc(108 * var(--u));
 }
 
 .unit-label {
-  font-size: 11px; font-weight: 700;
+  font-size: calc(11 * var(--u)); font-weight: 700;
   letter-spacing: 0.25em;
   color: rgba(92,232,69,0.16);
 }
 .unit-label.active {
   color: var(--label);
-  text-shadow: 0 0 2px rgba(3,6,4,0.9), 0 0 5px rgba(3,6,4,0.7), 0 0 6px rgba(92,232,69,0.7), 0 0 14px rgba(92,232,69,0.25);
+  text-shadow: 0 0 1px var(--glow-core), 0 0 7px var(--glow-on);
 }
 
 /* RIGHT: set + limit */
 .right-zone {
+  grid-area: right;
   display: flex; flex-direction: column;
-  align-items: flex-end; gap: 9px;
+  align-items: flex-end; gap: calc(9 * var(--u));
 }
 
-.sec-row { display: flex; align-items: center; gap: 9px; }
+body.portrait-layout .stage {
+  --u: calc(100cqw / 360);
+}
+
+body.portrait-layout .data-row {
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-areas:
+    '. speed .'
+    'gear . right';
+  row-gap: calc(14 * var(--u));
+  padding: calc(16 * var(--u)) calc(18 * var(--u)) calc(15 * var(--u));
+}
+
+body.portrait-layout .speed-zone {
+  justify-self: center;
+  transform: none;
+}
+
+body.portrait-layout .left-zone {
+  align-self: end;
+}
+
+body.portrait-layout .right-zone {
+  justify-self: end;
+  gap: calc(7 * var(--u));
+}
+
+.sec-row { display: flex; align-items: center; gap: calc(9 * var(--u)); }
 
 
 .icon-lim {
-  width: 15px; height: 15px; border-radius: 50%;
-  border: 2.5px solid var(--warn);
-  box-shadow: 0 0 2px rgba(3,6,4,0.9), 0 0 4px var(--warn), 0 0 10px rgba(255,100,24,0.3);
+  width: calc(15 * var(--u)); height: calc(15 * var(--u)); border-radius: 50%;
+  border: calc(2.5 * var(--u)) solid var(--warn);
+  box-shadow: 0 0 1px var(--glow-core), 0 0 7px var(--glow-warn);
   flex-shrink: 0; position: relative;
   transition: opacity 0.3s;
 }
 .icon-lim::after {
   content: '';
-  position: absolute; inset: -2px;
+  position: absolute; inset: calc(-2 * var(--u));
   background: linear-gradient(
     135deg,
     transparent 42%, var(--warn) 42%,
@@ -237,82 +277,68 @@ body.compact-chrome .bezel {
 
 
 /* ═══════════════════════════════════════════
-   ZONE 3 — STEERING STRIP
+   ZONE 3 — STEERING STRIP (reuses bs-tape)
    ═══════════════════════════════════════════ */
 
 .steer-strip {
-  display: flex; align-items: stretch;
-  padding: 9px 14px 11px;
-  border-top: 1px solid var(--border);
-}
-
-.steer-side { display: flex; gap: 3px; flex: 1; }
-.steer-left  { flex-direction: row-reverse; }
-.steer-right { flex-direction: row; }
-
-.steer-cell {
-  flex: 1; height: 14px;
-  background: var(--ghost); border-radius: 1px;
-}
-.steer-cell.on-gentle { background: var(--on);   box-shadow: 0 0 2px rgba(3,6,4,0.9), 0 0 4px var(--on),   0 0 10px rgba(92,232,69,0.25); }
-.steer-cell.on-mid    { background: #c8b020;     box-shadow: 0 0 2px rgba(3,6,4,0.9), 0 0 4px #c8b020,   0 0 10px rgba(200,176,32,0.25); }
-.steer-cell.on-hard   { background: var(--warn); box-shadow: 0 0 2px rgba(3,6,4,0.9), 0 0 4px var(--warn), 0 0 10px rgba(255,100,24,0.25); }
-
-.steer-center {
-  width: 14px; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-}
-.steer-center-pip {
-  width: 3px; height: 10px;
-  background: rgba(92,232,69,0.22); border-radius: 1px;
+  padding-top: calc(10 * var(--u));
+  padding-bottom: calc(10 * var(--u));
 }
 
 
-.disp     { display:flex; align-items:center; gap:4px; }
-.disp.lg  { gap:5px; }
-.disp.xxl { gap:10px; }
+.disp     { display:flex; align-items:center; gap:calc(4 * var(--u)); }
+.disp.lg  { gap:calc(5 * var(--u)); }
+.disp.xxl { gap:calc(10 * var(--u)); }
 
-#speed-disp { width: 218px; } /* gap between digits 2&3 at zone center via .speed-zone transform */
-#set-disp { width: 116px; } /* 4 × 26px + 3 × 4px */
-#lim-disp { width: 86px; }  /* 3 × 26px + 2 × 4px */
+#speed-disp { width: calc(218 * var(--u)); } /* gap between digits 2&3 at zone center via .speed-zone transform */
+#set-disp { width: calc(116 * var(--u)); } /* 4 × 26px + 3 × 4px */
+#lim-disp { width: calc(86 * var(--u)); }  /* 3 × 26px + 2 × 4px */
 
 
 /* ── 14-SEGMENT DIGITS ──────────────── */
 .d14 { position: relative; display: inline-block; flex-shrink: 0; }
-.d14.md  { width: 26px; height: 44px; }
-.d14.lg  { width: 42px; height: 60px; }
-.d14.xxl { width: 66px; height: 108px; }
-.d14-svg { display: block; width: 100%; height: 100%; overflow: visible; }
-.d14-seg { fill: var(--ghost); }
-.d14-seg.on {
+.d14.md  { width: calc(26 * var(--u)); height: calc(44 * var(--u)); }
+.d14.lg  { width: calc(42 * var(--u)); height: calc(60 * var(--u)); }
+.d14.xxl { width: calc(66 * var(--u)); height: calc(108 * var(--u)); }
+.d14-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform: skewX(-5deg);
+  transform-origin: center;
+}
+.d14-base { fill: var(--ghost); }
+.d14-on { fill: transparent; }
+.d14-on.on {
   fill: var(--bright);
-  filter: drop-shadow(0 0 1px rgba(3,6,4,0.9)) drop-shadow(0 0 3px var(--on)) drop-shadow(0 0 8px rgba(92,232,69,0.22));
+  filter: drop-shadow(0 0 1px var(--glow-core)) drop-shadow(0 0 7px var(--glow-on));
 }
-.d14-seg.on.warn-c {
+.d14-on.on.warn-c {
   fill: var(--warn);
-  filter: drop-shadow(0 0 1px rgba(3,6,4,0.9)) drop-shadow(0 0 3px var(--warn)) drop-shadow(0 0 8px rgba(255,100,24,0.22));
+  filter: drop-shadow(0 0 1px var(--glow-core)) drop-shadow(0 0 7px var(--glow-warn));
 }
-.d14-seg.on.set-c {
+.d14-on.on.set-c {
   fill: var(--set-c);
-  filter: drop-shadow(0 0 1px rgba(3,6,4,0.9)) drop-shadow(0 0 3px var(--set-c)) drop-shadow(0 0 8px rgba(56,184,255,0.22));
+  filter: drop-shadow(0 0 1px var(--glow-core)) drop-shadow(0 0 7px var(--glow-set));
 }
-.d14-seg.on.mads-c {
+.d14-on.on.mads-c {
   fill: var(--mads-c);
-  filter: drop-shadow(0 0 1px rgba(3,6,4,0.9)) drop-shadow(0 0 3px var(--mads-c)) drop-shadow(0 0 8px rgba(40,216,192,0.22));
+  filter: drop-shadow(0 0 1px var(--glow-core)) drop-shadow(0 0 7px var(--glow-mads));
 }
 
 /* ── OVERSPEED DOT ──────────────────────── */
 .overspeed-dot {
-  width: 9px; height: 9px; border-radius: 50%;
+  width: calc(9 * var(--u)); height: calc(9 * var(--u)); border-radius: 50%;
   background: var(--ghost);
-  border: 1px solid rgba(92,232,69,0.10);
+  border: calc(1 * var(--u)) solid rgba(92,232,69,0.10);
   flex-shrink: 0;
   transition: background 0.3s, box-shadow 0.3s, border-color 0.3s;
 }
 .overspeed-dot.active {
   background: var(--urgent);
   border-color: var(--urgent);
-  box-shadow: 0 0 2px rgba(3,6,4,0.9), 0 0 5px var(--urgent), 0 0 14px rgba(255,34,0,0.4);
+  box-shadow: 0 0 1px var(--glow-core), 0 0 7px var(--glow-urgent);
 }
 
 </style>
@@ -360,10 +386,10 @@ body.compact-chrome .bezel {
   </div>
 
   <!-- ZONE 3: STEERING -->
-  <div class="steer-strip">
-    <div class="steer-side steer-left"  id="steer-left"></div>
-    <div class="steer-center"><div class="steer-center-pip"></div></div>
-    <div class="steer-side steer-right" id="steer-right"></div>
+  <div class="bs-tape steer-strip">
+    <div class="bs-side bs-left"  id="steer-left"></div>
+    <div class="tape-divider"><div class="tape-divider-line"></div></div>
+    <div class="bs-side bs-right" id="steer-right"></div>
   </div>
 
 </div>
@@ -401,6 +427,9 @@ const SEG14 = {
 
 
 const SEG14_ORDER = ['a','b','c','d','e','f','g1','g2','h','i','j','k','l','m'];
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const XLINK_NS = 'http://www.w3.org/1999/xlink';
+const SEG14_BASE_ID = 'd14-glyph-base';
 
 const SEG14_PATHS = {
   a:  'M 12.5,9 L 15.5,12 L 29.5,12 L 32.5,9 Z',
@@ -419,32 +448,149 @@ const SEG14_PATHS = {
   m:  'M 29,35 L 25,29 L 25,34 L 29,40 Z',
 };
 
-function makeDigit14(ch, size, colorClass) {
-  const segs = SEG14[ch] || SEG14[' '];
+const SEG14_BASE_PATH = SEG14_ORDER.map(name => SEG14_PATHS[name]).join(' ');
+const SEG14_GLYPHS = Object.fromEntries(
+  Object.entries(SEG14).map(([ch, segs]) => [
+    ch,
+    {
+      id: 'd14-glyph-' + (ch === ' ' ? 'blank' : ch.toLowerCase()),
+      path: SEG14_ORDER.filter((_, i) => segs[i]).map(name => SEG14_PATHS[name]).join(' '),
+    },
+  ])
+);
+
+const UI = {
+  speedDisp: document.getElementById('speed-disp'),
+  gearDisp: document.getElementById('gear-disp'),
+  setDisp: document.getElementById('set-disp'),
+  limDisp: document.getElementById('lim-disp'),
+  unitLabel: document.getElementById('unit-label'),
+  overspeedDot: document.getElementById('overspeed-dot'),
+  iconLim: document.getElementById('icon-lim'),
+  viewport: document.getElementById('viewport'),
+  stage: document.getElementById('stage'),
+  bs: {},
+};
+
+let pendingCarState = null;
+let renderFrame = 0;
+let fitFrame = 0;
+let digit14SpriteReady = false;
+
+function setClassName(el, className) {
+  if (el && el.className !== className) el.className = className;
+}
+
+function setText(el, text) {
+  if (el && el.textContent !== text) el.textContent = text;
+}
+
+function setUseHref(el, id) {
+  const href = '#' + id;
+  if (el.getAttribute('href') !== href) el.setAttribute('href', href);
+  if (el.getAttributeNS(XLINK_NS, 'href') !== href) el.setAttributeNS(XLINK_NS, 'xlink:href', href);
+}
+
+function ensureDigit14Sprite() {
+  if (digit14SpriteReady) return;
+
+  const sprite = document.createElementNS(SVG_NS, 'svg');
+  const defs = document.createElementNS(SVG_NS, 'defs');
+
+  sprite.setAttribute('aria-hidden', 'true');
+  sprite.setAttribute('width', '0');
+  sprite.setAttribute('height', '0');
+  sprite.style.position = 'absolute';
+  sprite.style.width = '0';
+  sprite.style.height = '0';
+  sprite.style.overflow = 'hidden';
+
+  const basePath = document.createElementNS(SVG_NS, 'path');
+  basePath.setAttribute('id', SEG14_BASE_ID);
+  basePath.setAttribute('d', SEG14_BASE_PATH);
+  defs.appendChild(basePath);
+
+  Object.values(SEG14_GLYPHS).forEach(glyph => {
+    const path = document.createElementNS(SVG_NS, 'path');
+    path.setAttribute('id', glyph.id);
+    if (glyph.path) path.setAttribute('d', glyph.path);
+    defs.appendChild(path);
+  });
+
+  sprite.appendChild(defs);
+  document.body.appendChild(sprite);
+  digit14SpriteReady = true;
+}
+
+function updateDigit14(el, ch, colorClass) {
+  const nextColorClass = colorClass || '';
+  if (el._lastChar === ch && el._lastColorClass === nextColorClass) return;
+
+  const glyph = SEG14_GLYPHS[ch] || SEG14_GLYPHS[' '];
+  const nextClass = 'd14-on' + (glyph.path ? ' on' + (nextColorClass ? ' ' + nextColorClass : '') : '');
+  setUseHref(el._onUse, glyph.id);
+  if (el._onUse.getAttribute('class') !== nextClass) el._onUse.setAttribute('class', nextClass);
+
+  el._lastChar = ch;
+  el._lastColorClass = nextColorClass;
+}
+
+function makeDigit14(size) {
+  ensureDigit14Sprite();
+
   const d = document.createElement('div');
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  const baseUse = document.createElementNS(SVG_NS, 'use');
+  const onUse = document.createElementNS(SVG_NS, 'use');
 
   d.className = 'd14 ' + size;
   svg.setAttribute('class', 'd14-svg');
   svg.setAttribute('viewBox', '12 9 21 35');
   svg.setAttribute('aria-hidden', 'true');
 
-  SEG14_ORDER.forEach((name, i) => {
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('d', SEG14_PATHS[name]);
-    path.setAttribute('class', 'd14-seg ' + name + (segs[i] ? ' on' + (colorClass ? ' '+colorClass : '') : ''));
-    svg.appendChild(path);
-  });
+  setUseHref(baseUse, SEG14_BASE_ID);
+  baseUse.setAttribute('class', 'd14-base');
+  onUse.setAttribute('class', 'd14-on');
 
+  svg.appendChild(baseUse);
+  svg.appendChild(onUse);
+
+  d._onUse = onUse;
+  d._lastChar = null;
+  d._lastColorClass = null;
   d.appendChild(svg);
   return d;
 }
 
-function fillDisp14(id, text, size, colorClass) {
+function fillDisp14(el, text, size, colorClass) {
+  if (!el) return;
+
+  const chars = [...text];
+  if (el.childElementCount !== chars.length || el.dataset.size !== size) {
+    el.textContent = '';
+    chars.forEach(() => el.appendChild(makeDigit14(size)));
+    el.dataset.size = size;
+  }
+
+  chars.forEach((ch, i) => updateDigit14(el.children[i], ch, colorClass));
+}
+
+function initBsTape(id) {
   const el = document.getElementById(id);
   if (!el) return;
-  el.innerHTML = '';
-  [...text].forEach(ch => el.appendChild(makeDigit14(ch, size, colorClass)));
+
+  const cells = [];
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < 8; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'bs-cell';
+    cells.push(cell);
+    frag.appendChild(cell);
+  }
+
+  el.textContent = '';
+  el.appendChild(frag);
+  UI.bs[id] = { cells, state: null };
 }
 
 /* ── Blind spot tape ── */
@@ -457,43 +603,36 @@ function bsTapeState(blind, blinker, ldw) {
 }
 
 function buildBsTape(state, id) {
-  const el = document.getElementById(id);
-  el.innerHTML = '';
-  for (let i = 0; i < 8; i++) {
-    const c = document.createElement('div');
-    c.className = 'bs-cell' + (state ? ' ' + state : '');
-    el.appendChild(c);
-  }
+  const tape = UI.bs[id];
+  if (!tape || tape.state === state) return;
+
+  const nextClass = 'bs-cell' + (state ? ' ' + state : '');
+  tape.cells.forEach(cell => {
+    if (cell.className !== nextClass) cell.className = nextClass;
+  });
+  tape.state = state;
 }
 
 /* ── Steering strip ── */
 function buildSteerStrip(steerDeg) {
-  const CELLS = 10, MAX_DEG = 20;
-  const DEG_PER_C = MAX_DEG / CELLS;
+  const CELLS = 8, MAX_DEG = 20;
   const isRight = steerDeg >= 0;
-  const litCount = Math.min(CELLS, Math.round(Math.abs(steerDeg) / DEG_PER_C));
-
-  function colorClass(i) {
-    const deg = (i + 1) * DEG_PER_C;
-    if (deg <= 4)  return 'on-gentle';
-    if (deg <= 12) return 'on-mid';
-    return 'on-hard';
-  }
+  const litCount = Math.min(CELLS, Math.round(Math.abs(steerDeg) / (MAX_DEG / CELLS)));
+  const litClass = 'bs-cell blind';
 
   ['steer-left', 'steer-right'].forEach(id => {
-    const el = document.getElementById(id);
-    el.innerHTML = '';
+    const tape = UI.bs[id];
+    if (!tape) return;
     const lit = (id === 'steer-right') === isRight;
-    for (let i = 0; i < CELLS; i++) {
-      const c = document.createElement('div');
-      c.className = 'steer-cell' + (lit && i < litCount ? ' ' + colorClass(i) : '');
-      el.appendChild(c);
-    }
+    tape.cells.forEach((cell, i) => {
+      const nextClass = lit && i < litCount ? litClass : 'bs-cell';
+      if (cell.className !== nextClass) cell.className = nextClass;
+    });
   });
 }
 
 /* ── Main update ── */
-function receiveMessage(car) {
+function renderCarState(car) {
   const speed   = Math.max(0, Math.round(Number(car.egoSpeed)       || 0));
   const setSpd  = Math.max(0, Math.round(Number(car.accSetSpeed)    || 0));
   const limit   = Math.max(0, Math.round(Number(car.fusedSpeedLimit)|| 0));
@@ -512,31 +651,31 @@ function receiveMessage(car) {
   const rightLdw = ldw === 2 || ldw === 4;
 
   // Speed
-  fillDisp14('speed-disp', String(speed).padStart(3, ' '), 'xxl');
+  fillDisp14(UI.speedDisp, String(speed).padStart(3, ' '), 'xxl');
 
   // Unit label
-  document.getElementById('unit-label').textContent = imp ? 'MPH' : 'KMH';
+  setText(UI.unitLabel, imp ? 'MPH' : 'KMH');
 
   // Overspeed dot — red pulse at ≥15% over limit
   const overSpeed = limit > 0 && speed >= Math.round(limit * 1.15);
-  document.getElementById('overspeed-dot').className = 'overspeed-dot' + (overSpeed ? ' active' : '');
+  setClassName(UI.overspeedDot, 'overspeed-dot' + (overSpeed ? ' active' : ''));
 
   // Gear — 14-segment display
-  fillDisp14('gear-disp', gear, 'lg');
+  fillDisp14(UI.gearDisp, gear, 'lg');
 
   // Mode/set display — set speed when FULL, "MADS" when MADS only, blank otherwise
   if (adasOn && setSpd > 0) {
-    fillDisp14('set-disp', String(setSpd).padStart(4, ' '), 'md', 'set-c');
+    fillDisp14(UI.setDisp, String(setSpd).padStart(4, ' '), 'md', 'set-c');
   } else if (mads) {
-    fillDisp14('set-disp', 'MADS', 'md', 'set-c');
+    fillDisp14(UI.setDisp, 'MADS', 'md', 'set-c');
   } else {
-    fillDisp14('set-disp', '    ', 'md');
+    fillDisp14(UI.setDisp, '    ', 'md');
   }
 
   // Speed limit
   const showLim = limit > 0;
-  document.getElementById('icon-lim').className = 'icon-lim' + (showLim ? '' : ' dim');
-  fillDisp14('lim-disp',
+  setClassName(UI.iconLim, 'icon-lim' + (showLim ? '' : ' dim'));
+  fillDisp14(UI.limDisp,
     showLim ? String(limit).padStart(3, ' ') : '   ',
     'md', showLim ? 'warn-c' : '');
 
@@ -546,6 +685,21 @@ function receiveMessage(car) {
 
   // Steering strip
   buildSteerStrip(Number(car.steeringAngle) || 0);
+}
+
+function flushCarState() {
+  renderFrame = 0;
+  if (!pendingCarState) return;
+
+  const nextCarState = pendingCarState;
+  pendingCarState = null;
+  renderCarState(nextCarState);
+}
+
+function receiveMessage(car) {
+  pendingCarState = car;
+  if (renderFrame) return;
+  renderFrame = window.requestAnimationFrame(flushCarState);
 }
 
 /* ── Native bridge ── */
@@ -592,32 +746,34 @@ function updateSafeInsets() {
   document.documentElement.style.setProperty('--safe-left', `${Math.ceil(safeLeft)}px`);
 }
 
-function fitDashboard() {
+function fitDashboardNow() {
   updateSafeInsets();
 
-  const viewport = document.getElementById('viewport');
-  const stage = document.getElementById('stage');
-  if (!viewport || !stage) return;
+  const stage = UI.stage;
+  if (!stage) return;
 
-  const viewportRect = viewport.getBoundingClientRect();
-  const viewportStyle = window.getComputedStyle(viewport);
-  const availableWidth = viewportRect.width
-    - parseFloat(viewportStyle.paddingLeft)
-    - parseFloat(viewportStyle.paddingRight);
-  const availableHeight = viewportRect.height
-    - parseFloat(viewportStyle.paddingTop)
-    - parseFloat(viewportStyle.paddingBottom);
-
-  const compactChrome = availableWidth < 760 || availableHeight < 420;
+  const vv = window.visualViewport;
+  const viewportWidth = vv ? vv.width : (window.innerWidth || document.documentElement.clientWidth || 0);
+  const viewportHeight = vv ? vv.height : (window.innerHeight || document.documentElement.clientHeight || 0);
+  const compactChrome = viewportWidth < 760 || viewportHeight < 420;
+  const portraitLayout = viewportHeight > viewportWidth && viewportWidth < 560;
   document.body.classList.toggle('compact-chrome', compactChrome);
-
-  const baseWidth = stage.offsetWidth;
-  const baseHeight = stage.offsetHeight;
-  if (!baseWidth || !baseHeight) return;
-
-  const scale = Math.max(0.1, Math.min(availableWidth / baseWidth, availableHeight / baseHeight));
-  stage.style.transform = `scale(${scale})`;
+  document.body.classList.toggle('portrait-layout', portraitLayout);
+  stage.style.transform = '';
 }
+
+function fitDashboard() {
+  if (fitFrame) return;
+  fitFrame = window.requestAnimationFrame(() => {
+    fitFrame = 0;
+    fitDashboardNow();
+  });
+}
+
+initBsTape('bs-left');
+initBsTape('bs-right');
+initBsTape('steer-left');
+initBsTape('steer-right');
 
 window.addEventListener('resize', fitDashboard);
 window.addEventListener('orientationchange', fitDashboard);
