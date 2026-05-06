@@ -129,12 +129,12 @@ class CarStateBridge {
         currentTime = time
     }
 
-    fun updateDisplaySettings(settings: DisplaySettings) {
+    fun updateDisplaySettings(settings: DisplaySettings, isSystemDark: Boolean) {
         showPhoneBattery = settings.showPhoneBattery
         showCarBattery = settings.showCarBattery
         showOdometer = settings.showOdometer
         useImperial = settings.useImperial
-        darkMode = settings.darkMode
+        darkMode = settings.isDarkMode(isSystemDark)
         alwaysOnBlindSpotMonitor = settings.alwaysOnBlindSpotMonitor
         renderQuality = settings.renderQuality
         darkModeBackgroundGray = settings.darkModeBackgroundGray

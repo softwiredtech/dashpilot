@@ -8,7 +8,6 @@ import com.softwiredtech.dashpilot.datamodel.dash.DASH_PREFS_NAME
 import com.softwiredtech.dashpilot.datamodel.dash.DashState
 import com.softwiredtech.dashpilot.datamodel.dash.DisplaySettings
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_ALWAYS_ON_BLIND_SPOT_MONITOR
-import com.softwiredtech.dashpilot.datamodel.dash.PREF_DARK_MODE
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_DARK_MODE_BACKGROUND_GRAY
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_EXTRA_VEHICLE_BUS
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_RENDER_QUALITY
@@ -17,7 +16,6 @@ import com.softwiredtech.dashpilot.datamodel.dash.PREF_SHOW_ODOMETER
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_SHOW_PHONE_BATTERY
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_USE_IMPERIAL
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_ALWAYS_ON_BLIND_SPOT_MONITOR
-import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_DARK_MODE
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_DARK_MODE_BACKGROUND_GRAY
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_EXTRA_VEHICLE_BUS
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_RENDER_QUALITY
@@ -25,6 +23,7 @@ import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_CAR_BATTERY
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_ODOMETER
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_PHONE_BATTERY
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_USE_IMPERIAL
+import com.softwiredtech.dashpilot.datamodel.dash.readThemeModePreference
 import com.softwiredtech.dashpilot.datasource.DataSourceType
 import com.softwiredtech.dashpilot.datasource.CommaDataSource
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
@@ -107,7 +106,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
                 showCarBattery = prefs.getBoolean(PREF_SHOW_CAR_BATTERY, DEFAULT_SHOW_CAR_BATTERY),
                 showOdometer = prefs.getBoolean(PREF_SHOW_ODOMETER, DEFAULT_SHOW_ODOMETER),
                 useImperial = prefs.getBoolean(PREF_USE_IMPERIAL, DEFAULT_USE_IMPERIAL),
-                darkMode = prefs.getBoolean(PREF_DARK_MODE, DEFAULT_DARK_MODE),
+                themeMode = readThemeModePreference(prefs),
                 alwaysOnBlindSpotMonitor = prefs.getBoolean(PREF_ALWAYS_ON_BLIND_SPOT_MONITOR, DEFAULT_ALWAYS_ON_BLIND_SPOT_MONITOR),
                 renderQuality = prefs.getInt(PREF_RENDER_QUALITY, DEFAULT_RENDER_QUALITY),
                 darkModeBackgroundGray = prefs.getInt(PREF_DARK_MODE_BACKGROUND_GRAY, DEFAULT_DARK_MODE_BACKGROUND_GRAY),

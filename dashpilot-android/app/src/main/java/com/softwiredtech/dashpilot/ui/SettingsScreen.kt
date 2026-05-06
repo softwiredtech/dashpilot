@@ -64,9 +64,9 @@ import com.softwiredtech.dashpilot.datamodel.dash.PREF_RENDER_QUALITY
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_SHOW_CAR_BATTERY
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_SHOW_ODOMETER
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_SHOW_PHONE_BATTERY
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_THEME_MODE
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_USE_IMPERIAL
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_ALWAYS_ON_BLIND_SPOT_MONITOR
-import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_DARK_MODE
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_DARK_MODE_BACKGROUND_GRAY
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_EXTRA_VEHICLE_BUS
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_RENDER_QUALITY
@@ -74,9 +74,11 @@ import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_CAR_BATTERY
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_ODOMETER
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_PHONE_BATTERY
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_USE_IMPERIAL
+import com.softwiredtech.dashpilot.datamodel.dash.ThemeMode
 import com.softwiredtech.dashpilot.datamodel.dash.availableDashboards
 import com.softwiredtech.dashpilot.datamodel.dash.dashboardById
 import com.softwiredtech.dashpilot.datamodel.dash.getSelectedDashboard
+import com.softwiredtech.dashpilot.datamodel.dash.readThemeModePreference
 import com.softwiredtech.dashpilot.datamodel.dash.saveDevRiveFileUri
 import com.softwiredtech.dashpilot.datamodel.dash.saveSelectedDashboard
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
@@ -111,8 +113,12 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
         mutableStateOf(sharedPrefs.getBoolean(PREF_USE_IMPERIAL, DEFAULT_USE_IMPERIAL))
     }
 
+    val themeModeState = remember {
+        mutableStateOf(readThemeModePreference(sharedPrefs))
+    }
+
     val darkModeState = remember {
-        mutableStateOf(sharedPrefs.getBoolean(PREF_DARK_MODE, DEFAULT_DARK_MODE))
+        mutableStateOf(themeModeState.value == ThemeMode.DARK)
     }
 
     val alwaysOnBlindSpotMonitorState = remember {
@@ -158,7 +164,7 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
         showCarBattery = vehicleBusToggleStates.getValue(PREF_SHOW_CAR_BATTERY).value,
         showOdometer = vehicleBusToggleStates.getValue(PREF_SHOW_ODOMETER).value,
         useImperial = useImperialState.value,
-        darkMode = darkModeState.value,
+        themeMode = themeModeState.value,
         alwaysOnBlindSpotMonitor = alwaysOnBlindSpotMonitorState.value,
         renderQuality = renderQualityState.intValue,
         darkModeBackgroundGray = darkModeBackgroundGrayState.floatValue.toInt(),
@@ -321,7 +327,11 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
 
                 SettingsToggle(stringResource(R.string.settings_toggle_dark_mode), darkModeState.value) { enabled ->
                     darkModeState.value = enabled
-                    sharedPrefs.edit { putBoolean(PREF_DARK_MODE, enabled) }
+                    themeModeState.value = if (enabled) ThemeMode.DARK else ThemeMode.LIGHT
+                    sharedPrefs.edit {
+                        putBoolean(PREF_DARK_MODE, enabled)
+                        putString(PREF_THEME_MODE, themeModeState.value.prefValue)
+                    }
                     onDisplaySettingsChanged(buildDisplaySettings())
                 }
 

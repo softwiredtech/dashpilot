@@ -1,6 +1,7 @@
 package com.softwiredtech.dashpilot.datamodel.dash
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.core.content.edit
 
 const val DASH_PREFS_NAME = "dash_prefs"
@@ -12,6 +13,7 @@ const val PREF_SHOW_PHONE_BATTERY = "show_phone_battery"
 const val PREF_SHOW_CAR_BATTERY = "show_car_battery"
 const val PREF_SHOW_ODOMETER = "show_odometer"
 const val PREF_USE_IMPERIAL = "use_imperial"
+const val PREF_THEME_MODE = "theme_mode"
 const val PREF_DARK_MODE = "dark_mode"
 const val PREF_ALWAYS_ON_BLIND_SPOT_MONITOR = "always_on_blind_spot_monitor"
 const val PREF_RENDER_QUALITY = "render_quality"
@@ -23,6 +25,7 @@ const val DEFAULT_SHOW_PHONE_BATTERY = true
 const val DEFAULT_SHOW_CAR_BATTERY = true
 const val DEFAULT_SHOW_ODOMETER = true
 const val DEFAULT_USE_IMPERIAL = false
+const val DEFAULT_THEME_MODE = "auto"
 const val DEFAULT_DARK_MODE = false
 const val DEFAULT_ALWAYS_ON_BLIND_SPOT_MONITOR = true
 const val DEFAULT_RENDER_QUALITY = 3
@@ -65,4 +68,21 @@ fun saveDevRiveFileUri(context: Context, uri: String) {
         .edit {
             putString(PREF_DEV_RIVE_FILE_URI, uri)
         }
+}
+
+fun readThemeModePreference(prefs: SharedPreferences): ThemeMode {
+    val storedMode = prefs.getString(PREF_THEME_MODE, null)
+    if (storedMode != null) {
+        return ThemeMode.fromPref(storedMode)
+    }
+
+    if (prefs.contains(PREF_DARK_MODE)) {
+        return if (prefs.getBoolean(PREF_DARK_MODE, DEFAULT_DARK_MODE)) {
+            ThemeMode.DARK
+        } else {
+            ThemeMode.LIGHT
+        }
+    }
+
+    return ThemeMode.fromPref(DEFAULT_THEME_MODE)
 }

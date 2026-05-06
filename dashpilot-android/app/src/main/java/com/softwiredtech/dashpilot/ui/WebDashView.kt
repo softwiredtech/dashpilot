@@ -9,6 +9,7 @@ import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -38,6 +39,7 @@ fun WebDashView(
 ) {
     val carStateBridge = remember { CarStateBridge() }
     val context = LocalContext.current
+    val isSystemDark = isSystemInDarkTheme()
     val webView = remember { WebView(context) }
     var pageLoaded by remember { mutableStateOf(false) }
 
@@ -109,13 +111,13 @@ fun WebDashView(
         }
     }
 
-    LaunchedEffect(pageLoaded) {
+    LaunchedEffect(pageLoaded, isSystemDark) {
         if (pageLoaded) {
             dashStateFlow.collect { dashState ->
                 carStateBridge.update(dashState.carState)
                 carStateBridge.updatePhoneBattery(dashState.phoneBattery)
                 carStateBridge.updateCurrentTime(dashState.currentTime)
-                carStateBridge.updateDisplaySettings(dashState.displaySettings)
+                carStateBridge.updateDisplaySettings(dashState.displaySettings, isSystemDark)
                 carStateBridge.updateSpeedCameraDistance(dashState.speedCameraDistance)
                 webView.post {
                     webView.evaluateJavascript("window.onCarStateUpdate && window.onCarStateUpdate()", null)
