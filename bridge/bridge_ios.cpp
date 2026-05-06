@@ -1,59 +1,11 @@
 #include "bridge_ios.h"
-#include "msgq/ipc.h"
-#include "car/can_parsers.h"
-#include "car/car_state_mapper.h"
-#include "car/cars/tesla.h"
+#include "common/vehicle_decoder.h"
+#include "common/receive_loop.h"
 #include <vector>
 #include <thread>
 #include <chrono>
 #include <cstdio>
-#include <memory>
 #include <string>
-#include <capnp/message.h>
-#include <capnp/serialize.h>
-#include "capnp/gen/log.capnp.h"
-
-struct SubSocketGroup {
-    std::vector<SubSocket*> sockets;
-};
-
-class VehicleDecoder {
-public:
-    VehicleDecoder(const std::vector<std::string>& dbcContents,
-                   const std::vector<int>& busIndices,
-                   const std::string& vehicleType) {
-        for (size_t i = 0; i < dbcContents.size(); i++) {
-            printf("[VehicleDecoder] addBus(%d) dbc size=%zu\n", busIndices[i], dbcContents[i].size());
-            parsers_.addBus(busIndices[i], dbcContents[i]);
-        }
-        parsers_.buildCache();
-        printf("[VehicleDecoder] cache built, vehicleType='%s'\n", vehicleType.c_str());
-
-        if (vehicleType == "tesla_party") mapper_ = std::make_unique<TeslaCommaPartyMapper>();
-        else if (vehicleType == "tesla_extra") mapper_ = std::make_unique<TeslaCommaExtraMapper>();
-
-        if (!mapper_) {
-            printf("[VehicleDecoder] ERROR: unknown vehicle type '%s'\n", vehicleType.c_str());
-        }
-    }
-
-    void updateFrame(int bus, uint32_t address, const uint8_t* data, size_t len) {
-        parsers_.updateFrame(bus, address, data, len);
-    }
-
-    void updateMapper() {
-        if (mapper_) {
-            mapper_->update(parsers_, state_);
-        }
-    }
-
-    CarState& state() { return state_; }
-
-private:
-    CANParsers parsers_;
-    std::unique_ptr<CarStateMapper> mapper_;
-    CarState state_;
-};
 
 static void carStateToBridge(const CarState& cs, BridgeCarState* out) {
     out->egoSteeringAngle = cs.egoSteeringAngle;
@@ -142,6 +94,10 @@ void bridge_start_receive_loop(void* groupPtr, void* decoderPtr, void* callbackC
     receiveLoopRunning = true;
 
     BridgeCarState bridgeState = {};
+    double madsActive = 0.0;
+    double experimentalMode = 0.0;
+    double selfdriveActive = 0.0;
+    double changingLane = 0.0;
 
     while (receiveLoopRunning) {
         bool gotAny = false;
@@ -151,45 +107,9 @@ void bridge_start_receive_loop(void* groupPtr, void* decoderPtr, void* callbackC
             if (!msg) continue;
             gotAny = true;
 
-            kj::ArrayPtr<capnp::word> words(
-                reinterpret_cast<capnp::word*>(msg->getData()),
-                msg->getSize() / sizeof(capnp::word));
-            capnp::FlatArrayMessageReader reader(words);
-            auto event = reader.getRoot<cereal::Event>();
-
-            if (event.which() == cereal::Event::CAN) {
-                auto canList = event.getCan();
-                static int logCount = 0;
-                for (const auto& c : canList) {
-                    auto dat = c.getDat();
-                    if (logCount < 20) {
-                        printf("[bridge_ios] CAN frame: bus=%d addr=0x%X len=%u\n",
-                               c.getSrc(), c.getAddress(), (unsigned)dat.size());
-                    }
-                    decoder->updateFrame(
-                        c.getSrc(), c.getAddress(),
-                        reinterpret_cast<const uint8_t*>(dat.begin()),
-                        dat.size());
-                }
-                decoder->updateMapper();
-
-                auto& state = decoder->state();
-                if (logCount < 20) {
-                    printf("[bridge_ios] after mapper: speed=%.1f steering=%.1f gear=%.0f\n",
-                           state.egoSpeed, state.egoSteeringAngle, state.gear);
-                    logCount++;
-                }
-                carStateToBridge(state, &bridgeState);
+            if (processMessage(msg, decoder, madsActive, experimentalMode, selfdriveActive, changingLane)) {
+                carStateToBridge(decoder->state(), &bridgeState);
                 callback(callbackContext, &bridgeState);
-
-            } else if (event.which() == cereal::Event::SELFDRIVE_STATE) {
-                auto sd = event.getSelfdriveState();
-                decoder->state().experimentalMode = sd.getExperimentalMode() ? 1.0 : 0.0;
-                decoder->state().selfdriveActive = sd.getActive() ? 1.0 : 0.0;
-
-            } else if (event.which() == cereal::Event::SELFDRIVE_STATE_S_P) {
-                decoder->state().madsActive =
-                    event.getSelfdriveStateSP().getMads().getActive() ? 1.0 : 0.0;
             }
 
             delete msg;
