@@ -19,9 +19,18 @@ else
   FOLDERS=("${DEFAULT_FOLDERS[@]}")
 fi
 
+ADASVIZ_DIR="$REPO_ROOT/adasviz"
+
 for name in "${FOLDERS[@]}"; do
   src="$APPS_DIR/$name"
   dst="$ASSETS_DIR/$name"
+
+  # web-vanilla depends on adasviz assets (wasm, js, 3D models)
+  if [ "$name" = "web-vanilla" ]; then
+    echo "Copying adasviz into $src..."
+    cp -rf "$ADASVIZ_DIR"/* "$src/"
+    rm -f "$src/README.md"
+  fi
 
   if [ ! -d "$src" ]; then
     echo "Error: source not found at $src" >&2
