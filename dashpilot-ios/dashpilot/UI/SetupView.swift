@@ -14,15 +14,17 @@ struct SetupView: View {
             Color(red: 0x0D / 255.0, green: 0x0D / 255.0, blue: 0x0D / 255.0)
                 .ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                headerSection
-                Spacer()
-                ConnectionVisualization(connectionStatus: connectionVM.connectionStatus)
-                Spacer()
-                controlsSection
+            ScrollView {
+                VStack(spacing: 0) {
+                    headerSection
+                    Spacer().frame(height: 32)
+                    ConnectionVisualization(connectionStatus: connectionVM.connectionStatus)
+                    Spacer().frame(height: 32)
+                    controlsSection
+                }
+                .padding(.horizontal, 32)
+                .padding(.vertical, 48)
             }
-            .padding(.horizontal, 32)
-            .padding(.vertical, 48)
         }
         .navigationBarHidden(true)
     }
@@ -35,7 +37,7 @@ struct SetupView: View {
                 .foregroundColor(.white)
                 .font(.system(size: 28, weight: .bold))
                 .tracking(1)
-            Text("Connect your WebSocket device")
+            Text("Connect your comma device")
                 .foregroundColor(Color(white: 0.53))
                 .font(.system(size: 14))
         }
@@ -157,19 +159,19 @@ private struct ConnectionVisualization: View {
     @State private var dashPhase: CGFloat = 0
 
     private var isConnected: Bool { connectionStatus == .connected }
-    private var showDashLine: Bool { connectionStatus != .disconnected }
+    private var isIdle: Bool { connectionStatus == .disconnected }
     private var lineColor: Color { isConnected ? dashGreen : Color(white: 0.33) }
     private var borderColor: Color { isConnected ? dashGreen : .clear }
+    private var animating: Bool { !isIdle }
 
     var body: some View {
-        VStack(spacing: 0) {
-            circleIcon(systemName: "car.fill")
-            dashedLine
-            circleIcon(systemName: "iphone")
-        }
-        .onAppear {
-            withAnimation(.linear(duration: 1).repeatForever(autoreverses: false)) {
-                dashPhase = 20
+        TimelineView(.animation(paused: isIdle)) { timeline in
+            VStack(spacing: 0) {
+                circleIcon(systemName: "car.fill")
+                dashedLine(date: timeline.date)
+                dataSourceIcon
+                dashedLine(date: timeline.date)
+                circleIcon(systemName: "iphone")
             }
         }
     }
@@ -190,18 +192,36 @@ private struct ConnectionVisualization: View {
         }
     }
 
-    private var dashedLine: some View {
-        Canvas { context, size in
+    private var dataSourceIcon: some View {
+        VStack(spacing: 4) {
+            ZStack {
+                Circle()
+                    .fill(Color(white: 0.1))
+                    .frame(width: 48, height: 48)
+                CommaShape()
+                    .fill(Color.white)
+                    .frame(width: 14, height: 24)
+            }
+            Text("comma")
+                .foregroundColor(Color(white: 0.53))
+                .font(.system(size: 12))
+        }
+    }
+
+    private func dashedLine(date: Date) -> some View {
+        let dashCycle: CGFloat = 13 // dash (8) + gap (5)
+        let phase = animating ? CGFloat(date.timeIntervalSinceReferenceDate.truncatingRemainder(dividingBy: 1.0)) * dashCycle : 0
+        return Canvas { context, size in
             var path = Path()
             path.move(to: CGPoint(x: size.width / 2, y: 0))
             path.addLine(to: CGPoint(x: size.width / 2, y: size.height))
             context.stroke(
                 path,
-                with: .color(showDashLine ? lineColor : .clear),
+                with: .color(lineColor),
                 style: StrokeStyle(
-                    lineWidth: 3,
-                    dash: [10, 10],
-                    dashPhase: -dashPhase
+                    lineWidth: 2,
+                    dash: [8, 5],
+                    dashPhase: -phase
                 )
             )
         }
@@ -209,4 +229,3 @@ private struct ConnectionVisualization: View {
         .padding(.vertical, 4)
     }
 }
-
