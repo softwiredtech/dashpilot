@@ -10,14 +10,13 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 APPS_DIR="$REPO_ROOT/dash-apps"
 ASSETS_DIR="$REPO_ROOT/dashpilot-android/app/src/main/assets"
 
-# Folders to sync: arguments, or all directories in dash-apps
+# Default folders to sync (override by passing arguments)
+DEFAULT_FOLDERS=(web-vanilla web-retro web-ambient)
+
 if [ $# -gt 0 ]; then
   FOLDERS=("$@")
 else
-  FOLDERS=()
-  for d in "$APPS_DIR"/*/; do
-    FOLDERS+=("$(basename "$d")")
-  done
+  FOLDERS=("${DEFAULT_FOLDERS[@]}")
 fi
 
 for name in "${FOLDERS[@]}"; do

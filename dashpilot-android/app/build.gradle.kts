@@ -45,6 +45,15 @@ android {
     }
 }
 
+val syncDashApps by tasks.registering(Exec::class) {
+    description = "Sync dash-apps into Android assets"
+    commandLine("bash", "${rootProject.projectDir}/../scripts/sync-to-android.sh")
+}
+
+tasks.matching { it.name.startsWith("merge") && it.name.endsWith("Assets") }.configureEach {
+    dependsOn(syncDashApps)
+}
+
 dependencies {
     implementation(project(":bridge"))
     implementation("app.rive:rive-android:11.1.2")
