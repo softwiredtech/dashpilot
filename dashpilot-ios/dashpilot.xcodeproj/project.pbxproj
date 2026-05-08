@@ -35,7 +35,7 @@
 
 /* Begin PBXFileReference section */
 		29FF823E2F72C9C400D48E9A /* dashpilot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = dashpilot.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		802C94262FAA54E80034644B /* receive_loop.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = receive_loop.h; sourceTree = "<group>"; };
+		802C94262FAA54E80034644B /* bridge_core.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = bridge_core.h; sourceTree = "<group>"; };
 		802C94272FAA54E80034644B /* vehicle_decoder.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = vehicle_decoder.h; sourceTree = "<group>"; };
 		809087252FA61F2500D10891 /* libzmq.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = libzmq.xcframework; path = Libraries/libzmq.xcframework; sourceTree = "<group>"; };
 		8090872A2FA6312800D10891 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
@@ -141,7 +141,7 @@
 		802C94282FAA54E80034644B /* common */ = {
 			isa = PBXGroup;
 			children = (
-				802C94262FAA54E80034644B /* receive_loop.h */,
+				802C94262FAA54E80034644B /* bridge_core.h */,
 				802C94272FAA54E80034644B /* vehicle_decoder.h */,
 			);
 			name = common;
