@@ -11,11 +11,12 @@ import SwiftUI
 struct dashpilotApp: App {
 
     @State private var connectionVM = ConnectionViewModel()
+    @State private var navigationPath = NavigationPath()
 
     var body: some Scene {
         WindowGroup {
-            NavigationStack {
-                SetupView()
+            NavigationStack(path: $navigationPath) {
+                SetupView(navigationPath: $navigationPath)
                     .navigationDestination(for: AppRoute.self) { route in
                         switch route {
                         case .dashboardSelection:

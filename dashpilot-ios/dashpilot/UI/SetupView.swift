@@ -4,11 +4,11 @@ private let dashGreen = Color(red: 0x5C / 255.0, green: 0xBD / 255.0, blue: 0x68
 
 struct SetupView: View {
 
+    @Binding var navigationPath: NavigationPath
     @Environment(ConnectionViewModel.self) var connectionVM
 
     @State private var serverAddress: String =
         UserDefaults.standard.string(forKey: "device_ip") ?? "192.168.1.105"
-    @AppStorage(DisplaySettings.keySelectedDashboardId) private var selectedDashboardId = ""
 
     var body: some View {
         ZStack {
@@ -147,8 +147,11 @@ struct SetupView: View {
     }
 
     private func nextButton(isConnecting: Bool) -> some View {
-        let dash = selectedDashboard()
-        return NavigationLink(value: AppRoute.dashboard(type: dash.type.rawValue, url: dash.url)) {
+        Button {
+            UserDefaults.standard.set(serverAddress, forKey: "device_ip")
+            let dash = selectedDashboard()
+            navigationPath.append(AppRoute.dashboard(type: dash.type.rawValue, url: dash.url))
+        } label: {
             Text(isConnecting ? "Connecting..." : "Next")
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundColor(isConnecting ? Color(white: 0.67) : .black)
@@ -159,11 +162,6 @@ struct SetupView: View {
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .frame(width: UIScreen.main.bounds.width * 0.7)
         .disabled(isConnecting)
-        .simultaneousGesture(TapGesture().onEnded {
-            if !isConnecting {
-                UserDefaults.standard.set(serverAddress, forKey: "device_ip")
-            }
-        })
     }
 }
 
