@@ -2,12 +2,7 @@
 #include <string>
 #include <vector>
 #include <chrono>
-#include <android/log.h>
-
 #include "common/bridge_core.h"
-
-#define LOG_TAG "MsgQNative"
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
 
 extern "C" {
 
@@ -86,7 +81,7 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeCreateSubSockets(
 
     auto* group = bridge::createSubSockets(ctx, eps, addressStr);
     for (const auto& ep : eps) {
-        LOGD("SubSocketGroup: subscribed to '%s' at %s", ep.c_str(), addressStr.c_str());
+        BRIDGE_LOG("SubSocketGroup: subscribed to '%s' at %s", ep.c_str(), addressStr.c_str());
     }
     return reinterpret_cast<jlong>(group);
 }
@@ -121,15 +116,15 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDiscoverPublisher(
     env->ReleaseStringUTFChars(endpoint, endpointChars);
     env->ReleaseStringUTFChars(initialIp, ipChars);
 
-    LOGD("Discovery: starting on subnet %s, timeout %dms", ipStr.c_str(), timeoutMs);
+    BRIDGE_LOG("Discovery: starting on subnet %s, timeout %dms", ipStr.c_str(), timeoutMs);
     std::string foundIp = bridge::discoverPublisher(ctx, endpointStr, ipStr, timeoutMs);
 
     if (foundIp.empty()) {
-        LOGD("Discovery: no publisher found");
+        BRIDGE_LOG("Discovery: no publisher found");
         return nullptr;
     }
 
-    LOGD("Discovery: found publisher at %s", foundIp.c_str());
+    BRIDGE_LOG("Discovery: found publisher at %s", foundIp.c_str());
     return env->NewStringUTF(foundIp.c_str());
 }
 
@@ -183,7 +178,7 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeCreateVehicleDecoder(
     env->ReleaseStringUTFChars(vehicleType, typeStr);
 
     auto* decoder = bridge::createVehicleDecoder(dbcVec, busVec, type);
-    LOGD("VehicleDecoder created: type=%s, %d buses", type.c_str(), dbcCount);
+    BRIDGE_LOG("VehicleDecoder created: type=%s, %d buses", type.c_str(), dbcCount);
     return reinterpret_cast<jlong>(decoder);
 }
 
