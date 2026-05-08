@@ -32,6 +32,7 @@ import androidx.navigation.toRoute
 import androidx.startup.AppInitializer
 import app.rive.runtime.kotlin.RiveInitializer
 import com.softwiredtech.dashpilot.datamodel.dash.getSelectedDashboard
+import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.DataSourceType
 import com.softwiredtech.dashpilot.navigation.DashboardRoute
 import com.softwiredtech.dashpilot.navigation.SettingsRoute
@@ -90,9 +91,22 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val context = LocalContext.current
                 val connectionStatus by connectionVM.connectionStatus.collectAsState()
+                val hasAutoNavigated by connectionVM.hasAutoNavigatedToDashboard.collectAsState()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val onDashboard = navBackStackEntry?.destination?.route
                     ?.contains("DashboardRoute") == true
+
+                // Auto-open dashboard right after connection establishment
+                LaunchedEffect(connectionStatus, hasAutoNavigated) {
+                    if (connectionStatus is ConnectionStatus.Connected && !hasAutoNavigated) {
+                        connectionVM.markAutoNavigated()
+                        val dashboard = getSelectedDashboard(context)
+                        navController.navigate(DashboardRoute(
+                            dashboard.type.name.lowercase(),
+                            dashboard.url)
+                        )
+                    }
+                }
 
                 LaunchedEffect(onDashboard) {
                     if (onDashboard) {
