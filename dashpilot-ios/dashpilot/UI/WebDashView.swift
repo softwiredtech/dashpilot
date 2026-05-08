@@ -95,41 +95,61 @@ struct WebDashView: UIViewRepresentable {
         }
 
         // Inject NativeCarState bridge — mirrors Android's addJavascriptInterface.
-        // Getters read from window._iosCarState which Swift updates on every frame.
+        // Telemetry getters read from window._iosCarState (updated each frame).
+        // Settings getters are baked in at load time from UserDefaults.
+        let ud = UserDefaults.standard
+        let jsImperial   = ud.bool(forKey: DisplaySettings.keyUseImperial)   ? "true" : "false"
+        let jsDarkMode   = ud.bool(forKey: DisplaySettings.keyDarkMode)      ? "true" : "false"
+        let jsBlindSpot  = ud.bool(forKey: DisplaySettings.keyAlwaysOnBlindSpotMonitor) ? "true" : "false"
+        let jsQuality    = ud.object(forKey: DisplaySettings.keyRenderQuality) != nil
+                           ? "\(ud.integer(forKey: DisplaySettings.keyRenderQuality))" : "3"
+        let jsBgGray     = "\(ud.integer(forKey: DisplaySettings.keyDarkModeBackgroundGray))"
+        let jsShowPhone  = ud.object(forKey: DisplaySettings.keyShowPhoneBattery) != nil
+                           ? (ud.bool(forKey: DisplaySettings.keyShowPhoneBattery) ? "true" : "false") : "true"
+        let jsShowBatt   = ud.object(forKey: DisplaySettings.keyShowCarBattery) != nil
+                           ? (ud.bool(forKey: DisplaySettings.keyShowCarBattery) ? "true" : "false") : "true"
+        let jsShowOdo    = ud.object(forKey: DisplaySettings.keyShowOdometer) != nil
+                           ? (ud.bool(forKey: DisplaySettings.keyShowOdometer) ? "true" : "false") : "true"
+
         let nativeBridge = """
         window.NativeCarState = (function() {
             var s = function() { return window._iosCarState || {}; };
             return {
-                getEgoSteeringAngle:      function() { return s().egoSteeringAngle      ?? 0; },
-                getEgoSpeed:              function() { return s().egoSpeed              ?? 0; },
-                getLeftBlinker:           function() { return s().leftBlinker           ?? 0; },
-                getRightBlinker:          function() { return s().rightBlinker          ?? 0; },
-                getGear:                  function() { return s().gear                  ?? 0; },
-                isAdasOn:                 function() { return s().adasOn                ?? false; },
-                getLeftBlindSpot:         function() { return s().leftBlindSpot         ?? 0; },
-                getRightBlindSpot:        function() { return s().rightBlindSpot        ?? 0; },
-                getFusedSpeedLimit:       function() { return s().fusedSpeedLimit       ?? 0; },
-                getStopLineDist:          function() { return s().stopLineDist          ?? 0; },
-                getTrafficLightColor:     function() { return s().trafficLightColor     ?? 0; },
-                getLaneDepartureWarning:  function() { return s().laneDepartureWarning  ?? 0; },
-                getBuckleStatus:          function() { return s().buckleStatus          ?? undefined; },
-                getAnyDoorOpen:           function() { return s().anyDoorOpen           ?? undefined; },
-                getAccSetSpeed:           function() { return s().accSetSpeed           ?? undefined; },
-                getOdometer:              function() { return undefined; },
-                getPhoneBattery:          function() { return undefined; },
-                getFullPackEnergy:        function() { return undefined; },
-                getNominalEnergyRemaining:function() { return undefined; },
-                getEnergyBuffer:          function() { return undefined; },
-                getPackTMin:              function() { return undefined; },
-                getPackTMax:              function() { return undefined; },
-                getMaxRegenPower:         function() { return undefined; },
-                getMaxDischargePower:     function() { return undefined; },
-                getPackVoltage:           function() { return undefined; },
-                getPackCurrent:           function() { return undefined; },
-                getShowPhoneBattery:      function() { return false; },
-                getShowCarBattery:        function() { return false; },
-                getShowOdometer:          function() { return false; },
-                isImperial:               function() { return false; },
+                getEgoSteeringAngle:        function() { return s().egoSteeringAngle      ?? 0; },
+                getEgoSpeed:                function() { return s().egoSpeed              ?? 0; },
+                getLeftBlinker:             function() { return s().leftBlinker           ?? 0; },
+                getRightBlinker:            function() { return s().rightBlinker          ?? 0; },
+                getGear:                    function() { return s().gear                  ?? 0; },
+                isAdasOn:                   function() { return s().adasOn                ?? false; },
+                getLeftBlindSpot:           function() { return s().leftBlindSpot         ?? 0; },
+                getRightBlindSpot:          function() { return s().rightBlindSpot        ?? 0; },
+                getFusedSpeedLimit:         function() { return s().fusedSpeedLimit       ?? 0; },
+                getStopLineDist:            function() { return s().stopLineDist          ?? 0; },
+                getTrafficLightColor:       function() { return s().trafficLightColor     ?? 0; },
+                getLaneDepartureWarning:    function() { return s().laneDepartureWarning  ?? 0; },
+                getSideCollisionWarning:    function() { return s().sideCollisionWarning  ?? 0; },
+                getBuckleStatus:            function() { return s().buckleStatus          ?? undefined; },
+                getAnyDoorOpen:             function() { return s().anyDoorOpen           ?? undefined; },
+                getAccSetSpeed:             function() { return s().accSetSpeed           ?? undefined; },
+                getOdometer:                function() { return s().odometer              ?? undefined; },
+                getPhoneBattery:            function() { return undefined; },
+                getFullPackEnergy:          function() { return s().fullPackEnergy        ?? undefined; },
+                getNominalEnergyRemaining:  function() { return s().nominalEnergyRemaining ?? undefined; },
+                getEnergyBuffer:            function() { return s().energyBuffer          ?? undefined; },
+                getPackTMin:                function() { return s().packTMin              ?? undefined; },
+                getPackTMax:                function() { return s().packTMax              ?? undefined; },
+                getMaxRegenPower:           function() { return s().maxRegenPower         ?? undefined; },
+                getMaxDischargePower:       function() { return s().maxDischargePower     ?? undefined; },
+                getPackVoltage:             function() { return s().packVoltage           ?? undefined; },
+                getPackCurrent:             function() { return s().packCurrent           ?? undefined; },
+                getShowPhoneBattery:        function() { return \(jsShowPhone); },
+                getShowCarBattery:          function() { return \(jsShowBatt); },
+                getShowOdometer:            function() { return \(jsShowOdo); },
+                isImperial:                 function() { return \(jsImperial); },
+                isDarkMode:                 function() { return \(jsDarkMode); },
+                isAlwaysOnBlindSpotMonitor: function() { return \(jsBlindSpot); },
+                getRenderQuality:           function() { return \(jsQuality); },
+                getDarkModeBackgroundGray:  function() { return \(jsBgGray); },
             };
         })();
         """

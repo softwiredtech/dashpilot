@@ -8,6 +8,7 @@ struct SetupView: View {
 
     @State private var serverAddress: String =
         UserDefaults.standard.string(forKey: "device_ip") ?? "192.168.1.105"
+    @AppStorage(DisplaySettings.keySelectedDashboardId) private var selectedDashboardId = ""
 
     var body: some View {
         ZStack {
@@ -24,6 +25,21 @@ struct SetupView: View {
                 }
                 .padding(.horizontal, 32)
                 .padding(.vertical, 48)
+            }
+
+            VStack {
+                HStack {
+                    NavigationLink(value: AppRoute.settings) {
+                        Image(systemName: "gear")
+                            .foregroundColor(Color(white: 0.53))
+                            .font(.system(size: 22))
+                            .frame(width: 44, height: 44)
+                    }
+                    Spacer()
+                }
+                .padding(.top, 12)
+                .padding(.leading, 12)
+                Spacer()
             }
         }
         .navigationBarHidden(true)
@@ -131,7 +147,8 @@ struct SetupView: View {
     }
 
     private func nextButton(isConnecting: Bool) -> some View {
-        NavigationLink(value: AppRoute.dashboardSelection) {
+        let dash = selectedDashboard()
+        return NavigationLink(value: AppRoute.dashboard(type: dash.type.rawValue, url: dash.url)) {
             Text(isConnecting ? "Connecting..." : "Next")
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundColor(isConnecting ? Color(white: 0.67) : .black)

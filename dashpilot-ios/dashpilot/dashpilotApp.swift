@@ -22,6 +22,8 @@ struct dashpilotApp: App {
                             DashboardSelectionView()
                         case .dashboard(let type, let url):
                             DashboardView(dashboardType: type, dashboardUrl: url)
+                        case .settings:
+                            SettingsView()
                         }
                     }
             }
