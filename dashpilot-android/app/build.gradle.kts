@@ -1,3 +1,5 @@
+import org.gradle.internal.os.OperatingSystem
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -47,7 +49,26 @@ android {
 
 val syncDashApps by tasks.registering(Exec::class) {
     description = "Sync dash-apps into Android assets"
-    commandLine("bash", "${rootProject.projectDir}/../scripts/sync-to-android.sh")
+
+    val scriptPath = rootProject.projectDir.resolve("../scripts/sync-to-android.sh").absolutePath
+
+    if (OperatingSystem.current().isWindows) {
+        val repoRoot = rootProject.projectDir.resolve("..").absolutePath.replace('\\', '/')
+        val repoRootWsl = if (repoRoot.length >= 2 && repoRoot[1] == ':') {
+            "/mnt/${repoRoot[0].lowercaseChar()}${repoRoot.substring(2)}"
+        } else {
+            repoRoot
+        }
+        commandLine(
+            "wsl",
+            "--cd",
+            repoRootWsl,
+            "bash",
+            "./scripts/sync-to-android.sh"
+        )
+    } else {
+        commandLine("bash", scriptPath)
+    }
 }
 
 tasks.matching { it.name.startsWith("merge") && it.name.endsWith("Assets") }.configureEach {
