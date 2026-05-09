@@ -90,8 +90,6 @@ body {
   --d14-height-lg: calc(60 * var(--u));
   --d14-height-xxl: calc(108 * var(--u));
   --bs-blink-duration: 0.75s;
-  --bs-blink-loop-delay: 280ms;
-  --bs-blink-step-delay: 70ms;
   --bs-urgent-duration: 0.46s;
   --bg: rgb(var(--rgb-bg));
   --color-face-top: rgb(var(--rgb-face-top) / 0.98);
@@ -185,50 +183,67 @@ body {
   margin-block: auto;
   background: var(--color-cluster-ghost);
   border-radius: calc(1 * var(--u));
+  position: relative;
 }
 
-.bs-side.is-blink .bs-cell:nth-child(n + 5) {
-  animation-name: bs-blink-prime, bs-blink;
-  animation-duration: 1ms, var(--bs-blink-duration);
-  animation-timing-function: step-end, step-end;
-  animation-iteration-count: 1, infinite;
-  animation-fill-mode: forwards, none;
+.bs-cell::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--color-cluster);
+  box-shadow: var(--shadow-cluster-glow);
+  opacity: 0;
 }
 
-.bs-side.is-blink .bs-cell:nth-child(5) { animation-delay: calc(3 * var(--bs-blink-step-delay)), var(--bs-blink-loop-delay); }
-.bs-side.is-blink .bs-cell:nth-child(6) { animation-delay: calc(2 * var(--bs-blink-step-delay)), var(--bs-blink-loop-delay); }
-.bs-side.is-blink .bs-cell:nth-child(7) { animation-delay: calc(1 * var(--bs-blink-step-delay)), var(--bs-blink-loop-delay); }
-.bs-side.is-blink .bs-cell:nth-child(8) { animation-delay: 0ms, var(--bs-blink-loop-delay); }
+.bs-side.is-blink .bs-cell:nth-child(5)::after {
+  animation: bs-blink-step-1 var(--bs-blink-duration) step-end infinite;
+}
 
-.bs-side.is-hazard .bs-cell {
+.bs-side.is-blink .bs-cell:nth-child(6)::after {
+  animation: bs-blink-step-2 var(--bs-blink-duration) step-end infinite;
+}
+
+.bs-side.is-blink .bs-cell:nth-child(7)::after {
+  animation: bs-blink-step-3 var(--bs-blink-duration) step-end infinite;
+}
+
+.bs-side.is-blink .bs-cell:nth-child(8)::after {
+  animation: bs-blink-step-4 var(--bs-blink-duration) step-end infinite;
+}
+
+.bs-side.is-hazard .bs-cell::after {
+  background: var(--color-urgent);
+  box-shadow: var(--shadow-urgent-glow);
   animation: bs-hazard var(--bs-blink-duration) step-end infinite;
 }
 
-@keyframes bs-blink-prime {
-  to {
-    background: var(--color-cluster);
-    box-shadow: var(--shadow-cluster-glow);
-  }
+@keyframes bs-blink-step-1 {
+  0%,49%   { opacity: 1; }
+  50%,100% { opacity: 0; }
 }
-@keyframes bs-blink {
-  0%,49% {
-    background: var(--color-cluster);
-    box-shadow: var(--shadow-cluster-glow);
-  }
-  50%,100% {
-    background: var(--color-cluster-ghost);
-    box-shadow: none;
-  }
+
+@keyframes bs-blink-step-2 {
+  0%,9.32%  { opacity: 0; }
+  9.33%,49% { opacity: 1; }
+  50%,100%  { opacity: 0; }
 }
+
+@keyframes bs-blink-step-3 {
+  0%,18.65%  { opacity: 0; }
+  18.66%,49% { opacity: 1; }
+  50%,100%   { opacity: 0; }
+}
+
+@keyframes bs-blink-step-4 {
+  0%,27.99% { opacity: 0; }
+  28%,49%   { opacity: 1; }
+  50%,100%  { opacity: 0; }
+}
+
 @keyframes bs-hazard {
-  0%,49% {
-    background: var(--color-urgent);
-    box-shadow: var(--shadow-urgent-glow);
-  }
-  50%,100% {
-    background: var(--color-cluster-ghost);
-    box-shadow: none;
-  }
+  0%,49%   { opacity: 1; }
+  50%,100% { opacity: 0; }
 }
 
 .bs-side.is-blind .bs-cell:nth-child(n + 5) {
@@ -435,7 +450,7 @@ body.portrait-layout .right-zone {
   width: 100%;
   height: 100%;
   overflow: visible;
-  transform: skewX(-5deg);
+  transform: skewX(-7deg);
   transform-origin: center;
 }
 .d14-base { fill: var(--color-cluster-ghost); }
