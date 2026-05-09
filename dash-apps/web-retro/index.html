@@ -21,6 +21,8 @@
   --safe-right: 0px;
   --safe-bottom: 0px;
   --safe-left: 0px;
+  --rgb-page-bg: 5 6 10;
+  --color-page-bg: rgb(var(--rgb-page-bg));
 }
 
 html, body {
@@ -29,7 +31,7 @@ html, body {
 }
 
 body {
-  background: #05060a;
+  background: var(--color-page-bg);
   min-height: 100vh;
   min-height: 100dvh;
   overflow: hidden;
@@ -49,7 +51,15 @@ body {
   width: 100%;
   height: 100%;
   container-type: size;
-  --u: min(calc(100cqw / 580), calc(100cqh / 216));
+  --layout-width: 580;
+  --layout-height: 216;
+  --u: min(calc(100vw / var(--layout-width)), calc(100vh / var(--layout-height)));
+}
+
+@supports (width: 1cqw) {
+  .stage {
+    --u: min(calc(100cqw / var(--layout-width)), calc(100cqh / var(--layout-height)));
+  }
 }
 
 /* ── BEZEL ───────────────────────────────── */
@@ -60,30 +70,64 @@ body {
 
 /* ── FACE ────────────────────────────────── */
 .face {
-  --on:     #5ce845;
-  --bright: #b8ff8e;
-  --ghost:  rgba(124,255,109,0.12);
-  --label:  rgba(184,255,142,0.56);
-  --border: rgba(92,232,69,0.12);
-  --warn:   #ff6418;
-  --urgent: #ff2200;
-  --set-c:  #38b8ff;
-  --mads-c: #28d8c0;
-  --bg:     #030604;
-  --mid-c:  #c8b020;
-  --glow-core: rgba(3,6,4,0.9);
-  --glow-on: rgba(92,232,69,0.35);
-  --glow-warn: rgba(255,100,24,0.35);
-  --glow-urgent: rgba(255,34,0,0.38);
-  --glow-set: rgba(56,184,255,0.35);
-  --glow-mads: rgba(40,216,192,0.35);
-  --glow-mid: rgba(200,176,32,0.35);
+  --rgb-cluster: 92 232 69;
+  --rgb-cluster-bright: 184 255 142;
+  --rgb-mads: 96 208 255;
+  --rgb-warn: 255 100 24;
+  --rgb-urgent: 255 34 0;
+  --rgb-bg: 3 6 4;
+  --rgb-face-top: 8 16 10;
+  --rgb-black: 0 0 0;
+  --rgb-white: 255 255 255;
+  --display-digits: 3;
+  --d14-gap-md: calc(4 * var(--u));
+  --d14-gap-lg: calc(5 * var(--u));
+  --d14-gap-xxl: calc(10 * var(--u));
+  --d14-width-md: calc(26 * var(--u));
+  --d14-width-lg: calc(42 * var(--u));
+  --d14-width-xxl: calc(66 * var(--u));
+  --d14-height-md: calc(44 * var(--u));
+  --d14-height-lg: calc(60 * var(--u));
+  --d14-height-xxl: calc(108 * var(--u));
+  --bs-blink-duration: 0.75s;
+  --bs-blink-loop-delay: 280ms;
+  --bs-blink-step-delay: 70ms;
+  --bs-urgent-duration: 0.46s;
+  --bg: rgb(var(--rgb-bg));
+  --color-face-top: rgb(var(--rgb-face-top) / 0.98);
+  --color-cluster: rgb(var(--rgb-cluster));
+  --color-cluster-bright: rgb(var(--rgb-cluster-bright));
+  --color-cluster-ghost: rgb(var(--rgb-cluster) / 0.12);
+  --color-cluster-radial: rgb(var(--rgb-cluster) / 0.05);
+  --color-cluster-frame: rgb(var(--rgb-cluster) / 0.06);
+  --color-cluster-divider: rgb(var(--rgb-cluster) / 0.08);
+  --color-mads: rgb(var(--rgb-mads));
+  --color-mads-ghost: rgb(var(--rgb-mads) / 0.14);
+  --color-warn: rgb(var(--rgb-warn));
+  --color-urgent: rgb(var(--rgb-urgent));
+  --color-sheen-strong: rgb(var(--rgb-white) / 0.045);
+  --color-sheen-soft: rgb(var(--rgb-white) / 0.018);
+  --color-scanline-strong: rgb(var(--rgb-white) / 0.04);
+  --color-scanline-soft: rgb(var(--rgb-white) / 0.025);
+  --color-gridline-soft: rgb(var(--rgb-white) / 0.012);
+  --color-gridline-faint: rgb(var(--rgb-white) / 0.008);
+  --color-vignette-mid: rgb(var(--rgb-black) / 0.18);
+  --color-vignette-strong: rgb(var(--rgb-black) / 0.42);
+  --glow-core-color: rgb(var(--rgb-bg) / 0.9);
+  --shadow-cluster-glow: 0 0 1px var(--glow-core-color), 0 0 7px rgb(var(--rgb-cluster) / 0.35);
+  --shadow-mads-glow: 0 0 1px var(--glow-core-color), 0 0 7px rgb(var(--rgb-mads) / 0.35);
+  --shadow-warn-glow: 0 0 1px var(--glow-core-color), 0 0 7px rgb(var(--rgb-warn) / 0.35);
+  --shadow-urgent-glow: 0 0 1px var(--glow-core-color), 0 0 7px rgb(var(--rgb-urgent) / 0.38);
+  --shadow-mads-strong: 0 0 1px var(--glow-core-color), 0 0 9px rgb(var(--rgb-mads) / 0.35), 0 0 16px rgb(var(--rgb-mads) / 0.20);
+  --filter-cluster-glow: drop-shadow(0 0 1px var(--glow-core-color)) drop-shadow(0 0 7px rgb(var(--rgb-cluster) / 0.35));
+  --filter-mads-glow: drop-shadow(0 0 1px var(--glow-core-color)) drop-shadow(0 0 7px rgb(var(--rgb-mads) / 0.35));
+  --filter-warn-glow: drop-shadow(0 0 1px var(--glow-core-color)) drop-shadow(0 0 7px rgb(var(--rgb-warn) / 0.35));
 
   background:
-    radial-gradient(circle at 50% 42%, rgba(124,255,109,0.05), transparent 54%),
-    linear-gradient(180deg, rgba(8,16,10,0.98), var(--bg) 66%);
+    radial-gradient(circle at 50% 42%, var(--color-cluster-radial), transparent 54%),
+    linear-gradient(180deg, var(--color-face-top), var(--bg) 66%);
   border-radius: 0;
-  box-shadow: inset 0 0 0 1px rgba(92,232,69,0.06);
+  box-shadow: inset 0 0 0 1px var(--color-cluster-frame);
   overflow: hidden;
   position: relative;
   isolation: isolate;
@@ -100,8 +144,8 @@ body {
   pointer-events: none;
   z-index: 2;
   background:
-    radial-gradient(140% 110% at 50% 42%, transparent 54%, rgba(0,0,0,0.18) 76%, rgba(0,0,0,0.42) 100%),
-    linear-gradient(180deg, rgba(255,255,255,0.045), transparent 18%, transparent 82%, rgba(255,255,255,0.018));
+    radial-gradient(140% 110% at 50% 42%, transparent 54%, var(--color-vignette-mid) 76%, var(--color-vignette-strong) 100%),
+    linear-gradient(180deg, var(--color-sheen-strong), transparent 18%, transparent 82%, var(--color-sheen-soft));
 }
 
 .face::after {
@@ -112,9 +156,9 @@ body {
   z-index: 9999;
   opacity: 0.18;
   background-image:
-    linear-gradient(rgba(255,255,255,0.025), rgba(255,255,255,0.008)),
-    repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 3px),
-    repeating-linear-gradient(90deg, rgba(255,255,255,0.012) 0 1px, transparent 1px 6px);
+    linear-gradient(var(--color-scanline-soft), var(--color-gridline-faint)),
+    repeating-linear-gradient(0deg, var(--color-scanline-strong) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, var(--color-gridline-soft) 0 1px, transparent 1px 6px);
 }
 
 
@@ -139,30 +183,67 @@ body {
   min-height: calc(18 * var(--u));
   max-height: calc(22 * var(--u));
   margin-block: auto;
-  background: var(--ghost);
+  background: var(--color-cluster-ghost);
   border-radius: calc(1 * var(--u));
 }
 
-.bs-cell.blink {
-  background: var(--on);
-  animation: bs-blink 0.75s step-end infinite;
-  box-shadow: 0 0 1px var(--glow-core), 0 0 7px var(--glow-on);
-}
-@keyframes bs-blink { 0%,49%{opacity:1} 50%,100%{opacity:0.12} }
-
-.bs-cell.blind {
-  background: var(--warn);
-  box-shadow: 0 0 1px var(--glow-core), 0 0 7px var(--glow-warn);
+.bs-side.is-blink .bs-cell:nth-child(n + 5) {
+  animation-name: bs-blink-prime, bs-blink;
+  animation-duration: 1ms, var(--bs-blink-duration);
+  animation-timing-function: step-end, step-end;
+  animation-iteration-count: 1, infinite;
+  animation-fill-mode: forwards, none;
 }
 
-.bs-cell.urgent {
-  background: var(--urgent);
-  animation: bs-urgent 0.55s ease-in-out infinite;
-  box-shadow: 0 0 1px var(--glow-core), 0 0 7px var(--glow-urgent);
+.bs-side.is-blink .bs-cell:nth-child(5) { animation-delay: calc(3 * var(--bs-blink-step-delay)), var(--bs-blink-loop-delay); }
+.bs-side.is-blink .bs-cell:nth-child(6) { animation-delay: calc(2 * var(--bs-blink-step-delay)), var(--bs-blink-loop-delay); }
+.bs-side.is-blink .bs-cell:nth-child(7) { animation-delay: calc(1 * var(--bs-blink-step-delay)), var(--bs-blink-loop-delay); }
+.bs-side.is-blink .bs-cell:nth-child(8) { animation-delay: 0ms, var(--bs-blink-loop-delay); }
+
+.bs-side.is-hazard .bs-cell {
+  animation: bs-hazard var(--bs-blink-duration) step-end infinite;
+}
+
+@keyframes bs-blink-prime {
+  to {
+    background: var(--color-cluster);
+    box-shadow: var(--shadow-cluster-glow);
+  }
+}
+@keyframes bs-blink {
+  0%,49% {
+    background: var(--color-cluster);
+    box-shadow: var(--shadow-cluster-glow);
+  }
+  50%,100% {
+    background: var(--color-cluster-ghost);
+    box-shadow: none;
+  }
+}
+@keyframes bs-hazard {
+  0%,49% {
+    background: var(--color-urgent);
+    box-shadow: var(--shadow-urgent-glow);
+  }
+  50%,100% {
+    background: var(--color-cluster-ghost);
+    box-shadow: none;
+  }
+}
+
+.bs-side.is-blind .bs-cell:nth-child(n + 5) {
+  background: var(--color-warn);
+  box-shadow: var(--shadow-warn-glow);
+}
+
+.bs-side.is-urgent .bs-cell:nth-child(n + 5) {
+  background: var(--color-urgent);
+  animation: bs-urgent var(--bs-urgent-duration) ease-in-out infinite;
+  box-shadow: var(--shadow-urgent-glow);
 }
 @keyframes bs-urgent {
-  0%,100% { opacity:0.4; background:var(--warn); }
-  50%     { opacity:1;   background:var(--urgent); }
+  0%,100% { opacity:0.4; background:var(--color-warn); }
+  50%     { opacity:1;   background:var(--color-urgent); }
 }
 
 .tape-divider {
@@ -171,7 +252,7 @@ body {
 }
 .tape-divider-line {
   width: 1px; height: 100%;
-  background: rgba(92,232,69,0.08);
+  background: var(--color-cluster-divider);
 }
 
 
@@ -204,18 +285,18 @@ body {
 
 .speed-aside {
   display: flex; flex-direction: column;
-  align-items: flex-start; justify-content: space-between;
+  align-items: flex-start; justify-content: flex-end;
   height: calc(108 * var(--u));
 }
 
 .unit-label {
   font-size: calc(11 * var(--u)); font-weight: 700;
   letter-spacing: 0.25em;
-  color: rgba(92,232,69,0.16);
+  color: rgb(var(--rgb-cluster) / 0.16);
 }
 .unit-label.active {
-  color: var(--label);
-  text-shadow: 0 0 1px var(--glow-core), 0 0 7px var(--glow-on);
+  color: rgb(var(--rgb-mads) / 0.42);
+  text-shadow: var(--shadow-mads-glow);
 }
 
 /* RIGHT: set + limit */
@@ -226,7 +307,8 @@ body {
 }
 
 body.portrait-layout .stage {
-  --u: calc(100cqw / 360);
+  --layout-width: 360;
+  --layout-height: 640;
 }
 
 body.portrait-layout .data-row {
@@ -257,49 +339,97 @@ body.portrait-layout .right-zone {
 
 .icon-lim {
   width: calc(15 * var(--u)); height: calc(15 * var(--u)); border-radius: 50%;
-  border: calc(2.5 * var(--u)) solid var(--warn);
-  box-shadow: 0 0 1px var(--glow-core), 0 0 7px var(--glow-warn);
+  color: rgb(var(--rgb-urgent) / 0.18);
+  border: calc(2.5 * var(--u)) solid currentColor;
   flex-shrink: 0; position: relative;
-  transition: opacity 0.3s;
+  transition: color 0.3s, opacity 0.3s, box-shadow 0.3s;
 }
 .icon-lim::after {
   content: '';
-  position: absolute; inset: calc(-2 * var(--u));
-  background: linear-gradient(
-    135deg,
-    transparent 42%, var(--warn) 42%,
-    var(--warn) 58%, transparent 58%
-  );
-  border-radius: 50%;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(10.25 * var(--u));
+  height: calc(2.5 * var(--u));
+  background: currentColor;
+  transform: translate(calc(-50% + (0.09 * var(--u))), calc(-50% - (0.09 * var(--u)))) rotate(-45deg);
 }
-.icon-lim.dim { opacity: 0.15; box-shadow: none; }
+.icon-lim.active {
+  color: var(--color-urgent);
+  box-shadow: var(--shadow-urgent-glow);
+}
+
+.icon-lim.hidden {
+  opacity: 0;
+}
 
 
 
 /* ═══════════════════════════════════════════
-   ZONE 3 — STEERING STRIP (reuses bs-tape)
+   ZONE 3 — MODE STRIP
    ═══════════════════════════════════════════ */
 
-.steer-strip {
+.mode-strip {
+  flex: 1;
+  display: flex;
+  align-items: stretch;
   padding-top: calc(10 * var(--u));
+  padding-right: calc(14 * var(--u));
   padding-bottom: calc(10 * var(--u));
+  padding-left: calc(14 * var(--u));
+  justify-content: center;
+}
+
+.mode-strip-inner {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(12 * var(--u));
+}
+
+.mode-text {
+  min-width: calc(48 * var(--u));
+  font-size: calc(17 * var(--u));
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-align: center;
+  transition: color 0.2s, text-shadow 0.2s;
+}
+
+#mode-mads {
+  color: rgb(var(--rgb-mads) / 0.18);
+}
+
+#mode-full {
+  color: rgb(var(--rgb-cluster) / 0.18);
+}
+
+#mode-mads.active.mads {
+  color: var(--color-mads);
+  text-shadow: var(--shadow-mads-strong);
+}
+
+#mode-full.active.full {
+  color: var(--color-cluster-bright);
+  text-shadow: var(--shadow-cluster-glow);
 }
 
 
-.disp     { display:flex; align-items:center; gap:calc(4 * var(--u)); }
-.disp.lg  { gap:calc(5 * var(--u)); }
-.disp.xxl { gap:calc(10 * var(--u)); }
+.disp     { display:flex; align-items:center; gap:var(--d14-gap-md); }
+.disp.lg  { gap:var(--d14-gap-lg); }
+.disp.xxl { gap:var(--d14-gap-xxl); }
 
-#speed-disp { width: calc(218 * var(--u)); } /* gap between digits 2&3 at zone center via .speed-zone transform */
-#set-disp { width: calc(116 * var(--u)); } /* 4 × 26px + 3 × 4px */
-#lim-disp { width: calc(86 * var(--u)); }  /* 3 × 26px + 2 × 4px */
+#speed-disp { width: calc((var(--display-digits) * var(--d14-width-xxl)) + ((var(--display-digits) - 1) * var(--d14-gap-xxl))); } /* gap between digits 2&3 at zone center via .speed-zone transform */
+#set-disp { width: calc((var(--display-digits) * var(--d14-width-md)) + ((var(--display-digits) - 1) * var(--d14-gap-md))); }
+#lim-disp { width: calc((var(--display-digits) * var(--d14-width-md)) + ((var(--display-digits) - 1) * var(--d14-gap-md))); }
 
 
 /* ── 14-SEGMENT DIGITS ──────────────── */
 .d14 { position: relative; display: inline-block; flex-shrink: 0; }
-.d14.md  { width: calc(26 * var(--u)); height: calc(44 * var(--u)); }
-.d14.lg  { width: calc(42 * var(--u)); height: calc(60 * var(--u)); }
-.d14.xxl { width: calc(66 * var(--u)); height: calc(108 * var(--u)); }
+.d14.md  { width: var(--d14-width-md); height: var(--d14-height-md); }
+.d14.lg  { width: var(--d14-width-lg); height: var(--d14-height-lg); }
+.d14.xxl { width: var(--d14-width-xxl); height: var(--d14-height-xxl); }
 .d14-svg {
   display: block;
   width: 100%;
@@ -308,42 +438,47 @@ body.portrait-layout .right-zone {
   transform: skewX(-5deg);
   transform-origin: center;
 }
-.d14-base { fill: var(--ghost); }
+.d14-base { fill: var(--color-cluster-ghost); }
+.d14-base.mads-c { fill: var(--color-mads-ghost); }
+.d14-base.limit-c { fill: rgb(var(--rgb-warn) / 0.14); }
 .d14-on { fill: transparent; }
 .d14-on.on {
-  fill: var(--bright);
-  filter: drop-shadow(0 0 1px var(--glow-core)) drop-shadow(0 0 7px var(--glow-on));
-}
-.d14-on.on.warn-c {
-  fill: var(--warn);
-  filter: drop-shadow(0 0 1px var(--glow-core)) drop-shadow(0 0 7px var(--glow-warn));
-}
-.d14-on.on.set-c {
-  fill: var(--set-c);
-  filter: drop-shadow(0 0 1px var(--glow-core)) drop-shadow(0 0 7px var(--glow-set));
+  fill: var(--color-cluster-bright);
+  filter: var(--filter-cluster-glow);
 }
 .d14-on.on.mads-c {
-  fill: var(--mads-c);
-  filter: drop-shadow(0 0 1px var(--glow-core)) drop-shadow(0 0 7px var(--glow-mads));
+  fill: var(--color-mads);
+  filter: var(--filter-mads-glow);
 }
-
-/* ── OVERSPEED DOT ──────────────────────── */
-.overspeed-dot {
-  width: calc(9 * var(--u)); height: calc(9 * var(--u)); border-radius: 50%;
-  background: var(--ghost);
-  border: calc(1 * var(--u)) solid rgba(92,232,69,0.10);
-  flex-shrink: 0;
-  transition: background 0.3s, box-shadow 0.3s, border-color 0.3s;
-}
-.overspeed-dot.active {
-  background: var(--urgent);
-  border-color: var(--urgent);
-  box-shadow: 0 0 1px var(--glow-core), 0 0 7px var(--glow-urgent);
+.d14-on.on.limit-c {
+  fill: var(--color-warn);
+  filter: var(--filter-warn-glow);
 }
 
 </style>
 </head>
 <body>
+
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="0" height="0" style="position:absolute;width:0;height:0;overflow:hidden">
+  <defs>
+    <path id="d14-glyph-base" d="M 12.5,9 L 15.5,12 L 29.5,12 L 32.5,9 Z M 33,9.5 L 30,12.5 L 30,23.5 L 33,26.5 Z M 33,26.5 L 30,29.5 L 30,40.5 L 33,43.5 Z M 12.5,44 L 15.5,41 L 29.5,41 L 32.5,44 Z M 12,26.5 L 15,29.5 L 15,40.5 L 12,43.5 Z M 12,9.5 L 15,12.5 L 15,23.5 L 12,26.5 Z M 14.5,25 L 13,26.5 L 14.5,28 L 20.5,28 L 22,26.5 L 20.5,25 Z M 24.5,25 L 23,26.5 L 24.5,28 L 30.5,28 L 32,26.5 L 30.5,25 Z M 16,18 L 20,24 L 20,19 L 16,13 Z M 22.5,25 L 21,23.5 L 21,13 L 24,13 L 24,23.5 L 22.5,25 Z M 29,18 L 25,24 L 25,19 L 29,13 Z M 16,35 L 20,29 L 20,34 L 16,40 Z M 22.5,28 L 21,29.5 L 21,40 L 24,40 L 24,29.5 L 22.5,28 Z M 29,35 L 25,29 L 25,34 L 29,40 Z"></path>
+    <path id="d14-glyph-0" d="M 12.5,9 L 15.5,12 L 29.5,12 L 32.5,9 Z M 33,9.5 L 30,12.5 L 30,23.5 L 33,26.5 Z M 33,26.5 L 30,29.5 L 30,40.5 L 33,43.5 Z M 12.5,44 L 15.5,41 L 29.5,41 L 32.5,44 Z M 12,26.5 L 15,29.5 L 15,40.5 L 12,43.5 Z M 12,9.5 L 15,12.5 L 15,23.5 L 12,26.5 Z M 29,18 L 25,24 L 25,19 L 29,13 Z M 16,35 L 20,29 L 20,34 L 16,40 Z"></path>
+    <path id="d14-glyph-1" d="M 33,9.5 L 30,12.5 L 30,23.5 L 33,26.5 Z M 33,26.5 L 30,29.5 L 30,40.5 L 33,43.5 Z M 29,18 L 25,24 L 25,19 L 29,13 Z"></path>
+    <path id="d14-glyph-2" d="M 12.5,9 L 15.5,12 L 29.5,12 L 32.5,9 Z M 33,9.5 L 30,12.5 L 30,23.5 L 33,26.5 Z M 12.5,44 L 15.5,41 L 29.5,41 L 32.5,44 Z M 12,26.5 L 15,29.5 L 15,40.5 L 12,43.5 Z M 14.5,25 L 13,26.5 L 14.5,28 L 20.5,28 L 22,26.5 L 20.5,25 Z M 24.5,25 L 23,26.5 L 24.5,28 L 30.5,28 L 32,26.5 L 30.5,25 Z"></path>
+    <path id="d14-glyph-3" d="M 12.5,9 L 15.5,12 L 29.5,12 L 32.5,9 Z M 33,9.5 L 30,12.5 L 30,23.5 L 33,26.5 Z M 33,26.5 L 30,29.5 L 30,40.5 L 33,43.5 Z M 12.5,44 L 15.5,41 L 29.5,41 L 32.5,44 Z M 14.5,25 L 13,26.5 L 14.5,28 L 20.5,28 L 22,26.5 L 20.5,25 Z M 24.5,25 L 23,26.5 L 24.5,28 L 30.5,28 L 32,26.5 L 30.5,25 Z"></path>
+    <path id="d14-glyph-4" d="M 33,9.5 L 30,12.5 L 30,23.5 L 33,26.5 Z M 33,26.5 L 30,29.5 L 30,40.5 L 33,43.5 Z M 12,9.5 L 15,12.5 L 15,23.5 L 12,26.5 Z M 14.5,25 L 13,26.5 L 14.5,28 L 20.5,28 L 22,26.5 L 20.5,25 Z M 24.5,25 L 23,26.5 L 24.5,28 L 30.5,28 L 32,26.5 L 30.5,25 Z"></path>
+    <path id="d14-glyph-5" d="M 12.5,9 L 15.5,12 L 29.5,12 L 32.5,9 Z M 33,26.5 L 30,29.5 L 30,40.5 L 33,43.5 Z M 12.5,44 L 15.5,41 L 29.5,41 L 32.5,44 Z M 12,9.5 L 15,12.5 L 15,23.5 L 12,26.5 Z M 14.5,25 L 13,26.5 L 14.5,28 L 20.5,28 L 22,26.5 L 20.5,25 Z M 24.5,25 L 23,26.5 L 24.5,28 L 30.5,28 L 32,26.5 L 30.5,25 Z"></path>
+    <path id="d14-glyph-6" d="M 12.5,9 L 15.5,12 L 29.5,12 L 32.5,9 Z M 33,26.5 L 30,29.5 L 30,40.5 L 33,43.5 Z M 12.5,44 L 15.5,41 L 29.5,41 L 32.5,44 Z M 12,26.5 L 15,29.5 L 15,40.5 L 12,43.5 Z M 12,9.5 L 15,12.5 L 15,23.5 L 12,26.5 Z M 14.5,25 L 13,26.5 L 14.5,28 L 20.5,28 L 22,26.5 L 20.5,25 Z M 24.5,25 L 23,26.5 L 24.5,28 L 30.5,28 L 32,26.5 L 30.5,25 Z"></path>
+    <path id="d14-glyph-7" d="M 12.5,9 L 15.5,12 L 29.5,12 L 32.5,9 Z M 33,9.5 L 30,12.5 L 30,23.5 L 33,26.5 Z M 33,26.5 L 30,29.5 L 30,40.5 L 33,43.5 Z"></path>
+    <path id="d14-glyph-8" d="M 12.5,9 L 15.5,12 L 29.5,12 L 32.5,9 Z M 33,9.5 L 30,12.5 L 30,23.5 L 33,26.5 Z M 33,26.5 L 30,29.5 L 30,40.5 L 33,43.5 Z M 12.5,44 L 15.5,41 L 29.5,41 L 32.5,44 Z M 12,26.5 L 15,29.5 L 15,40.5 L 12,43.5 Z M 12,9.5 L 15,12.5 L 15,23.5 L 12,26.5 Z M 14.5,25 L 13,26.5 L 14.5,28 L 20.5,28 L 22,26.5 L 20.5,25 Z M 24.5,25 L 23,26.5 L 24.5,28 L 30.5,28 L 32,26.5 L 30.5,25 Z"></path>
+    <path id="d14-glyph-9" d="M 12.5,9 L 15.5,12 L 29.5,12 L 32.5,9 Z M 33,9.5 L 30,12.5 L 30,23.5 L 33,26.5 Z M 33,26.5 L 30,29.5 L 30,40.5 L 33,43.5 Z M 12.5,44 L 15.5,41 L 29.5,41 L 32.5,44 Z M 12,9.5 L 15,12.5 L 15,23.5 L 12,26.5 Z M 14.5,25 L 13,26.5 L 14.5,28 L 20.5,28 L 22,26.5 L 20.5,25 Z M 24.5,25 L 23,26.5 L 24.5,28 L 30.5,28 L 32,26.5 L 30.5,25 Z"></path>
+    <path id="d14-glyph-d" d="M 12.5,9 L 15.5,12 L 29.5,12 L 32.5,9 Z M 33,9.5 L 30,12.5 L 30,23.5 L 33,26.5 Z M 33,26.5 L 30,29.5 L 30,40.5 L 33,43.5 Z M 12.5,44 L 15.5,41 L 29.5,41 L 32.5,44 Z M 22.5,25 L 21,23.5 L 21,13 L 24,13 L 24,23.5 L 22.5,25 Z M 22.5,28 L 21,29.5 L 21,40 L 24,40 L 24,29.5 L 22.5,28 Z"></path>
+    <path id="d14-glyph-p" d="M 12.5,9 L 15.5,12 L 29.5,12 L 32.5,9 Z M 33,9.5 L 30,12.5 L 30,23.5 L 33,26.5 Z M 12,26.5 L 15,29.5 L 15,40.5 L 12,43.5 Z M 12,9.5 L 15,12.5 L 15,23.5 L 12,26.5 Z M 14.5,25 L 13,26.5 L 14.5,28 L 20.5,28 L 22,26.5 L 20.5,25 Z M 24.5,25 L 23,26.5 L 24.5,28 L 30.5,28 L 32,26.5 L 30.5,25 Z"></path>
+    <path id="d14-glyph-r" d="M 12.5,9 L 15.5,12 L 29.5,12 L 32.5,9 Z M 33,9.5 L 30,12.5 L 30,23.5 L 33,26.5 Z M 12,26.5 L 15,29.5 L 15,40.5 L 12,43.5 Z M 12,9.5 L 15,12.5 L 15,23.5 L 12,26.5 Z M 14.5,25 L 13,26.5 L 14.5,28 L 20.5,28 L 22,26.5 L 20.5,25 Z M 24.5,25 L 23,26.5 L 24.5,28 L 30.5,28 L 32,26.5 L 30.5,25 Z M 29,35 L 25,29 L 25,34 L 29,40 Z"></path>
+    <path id="d14-glyph-n" d="M 33,9.5 L 30,12.5 L 30,23.5 L 33,26.5 Z M 33,26.5 L 30,29.5 L 30,40.5 L 33,43.5 Z M 12,26.5 L 15,29.5 L 15,40.5 L 12,43.5 Z M 12,9.5 L 15,12.5 L 15,23.5 L 12,26.5 Z M 16,18 L 20,24 L 20,19 L 16,13 Z M 29,35 L 25,29 L 25,34 L 29,40 Z"></path>
+    <g id="d14-glyph-blank"></g>
+  </defs>
+</svg>
 
 <div class="viewport" id="viewport">
 <div class="stage" id="stage">
@@ -352,9 +487,13 @@ body.portrait-layout .right-zone {
 
   <!-- ZONE 1: BLIND SPOT / BLINKER -->
   <div class="bs-tape">
-    <div class="bs-side bs-left"  id="bs-left"></div>
+    <div class="bs-side bs-left" id="bs-left">
+      <div class="bs-cell"></div><div class="bs-cell"></div><div class="bs-cell"></div><div class="bs-cell"></div><div class="bs-cell"></div><div class="bs-cell"></div><div class="bs-cell"></div><div class="bs-cell"></div>
+    </div>
     <div class="tape-divider"><div class="tape-divider-line"></div></div>
-    <div class="bs-side bs-right" id="bs-right"></div>
+    <div class="bs-side bs-right" id="bs-right">
+      <div class="bs-cell"></div><div class="bs-cell"></div><div class="bs-cell"></div><div class="bs-cell"></div><div class="bs-cell"></div><div class="bs-cell"></div><div class="bs-cell"></div><div class="bs-cell"></div>
+    </div>
   </div>
 
   <!-- ZONE 2: DATA -->
@@ -367,7 +506,6 @@ body.portrait-layout .right-zone {
     <div class="speed-zone">
       <div class="disp xxl" id="speed-disp"></div>
       <div class="speed-aside">
-        <div class="overspeed-dot" id="overspeed-dot"></div>
         <span class="unit-label active" id="unit-label">MPH</span>
       </div>
     </div>
@@ -378,18 +516,20 @@ body.portrait-layout .right-zone {
       </div>
 
       <div class="sec-row">
-        <div class="icon-lim dim" id="icon-lim"></div>
+        <div class="icon-lim" id="icon-lim"></div>
         <div class="disp md" id="lim-disp"></div>
       </div>
     </div>
 
   </div>
 
-  <!-- ZONE 3: STEERING -->
-  <div class="bs-tape steer-strip">
-    <div class="bs-side bs-left"  id="steer-left"></div>
+  <!-- ZONE 3: MODE -->
+  <div class="mode-strip">
+    <div class="mode-strip-inner">
+      <span class="mode-text" id="mode-mads">MADS</span>
     <div class="tape-divider"><div class="tape-divider-line"></div></div>
-    <div class="bs-side bs-right" id="steer-right"></div>
+      <span class="mode-text" id="mode-full">FULL</span>
+    </div>
   </div>
 
 </div>
@@ -399,65 +539,34 @@ body.portrait-layout .right-zone {
 
 
 <script>
-/* ── Segment map ── */
 const GEAR_MAP = { 1:'P', 2:'R', 3:'N', 4:'D' };
-
-/* ── 14-segment map ── */
-/* indices: a b c d e f g1 g2  h i j k  l m */
-const SEG14 = {
-  '0':[1,1,1,1,1,1, 0,0, 0,0,1,1, 0,0],
-  '1':[0,1,1,0,0,0, 0,0, 0,0,1,0, 0,0],
-  '2':[1,1,0,1,1,0, 1,1, 0,0,0,0, 0,0],
-  '3':[1,1,1,1,0,0, 1,1, 0,0,0,0, 0,0],
-  '4':[0,1,1,0,0,1, 1,1, 0,0,0,0, 0,0],
-  '5':[1,0,1,1,0,1, 1,1, 0,0,0,0, 0,0],
-  '6':[1,0,1,1,1,1, 1,1, 0,0,0,0, 0,0],
-  '7':[1,1,1,0,0,0, 0,0, 0,0,0,0, 0,0],
-  '8':[1,1,1,1,1,1, 1,1, 0,0,0,0, 0,0],
-  '9':[1,1,1,1,0,1, 1,1, 0,0,0,0, 0,0],
-  'D':[1,1,1,1,0,0, 0,0, 0,1,0,0, 1,0],
-  'P':[1,1,0,0,1,1, 1,1, 0,0,0,0, 0,0],
-  'R':[1,1,0,0,1,1, 1,1, 0,0,0,0, 0,1],
-  'N':[0,1,1,0,1,1, 0,0, 1,0,0,0, 0,1],
-  'M':[0,1,1,0,1,1, 0,0, 1,0,1,0, 0,0],
-  'A':[1,1,1,0,1,1, 1,1, 0,0,0,0, 0,0],
-  'S':[1,0,1,1,0,1, 1,1, 0,0,0,0, 0,0],
-  ' ':[0,0,0,0,0,0, 0,0, 0,0,0,0, 0,0],
-};
-
-
-const SEG14_ORDER = ['a','b','c','d','e','f','g1','g2','h','i','j','k','l','m'];
+const DISPLAY_DIGITS = 3;
+const BLANK_DISPLAY = ' '.repeat(DISPLAY_DIGITS);
+const MAX_DISPLAY_VALUE = 999;
+const GEAR_FALLBACK = 'D';
+const OVERSPEED_THRESHOLD = 0.15;
+const PORTRAIT_BREAKPOINT = 560;
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const XLINK_NS = 'http://www.w3.org/1999/xlink';
 const SEG14_BASE_ID = 'd14-glyph-base';
-
-const SEG14_PATHS = {
-  a:  'M 12.5,9 L 15.5,12 L 29.5,12 L 32.5,9 Z',
-  b:  'M 33,9.5 L 30,12.5 L 30,23.5 L 33,26.5 Z',
-  c:  'M 33,26.5 L 30,29.5 L 30,40.5 L 33,43.5 Z',
-  d:  'M 12.5,44 L 15.5,41 L 29.5,41 L 32.5,44 Z',
-  e:  'M 12,26.5 L 15,29.5 L 15,40.5 L 12,43.5 Z',
-  f:  'M 12,9.5 L 15,12.5 L 15,23.5 L 12,26.5 Z',
-  g1: 'M 14.5,25 L 13,26.5 L 14.5,28 L 20.5,28 L 22,26.5 L 20.5,25 Z',
-  g2: 'M 24.5,25 L 23,26.5 L 24.5,28 L 30.5,28 L 32,26.5 L 30.5,25 Z',
-  h:  'M 16,18 L 20,24 L 20,19 L 16,13 Z',
-  i:  'M 22.5,25 L 21,23.5 L 21,13 L 24,13 L 24,23.5 L 22.5,25 Z',
-  j:  'M 29,18 L 25,24 L 25,19 L 29,13 Z',
-  k:  'M 16,35 L 20,29 L 20,34 L 16,40 Z',
-  l:  'M 22.5,28 L 21,29.5 L 21,40 L 24,40 L 24,29.5 L 22.5,28 Z',
-  m:  'M 29,35 L 25,29 L 25,34 L 29,40 Z',
+const SEG14_BLANK = ' ';
+const SEG14_GLYPH_IDS = {
+  '0': 'd14-glyph-0',
+  '1': 'd14-glyph-1',
+  '2': 'd14-glyph-2',
+  '3': 'd14-glyph-3',
+  '4': 'd14-glyph-4',
+  '5': 'd14-glyph-5',
+  '6': 'd14-glyph-6',
+  '7': 'd14-glyph-7',
+  '8': 'd14-glyph-8',
+  '9': 'd14-glyph-9',
+  'D': 'd14-glyph-d',
+  'P': 'd14-glyph-p',
+  'R': 'd14-glyph-r',
+  'N': 'd14-glyph-n',
+  ' ': 'd14-glyph-blank',
 };
-
-const SEG14_BASE_PATH = SEG14_ORDER.map(name => SEG14_PATHS[name]).join(' ');
-const SEG14_GLYPHS = Object.fromEntries(
-  Object.entries(SEG14).map(([ch, segs]) => [
-    ch,
-    {
-      id: 'd14-glyph-' + (ch === ' ' ? 'blank' : ch.toLowerCase()),
-      path: SEG14_ORDER.filter((_, i) => segs[i]).map(name => SEG14_PATHS[name]).join(' '),
-    },
-  ])
-);
 
 const UI = {
   speedDisp: document.getElementById('speed-disp'),
@@ -465,9 +574,9 @@ const UI = {
   setDisp: document.getElementById('set-disp'),
   limDisp: document.getElementById('lim-disp'),
   unitLabel: document.getElementById('unit-label'),
-  overspeedDot: document.getElementById('overspeed-dot'),
   iconLim: document.getElementById('icon-lim'),
-  viewport: document.getElementById('viewport'),
+  modeMads: document.getElementById('mode-mads'),
+  modeFull: document.getElementById('mode-full'),
   stage: document.getElementById('stage'),
   bs: {},
 };
@@ -475,7 +584,6 @@ const UI = {
 let pendingCarState = null;
 let renderFrame = 0;
 let fitFrame = 0;
-let digit14SpriteReady = false;
 
 function setClassName(el, className) {
   if (el && el.className !== className) el.className = className;
@@ -491,53 +599,23 @@ function setUseHref(el, id) {
   if (el.getAttributeNS(XLINK_NS, 'href') !== href) el.setAttributeNS(XLINK_NS, 'xlink:href', href);
 }
 
-function ensureDigit14Sprite() {
-  if (digit14SpriteReady) return;
-
-  const sprite = document.createElementNS(SVG_NS, 'svg');
-  const defs = document.createElementNS(SVG_NS, 'defs');
-
-  sprite.setAttribute('aria-hidden', 'true');
-  sprite.setAttribute('width', '0');
-  sprite.setAttribute('height', '0');
-  sprite.style.position = 'absolute';
-  sprite.style.width = '0';
-  sprite.style.height = '0';
-  sprite.style.overflow = 'hidden';
-
-  const basePath = document.createElementNS(SVG_NS, 'path');
-  basePath.setAttribute('id', SEG14_BASE_ID);
-  basePath.setAttribute('d', SEG14_BASE_PATH);
-  defs.appendChild(basePath);
-
-  Object.values(SEG14_GLYPHS).forEach(glyph => {
-    const path = document.createElementNS(SVG_NS, 'path');
-    path.setAttribute('id', glyph.id);
-    if (glyph.path) path.setAttribute('d', glyph.path);
-    defs.appendChild(path);
-  });
-
-  sprite.appendChild(defs);
-  document.body.appendChild(sprite);
-  digit14SpriteReady = true;
-}
-
 function updateDigit14(el, ch, colorClass) {
   const nextColorClass = colorClass || '';
   if (el._lastChar === ch && el._lastColorClass === nextColorClass) return;
 
-  const glyph = SEG14_GLYPHS[ch] || SEG14_GLYPHS[' '];
-  const nextClass = 'd14-on' + (glyph.path ? ' on' + (nextColorClass ? ' ' + nextColorClass : '') : '');
-  setUseHref(el._onUse, glyph.id);
+  const nextChar = SEG14_GLYPH_IDS[ch] ? ch : SEG14_BLANK;
+  const glyphId = SEG14_GLYPH_IDS[nextChar];
+  const baseClass = 'd14-base' + (nextColorClass ? ' ' + nextColorClass : '');
+  const nextClass = 'd14-on' + (nextChar !== SEG14_BLANK ? ' on' + (nextColorClass ? ' ' + nextColorClass : '') : '');
+  if (el._baseUse.getAttribute('class') !== baseClass) el._baseUse.setAttribute('class', baseClass);
+  setUseHref(el._onUse, glyphId);
   if (el._onUse.getAttribute('class') !== nextClass) el._onUse.setAttribute('class', nextClass);
 
-  el._lastChar = ch;
+  el._lastChar = nextChar;
   el._lastColorClass = nextColorClass;
 }
 
 function makeDigit14(size) {
-  ensureDigit14Sprite();
-
   const d = document.createElement('div');
   const svg = document.createElementNS(SVG_NS, 'svg');
   const baseUse = document.createElementNS(SVG_NS, 'use');
@@ -555,6 +633,7 @@ function makeDigit14(size) {
   svg.appendChild(baseUse);
   svg.appendChild(onUse);
 
+  d._baseUse = baseUse;
   d._onUse = onUse;
   d._lastChar = null;
   d._lastColorClass = null;
@@ -575,28 +654,19 @@ function fillDisp14(el, text, size, colorClass) {
   chars.forEach((ch, i) => updateDigit14(el.children[i], ch, colorClass));
 }
 
+function formatDisplayValue(value) {
+  return String(Math.min(value, MAX_DISPLAY_VALUE)).padStart(DISPLAY_DIGITS, ' ');
+}
+
 function initBsTape(id) {
   const el = document.getElementById(id);
   if (!el) return;
 
-  const cells = [];
-  const frag = document.createDocumentFragment();
-  for (let i = 0; i < 8; i++) {
-    const cell = document.createElement('div');
-    cell.className = 'bs-cell';
-    cells.push(cell);
-    frag.appendChild(cell);
-  }
-
-  el.textContent = '';
-  el.appendChild(frag);
-  UI.bs[id] = { cells, state: null };
+  UI.bs[id] = { el, baseClass: el.className, state: null };
 }
 
-/* ── Blind spot tape ── */
-function bsTapeState(blind, blinker, ldw) {
+function bsTapeState(blind, blinker) {
   if (blind && blinker) return 'urgent';
-  if (ldw)             return 'urgent';
   if (blind)           return 'blind';
   if (blinker)         return 'blink';
   return '';
@@ -606,29 +676,14 @@ function buildBsTape(state, id) {
   const tape = UI.bs[id];
   if (!tape || tape.state === state) return;
 
-  const nextClass = 'bs-cell' + (state ? ' ' + state : '');
-  tape.cells.forEach(cell => {
-    if (cell.className !== nextClass) cell.className = nextClass;
-  });
+  const nextClass = tape.baseClass + (state ? ' is-' + state : '');
+  if (tape.el.className !== nextClass) tape.el.className = nextClass;
   tape.state = state;
 }
 
-/* ── Steering strip ── */
-function buildSteerStrip(steerDeg) {
-  const CELLS = 8, MAX_DEG = 20;
-  const isRight = steerDeg >= 0;
-  const litCount = Math.min(CELLS, Math.round(Math.abs(steerDeg) / (MAX_DEG / CELLS)));
-  const litClass = 'bs-cell blind';
-
-  ['steer-left', 'steer-right'].forEach(id => {
-    const tape = UI.bs[id];
-    if (!tape) return;
-    const lit = (id === 'steer-right') === isRight;
-    tape.cells.forEach((cell, i) => {
-      const nextClass = lit && i < litCount ? litClass : 'bs-cell';
-      if (cell.className !== nextClass) cell.className = nextClass;
-    });
-  });
+function setModeState(mode) {
+  setClassName(UI.modeMads, 'mode-text' + (mode === 'mads' ? ' active mads' : ''));
+  setClassName(UI.modeFull, 'mode-text' + (mode === 'full' ? ' active full' : ''));
 }
 
 /* ── Main update ── */
@@ -636,7 +691,8 @@ function renderCarState(car) {
   const speed   = Math.max(0, Math.round(Number(car.egoSpeed)       || 0));
   const setSpd  = Math.max(0, Math.round(Number(car.accSetSpeed)    || 0));
   const limit   = Math.max(0, Math.round(Number(car.fusedSpeedLimit)|| 0));
-  const gear    = GEAR_MAP[Math.round(Number(car.gear) || 0)] || 'D';
+  const gear    = GEAR_MAP[Math.round(Number(car.gear) || 0)] || GEAR_FALLBACK;
+  const isDrive = gear === 'D';
   const adasOn  = !!car.adasOn;
   const mads    = !!car.madsActive;
   const imp     = !!car.isImperial;
@@ -645,46 +701,41 @@ function renderCarState(car) {
   const rightBlind  = (Number(car.rightBlindSpot) || 0) > 0;
   const leftBlink   = (Number(car.leftBlinker)    || 0) > 0;
   const rightBlink  = (Number(car.rightBlinker)   || 0) > 0;
-
-  const ldw = Number(car.laneDepartureWarning) || 0;
-  const leftLdw  = ldw === 1 || ldw === 3;
-  const rightLdw = ldw === 2 || ldw === 4;
+  const hazardActive = leftBlink && rightBlink;
 
   // Speed
-  fillDisp14(UI.speedDisp, String(speed).padStart(3, ' '), 'xxl');
+  fillDisp14(UI.speedDisp, formatDisplayValue(speed), 'xxl', 'mads-c');
 
   // Unit label
   setText(UI.unitLabel, imp ? 'MPH' : 'KMH');
 
-  // Overspeed dot — red pulse at ≥15% over limit
-  const overSpeed = limit > 0 && speed >= Math.round(limit * 1.15);
-  setClassName(UI.overspeedDot, 'overspeed-dot' + (overSpeed ? ' active' : ''));
+  // Match web-ambient: warn only in Drive, after crossing 15% over the limit.
+  const pctOver = isDrive && limit > 0 ? (speed - limit) / limit : 0;
+  const overSpeed = pctOver > OVERSPEED_THRESHOLD;
 
   // Gear — 14-segment display
   fillDisp14(UI.gearDisp, gear, 'lg');
 
-  // Mode/set display — set speed when FULL, "MADS" when MADS only, blank otherwise
-  if (adasOn && setSpd > 0) {
-    fillDisp14(UI.setDisp, String(setSpd).padStart(4, ' '), 'md', 'set-c');
-  } else if (mads) {
-    fillDisp14(UI.setDisp, 'MADS', 'md', 'set-c');
-  } else {
-    fillDisp14(UI.setDisp, '    ', 'md');
-  }
+  // Mode strip + set speed — show state below, keep right display numeric only
+  setModeState(adasOn ? 'full' : (mads ? 'mads' : ''));
+  fillDisp14(UI.setDisp, adasOn && setSpd > 0 ? formatDisplayValue(setSpd) : BLANK_DISPLAY, 'md');
 
   // Speed limit
-  const showLim = limit > 0;
-  setClassName(UI.iconLim, 'icon-lim' + (showLim ? '' : ' dim'));
+  const showLim = limit > 0 && gear !== 'P';
+  setClassName(UI.iconLim, 'icon-lim' + (!showLim ? ' hidden' : (overSpeed ? ' active' : '')));
   fillDisp14(UI.limDisp,
-    showLim ? String(limit).padStart(3, ' ') : '   ',
-    'md', showLim ? 'warn-c' : '');
+    showLim ? formatDisplayValue(limit) : BLANK_DISPLAY,
+    'md', 'limit-c');
 
   // Blind spot tape
-  buildBsTape(bsTapeState(leftBlind,  leftBlink,  leftLdw),  'bs-left');
-  buildBsTape(bsTapeState(rightBlind, rightBlink, rightLdw), 'bs-right');
+  if (hazardActive) {
+    buildBsTape('hazard', 'bs-left');
+    buildBsTape('hazard', 'bs-right');
+  } else {
+    buildBsTape(bsTapeState(leftBlind,  leftBlink),  'bs-left');
+    buildBsTape(bsTapeState(rightBlind, rightBlink), 'bs-right');
+  }
 
-  // Steering strip
-  buildSteerStrip(Number(car.steeringAngle) || 0);
 }
 
 function flushCarState() {
@@ -721,10 +772,8 @@ window.onCarStateUpdate = function() {
     madsActive:          readNative('isMadsActive',           false),
     leftBlindSpot:       readNative('getLeftBlindSpot',       0),
     rightBlindSpot:      readNative('getRightBlindSpot',      0),
-    laneDepartureWarning:readNative('getLaneDepartureWarning',0),
     accSetSpeed:         readNative('getAccSetSpeed',         0),
     fusedSpeedLimit:     readNative('getFusedSpeedLimit',     0),
-    steeringAngle:       readNative('getSteeringAngle',       0),
     isImperial:          readNative('isImperial',             true),
   });
 };
@@ -755,11 +804,8 @@ function fitDashboardNow() {
   const vv = window.visualViewport;
   const viewportWidth = vv ? vv.width : (window.innerWidth || document.documentElement.clientWidth || 0);
   const viewportHeight = vv ? vv.height : (window.innerHeight || document.documentElement.clientHeight || 0);
-  const compactChrome = viewportWidth < 760 || viewportHeight < 420;
-  const portraitLayout = viewportHeight > viewportWidth && viewportWidth < 560;
-  document.body.classList.toggle('compact-chrome', compactChrome);
+  const portraitLayout = viewportHeight > viewportWidth && viewportWidth < PORTRAIT_BREAKPOINT;
   document.body.classList.toggle('portrait-layout', portraitLayout);
-  stage.style.transform = '';
 }
 
 function fitDashboard() {
@@ -772,8 +818,6 @@ function fitDashboard() {
 
 initBsTape('bs-left');
 initBsTape('bs-right');
-initBsTape('steer-left');
-initBsTape('steer-right');
 
 window.addEventListener('resize', fitDashboard);
 window.addEventListener('orientationchange', fitDashboard);
@@ -784,9 +828,7 @@ receiveMessage({
   egoSpeed: 0, leftBlinker: 0, rightBlinker: 0,
   gear: 4, adasOn: false, madsActive: false,
   leftBlindSpot: 0, rightBlindSpot: 0,
-  laneDepartureWarning: 0,
-  accSetSpeed: 0, fusedSpeedLimit: 0,
-  steeringAngle: 0, isImperial: true,
+  accSetSpeed: 0, fusedSpeedLimit: 0, isImperial: true,
 });
 fitDashboard();
 </script>
