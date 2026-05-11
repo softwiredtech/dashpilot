@@ -32,13 +32,6 @@ struct DashboardConfig: Identifiable {
 
 let availableDashboards: [DashboardConfig] = [
     DashboardConfig(
-        id: "expo",
-        name: "Expo Dashboard",
-        url: "https://dashpilot-expo.web.app",
-        type: .web,
-        screenshotName: "preview_expo"
-    ),
-    DashboardConfig(
         id: "vanilla",
         name: "Vanilla Dashboard",
         url: "vanilla",
@@ -51,11 +44,18 @@ let availableDashboards: [DashboardConfig] = [
         )
     ),
     DashboardConfig(
-        id: "rive",
-        name: "Rive Dashboard",
-        url: "dashboard_test",
-        type: .rive,
-        screenshotName: "preview_rive"
+        id: "ambient",
+        name: "Ambient Dashboard",
+        url: "ambient",
+        type: .web,
+        screenshotName: "preview_ambient"
+    ),
+    DashboardConfig(
+        id: "retro",
+        name: "Retro Dashboard",
+        url: "retro",
+        type: .web,
+        screenshotName: "preview_retro"
     ),
     DashboardConfig(
         id: "dev_rive",

@@ -347,7 +347,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cp -R \"${SRCROOT}/../dash-apps/web-vanilla/\" \"${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/web-vanilla/\"\n\n";
+			shellScript = "\"${SRCROOT}/../scripts/sync-to-ios.sh\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
