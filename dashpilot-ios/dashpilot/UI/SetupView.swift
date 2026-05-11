@@ -4,6 +4,7 @@ private let dashGreen = Color(red: 0x5C / 255.0, green: 0xBD / 255.0, blue: 0x68
 
 struct SetupView: View {
 
+    @Binding var navigationPath: NavigationPath
     @Environment(ConnectionViewModel.self) var connectionVM
 
     @State private var serverAddress: String =
@@ -24,6 +25,21 @@ struct SetupView: View {
                 }
                 .padding(.horizontal, 32)
                 .padding(.vertical, 48)
+            }
+
+            VStack {
+                HStack {
+                    NavigationLink(value: AppRoute.settings) {
+                        Image(systemName: "gear")
+                            .foregroundColor(Color(white: 0.53))
+                            .font(.system(size: 22))
+                            .frame(width: 44, height: 44)
+                    }
+                    Spacer()
+                }
+                .padding(.top, 12)
+                .padding(.leading, 12)
+                Spacer()
             }
         }
         .navigationBarHidden(true)
@@ -131,7 +147,11 @@ struct SetupView: View {
     }
 
     private func nextButton(isConnecting: Bool) -> some View {
-        NavigationLink(value: AppRoute.dashboardSelection) {
+        Button {
+            UserDefaults.standard.set(serverAddress, forKey: "device_ip")
+            let dash = selectedDashboard()
+            navigationPath.append(AppRoute.dashboard(type: dash.type.rawValue, url: dash.url))
+        } label: {
             Text(isConnecting ? "Connecting..." : "Next")
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundColor(isConnecting ? Color(white: 0.67) : .black)
@@ -142,11 +162,6 @@ struct SetupView: View {
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .frame(width: UIScreen.main.bounds.width * 0.7)
         .disabled(isConnecting)
-        .simultaneousGesture(TapGesture().onEnded {
-            if !isConnecting {
-                UserDefaults.standard.set(serverAddress, forKey: "device_ip")
-            }
-        })
     }
 }
 

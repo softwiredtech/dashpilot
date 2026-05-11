@@ -35,6 +35,9 @@ struct DashboardSelectionView: View {
                                 DashboardCard(dashboard: dashboard)
                             }
                             .buttonStyle(.plain)
+                            .simultaneousGesture(TapGesture().onEnded {
+                                UserDefaults.standard.set(dashboard.id, forKey: DisplaySettings.keySelectedDashboardId)
+                            })
                         }
                     }
                 }
