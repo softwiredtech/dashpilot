@@ -85,12 +85,14 @@ struct WebDashView: UIViewRepresentable {
         Coordinator()
     }
 
+    private static let localApps: Set<String> = ["vanilla", "retro", "ambient"]
+
     func makeUIView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
         config.userContentController.add(context.coordinator, name: "log")
 
-        if url == "vanilla" {
-            let bundleDir = Bundle.main.bundleURL.appendingPathComponent("web-vanilla")
+        if Self.localApps.contains(url) {
+            let bundleDir = Bundle.main.bundleURL.appendingPathComponent("web-\(url)")
             config.setURLSchemeHandler(AppSchemeHandler(bundleDir: bundleDir), forURLScheme: "app")
         }
 
@@ -121,7 +123,7 @@ struct WebDashView: UIViewRepresentable {
 
         if url.hasPrefix("http") || url.hasPrefix("https") {
             webView.load(URLRequest(url: URL(string: url)!))
-        } else if url == "vanilla" {
+        } else if Self.localApps.contains(url) {
             webView.load(URLRequest(url: URL(string: "app://localhost/index.html")!))
         }
 
