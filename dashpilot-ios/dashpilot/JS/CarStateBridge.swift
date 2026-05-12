@@ -1,11 +1,9 @@
 import Foundation
 
-extension CarState {
+extension DashState {
     func toJSONString() -> String {
-        guard let data = try? JSONEncoder().encode(self),
-              let json = String(data: data, encoding: .utf8) else {
-            return "{}"
-        }
-        return json
+        let cs = carState
+        let ds = displaySettings
+        return "{\"egoSteeringAngle\":\(cs.egoSteeringAngle),\"egoSpeed\":\(cs.egoSpeed),\"leftBlinker\":\(cs.leftBlinker),\"rightBlinker\":\(cs.rightBlinker),\"gear\":\(cs.gear),\"adasOn\":\(cs.adasOn),\"leftBlindSpot\":\(cs.leftBlindSpot),\"rightBlindSpot\":\(cs.rightBlindSpot),\"fusedSpeedLimit\":\(cs.fusedSpeedLimit),\"stopLineDist\":\(cs.stopLineDist),\"trafficLightColor\":\(cs.trafficLightColor),\"laneDepartureWarning\":\(cs.laneDepartureWarning),\"sideCollisionWarning\":\(cs.sideCollisionWarning),\"anyDoorOpen\":\(cs.anyDoorOpen),\"buckleStatus\":\(cs.buckleStatus),\"accSetSpeed\":\(cs.accSetSpeed),\"fullPackEnergy\":\(cs.fullPackEnergy),\"nominalEnergyRemaining\":\(cs.nominalEnergyRemaining),\"energyBuffer\":\(cs.energyBuffer),\"maxRegenPower\":\(cs.maxRegenPower),\"maxDischargePower\":\(cs.maxDischargePower),\"packVoltage\":\(cs.packVoltage),\"packCurrent\":\(cs.packCurrent),\"packTMin\":\(cs.packTMin),\"packTMax\":\(cs.packTMax),\"odometer\":\(cs.odometer),\"madsActive\":\(cs.madsActive),\"selfdriveActive\":\(cs.selfdriveActive),\"experimentalMode\":\(cs.experimentalMode),\"changingLane\":\(cs.changingLane),\"phoneBattery\":\(phoneBattery),\"currentTime\":\(currentTime),\"showPhoneBattery\":\(ds.showPhoneBattery),\"showCarBattery\":\(ds.showCarBattery),\"showOdometer\":\(ds.showOdometer),\"isImperial\":\(ds.useImperial),\"darkMode\":\(ds.darkMode),\"alwaysOnBlindSpotMonitor\":\(ds.alwaysOnBlindSpotMonitor),\"renderQuality\":\(ds.renderQuality),\"darkModeBackgroundGray\":\(ds.darkModeBackgroundGray)}"
     }
 }

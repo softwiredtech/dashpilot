@@ -79,7 +79,7 @@ final class AppSchemeHandler: NSObject, WKURLSchemeHandler {
 struct WebDashView: UIViewRepresentable {
 
     let url: String
-    let incomingMessages: AsyncStream<CarState>
+    let incomingMessages: AsyncStream<DashState>
 
     func makeCoordinator() -> Coordinator {
         Coordinator()
@@ -95,23 +95,6 @@ struct WebDashView: UIViewRepresentable {
             let bundleDir = Bundle.main.bundleURL.appendingPathComponent("web-\(url)")
             config.setURLSchemeHandler(AppSchemeHandler(bundleDir: bundleDir), forURLScheme: "app")
         }
-
-        // Inject settings once at load time as window._iosSettings.
-        // Each frame Swift merges _iosCarState + _iosSettings and calls receiveMessage directly.
-        let ud = UserDefaults.standard
-        let settingsScript = """
-        window._iosSettings = {
-            isImperial:                \(ud.bool(forKey: DisplaySettings.keyUseImperial) ? "true" : "false"),
-            darkMode:                  \(ud.bool(forKey: DisplaySettings.keyDarkMode) ? "true" : "false"),
-            alwaysOnBlindSpotMonitor:  \(ud.bool(forKey: DisplaySettings.keyAlwaysOnBlindSpotMonitor) ? "true" : "false"),
-            renderQuality:             \(ud.object(forKey: DisplaySettings.keyRenderQuality) != nil ? ud.integer(forKey: DisplaySettings.keyRenderQuality) : 3),
-            showPhoneBattery:          \(ud.object(forKey: DisplaySettings.keyShowPhoneBattery) == nil || ud.bool(forKey: DisplaySettings.keyShowPhoneBattery) ? "true" : "false"),
-            showCarBattery:            \(ud.object(forKey: DisplaySettings.keyShowCarBattery) == nil || ud.bool(forKey: DisplaySettings.keyShowCarBattery) ? "true" : "false"),
-            showOdometer:              \(ud.object(forKey: DisplaySettings.keyShowOdometer) == nil || ud.bool(forKey: DisplaySettings.keyShowOdometer) ? "true" : "false")
-        };
-        """
-        let script = WKUserScript(source: settingsScript, injectionTime: .atDocumentStart, forMainFrameOnly: true)
-        config.userContentController.addUserScript(script)
 
         let webView = WKWebView(frame: .zero, configuration: config)
         webView.scrollView.isScrollEnabled = false
@@ -135,7 +118,7 @@ struct WebDashView: UIViewRepresentable {
     final class Coordinator: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
 
         weak var webView: WKWebView?
-        var incomingMessages: AsyncStream<CarState>?
+        var incomingMessages: AsyncStream<DashState>?
         private var receiveTask: Task<Void, Never>?
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -143,13 +126,13 @@ struct WebDashView: UIViewRepresentable {
             startReceiving(stream)
         }
 
-        private func startReceiving(_ stream: AsyncStream<CarState>) {
+        private func startReceiving(_ stream: AsyncStream<DashState>) {
             receiveTask?.cancel()
             receiveTask = Task { @MainActor in
                 for await state in stream {
                     let json = state.toJSONString()
                     webView?.evaluateJavaScript(
-                        "window._iosCarState = \(json); window.receiveMessage && window.receiveMessage(Object.assign({}, window._iosCarState, window._iosSettings || {}))",
+                        "window.receiveMessage && window.receiveMessage(\(json))",
                         completionHandler: nil
                     )
                 }
