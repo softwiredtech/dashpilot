@@ -1,8 +1,8 @@
 {
   "images" : [
     {
-      "idiom" : "universal",
-      "filename" : "preview_expo.jpg"
+      "filename" : "preview_ambient.jpg",
+      "idiom" : "universal"
     }
   ],
   "info" : {

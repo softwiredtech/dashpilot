@@ -1,8 +1,8 @@
 {
   "images" : [
     {
-      "idiom" : "universal",
-      "filename" : "preview_retro.png"
+      "filename" : "preview_retro.png",
+      "idiom" : "universal"
     }
   ],
   "info" : {
