@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <cstdio>
+#include <cstring>
 #include <atomic>
 
 static void carStateToBridge(const CarState& cs, BridgeCarState* out) {
@@ -49,6 +50,13 @@ void* bridge_create_context(void) {
 
 void bridge_delete_context(void* ctx) {
     bridge::deleteContext(static_cast<Context*>(ctx));
+}
+
+char* bridge_discover_publisher(void* ctx, const char* endpoint, const char* initialIp, int timeoutMs) {
+    std::string result = bridge::discoverPublisher(
+        static_cast<Context*>(ctx), endpoint, initialIp, timeoutMs);
+    if (result.empty()) return nullptr;
+    return strdup(result.c_str());
 }
 
 void* bridge_create_sub_sockets(void* ctx, const char** endpoints, int count, const char* address) {
