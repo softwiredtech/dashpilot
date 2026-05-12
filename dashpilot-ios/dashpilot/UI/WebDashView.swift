@@ -85,55 +85,32 @@ struct WebDashView: UIViewRepresentable {
         Coordinator()
     }
 
+    private static let localApps: Set<String> = ["vanilla", "retro", "ambient"]
+
     func makeUIView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
         config.userContentController.add(context.coordinator, name: "log")
 
-        if url == "vanilla" {
-            let bundleDir = Bundle.main.bundleURL.appendingPathComponent("web-vanilla")
+        if Self.localApps.contains(url) {
+            let bundleDir = Bundle.main.bundleURL.appendingPathComponent("web-\(url)")
             config.setURLSchemeHandler(AppSchemeHandler(bundleDir: bundleDir), forURLScheme: "app")
         }
 
-        // Inject NativeCarState bridge — mirrors Android's addJavascriptInterface.
-        // Getters read from window._iosCarState which Swift updates on every frame.
-        let nativeBridge = """
-        window.NativeCarState = (function() {
-            var s = function() { return window._iosCarState || {}; };
-            return {
-                getEgoSteeringAngle:      function() { return s().egoSteeringAngle      ?? 0; },
-                getEgoSpeed:              function() { return s().egoSpeed              ?? 0; },
-                getLeftBlinker:           function() { return s().leftBlinker           ?? 0; },
-                getRightBlinker:          function() { return s().rightBlinker          ?? 0; },
-                getGear:                  function() { return s().gear                  ?? 0; },
-                isAdasOn:                 function() { return s().adasOn                ?? false; },
-                getLeftBlindSpot:         function() { return s().leftBlindSpot         ?? 0; },
-                getRightBlindSpot:        function() { return s().rightBlindSpot        ?? 0; },
-                getFusedSpeedLimit:       function() { return s().fusedSpeedLimit       ?? 0; },
-                getStopLineDist:          function() { return s().stopLineDist          ?? 0; },
-                getTrafficLightColor:     function() { return s().trafficLightColor     ?? 0; },
-                getLaneDepartureWarning:  function() { return s().laneDepartureWarning  ?? 0; },
-                getBuckleStatus:          function() { return s().buckleStatus          ?? undefined; },
-                getAnyDoorOpen:           function() { return s().anyDoorOpen           ?? undefined; },
-                getAccSetSpeed:           function() { return s().accSetSpeed           ?? undefined; },
-                getOdometer:              function() { return undefined; },
-                getPhoneBattery:          function() { return undefined; },
-                getFullPackEnergy:        function() { return undefined; },
-                getNominalEnergyRemaining:function() { return undefined; },
-                getEnergyBuffer:          function() { return undefined; },
-                getPackTMin:              function() { return undefined; },
-                getPackTMax:              function() { return undefined; },
-                getMaxRegenPower:         function() { return undefined; },
-                getMaxDischargePower:     function() { return undefined; },
-                getPackVoltage:           function() { return undefined; },
-                getPackCurrent:           function() { return undefined; },
-                getShowPhoneBattery:      function() { return false; },
-                getShowCarBattery:        function() { return false; },
-                getShowOdometer:          function() { return false; },
-                isImperial:               function() { return false; },
-            };
-        })();
+        // Inject settings once at load time as window._iosSettings.
+        // Each frame Swift merges _iosCarState + _iosSettings and calls receiveMessage directly.
+        let ud = UserDefaults.standard
+        let settingsScript = """
+        window._iosSettings = {
+            isImperial:                \(ud.bool(forKey: DisplaySettings.keyUseImperial) ? "true" : "false"),
+            darkMode:                  \(ud.bool(forKey: DisplaySettings.keyDarkMode) ? "true" : "false"),
+            alwaysOnBlindSpotMonitor:  \(ud.bool(forKey: DisplaySettings.keyAlwaysOnBlindSpotMonitor) ? "true" : "false"),
+            renderQuality:             \(ud.object(forKey: DisplaySettings.keyRenderQuality) != nil ? ud.integer(forKey: DisplaySettings.keyRenderQuality) : 3),
+            showPhoneBattery:          \(ud.object(forKey: DisplaySettings.keyShowPhoneBattery) == nil || ud.bool(forKey: DisplaySettings.keyShowPhoneBattery) ? "true" : "false"),
+            showCarBattery:            \(ud.object(forKey: DisplaySettings.keyShowCarBattery) == nil || ud.bool(forKey: DisplaySettings.keyShowCarBattery) ? "true" : "false"),
+            showOdometer:              \(ud.object(forKey: DisplaySettings.keyShowOdometer) == nil || ud.bool(forKey: DisplaySettings.keyShowOdometer) ? "true" : "false")
+        };
         """
-        let script = WKUserScript(source: nativeBridge, injectionTime: .atDocumentStart, forMainFrameOnly: true)
+        let script = WKUserScript(source: settingsScript, injectionTime: .atDocumentStart, forMainFrameOnly: true)
         config.userContentController.addUserScript(script)
 
         let webView = WKWebView(frame: .zero, configuration: config)
@@ -146,7 +123,7 @@ struct WebDashView: UIViewRepresentable {
 
         if url.hasPrefix("http") || url.hasPrefix("https") {
             webView.load(URLRequest(url: URL(string: url)!))
-        } else if url == "vanilla" {
+        } else if Self.localApps.contains(url) {
             webView.load(URLRequest(url: URL(string: "app://localhost/index.html")!))
         }
 
@@ -172,7 +149,7 @@ struct WebDashView: UIViewRepresentable {
                 for await state in stream {
                     let json = state.toJSONString()
                     webView?.evaluateJavaScript(
-                        "window._iosCarState = \(json); window.onCarStateUpdate && window.onCarStateUpdate()",
+                        "window._iosCarState = \(json); window.receiveMessage && window.receiveMessage(Object.assign({}, window._iosCarState, window._iosSettings || {}))",
                         completionHandler: nil
                     )
                 }

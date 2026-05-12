@@ -54,6 +54,13 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     private val _connectionStatus = MutableStateFlow<ConnectionStatus>(ConnectionStatus.Disconnected)
     val connectionStatus = _connectionStatus.asStateFlow()
 
+    private val _hasAutoNavigatedToDashboard = MutableStateFlow(false)
+    val hasAutoNavigatedToDashboard = _hasAutoNavigatedToDashboard.asStateFlow()
+
+    fun markAutoNavigated() {
+        _hasAutoNavigatedToDashboard.value = true
+    }
+
     private val _displaySettings = MutableStateFlow(DisplaySettings())
     private val _speedCameraDistance = MutableStateFlow(-1)
 
@@ -153,6 +160,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         _dataSource.value?.disconnect()
         _dataSource.value = null
         _dashState.value = null
+        _hasAutoNavigatedToDashboard.value = false
         _connectionStatus.value = if (wasConnecting) {
             ConnectionStatus.Error("Discovery cancelled")
         } else {
