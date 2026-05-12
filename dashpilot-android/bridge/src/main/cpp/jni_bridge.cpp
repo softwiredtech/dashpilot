@@ -2,11 +2,13 @@
 #include <string>
 #include <vector>
 #include <chrono>
+#include <thread>
 #include "common/bridge_core.h"
 
 extern "C" {
 
 static std::atomic<bool> receiveLoopRunning{false};
+static std::atomic<bool> receiveLoopExited{true};
 static JavaVM* g_vm = nullptr;
 static jobject g_callback = nullptr;
 static jdoubleArray g_buffer = nullptr;
@@ -96,6 +98,11 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDeleteSubSockets(
 JNIEXPORT void JNICALL
 Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStopReceiveLoop(JNIEnv* env, jobject thiz) {
     receiveLoopRunning.store(false);
+    // Wait for the receive loop to fully exit before returning,
+    // so the caller can safely delete sockets and other resources.
+    while (!receiveLoopExited.load()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
 }
 
 // === Publisher discovery ===
@@ -236,6 +243,7 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStartReceiveLoop(
     g_onCanDataMethod = env->GetMethodID(callbackClass, "onCanData", "([D)V");
 
     receiveLoopRunning.store(true);
+    receiveLoopExited.store(false);
 
     bridge::runReceiveLoop(group, decoder, receiveLoopRunning,
         [&](const CarState& state) {
@@ -244,6 +252,8 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStartReceiveLoop(
             env->SetDoubleArrayRegion(g_buffer, 0, CarState::FIELD_COUNT, output);
             env->CallVoidMethod(g_callback, g_onCanDataMethod, g_buffer);
         });
+
+    receiveLoopExited.store(true);
 }
 
 }

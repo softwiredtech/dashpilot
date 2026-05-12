@@ -39,6 +39,7 @@ static void carStateToBridge(const CarState& cs, BridgeCarState* out) {
 }
 
 static std::atomic<bool> receiveLoopRunning{false};
+static std::atomic<bool> receiveLoopExited{true};
 
 extern "C" {
 
@@ -82,6 +83,7 @@ void bridge_start_receive_loop(void* groupPtr, void* decoderPtr, void* callbackC
     auto* group = static_cast<SubSocketGroup*>(groupPtr);
     auto* decoder = static_cast<VehicleDecoder*>(decoderPtr);
     receiveLoopRunning.store(true);
+    receiveLoopExited.store(false);
 
     BridgeCarState bridgeState = {};
     bridge::runReceiveLoop(group, decoder, receiveLoopRunning,
@@ -89,10 +91,17 @@ void bridge_start_receive_loop(void* groupPtr, void* decoderPtr, void* callbackC
             carStateToBridge(state, &bridgeState);
             callback(callbackContext, &bridgeState);
         });
+
+    receiveLoopExited.store(true);
 }
 
 void bridge_stop_receive_loop(void) {
     receiveLoopRunning.store(false);
+    // Wait for the receive loop to fully exit before returning,
+    // so the caller can safely delete sockets and other resources.
+    while (!receiveLoopExited.load()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
 }
 
 }

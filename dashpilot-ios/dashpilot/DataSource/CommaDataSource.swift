@@ -73,7 +73,9 @@ final class CommaDataSource: IDataSource {
     }
 
     func disconnect() {
+        // NOTE: This will block until receive loop has excited
         bridge_stop_receive_loop()
+
         if let group { bridge_delete_sub_sockets(group) }
         if let decoder { bridge_destroy_vehicle_decoder(decoder) }
         if let context { bridge_delete_context(context) }
