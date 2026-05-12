@@ -1,20 +1,12 @@
 #include <jni.h>
 #include <string>
-#include <iostream>
-#include <cmath>
-#include <memory>
-#include <android/log.h>
-
-#include "common/vehicle_decoder.h"
-#include "common/receive_loop.h"
-
-#define LOG_TAG "MsgQNative"
-#define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
-#include <map>
+#include <vector>
+#include <chrono>
+#include "common/bridge_core.h"
 
 extern "C" {
 
-static bool receiveLoopRunning = false;
+static std::atomic<bool> receiveLoopRunning{false};
 static JavaVM* g_vm = nullptr;
 static jobject g_callback = nullptr;
 static jdoubleArray g_buffer = nullptr;
@@ -28,21 +20,17 @@ jint JNI_OnLoad(JavaVM* vm, void*) {
 // === Context ===
 JNIEXPORT jlong JNICALL
 Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeCreateContext(JNIEnv *env, jobject thiz) {
-    Context *ctx = Context::create();
-    return reinterpret_cast<jlong>(ctx);
+    return reinterpret_cast<jlong>(bridge::createContext());
 }
 
 JNIEXPORT void JNICALL
 Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDeleteContext(JNIEnv *env, jobject thiz,
                                                            jlong ctxPtr) {
-    if (ctxPtr == 0) {
-        return;
-    }
-    Context *ctx = reinterpret_cast<Context *>(ctxPtr);
-    delete ctx;
+    if (ctxPtr == 0) return;
+    bridge::deleteContext(reinterpret_cast<Context*>(ctxPtr));
 }
 
-// === SubSocket ===
+// === SubSocket (single) ===
 JNIEXPORT jlong JNICALL
 Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeCreateSubSocket(
         JNIEnv* env, jobject thiz,
@@ -52,27 +40,21 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeCreateSubSocket(
 
     Context* ctx = reinterpret_cast<Context*>(ctxPtr);
 
-    std::string  endpointStr = env->GetStringUTFChars(endpoint, nullptr);
-    std::string  addressStr = env->GetStringUTFChars(address, nullptr);
+    const char* epChars = env->GetStringUTFChars(endpoint, nullptr);
+    const char* addrChars = env->GetStringUTFChars(address, nullptr);
+    std::string endpointStr(epChars);
+    std::string addressStr(addrChars);
+    env->ReleaseStringUTFChars(endpoint, epChars);
+    env->ReleaseStringUTFChars(address, addrChars);
 
-    SubSocket* sub = SubSocket::create(
-            ctx,
-            endpointStr,
-            addressStr,
-            false,
-            true,
-            0);
-
+    SubSocket* sub = SubSocket::create(ctx, endpointStr, addressStr, false, true, 0);
     return reinterpret_cast<jlong>(sub);
 }
 
 JNIEXPORT void JNICALL
 Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDeleteSubSocket(JNIEnv* env, jobject thiz, jlong subPtr) {
-    if (subPtr == 0) {
-        return;
-    }
-    SubSocket* sub = reinterpret_cast<SubSocket*>(subPtr);
-    delete sub;
+    if (subPtr == 0) return;
+    delete reinterpret_cast<SubSocket*>(subPtr);
 }
 
 // === SubSocketGroup (multiple endpoints) ===
@@ -89,21 +71,18 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeCreateSubSockets(
     env->ReleaseStringUTFChars(address, addrChars);
 
     int count = env->GetArrayLength(endpoints);
-    auto* group = new SubSocketGroup();
-
+    std::vector<std::string> eps;
     for (int i = 0; i < count; i++) {
         auto jstr = (jstring) env->GetObjectArrayElement(endpoints, i);
         const char* chars = env->GetStringUTFChars(jstr, nullptr);
-        std::string endpointStr(chars);
+        eps.emplace_back(chars);
         env->ReleaseStringUTFChars(jstr, chars);
-
-        SubSocket* sub = SubSocket::create(ctx, endpointStr, addressStr, false, true, 0);
-        if (sub) {
-            group->sockets.push_back(sub);
-            LOGD("SubSocketGroup: subscribed to '%s' at %s", endpointStr.c_str(), addressStr.c_str());
-        }
     }
 
+    auto* group = bridge::createSubSockets(ctx, eps, addressStr);
+    for (const auto& ep : eps) {
+        BRIDGE_LOG("SubSocketGroup: subscribed to '%s' at %s", ep.c_str(), addressStr.c_str());
+    }
     return reinterpret_cast<jlong>(group);
 }
 
@@ -111,17 +90,15 @@ JNIEXPORT void JNICALL
 Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDeleteSubSockets(
         JNIEnv* env, jobject thiz, jlong groupPtr) {
     if (groupPtr == 0) return;
-    auto* group = reinterpret_cast<SubSocketGroup*>(groupPtr);
-    for (auto* sub : group->sockets) delete sub;
-    delete group;
+    bridge::deleteSubSockets(reinterpret_cast<SubSocketGroup*>(groupPtr));
 }
 
 JNIEXPORT void JNICALL
 Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStopReceiveLoop(JNIEnv* env, jobject thiz) {
-    receiveLoopRunning = false;
+    receiveLoopRunning.store(false);
 }
 
-// Discover a ZMQ publisher on the local subnet using Poller.
+// === Publisher discovery ===
 JNIEXPORT jstring JNICALL
 Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDiscoverPublisher(
         JNIEnv* env, jobject thiz,
@@ -139,82 +116,19 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDiscoverPublisher(
     env->ReleaseStringUTFChars(endpoint, endpointChars);
     env->ReleaseStringUTFChars(initialIp, ipChars);
 
-    // Parse subnet prefix and self octet
-    auto lastDot = ipStr.rfind('.');
-    if (lastDot == std::string::npos) return nullptr;
-    std::string prefix = ipStr.substr(0, lastDot);
-    int selfOctet = std::stoi(ipStr.substr(lastDot + 1));
-
-    // Build candidate list, skipping our own octet
-    std::vector<int> octets;
-    for (int i = 1; i <= 254; i++) {
-        if (i != selfOctet) octets.push_back(i);
-    }
-
-    // Create all sockets and map them to their IPs
-    std::vector<SubSocket*> allSockets;
-    std::map<SubSocket*, std::string> socketToIp;
-    allSockets.reserve(octets.size());
-
-    for (int octet : octets) {
-        std::string candidate = prefix + "." + std::to_string(octet);
-        SubSocket* sub = SubSocket::create(ctx, endpointStr, candidate, false, true, 0);
-        if (sub) {
-            allSockets.push_back(sub);
-            socketToIp[sub] = candidate;
-        }
-    }
-
-    LOGD("Discovery: created %zu sockets on subnet %s.*, timeout %dms",
-         allSockets.size(), prefix.c_str(), timeoutMs);
-
-    std::string foundIp;
-    auto start = std::chrono::steady_clock::now();
-    const size_t batchSize = 127;
-    std::vector<Poller*> pollers;
-
-    for (size_t i = 0; i < allSockets.size(); i += batchSize) {
-        Poller* poller = Poller::create();
-        size_t end = std::min(i + batchSize, allSockets.size());
-        for (size_t j = i; j < end; j++) {
-            poller->registerSocket(allSockets[j]);
-        }
-        pollers.push_back(poller);
-    }
-
-    // Poll all batches in round-robin until timeout or hit
-    while (foundIp.empty()) {
-        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(
-                std::chrono::steady_clock::now() - start).count();
-        if (elapsed >= timeoutMs) break;
-
-        for (auto* poller : pollers) {
-            auto ready = poller->poll(100);
-            for (auto* sub : ready) {
-                Message* msg = sub->receive(true);
-                if (msg) {
-                    delete msg;
-                    foundIp = socketToIp[sub];
-                    break;
-                }
-            }
-            if (!foundIp.empty()) break;
-        }
-    }
-
-    // Cleanup
-    for (auto* poller : pollers) delete poller;
-    for (auto* sub : allSockets) delete sub;
+    BRIDGE_LOG("Discovery: starting on subnet %s, timeout %dms", ipStr.c_str(), timeoutMs);
+    std::string foundIp = bridge::discoverPublisher(ctx, endpointStr, ipStr, timeoutMs);
 
     if (foundIp.empty()) {
-        LOGD("Discovery: no publisher found");
+        BRIDGE_LOG("Discovery: no publisher found");
         return nullptr;
     }
 
-    LOGD("Discovery: found publisher at %s", foundIp.c_str());
+    BRIDGE_LOG("Discovery: found publisher at %s", foundIp.c_str());
     return env->NewStringUTF(foundIp.c_str());
 }
 
+// === Raw message accessors ===
 JNIEXPORT jbyteArray JNICALL
 Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeGetData(JNIEnv* env, jobject thiz, jlong msgPtr) {
     Message* msg = reinterpret_cast<Message*>(msgPtr);
@@ -234,14 +148,10 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeGetSize(JNIEnv* env, jo
 
 JNIEXPORT void JNICALL
 Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDeleteMessage(JNIEnv* env, jobject thiz, jlong msgPtr) {
-    Message* msg = reinterpret_cast<Message*>(msgPtr);
-    delete msg;
+    delete reinterpret_cast<Message*>(msgPtr);
 }
 
-// ============================================================
-// VehicleDecoder JNI functions
-// ============================================================
-
+// === VehicleDecoder ===
 JNIEXPORT jlong JNICALL
 Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeCreateVehicleDecoder(
         JNIEnv* env, jobject thiz,
@@ -250,25 +160,25 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeCreateVehicleDecoder(
         jstring vehicleType) {
 
     int dbcCount = env->GetArrayLength(dbcContents);
-    std::vector<std::string> dbcContentsVec;
-    std::vector<int> busIndicesVec;
+    std::vector<std::string> dbcVec;
+    std::vector<int> busVec;
 
-    jint* busIndicesArr = env->GetIntArrayElements(busIndices, nullptr);
+    jint* busArr = env->GetIntArrayElements(busIndices, nullptr);
     for (int i = 0; i < dbcCount; i++) {
         auto jstr = (jstring) env->GetObjectArrayElement(dbcContents, i);
         const char* str = env->GetStringUTFChars(jstr, nullptr);
-        dbcContentsVec.emplace_back(str);
+        dbcVec.emplace_back(str);
         env->ReleaseStringUTFChars(jstr, str);
-        busIndicesVec.push_back(busIndicesArr[i]);
+        busVec.push_back(busArr[i]);
     }
-    env->ReleaseIntArrayElements(busIndices, busIndicesArr, 0);
+    env->ReleaseIntArrayElements(busIndices, busArr, 0);
 
     const char* typeStr = env->GetStringUTFChars(vehicleType, nullptr);
     std::string type(typeStr);
     env->ReleaseStringUTFChars(vehicleType, typeStr);
 
-    auto* decoder = new VehicleDecoder(dbcContentsVec, busIndicesVec, type);
-    LOGD("VehicleDecoder created: type=%s, %d buses", type.c_str(), dbcCount);
+    auto* decoder = bridge::createVehicleDecoder(dbcVec, busVec, type);
+    BRIDGE_LOG("VehicleDecoder created: type=%s, %d buses", type.c_str(), dbcCount);
     return reinterpret_cast<jlong>(decoder);
 }
 
@@ -290,7 +200,6 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDecodeCanFrame(
 
     env->ReleaseByteArrayElements(data, dataBytes, 0);
 
-    // Return full CarState as double array
     double output[CarState::FIELD_COUNT];
     decoder->state().toArray(output);
 
@@ -303,14 +212,11 @@ JNIEXPORT void JNICALL
 Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDestroyVehicleDecoder(
         JNIEnv* env, jobject thiz,
         jlong decoderHandle) {
-    if (decoderHandle == 0) {
-        return;
-    }
-    auto* decoder = reinterpret_cast<VehicleDecoder*>(decoderHandle);
-    delete decoder;
+    if (decoderHandle == 0) return;
+    bridge::destroyVehicleDecoder(reinterpret_cast<VehicleDecoder*>(decoderHandle));
 }
 
-// Receive loop using VehicleDecoder + SubSocketGroup (for CommaDataSource / ZMQ)
+// === Receive loop ===
 JNIEXPORT void JNICALL
 Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStartReceiveLoop(
         JNIEnv* env,
@@ -329,49 +235,15 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStartReceiveLoop(
     jclass callbackClass = env->GetObjectClass(callback);
     g_onCanDataMethod = env->GetMethodID(callbackClass, "onCanData", "([D)V");
 
-    receiveLoopRunning = true;
+    receiveLoopRunning.store(true);
 
-    long long msgTimeAccum = 0;
-    int msgCount = 0;
-
-    double madsActive = 0.0;
-    double experimentalMode = 0.0;
-    double selfdriveActive = 0.0;
-    double changingLane = 0.0;
-
-    while (receiveLoopRunning) {
-        bool gotAny = false;
-
-        for (auto* sub : group->sockets) {
-            Message *msg = sub->receive(true);
-            if (!msg) continue;
-            gotAny = true;
-
-            auto t0 = std::chrono::high_resolution_clock::now();
-
-            if (processMessage(msg, decoder, madsActive, experimentalMode, selfdriveActive, changingLane)) {
-                double output[CarState::FIELD_COUNT];
-                decoder->state().toArray(output);
-                env->SetDoubleArrayRegion(g_buffer, 0, CarState::FIELD_COUNT, output);
-                env->CallVoidMethod(g_callback, g_onCanDataMethod, g_buffer);
-            }
-
-            delete msg;
-
-            auto t1 = std::chrono::high_resolution_clock::now();
-            msgTimeAccum += std::chrono::duration_cast<std::chrono::microseconds>(t1 - t0).count();
-            msgCount++;
-            if (msgCount >= 100) {
-                LOGD("receiveLoop avg: %.3f ms/msg (over %d msgs)", msgTimeAccum / 1000.0 / msgCount, msgCount);
-                msgTimeAccum = 0;
-                msgCount = 0;
-            }
-        }
-
-        if (!gotAny) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        }
-    }
+    bridge::runReceiveLoop(group, decoder, receiveLoopRunning,
+        [&](const CarState& state) {
+            double output[CarState::FIELD_COUNT];
+            state.toArray(output);
+            env->SetDoubleArrayRegion(g_buffer, 0, CarState::FIELD_COUNT, output);
+            env->CallVoidMethod(g_callback, g_onCanDataMethod, g_buffer);
+        });
 }
 
 }
