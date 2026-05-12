@@ -58,6 +58,11 @@ void  bridge_delete_sub_sockets(void* group);
 void* bridge_create_vehicle_decoder(const char** dbcContents, const int* busIndices, int count, const char* vehicleType);
 void  bridge_destroy_vehicle_decoder(void* decoder);
 
+// Discovery
+// Returns a malloc'd C string with the discovered IP, or NULL if not found.
+// Caller must free() the result.
+char* bridge_discover_publisher(void* ctx, const char* endpoint, const char* initialIp, int timeoutMs);
+
 // Receive loop
 typedef void (*bridge_car_state_callback_t)(void* context, const BridgeCarState* state);
 void bridge_start_receive_loop(void* group, void* decoder, void* callbackContext, bridge_car_state_callback_t callback);

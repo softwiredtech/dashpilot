@@ -9,6 +9,7 @@ struct SetupView: View {
 
     @State private var serverAddress: String =
         UserDefaults.standard.string(forKey: "device_ip") ?? "192.168.1.105"
+    @State private var showManualEntry = false
 
     var body: some View {
         ZStack {
@@ -63,31 +64,44 @@ struct SetupView: View {
 
     private var controlsSection: some View {
         VStack(spacing: 0) {
-            TextField("Device IP", text: $serverAddress)
-                .keyboardType(.default)
-                .foregroundColor(connectionVM.connectionStatus == .disconnected ? .white : Color(white: 0.53))
-                .disabled(connectionVM.connectionStatus != .disconnected)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 12)
-                .background(Color(white: 0.08))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color(white: 0.2), lineWidth: 1)
-                )
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-                .frame(maxWidth: .infinity * 0.7)
-                .frame(width: UIScreen.main.bounds.width * 0.7)
-
-            Spacer().frame(height: 16)
-
             switch connectionVM.connectionStatus {
             case .disconnected:
+                if showManualEntry || connectionVM.discoveryError != nil {
+                    manualIPField
+                    Spacer().frame(height: 12)
+                }
+
                 connectButton
+
+                if let error = connectionVM.discoveryError {
+                    Spacer().frame(height: 8)
+                    Text(error)
+                        .foregroundColor(Color(red: 1, green: 0.32, blue: 0.32))
+                        .font(.system(size: 13))
+                }
+
+                if !showManualEntry && connectionVM.discoveryError == nil {
+                    Spacer().frame(height: 12)
+                    manualToggleButton
+                }
+
             case .connecting:
+                if let ip = connectionVM.discoveredAddress {
+                    statusText("Connecting to \(ip)...")
+                } else {
+                    statusText("Searching for device...")
+                }
+                Spacer().frame(height: 16)
                 cancelButton
                 Spacer().frame(height: 12)
                 nextButton(isConnecting: true)
+
             case .connected:
+                if let ip = connectionVM.discoveredAddress {
+                    statusText("Connected to \(ip)")
+                        .foregroundColor(dashGreen)
+                }
+                Spacer().frame(height: 16)
                 disconnectButton
                 Spacer().frame(height: 12)
                 nextButton(isConnecting: false)
@@ -96,10 +110,20 @@ struct SetupView: View {
         .frame(maxWidth: .infinity)
     }
 
+    private func statusText(_ text: String) -> some View {
+        Text(text)
+            .foregroundColor(Color(white: 0.53))
+            .font(.system(size: 14))
+    }
+
     private var connectButton: some View {
         Button {
-            UserDefaults.standard.set(serverAddress, forKey: "device_ip")
-            connectionVM.connect(serverAddress: serverAddress)
+            if showManualEntry || connectionVM.discoveryError != nil {
+                UserDefaults.standard.set(serverAddress, forKey: "device_ip")
+                connectionVM.connect(serverAddress: serverAddress)
+            } else {
+                connectionVM.autoConnect()
+            }
         } label: {
             Text("Connect")
                 .font(.system(size: 16, weight: .semibold))
@@ -110,6 +134,31 @@ struct SetupView: View {
         .background(Color.white)
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .frame(width: UIScreen.main.bounds.width * 0.7)
+    }
+
+    private var manualToggleButton: some View {
+        Button {
+            showManualEntry = true
+        } label: {
+            Text("Enter IP manually")
+                .font(.system(size: 14))
+                .foregroundColor(Color(white: 0.53))
+        }
+    }
+
+    private var manualIPField: some View {
+        TextField("Device IP", text: $serverAddress)
+            .keyboardType(.default)
+            .foregroundColor(.white)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .background(Color(white: 0.08))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color(white: 0.2), lineWidth: 1)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .frame(width: UIScreen.main.bounds.width * 0.7)
     }
 
     private var cancelButton: some View {
@@ -148,7 +197,9 @@ struct SetupView: View {
 
     private func nextButton(isConnecting: Bool) -> some View {
         Button {
-            UserDefaults.standard.set(serverAddress, forKey: "device_ip")
+            if let ip = connectionVM.discoveredAddress {
+                UserDefaults.standard.set(ip, forKey: "device_ip")
+            }
             let dash = selectedDashboard()
             navigationPath.append(AppRoute.dashboard(type: dash.type.rawValue, url: dash.url))
         } label: {
