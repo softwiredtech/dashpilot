@@ -11,10 +11,10 @@ struct DashboardView: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             Group {
-                if let ds = connectionVM.dataSource {
+                if let dashStream = connectionVM.dashMessages {
                     switch dashboardType {
                     case DashboardType.web.rawValue:
-                        WebDashView(url: dashboardUrl, incomingMessages: ds.incomingMessages)
+                        WebDashView(url: dashboardUrl, incomingMessages: dashStream)
                     default:
                         Text("Unsupported dashboard type: \(dashboardType)")
                             .foregroundColor(.white)

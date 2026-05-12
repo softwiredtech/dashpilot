@@ -1,14 +1,16 @@
 import Foundation
 import Observation
+import UIKit
 
 @Observable
 final class ConnectionViewModel {
 
     private(set) var connectionStatus: ConnectionStatus = .disconnected
-    private(set) var dataSource: (any IDataSource)?
+    private(set) var dashMessages: AsyncStream<DashState>?
     private(set) var discoveredAddress: String?
     private(set) var discoveryError: String?
 
+    private var dataSource: (any IDataSource)?
     private var connectTask: Task<Void, Never>?
 
     /// Auto-discover a publisher on the local subnet, then connect.
@@ -58,6 +60,7 @@ final class ConnectionViewModel {
         connectTask = nil
         dataSource?.disconnect()
         dataSource = nil
+        dashMessages = nil
         discoveredAddress = nil
         discoveryError = nil
         connectionStatus = .disconnected
@@ -70,12 +73,32 @@ final class ConnectionViewModel {
         dataSource = ds
         ds.connect(address: address)
 
+        var capturedContinuation: AsyncStream<DashState>.Continuation?
+        dashMessages = AsyncStream<DashState>(bufferingPolicy: .bufferingNewest(1)) { continuation in
+            capturedContinuation = continuation
+        }
+
         connectTask = Task { @MainActor [weak self] in
             guard let self else { return }
-            for await _ in ds.incomingMessages {
-                self.connectionStatus = .connected
-                break
+            UIDevice.current.isBatteryMonitoringEnabled = true
+            var first = true
+            for await carState in ds.incomingMessages {
+                if first {
+                    self.connectionStatus = .connected
+                    first = false
+                }
+                let settings = DisplaySettingsState.fromUserDefaults()
+                let converted = settings.useImperial ? carState.toImperial() : carState
+                let batteryLevel = UIDevice.current.batteryLevel
+                let state = DashState(
+                    carState: converted,
+                    displaySettings: settings,
+                    phoneBattery: batteryLevel >= 0 ? Int(batteryLevel * 100) : -1,
+                    currentTime: Int64(Date().timeIntervalSince1970 * 1000)
+                )
+                capturedContinuation?.yield(state)
             }
+            capturedContinuation?.finish()
         }
     }
 }

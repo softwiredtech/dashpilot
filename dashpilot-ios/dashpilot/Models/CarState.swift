@@ -72,6 +72,26 @@ struct CarState: Codable {
         changingLane = bridge.changingLane > 0
     }
 
+    private static let kmToMiles: Float = 0.621371
+
+    private static let milesCountries: Set<String> = ["US", "GB", "MM", "LR"]
+
+    private static func speedLimitSignsInKm() -> Bool {
+        let country = Locale.current.region?.identifier ?? ""
+        return !milesCountries.contains(country)
+    }
+
+    func toImperial() -> CarState {
+        var c = self
+        c.odometer = odometer * Self.kmToMiles
+        c.packTMin = packTMin != 0 ? packTMin * 1.8 + 32 : 0
+        c.packTMax = packTMax != 0 ? packTMax * 1.8 + 32 : 0
+        if Self.speedLimitSignsInKm() {
+            c.fusedSpeedLimit = fusedSpeedLimit * Self.kmToMiles
+        }
+        return c
+    }
+
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         egoSteeringAngle     = try c.decodeIfPresent(Float.self, forKey: .egoSteeringAngle)     ?? 0
