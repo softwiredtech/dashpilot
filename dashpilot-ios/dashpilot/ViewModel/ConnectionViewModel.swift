@@ -69,7 +69,19 @@ final class ConnectionViewModel {
     // MARK: - Private
 
     private func startDataSource(address: String) {
-        let ds = CommaDataSource()
+        let extraBus = UserDefaults.standard.bool(forKey: DisplaySettings.keyExtraVehicleBus)
+        let ds: CommaDataSource
+        if extraBus {
+            ds = CommaDataSource(
+                vehicleType: "tesla_extra",
+                dbcFiles: [
+                    (1, "bus_1_tesla_vehicle"),
+                    (2, "bus_2_tesla_party")
+                ]
+            )
+        } else {
+            ds = CommaDataSource()
+        }
         dataSource = ds
         ds.connect(address: address)
 
