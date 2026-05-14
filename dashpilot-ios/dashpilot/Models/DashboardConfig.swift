@@ -51,6 +51,13 @@ let availableDashboards: [DashboardConfig] = [
         screenshotName: "preview_ambient"
     ),
     DashboardConfig(
+        id: "analog",
+        name: "Analog Dashboard",
+        url: "analog",
+        type: .web,
+        screenshotName: "preview_analog"
+    ),
+    DashboardConfig(
         id: "retro",
         name: "Retro Dashboard",
         url: "retro",

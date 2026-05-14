@@ -85,7 +85,7 @@ struct WebDashView: UIViewRepresentable {
         Coordinator()
     }
 
-    private static let localApps: Set<String> = ["vanilla", "retro", "ambient"]
+    private static let localApps: Set<String> = ["vanilla", "retro", "ambient", "analog"]
 
     func makeUIView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
