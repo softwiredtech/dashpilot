@@ -11,7 +11,7 @@ APPS_DIR="$REPO_ROOT/dash-apps"
 ASSETS_DIR="$REPO_ROOT/dashpilot-android/app/src/main/assets"
 
 # Default folders to sync (override by passing arguments)
-DEFAULT_FOLDERS=(web-vanilla web-retro web-ambient)
+DEFAULT_FOLDERS=(web-vanilla web-retro web-ambient web-analog)
 
 if [ $# -gt 0 ]; then
   FOLDERS=("$@")
