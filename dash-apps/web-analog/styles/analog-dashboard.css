@@ -1,0 +1,121 @@
+.viewport {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  padding-top: max(env(safe-area-inset-top), var(--safe-top));
+  padding-right: max(env(safe-area-inset-right), var(--safe-right));
+  padding-bottom: max(env(safe-area-inset-bottom), var(--safe-bottom));
+  padding-left: max(env(safe-area-inset-left), var(--safe-left));
+}
+
+.analog-dashboard {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35%;
+}
+
+.dashboard-slot {
+  --well-size: min(92vw, 92vh);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  z-index: 1;
+}
+
+.dashboard-slot::before,
+.dashboard-slot::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.dashboard-slot::before {
+  width: var(--well-size);
+  aspect-ratio: 1;
+  background:
+    radial-gradient(88% 86% at var(--backdrop-recessed-shadow-x, 45.34%) var(--backdrop-recessed-shadow-y, 32.61%), rgb(var(--shadow-rgb) / 0.08), transparent 44%),
+    radial-gradient(96% 92% at var(--backdrop-recessed-highlight-x, 54.66%) var(--backdrop-recessed-highlight-y, 67.39%), rgb(var(--highlight-rgb) / var(--gauge-well-highlight-opacity)), transparent 40%),
+    linear-gradient(var(--lighting-direction-deg, 345deg), rgb(var(--gauge-well-top-rgb)) 0%, rgb(var(--gauge-well-bottom-rgb)) 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(var(--highlight-rgb) / var(--gauge-well-edge-opacity)),
+    inset 0 0 0 1px rgb(var(--highlight-rgb) / 0.03),
+    inset 0 -18px 24px rgb(var(--shadow-rgb) / var(--gauge-well-shadow-opacity)),
+    4px 12px 14px rgb(var(--shadow-rgb) / var(--gauge-contact-shadow-opacity));
+  z-index: 1;
+}
+
+.dashboard-slot::after {
+  width: calc(var(--well-size) + min(4vw, 4vh));
+  aspect-ratio: 1;
+  box-shadow:
+    inset 0 1px 0 rgb(var(--highlight-rgb) / 0.055),
+    inset -1px -1px 0 rgb(var(--shadow-rgb) / 0.18),
+    0 0 0 1px rgb(var(--highlight-rgb) / 0.035),
+    0 0 0 2px rgb(var(--shadow-rgb) / 0.18),
+    8px 14px 20px rgb(var(--shadow-rgb) / 0.22);
+  opacity: 0.95;
+  z-index: 0;
+}
+
+.gauge {
+  position: relative;
+  z-index: 2;
+  width: min(89vw, 89vh);
+}
+
+.dashboard-slot--center {
+  z-index: 3;
+}
+
+/* Blind-spot monitor bloom — soft red panel glow on the affected side */
+.bsm-bloom {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 46vmin;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 0;
+  transition: opacity 320ms ease-out;
+}
+
+.bsm-bloom--left {
+  left: -12vmin;
+  background: radial-gradient(
+    72% 62% at 28% 50%,
+    rgb(var(--bsm-glow-rgb) / 0.62) 0%,
+    rgb(var(--bsm-rgb) / 0.34) 26%,
+    rgb(var(--bsm-rgb) / 0.12) 52%,
+    transparent 74%
+  );
+}
+
+.bsm-bloom--right {
+  right: -12vmin;
+  background: radial-gradient(
+    72% 62% at 72% 50%,
+    rgb(var(--bsm-glow-rgb) / 0.62) 0%,
+    rgb(var(--bsm-rgb) / 0.34) 26%,
+    rgb(var(--bsm-rgb) / 0.12) 52%,
+    transparent 74%
+  );
+}
+
+.analog-dashboard[data-bsm-left="active"] .bsm-bloom--left,
+.analog-dashboard[data-bsm-right="active"] .bsm-bloom--right {
+  opacity: 1;
+}

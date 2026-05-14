@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="classic-911">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <title>DashPilot Analog Dashboard</title>
+  <link rel="stylesheet" href="styles/analog-theme.css">
+  <link rel="stylesheet" href="styles/analog-dashboard.css">
+</head>
+<body>
+  <div class="viewport">
+    <main class="analog-dashboard" data-dashboard-root data-bsm-left="idle" data-bsm-right="idle">
+      <div class="bsm-bloom bsm-bloom--left" aria-hidden="true"></div>
+      <div class="bsm-bloom bsm-bloom--right" aria-hidden="true"></div>
+      <section class="dashboard-slot dashboard-slot--center" aria-label="Speedometer gauge slot">
+        <analog-speed-gauge class="gauge" data-detail="full" value="0" min="0" max="140" unit="MPH" gear="D" acc-set-speed="0" speed-limit="0" mode-state="off" left-blinker="0" right-blinker="0"></analog-speed-gauge>
+      </section>
+    </main>
+  </div>
+
+  <script defer src="scripts/analog-geometry.js"></script>
+  <script defer src="scripts/analog-shell.js"></script>
+  <script defer src="scripts/speed-gauge.js"></script>
+  <script defer src="scripts/dashboard-model.js"></script>
+  <script defer src="scripts/dashboard-runtime.js"></script>
+</body>
+</html>
