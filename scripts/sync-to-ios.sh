@@ -15,7 +15,7 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 APPS_DIR="$REPO_ROOT/dash-apps"
 
 # Default folders (override by passing arguments)
-DEFAULT_FOLDERS=(web-vanilla web-retro web-ambient)
+DEFAULT_FOLDERS=(web-vanilla web-retro web-ambient web-analog)
 
 if [ $# -gt 0 ]; then
   FOLDERS=("$@")
