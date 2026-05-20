@@ -1,6 +1,7 @@
 package com.softwiredtech.dashpilot.ui
 
 import android.content.Context
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -454,8 +455,23 @@ private fun RenderQualitySelector(selected: Int, onSelected: (Int) -> Unit) {
 @Composable
 private fun FirmwareUpdateSection(bleManager: DashKitBleManager) {
     val context = LocalContext.current
-    val otaUpdate = remember(bleManager) { DashKitOtaUpdate(bleManager, context) }
+    val otaUpdate = remember(bleManager) { DashKitOtaUpdate(bleManager) }
     val otaState by otaUpdate.state.collectAsState()
+
+    val filePicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        val bytes = try {
+            context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+        } catch (e: Exception) {
+            Log.e("FirmwareUpdate", "Failed to read file: ${e.message}")
+            null
+        }
+        if (bytes != null && bytes.isNotEmpty()) {
+            otaUpdate.start(bytes)
+        }
+    }
 
     DisposableEffect(otaUpdate) {
         onDispose { otaUpdate.cancel() }
@@ -471,7 +487,7 @@ private fun FirmwareUpdateSection(bleManager: DashKitBleManager) {
     when (val state = otaState) {
         is OtaState.Idle -> {
             Button(
-                onClick = { otaUpdate.start() },
+                onClick = { filePicker.launch("application/octet-stream") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = AccentColor)
             ) {
@@ -518,7 +534,7 @@ private fun FirmwareUpdateSection(bleManager: DashKitBleManager) {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Button(
-                onClick = { otaUpdate.start() },
+                onClick = { filePicker.launch("application/octet-stream") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = AccentColor)
             ) {

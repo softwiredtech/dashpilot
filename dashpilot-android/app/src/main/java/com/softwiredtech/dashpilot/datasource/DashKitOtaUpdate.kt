@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
-import android.content.Context
 import android.os.Build
 import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,8 +20,7 @@ sealed class OtaState {
 
 @SuppressLint("MissingPermission")
 class DashKitOtaUpdate(
-    private val manager: DashKitBleManager,
-    private val context: Context
+    private val manager: DashKitBleManager
 ) : GattListener {
 
     companion object {
@@ -32,7 +30,6 @@ class DashKitOtaUpdate(
         private val OTA_DATA_UUID = UUID.fromString("CADA0102-CA00-B1E0-B0D6-C000AA0100A1")
         private val OTA_STATUS_UUID = UUID.fromString("CADA0103-CA00-B1E0-B0D6-C000AA0100A1")
         private val CCCD_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
-        private const val FIRMWARE_ASSET = "dashkit-firmware.bin"
     }
 
     private val _state = MutableStateFlow<OtaState>(OtaState.Idle)
@@ -44,10 +41,9 @@ class DashKitOtaUpdate(
     private var dataChar: BluetoothGattCharacteristic? = null
     private var statusChar: BluetoothGattCharacteristic? = null
 
-    fun start() {
-        val fw = loadFirmware()
-        if (fw == null || fw.isEmpty()) {
-            _state.value = OtaState.Error("Firmware file not found or empty")
+    fun start(fw: ByteArray) {
+        if (fw.isEmpty()) {
+            _state.value = OtaState.Error("Firmware file is empty")
             return
         }
         firmware = fw
@@ -150,15 +146,6 @@ class DashKitOtaUpdate(
         ctrlChar = null
         dataChar = null
         statusChar = null
-    }
-
-    private fun loadFirmware(): ByteArray? {
-        return try {
-            context.assets.open(FIRMWARE_ASSET).use { it.readBytes() }
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to load firmware: ${e.message}")
-            null
-        }
     }
 
     private fun sendBeginCommand(g: BluetoothGatt) {
