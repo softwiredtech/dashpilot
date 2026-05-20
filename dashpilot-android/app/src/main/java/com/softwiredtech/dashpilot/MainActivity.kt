@@ -157,9 +157,11 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable<SettingsRoute> {
+                            val manager by connectionVM.bleManager.collectAsState()
                             SettingsScreen(
                                 onBack = { navController.popBackStack() },
-                                onDisplaySettingsChanged = { connectionVM.updateDisplaySettings(it) }
+                                onDisplaySettingsChanged = { connectionVM.updateDisplaySettings(it) },
+                                bleManager = manager
                             )
                         }
                         composable<DashboardRoute> { backStackEntry ->

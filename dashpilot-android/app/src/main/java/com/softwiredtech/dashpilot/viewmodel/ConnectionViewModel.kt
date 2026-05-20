@@ -29,6 +29,7 @@ import com.softwiredtech.dashpilot.datasource.DataSourceType
 import com.softwiredtech.dashpilot.datasource.CommaDataSource
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.IDataSource
+import com.softwiredtech.dashpilot.datasource.DashKitBleManager
 import com.softwiredtech.dashpilot.datasource.DashKitDataSource
 import com.softwiredtech.dashpilot.datasource.WebsocketDataSource
 import com.softwiredtech.dashpilot.jni.VehicleBridge
@@ -53,6 +54,9 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
 
     private val _connectionStatus = MutableStateFlow<ConnectionStatus>(ConnectionStatus.Disconnected)
     val connectionStatus = _connectionStatus.asStateFlow()
+
+    private val _bleManager = MutableStateFlow<DashKitBleManager?>(null)
+    val bleManager: StateFlow<DashKitBleManager?> = _bleManager.asStateFlow()
 
     private val _hasAutoNavigatedToDashboard = MutableStateFlow(false)
     val hasAutoNavigatedToDashboard = _hasAutoNavigatedToDashboard.asStateFlow()
@@ -87,15 +91,17 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
             val prefs = context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
             val extraBus = prefs.getBoolean(PREF_EXTRA_VEHICLE_BUS, DEFAULT_EXTRA_VEHICLE_BUS)
             val configFile = when (dataSourceType) {
-                DataSourceType.BLE -> "config_dashkit.json"
+                DataSourceType.DASHKIT -> "config_dashkit.json"
                 else -> if (extraBus) "config_comma_extra_bus.json" else "config_comma_normal.json"
             }
             val profile = VehicleProfileLoader.loadProfile(context, vehicleName, configFile)
             val bridge = VehicleBridge()
             val ds = when (dataSourceType) {
-                DataSourceType.BLE -> {
+                DataSourceType.DASHKIT -> {
+                    val manager = DashKitBleManager(context)
+                    _bleManager.value = manager
                     val decoder = CanFrameDecoder(bridge, profile)
-                    DashKitDataSource(context, decoder)
+                    DashKitDataSource(manager, decoder)
                 }
                 DataSourceType.WEBSOCKET -> WebsocketDataSource()
                 else -> CommaDataSource(bridge, profile)
@@ -162,6 +168,8 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         connectionJob = null
         _dataSource.value?.disconnect()
         _dataSource.value = null
+        _bleManager.value?.disconnect()
+        _bleManager.value = null
         _dashState.value = null
         _hasAutoNavigatedToDashboard.value = false
         _connectionStatus.value = if (wasConnecting) {

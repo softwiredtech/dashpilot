@@ -58,8 +58,10 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.core.content.edit
+import com.softwiredtech.dashpilot.datasource.DashKitBleManager
 import com.softwiredtech.dashpilot.datasource.DashKitOtaUpdate
 import com.softwiredtech.dashpilot.datasource.OtaState
+
 import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.datamodel.dash.DASH_PREFS_NAME
 import com.softwiredtech.dashpilot.datamodel.dash.DashboardType
@@ -103,7 +105,7 @@ private val vehicleBusToggles = listOf(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySettings) -> Unit = {}) {
+fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySettings) -> Unit = {}, bleManager: DashKitBleManager? = null) {
     val context = LocalContext.current
     val sharedPrefs = remember { context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE) }
 
@@ -383,10 +385,11 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                 Spacer(modifier = Modifier.height(24.dp))
             }
 
-            // Firmware update
-            FirmwareUpdateSection()
-
-            Spacer(modifier = Modifier.height(24.dp))
+            // Firmware update (only for DashKit)
+            if (bleManager != null) {
+                FirmwareUpdateSection(bleManager)
+                Spacer(modifier = Modifier.height(24.dp))
+            }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -449,12 +452,12 @@ private fun RenderQualitySelector(selected: Int, onSelected: (Int) -> Unit) {
 }
 
 @Composable
-private fun FirmwareUpdateSection() {
+private fun FirmwareUpdateSection(bleManager: DashKitBleManager) {
     val context = LocalContext.current
-    val otaUpdate = remember { DashKitOtaUpdate(context) }
+    val otaUpdate = remember(bleManager) { DashKitOtaUpdate(bleManager, context) }
     val otaState by otaUpdate.state.collectAsState()
 
-    DisposableEffect(Unit) {
+    DisposableEffect(otaUpdate) {
         onDispose { otaUpdate.cancel() }
     }
 
@@ -474,13 +477,6 @@ private fun FirmwareUpdateSection() {
             ) {
                 Text(stringResource(R.string.settings_firmware_update))
             }
-        }
-        is OtaState.Scanning -> {
-            Text(
-                stringResource(R.string.settings_firmware_scanning),
-                color = DarkColors.ContentDisabled,
-                fontSize = 14.sp
-            )
         }
         is OtaState.Connecting -> {
             Text(

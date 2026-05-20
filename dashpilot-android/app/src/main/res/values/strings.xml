@@ -48,4 +48,5 @@
     <string name="settings_firmware_uploading">Uploading firmware… %1$d%%</string>
     <string name="settings_firmware_rebooting">Update complete! Rebooting DashKit…</string>
     <string name="settings_firmware_error">Update failed: %1$s</string>
+    <string name="settings_firmware_not_connected">Connect to DashKit first to update firmware</string>
 </resources>
