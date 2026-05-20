@@ -55,6 +55,10 @@ class MainActivity : ComponentActivity() {
 
     private val speedCameraVM: SpeedCameraViewModel by viewModels()
 
+    private val bluetoothPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { _ -> }
+
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -73,6 +77,10 @@ class MainActivity : ComponentActivity() {
             speedCameraVM.startUpdating(this)
         } else {
             requestLocationPermission()
+        }
+
+        if (!hasBluetoothPermission()) {
+            requestBluetoothPermission()
         }
 
         AppInitializer.getInstance(applicationContext)
@@ -149,9 +157,11 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable<SettingsRoute> {
+                            val manager by connectionVM.bleManager.collectAsState()
                             SettingsScreen(
                                 onBack = { navController.popBackStack() },
-                                onDisplaySettingsChanged = { connectionVM.updateDisplaySettings(it) }
+                                onDisplaySettingsChanged = { connectionVM.updateDisplaySettings(it) },
+                                bleManager = manager
                             )
                         }
                         composable<DashboardRoute> { backStackEntry ->
@@ -168,6 +178,32 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private fun hasBluetoothPermission(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) ==
+                    PackageManager.PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) ==
+                    PackageManager.PERMISSION_GRANTED
+        } else {
+            true
+        }
+    }
+
+    private fun requestBluetoothPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val needed = arrayOf(
+                Manifest.permission.BLUETOOTH_CONNECT,
+                Manifest.permission.BLUETOOTH_SCAN
+            ).filter {
+                ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+            }.toTypedArray()
+
+            if (needed.isNotEmpty()) {
+                bluetoothPermissionLauncher.launch(needed)
             }
         }
     }

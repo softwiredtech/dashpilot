@@ -16,6 +16,7 @@ struct SubSocketGroup {
 inline std::unique_ptr<CarStateMapper> createMapper(const std::string& vehicleType) {
     if (vehicleType == "tesla_party") return std::make_unique<TeslaCommaPartyMapper>();
     if (vehicleType == "tesla_extra") return std::make_unique<TeslaCommaExtraMapper>();
+    if (vehicleType == "dashkit") return std::make_unique<TeslaDashKitMapper>();
     return nullptr;
 }
 

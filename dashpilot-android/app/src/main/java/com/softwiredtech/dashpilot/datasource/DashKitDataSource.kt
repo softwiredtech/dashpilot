@@ -2,14 +2,8 @@ package com.softwiredtech.dashpilot.datasource
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
-import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
-import android.bluetooth.BluetoothProfile
-import android.bluetooth.le.ScanCallback
-import android.bluetooth.le.ScanResult
-import android.bluetooth.le.ScanSettings
-import android.content.Context
 import android.os.Build
 import android.util.Log
 import com.softwiredtech.dashpilot.datamodel.dash.CarState
@@ -24,13 +18,12 @@ import kotlinx.coroutines.flow.sample
 
 @SuppressLint("MissingPermission")
 class DashKitDataSource(
-    private val context: Context,
+    private val manager: DashKitBleManager,
     private val decoder: CanFrameDecoder
-) : IDataSource {
+) : IDataSource, GattListener {
 
     companion object {
         private const val TAG = "DashKitDataSource"
-        private const val DEVICE_NAME = "DashKit"
         private val SERVICE_UUID = UUID.fromString("CADA0000-CA00-B1E0-B0D6-C000AA0100A1")
         private val CHAR_UUID = UUID.fromString("CADA0001-CA00-B1E0-B0D6-C000AA0100A1")
         private val CCCD_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
@@ -38,157 +31,52 @@ class DashKitDataSource(
 
     private val _incoming = MutableSharedFlow<CarState>(replay = 1)
     @OptIn(FlowPreview::class)
-    override val incomingMessages: Flow<CarState> = _incoming.sample(16)
+    override val incomingMessages: Flow<CarState> = _incoming.sample(40)
 
-    private var gatt: BluetoothGatt? = null
-    private var scanning = false
     private var currentState = CarState()
 
-    private val scanCallback = object : ScanCallback() {
-        override fun onScanResult(callbackType: Int, result: ScanResult) {
-            val name = result.device.name ?: result.scanRecord?.deviceName
-            if (name == DEVICE_NAME) {
-                Log.d(TAG, "Found PandaCAN: ${result.device.address}")
-                stopScan()
-                result.device.connectGatt(context, false, gattCallback, android.bluetooth.BluetoothDevice.TRANSPORT_LE)
-            }
-        }
-
-        override fun onScanFailed(errorCode: Int) {
-            Log.e(TAG, "BLE scan failed with error code: $errorCode")
-        }
-    }
-
-    private val gattCallback = object : BluetoothGattCallback() {
-        override fun onConnectionStateChange(g: BluetoothGatt, status: Int, newState: Int) {
-            if (newState == BluetoothProfile.STATE_CONNECTED) {
-                Log.d(TAG, "Connected to GATT server")
-                gatt = g
-                // Clear Android's GATT cache to avoid stale service lists
-                try {
-                    val refresh = g.javaClass.getMethod("refresh")
-                    val result = refresh.invoke(g) as Boolean
-                    Log.d(TAG, "GATT cache refresh: $result")
-                } catch (e: Exception) {
-                    Log.w(TAG, "Could not clear GATT cache: ${e.message}")
-                }
-                // Delay service discovery to let cache clear take effect
-                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                    g.discoverServices()
-                    Log.d(TAG, "Service discovery started")
-                }, 600)
-            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                Log.d(TAG, "Disconnected from GATT server")
-                gatt = null
-            }
-        }
-
-        override fun onServicesDiscovered(g: BluetoothGatt, status: Int) {
-            if (status != BluetoothGatt.GATT_SUCCESS) {
-                Log.e(TAG, "Service discovery failed: $status")
-                return
-            }
-            Log.d(TAG, "Discovered ${g.services.size} services:")
-            for (s in g.services) {
-                Log.d(TAG, "  service: ${s.uuid}")
-                for (c in s.characteristics) {
-                    Log.d(TAG, "    char: ${c.uuid} props=${c.properties}")
-                }
-            }
-            val service = g.getService(SERVICE_UUID)
-            if (service == null) {
-                Log.e(TAG, "Panda BLE service not found (looking for $SERVICE_UUID)")
-                return
-            }
-            val characteristic = service.getCharacteristic(CHAR_UUID)
-            if (characteristic == null) {
-                Log.e(TAG, "Panda BLE characteristic not found")
-                return
-            }
-            g.setCharacteristicNotification(characteristic, true)
-            val descriptor = characteristic.getDescriptor(CCCD_UUID)
-            if (descriptor != null) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    g.writeDescriptor(descriptor, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
-                } else {
-                    @Suppress("DEPRECATION")
-                    descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                    @Suppress("DEPRECATION")
-                    g.writeDescriptor(descriptor)
-                }
-            }
-            Log.d(TAG, "Subscribed to CAN notifications")
-        }
-
-        override fun onDescriptorWrite(g: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
-            Log.d(TAG, "onDescriptorWrite status=${if (status == BluetoothGatt.GATT_SUCCESS) "SUCCESS" else status.toString()}")
-        }
-
-        // API 33+
-        override fun onCharacteristicChanged(
-            g: BluetoothGatt,
-            characteristic: BluetoothGattCharacteristic,
-            value: ByteArray
-        ) {
-            Log.d(TAG, "onCharacteristicChanged (new) ${value.size} bytes")
-            parseAndEmit(value)
-        }
-
-        // API < 33
-        @Deprecated("Deprecated in API 33")
-        override fun onCharacteristicChanged(
-            g: BluetoothGatt,
-            characteristic: BluetoothGattCharacteristic
-        ) {
-            @Suppress("DEPRECATION")
-            val value = characteristic.value ?: return
-            Log.d(TAG, "onCharacteristicChanged (legacy) ${value.size} bytes")
-            parseAndEmit(value)
-        }
-    }
-
     override fun connect(address: String) {
-        startScan()
+        manager.addGattListener(this)
+        manager.connect()
     }
 
     override fun disconnect() {
-        stopScan()
-        gatt?.close()
-        gatt = null
+        manager.removeGattListener(this)
     }
 
-    private fun startScan() {
-        val adapter = android.bluetooth.BluetoothManager::class.java
-            .let { context.getSystemService(Context.BLUETOOTH_SERVICE) as android.bluetooth.BluetoothManager }
-            .adapter ?: run {
-            Log.e(TAG, "Bluetooth not available")
+    override fun onServicesReady(gatt: BluetoothGatt) {
+        val service = gatt.getService(SERVICE_UUID)
+        if (service == null) {
+            Log.e(TAG, "CAN BLE service not found")
             return
         }
-        val scanner = adapter.bluetoothLeScanner ?: run {
-            Log.e(TAG, "BLE scanner not available")
+        val characteristic = service.getCharacteristic(CHAR_UUID)
+        if (characteristic == null) {
+            Log.e(TAG, "CAN BLE characteristic not found")
             return
         }
-        // Scan with no filter first to debug — log everything Android can see.
-        // We'll match by name ("PandaCAN") in the callback once we confirm visibility.
-        val settings = ScanSettings.Builder()
-            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-            .build()
-        try {
-            scanner.startScan(null, settings, scanCallback)
-            scanning = true
-            Log.d(TAG, "BLE scan started (unfiltered, logging all devices)")
-        } catch (e: SecurityException) {
-            Log.e(TAG, "BLE scan failed — missing permission: ${e.message}")
-        } catch (e: Exception) {
-            Log.e(TAG, "BLE scan failed: ${e.message}")
+        gatt.setCharacteristicNotification(characteristic, true)
+        val descriptor = characteristic.getDescriptor(CCCD_UUID)
+        if (descriptor != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                gatt.writeDescriptor(descriptor, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
+            } else {
+                @Suppress("DEPRECATION")
+                descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                @Suppress("DEPRECATION")
+                gatt.writeDescriptor(descriptor)
+            }
         }
+        Log.d(TAG, "Subscribed to CAN notifications")
     }
 
-    private fun stopScan() {
-        if (!scanning) return
-        val adapter = (context.getSystemService(Context.BLUETOOTH_SERVICE) as android.bluetooth.BluetoothManager).adapter
-        adapter?.bluetoothLeScanner?.stopScan(scanCallback)
-        scanning = false
+    override fun onCharacteristicChanged(
+        gatt: BluetoothGatt,
+        characteristic: BluetoothGattCharacteristic,
+        value: ByteArray
+    ) {
+        if (characteristic.uuid != CHAR_UUID) return
+        parseAndEmit(value)
     }
 
     private fun parseAndEmit(payload: ByteArray) {
@@ -213,5 +101,4 @@ class DashKitDataSource(
         }
         _incoming.tryEmit(currentState)
     }
-
 }

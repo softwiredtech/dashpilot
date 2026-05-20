@@ -1,6 +1,5 @@
 package com.softwiredtech.dashpilot.ui
 
-import android.content.Context
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -77,7 +76,7 @@ private data class DataSource(
 private val dataSources = buildList {
     add(DataSource(DataSourceType.COMMA, "comma", null))
     if (BuildConfig.DEBUG) {
-        add(DataSource(DataSourceType.BLE, "BLE", Icons.Rounded.Bluetooth))
+        add(DataSource(DataSourceType.DASHKIT, "BLE", Icons.Rounded.Bluetooth))
         add(DataSource(DataSourceType.WEBSOCKET, "WebSocket", Icons.Rounded.Lan))
     }
 }
