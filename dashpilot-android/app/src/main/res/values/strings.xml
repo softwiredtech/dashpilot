@@ -41,4 +41,11 @@
     <string name="settings_toggle_dark_mode">Dark mode</string>
     <string name="settings_dark_mode_background_brightness">Background brightness</string>
     <string name="dashboard_rotate_prompt">Rotate your phone to landscape</string>
+    <string name="settings_section_firmware">Firmware</string>
+    <string name="settings_firmware_update">Update DashKit Firmware</string>
+    <string name="settings_firmware_scanning">Scanning for DashKit…</string>
+    <string name="settings_firmware_connecting">Connecting…</string>
+    <string name="settings_firmware_uploading">Uploading firmware… %1$d%%</string>
+    <string name="settings_firmware_rebooting">Update complete! Rebooting DashKit…</string>
+    <string name="settings_firmware_error">Update failed: %1$s</string>
 </resources>

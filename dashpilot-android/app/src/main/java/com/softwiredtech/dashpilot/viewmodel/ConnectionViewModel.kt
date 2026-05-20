@@ -86,7 +86,10 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
             val vehicleName = "tesla" // TODO: make configurable via UI
             val prefs = context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
             val extraBus = prefs.getBoolean(PREF_EXTRA_VEHICLE_BUS, DEFAULT_EXTRA_VEHICLE_BUS)
-            val configFile = if (extraBus) "config_comma_extra_bus.json" else "config_comma_normal.json"
+            val configFile = when (dataSourceType) {
+                DataSourceType.BLE -> "config_dashkit.json"
+                else -> if (extraBus) "config_comma_extra_bus.json" else "config_comma_normal.json"
+            }
             val profile = VehicleProfileLoader.loadProfile(context, vehicleName, configFile)
             val bridge = VehicleBridge()
             val ds = when (dataSourceType) {

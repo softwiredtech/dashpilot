@@ -22,9 +22,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -34,6 +37,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -52,6 +58,8 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.core.content.edit
+import com.softwiredtech.dashpilot.datasource.DashKitOtaUpdate
+import com.softwiredtech.dashpilot.datasource.OtaState
 import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.datamodel.dash.DASH_PREFS_NAME
 import com.softwiredtech.dashpilot.datamodel.dash.DashboardType
@@ -375,6 +383,11 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                 Spacer(modifier = Modifier.height(24.dp))
             }
 
+            // Firmware update
+            FirmwareUpdateSection()
+
+            Spacer(modifier = Modifier.height(24.dp))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -430,6 +443,90 @@ private fun RenderQualitySelector(selected: Int, onSelected: (Int) -> Unit) {
                         fontSize = 13.sp
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun FirmwareUpdateSection() {
+    val context = LocalContext.current
+    val otaUpdate = remember { DashKitOtaUpdate(context) }
+    val otaState by otaUpdate.state.collectAsState()
+
+    DisposableEffect(Unit) {
+        onDispose { otaUpdate.cancel() }
+    }
+
+    Text(
+        text = stringResource(R.string.settings_section_firmware),
+        color = DarkColors.TextMuted,
+        fontSize = 16.sp
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+
+    when (val state = otaState) {
+        is OtaState.Idle -> {
+            Button(
+                onClick = { otaUpdate.start() },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = AccentColor)
+            ) {
+                Text(stringResource(R.string.settings_firmware_update))
+            }
+        }
+        is OtaState.Scanning -> {
+            Text(
+                stringResource(R.string.settings_firmware_scanning),
+                color = DarkColors.ContentDisabled,
+                fontSize = 14.sp
+            )
+        }
+        is OtaState.Connecting -> {
+            Text(
+                stringResource(R.string.settings_firmware_connecting),
+                color = DarkColors.ContentDisabled,
+                fontSize = 14.sp
+            )
+        }
+        is OtaState.Uploading -> {
+            val percent = (state.progress * 100).toInt()
+            Text(
+                stringResource(R.string.settings_firmware_uploading, percent),
+                color = Color.White,
+                fontSize = 14.sp
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            LinearProgressIndicator(
+                progress = { state.progress },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(6.dp)
+                    .clip(RoundedCornerShape(3.dp)),
+                color = AccentColor,
+                trackColor = DarkColors.Border
+            )
+        }
+        is OtaState.Rebooting -> {
+            Text(
+                stringResource(R.string.settings_firmware_rebooting),
+                color = AccentColor,
+                fontSize = 14.sp
+            )
+        }
+        is OtaState.Error -> {
+            Text(
+                stringResource(R.string.settings_firmware_error, state.message),
+                color = DarkColors.Error,
+                fontSize = 14.sp
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(
+                onClick = { otaUpdate.start() },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = AccentColor)
+            ) {
+                Text(stringResource(R.string.settings_firmware_update))
             }
         }
     }

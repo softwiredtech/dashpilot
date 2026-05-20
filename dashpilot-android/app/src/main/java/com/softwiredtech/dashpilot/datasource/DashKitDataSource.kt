@@ -38,7 +38,7 @@ class DashKitDataSource(
 
     private val _incoming = MutableSharedFlow<CarState>(replay = 1)
     @OptIn(FlowPreview::class)
-    override val incomingMessages: Flow<CarState> = _incoming.sample(16)
+    override val incomingMessages: Flow<CarState> = _incoming.sample(40)
 
     private var gatt: BluetoothGatt? = null
     private var scanning = false
@@ -48,7 +48,7 @@ class DashKitDataSource(
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             val name = result.device.name ?: result.scanRecord?.deviceName
             if (name == DEVICE_NAME) {
-                Log.d(TAG, "Found PandaCAN: ${result.device.address}")
+                Log.d(TAG, "Found DashKit: ${result.device.address}")
                 stopScan()
                 result.device.connectGatt(context, false, gattCallback, android.bluetooth.BluetoothDevice.TRANSPORT_LE)
             }
@@ -97,12 +97,12 @@ class DashKitDataSource(
             }
             val service = g.getService(SERVICE_UUID)
             if (service == null) {
-                Log.e(TAG, "Panda BLE service not found (looking for $SERVICE_UUID)")
+                Log.e(TAG, "DashKit BLE service not found (looking for $SERVICE_UUID)")
                 return
             }
             val characteristic = service.getCharacteristic(CHAR_UUID)
             if (characteristic == null) {
-                Log.e(TAG, "Panda BLE characteristic not found")
+                Log.e(TAG, "DashKit BLE characteristic not found")
                 return
             }
             g.setCharacteristicNotification(characteristic, true)
@@ -168,8 +168,6 @@ class DashKitDataSource(
             Log.e(TAG, "BLE scanner not available")
             return
         }
-        // Scan with no filter first to debug — log everything Android can see.
-        // We'll match by name ("PandaCAN") in the callback once we confirm visibility.
         val settings = ScanSettings.Builder()
             .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
             .build()
