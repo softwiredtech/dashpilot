@@ -2,7 +2,7 @@
   "name": "Tesla Model 3",
   "type": "dashkit",
   "buses": [
-    { "index": 2, "dbc": "bus_1_tesla_vehicle.dbc" },
+    { "index": 0, "dbc": "bus_1_tesla_vehicle.dbc" },
     { "index": 1, "dbc": "bus_1_tesla_vehicle.dbc" }
   ]
 }
