@@ -26,7 +26,43 @@ class DashKitDataSource(
         private const val TAG = "DashKitDataSource"
         private val SERVICE_UUID = UUID.fromString("CADA0000-CA00-B1E0-B0D6-C000AA0100A1")
         private val CHAR_UUID = UUID.fromString("CADA0001-CA00-B1E0-B0D6-C000AA0100A1")
+        private val FILTER_CHAR_UUID = UUID.fromString("CADA0002-CA00-B1E0-B0D6-C000AA0100A1")
         private val CCCD_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
+
+        // Whitelist of CAN frames the firmware should forward over BLE.
+        private val MAPPER_MESSAGE_IDS: List<Int> = listOf(
+            0x129, // SCCM_steeringAngleSensor   (297)
+            0x118, // DI_systemStatus            (280)
+            0x257, // DI_speed                   (599)
+            0x399, // DAS_status                 (921)
+            0x3E2, // VCLEFT_lightStatus         (994)
+            0x3E3, // VCRIGHT_lightStatus        (995)
+            0x352, // BMS_energyStatus           (850)
+            0x252, // BMS_powerAvailable         (594)
+            0x132, // BMS_hvBusStatus            (306)
+            0x332, // BMS_bmbMinMax              (818)
+            0x3B6, // DI_odometerStatus          (950)
+        )
+
+        private val CAN_FILTER: Map<Int, List<Int>> = mapOf(
+            0 to MAPPER_MESSAGE_IDS, // Chassis bus
+            1 to MAPPER_MESSAGE_IDS, // Vehicle bus
+        )
+
+        // Encode the filter map into the DashKit wire format:
+        //   [bus][num_addrs][addr_LE32]*  repeated per bus.
+        // Buses with an empty address list are skipped.
+        internal fun encodeFilter(filter: Map<Int, List<Int>>): ByteArray {
+            val nonEmpty = filter.filterValues { it.isNotEmpty() }
+            val size = nonEmpty.entries.sumOf { 2 + it.value.size * 4 }
+            val buf = ByteBuffer.allocate(size).order(ByteOrder.LITTLE_ENDIAN)
+            for ((bus, addrs) in nonEmpty) {
+                buf.put(bus.toByte())
+                buf.put(addrs.size.toByte())
+                for (a in addrs) buf.putInt(a)
+            }
+            return buf.array()
+        }
     }
 
     private val _incoming = MutableSharedFlow<CarState>(replay = 1)
@@ -70,6 +106,44 @@ class DashKitDataSource(
         Log.d(TAG, "Subscribed to CAN notifications")
     }
 
+    override fun onDescriptorWrite(
+        gatt: BluetoothGatt,
+        descriptor: BluetoothGattDescriptor,
+        status: Int
+    ) {
+        // After the CAN notification CCCD write completes, push the filter
+        // to the firmware. Done here (rather than back-to-back in
+        // onServicesReady) because Android only allows one GATT op at a time.
+        if (descriptor.characteristic?.uuid == CHAR_UUID && status == BluetoothGatt.GATT_SUCCESS) {
+            writeFilter(gatt)
+        }
+    }
+
+    private fun writeFilter(gatt: BluetoothGatt) {
+        val service = gatt.getService(SERVICE_UUID) ?: return
+        val filterChar = service.getCharacteristic(FILTER_CHAR_UUID)
+        if (filterChar == null) {
+            Log.w(TAG, "Filter characteristic not found; firmware may be older — skipping")
+            return
+        }
+        val payload = encodeFilter(CAN_FILTER)
+        Log.d(TAG, "Writing CAN filter (${payload.size} bytes)")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            gatt.writeCharacteristic(
+                filterChar,
+                payload,
+                BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            filterChar.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+            @Suppress("DEPRECATION")
+            filterChar.value = payload
+            @Suppress("DEPRECATION")
+            gatt.writeCharacteristic(filterChar)
+        }
+    }
+
     override fun onCharacteristicChanged(
         gatt: BluetoothGatt,
         characteristic: BluetoothGattCharacteristic,
@@ -80,10 +154,21 @@ class DashKitDataSource(
     }
 
     private fun parseAndEmit(payload: ByteArray) {
+        // Wire format from firmware (build_ble_packet):
+        //   [count : 1]
+        //   per frame:
+        //     [timestamp_us : LE32]
+        //     [bus          : 1]
+        //     [addr         : LE32]
+        //     [len          : 1]
+        //     [data         : len bytes]
         if (payload.isEmpty()) return
         val count = payload[0].toInt() and 0xFF
         var offset = 1
         for (i in 0 until count) {
+            if (offset + 4 > payload.size) break
+            // Timestamp is currently unused by the decoder; skip it.
+            offset += 4
             if (offset >= payload.size) break
             val bus = payload[offset].toInt() and 0xFF
             offset += 1
