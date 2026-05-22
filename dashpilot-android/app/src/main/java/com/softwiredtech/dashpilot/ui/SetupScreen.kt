@@ -87,7 +87,8 @@ fun SetupScreen(
     onConnect: (serverAddress: String, dataSourceType: String) -> Unit,
     onDisconnect: () -> Unit,
     onNext: () -> Unit,
-    onSettingsClick: () -> Unit = {}
+    onSettingsClick: () -> Unit = {},
+    onSwcLeftScrollDown: () -> Unit = {}
 ) {
     val context = LocalContext.current
     var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
@@ -251,6 +252,31 @@ fun SetupScreen(
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold
                         )
+                    }
+
+                    // Debug-only: send a single "left SWC scroll down" CAN frame
+                    // (VCLEFT_switchStatus, ID 0x3C2 on bus 1, ticks=-1).
+                    if (BuildConfig.DEBUG &&
+                        connectionStatus is ConnectionStatus.Connected &&
+                        currentSource.key == DataSourceType.DASHKIT
+                    ) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        OutlinedButton(
+                            onClick = { onSwcLeftScrollDown() },
+                            shape = RoundedCornerShape(16.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = Color.White
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth(0.7f)
+                                .height(52.dp)
+                        ) {
+                            Text(
+                                text = "SWC \u2190 Scroll Down",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
                     }
                 }
             }

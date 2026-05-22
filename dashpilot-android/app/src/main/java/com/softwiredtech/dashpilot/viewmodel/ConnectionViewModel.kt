@@ -162,6 +162,18 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         }
     }
 
+    // Send a "left steering wheel scroll" event by spoofing VCLEFT_switchStatus.
+    // Frame: ID 0x3C2 (962) on bus 1, mux=1, swcLeftScrollTicks=ticks
+    // ticks is a signed 6-bit value [-32..31]; negative = scroll down (toward driver).
+    fun sendSwcLeftScroll(ticks: Int = -1) {
+        val ds = _dataSource.value ?: return
+        val t = ticks.coerceIn(-32, 31) and 0x3F  // 6-bit two's complement
+        val data = ByteArray(8)
+        data[0] = 0x01                  // bits 0..1 = mux selector = 1
+        data[2] = t.toByte()            // bits 16..21 = swcLeftScrollTicks
+        ds.sendCanFrame(bus = 1, addr = 0x3C2, data = data)
+    }
+
     fun disconnect() {
         val wasConnecting = _connectionStatus.value is ConnectionStatus.Connecting
         connectionJob?.cancel()

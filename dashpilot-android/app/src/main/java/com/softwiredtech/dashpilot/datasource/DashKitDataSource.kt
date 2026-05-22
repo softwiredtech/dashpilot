@@ -27,6 +27,7 @@ class DashKitDataSource(
         private val SERVICE_UUID = UUID.fromString("CADA0000-CA00-B1E0-B0D6-C000AA0100A1")
         private val CHAR_UUID = UUID.fromString("CADA0001-CA00-B1E0-B0D6-C000AA0100A1")
         private val FILTER_CHAR_UUID = UUID.fromString("CADA0002-CA00-B1E0-B0D6-C000AA0100A1")
+        private val TX_CHAR_UUID = UUID.fromString("CADA0003-CA00-B1E0-B0D6-C000AA0100A1")
         private val CCCD_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
 
         // Whitelist of CAN frames the firmware should forward over BLE.
@@ -141,6 +142,57 @@ class DashKitDataSource(
             filterChar.value = payload
             @Suppress("DEPRECATION")
             gatt.writeCharacteristic(filterChar)
+        }
+    }
+
+    override fun sendCanFrame(
+        bus: Int,
+        addr: Int,
+        data: ByteArray,
+        extended: Boolean,
+        fd: Boolean,
+        brs: Boolean,
+    ) {
+        val gatt = manager.gatt
+        if (gatt == null) {
+            Log.w(TAG, "sendCanFrame: not connected")
+            return
+        }
+        val service = gatt.getService(SERVICE_UUID) ?: run {
+            Log.w(TAG, "sendCanFrame: service not found"); return
+        }
+        val txChar = service.getCharacteristic(TX_CHAR_UUID) ?: run {
+            Log.w(TAG, "sendCanFrame: TX characteristic not found (firmware too old?)"); return
+        }
+        if (data.size > 64) {
+            Log.w(TAG, "sendCanFrame: data too long (${data.size})"); return
+        }
+
+        // Wire format: [bus][flags][addr_LE32][len][data...]
+        // flags: bit0 = extended ID, bit1 = CAN FD, bit2 = BRS
+        var flags = 0
+        if (extended) flags = flags or 0x01
+        if (fd)       flags = flags or 0x02
+        if (brs)      flags = flags or 0x04
+
+        val payload = ByteBuffer.allocate(7 + data.size).order(ByteOrder.LITTLE_ENDIAN)
+        payload.put(bus.toByte())
+        payload.put(flags.toByte())
+        payload.putInt(addr)
+        payload.put(data.size.toByte())
+        payload.put(data)
+        val bytes = payload.array()
+
+        Log.d(TAG, "TX bus=$bus addr=0x${addr.toString(16)} len=${data.size}")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            gatt.writeCharacteristic(txChar, bytes, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
+        } else {
+            @Suppress("DEPRECATION")
+            txChar.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+            @Suppress("DEPRECATION")
+            txChar.value = bytes
+            @Suppress("DEPRECATION")
+            gatt.writeCharacteristic(txChar)
         }
     }
 

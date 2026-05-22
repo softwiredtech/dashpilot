@@ -153,7 +153,8 @@ class MainActivity : ComponentActivity() {
                                 },
                                 onSettingsClick = {
                                     navController.navigate(SettingsRoute)
-                                }
+                                },
+                                onSwcLeftScrollDown = { connectionVM.sendSwcLeftScroll(-1) }
                             )
                         }
                         composable<SettingsRoute> {
