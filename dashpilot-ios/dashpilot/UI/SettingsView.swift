@@ -17,11 +17,37 @@ struct SettingsView: View {
     @AppStorage(DisplaySettings.keyAlwaysOnBlindSpotMonitor)  private var alwaysOnBlindSpotMonitor = true
     @AppStorage(DisplaySettings.keyDarkMode)                  private var darkMode = false
     @AppStorage(DisplaySettings.keyRenderQuality)             private var renderQuality = 3
+    @AppStorage(DisplaySettings.keyDarkModeBackgroundGray)    private var darkModeBackgroundGray = 0
     @AppStorage(DisplaySettings.keySelectedDashboardId)       private var selectedDashboardId = ""
 
-    private var showVanillaSettings: Bool {
-        selectedDashboardId == "vanilla"
+    private var currentDashboard: DashboardConfig {
+        dashboardById(selectedDashboardId) ?? selectedDashboard()
     }
+
+    private var currentDashboardId: String {
+        currentDashboard.id
+    }
+
+    private var selectedManifest: DashboardManifest? {
+        currentDashboard.manifest
+    }
+
+    private func hasSetting(_ setting: ManifestDisplaySetting) -> Bool {
+        selectedManifest?.settings.contains(setting) == true
+    }
+
+    private var showAlwaysOnBlindSpotMonitorToggle: Bool { hasSetting(.alwaysOnBlindSpotMonitor) }
+    private var showDarkModeToggle: Bool { hasSetting(.darkMode) }
+    private var showDarkModeBackgroundGrayControl: Bool { hasSetting(.darkModeBackgroundGray) && showDarkModeToggle }
+    private var showRenderQualityControl: Bool { hasSetting(.renderQuality) }
+    private var showVisualizerSettings: Bool {
+        showRenderQualityControl || showDarkModeBackgroundGrayControl ||
+        showAlwaysOnBlindSpotMonitorToggle || showDarkModeToggle
+    }
+    private var showPhoneBatteryToggle: Bool { hasSetting(.showPhoneBattery) }
+    private var showUseImperialToggle: Bool { hasSetting(.useImperial) }
+    private var showCarBatteryToggle: Bool { hasSetting(.showCarBattery) }
+    private var showOdometerToggle: Bool { hasSetting(.showOdometer) }
 
     var body: some View {
         ZStack {
@@ -35,7 +61,7 @@ struct SettingsView: View {
                         dashboardSection
                         configurationSection
                         displaySection
-                        if showVanillaSettings {
+                        if showVisualizerSettings {
                             visualizerSection
                         }
                         versionRow
@@ -83,7 +109,7 @@ struct SettingsView: View {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
                     ForEach(availableDashboards.filter { $0.type != .devRive }) { dashboard in
-                        let isSelected = dashboard.id == selectedDashboardId
+                        let isSelected = dashboard.id == currentDashboardId
                         VStack(spacing: 0) {
                             dashboardThumbnail(for: dashboard)
                                 .clipShape(RoundedRectangle(cornerRadius: 10))
@@ -142,12 +168,18 @@ struct SettingsView: View {
     private var displaySection: some View {
         VStack(alignment: .leading, spacing: 8) {
             sectionTitle("Display")
-            if extraVehicleBus {
+            if extraVehicleBus && showCarBatteryToggle {
                 SettingsToggleRow(label: "Show Car Battery", isOn: $showCarBattery)
+            }
+            if extraVehicleBus && showOdometerToggle {
                 SettingsToggleRow(label: "Show Odometer", isOn: $showOdometer)
             }
-            SettingsToggleRow(label: "Use Imperial Units", isOn: $useImperial)
-            SettingsToggleRow(label: "Show Phone Battery", isOn: $showPhoneBattery)
+            if showUseImperialToggle {
+                SettingsToggleRow(label: "Use Imperial Units", isOn: $useImperial)
+            }
+            if showPhoneBatteryToggle {
+                SettingsToggleRow(label: "Show Phone Battery", isOn: $showPhoneBattery)
+            }
             Spacer().frame(height: 8)
         }
         .padding(.horizontal, 24)
@@ -158,12 +190,45 @@ struct SettingsView: View {
     private var visualizerSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             sectionTitle("3D Visualizer")
-            SettingsToggleRow(label: "Always On Blind-Spot Monitor", isOn: $alwaysOnBlindSpotMonitor)
-            SettingsToggleRow(label: "Dark Mode", isOn: $darkMode)
-            renderQualityRow
+            if showAlwaysOnBlindSpotMonitorToggle {
+                SettingsToggleRow(label: "Always On Blind-Spot Monitor", isOn: $alwaysOnBlindSpotMonitor)
+            }
+            if showDarkModeToggle {
+                SettingsToggleRow(label: "Dark Mode", isOn: $darkMode)
+            }
+            if showDarkModeBackgroundGrayControl && darkMode {
+                darkModeBackgroundGrayRow
+            }
+            if showRenderQualityControl {
+                renderQualityRow
+            }
             Spacer().frame(height: 8)
         }
         .padding(.horizontal, 24)
+    }
+
+    private var darkModeBackgroundGrayRow: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Dark Mode Background Brightness")
+                    .foregroundColor(.white)
+                    .font(.system(size: 16))
+                Spacer()
+                Text("\(darkModeBackgroundGray)")
+                    .foregroundColor(mutedText)
+                    .font(.system(size: 13, weight: .medium))
+            }
+            Slider(
+                value: Binding(
+                    get: { Double(darkModeBackgroundGray) },
+                    set: { darkModeBackgroundGray = Int($0.rounded()) }
+                ),
+                in: 0...30,
+                step: 1
+            )
+            .tint(dashGreen)
+        }
+        .padding(.vertical, 4)
     }
 
     private var renderQualityRow: some View {

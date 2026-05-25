@@ -31,7 +31,11 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import androidx.startup.AppInitializer
 import app.rive.runtime.kotlin.RiveInitializer
+import com.softwiredtech.dashpilot.datamodel.dash.DashboardType
+import com.softwiredtech.dashpilot.datamodel.dash.ManifestLoader
+import com.softwiredtech.dashpilot.datamodel.dash.availableDashboards
 import com.softwiredtech.dashpilot.datamodel.dash.getSelectedDashboard
+import com.softwiredtech.dashpilot.datamodel.dash.setLoadedManifests
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.DataSourceType
 import com.softwiredtech.dashpilot.navigation.DashboardRoute
@@ -68,8 +72,17 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun loadDashboardManifests() {
+        val webIds = availableDashboards
+            .filter { it.type == DashboardType.WEB }
+            .map { it.id }
+        setLoadedManifests(ManifestLoader.loadFromAssets(applicationContext, webIds))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        loadDashboardManifests()
 
         connectionVM.bindSpeedCamera(speedCameraVM.nearestApproachingCamera)
 

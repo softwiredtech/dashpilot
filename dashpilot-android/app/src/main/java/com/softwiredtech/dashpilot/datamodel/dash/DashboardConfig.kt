@@ -9,19 +9,13 @@ import kotlinx.serialization.Serializable
 @Serializable
 enum class DashboardType { WEB, RIVE, DEV_RIVE }
 
-data class DashboardCapabilities(
-    val supports3dVisualizerSettings: Boolean = false,
-    val supportsVehicleBusWidgets: Boolean = false,
-    val supportsPhoneBatteryToggle: Boolean = false
-)
-
 data class DashboardConfig(
     val id: String,
     @StringRes val nameRes: Int,
     val url: String,
     val type: DashboardType,
     val screenshotRes: Int = 0,
-    val capabilities: DashboardCapabilities = DashboardCapabilities()
+    val manifest: DashboardManifest? = null,
 )
 
 val availableDashboards = buildList {
@@ -32,11 +26,6 @@ val availableDashboards = buildList {
             url = "${LOCAL_ASSET_BASE_URL}web-vanilla/index.html",
             type = DashboardType.WEB,
             screenshotRes = R.drawable.preview_vanilla,
-            capabilities = DashboardCapabilities(
-                supports3dVisualizerSettings = true,
-                supportsVehicleBusWidgets = true,
-                supportsPhoneBatteryToggle = true
-            )
         )
     )
     add(
@@ -96,3 +85,20 @@ val availableDashboards = buildList {
         )
     }
 }
+
+// Mutable, written once at app startup by MainActivity via setLoadedManifests().
+// Reads happen via DashboardConfig.withManifest() and dashboardById().
+@Volatile
+private var manifestsById: Map<String, DashboardManifest> = emptyMap()
+
+internal fun setLoadedManifests(map: Map<String, DashboardManifest>) {
+    manifestsById = map
+}
+
+/**
+ * Returns a copy of this DashboardConfig with its manifest field populated
+ * from the loaded manifest store. WEB dashboards may have a non-null manifest;
+ * other types always return the receiver unchanged (manifest stays null).
+ */
+fun DashboardConfig.withManifest(): DashboardConfig =
+    if (type == DashboardType.WEB) copy(manifest = manifestsById[id]) else this
