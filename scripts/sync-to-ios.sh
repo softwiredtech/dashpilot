@@ -13,6 +13,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 APPS_DIR="$REPO_ROOT/dash-apps"
+XCASSETS_DIR="$REPO_ROOT/dashpilot-ios/dashpilot/Assets.xcassets"
 
 # Default folders (override by passing arguments)
 DEFAULT_FOLDERS=(web-vanilla web-retro web-ambient web-analog)
@@ -24,6 +25,12 @@ else
 fi
 
 ADASVIZ_DIR="$REPO_ROOT/adasviz"
+
+for folder in "${DEFAULT_FOLDERS[@]}"; do
+  name="${folder#web-}"
+  cp -f "$APPS_DIR/$folder/preview.jpg" "$XCASSETS_DIR/preview_$name.imageset/preview_$name.jpg"
+  echo "Copied preview $folder -> $XCASSETS_DIR/preview_$name.imageset/preview_$name.jpg"
+done
 
 for name in "${FOLDERS[@]}"; do
   src="$APPS_DIR/$name"
@@ -42,7 +49,9 @@ for name in "${FOLDERS[@]}"; do
 
   # Copy into the app bundle when running inside Xcode
   if [ -n "${BUILT_PRODUCTS_DIR:-}" ] && [ -n "${CONTENTS_FOLDER_PATH:-}" ]; then
-    cp -R "$src/" "${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/${name}/"
+    dst="${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/${name}"
+    cp -R "$src/" "$dst/"
+    rm -f "$dst"/preview.*
     echo "Copied $name -> app bundle"
   else
     echo "Prepared $name (run from Xcode to copy into bundle)"

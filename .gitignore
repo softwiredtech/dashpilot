@@ -6,5 +6,7 @@ dash-apps/web-vanilla/*.wasm
 dash-apps/web-vanilla/*.d.ts
 dash-apps/web-vanilla/car-visualization.js
 dashpilot-android/app/src/main/assets/web-*
+dashpilot-android/app/src/main/res/drawable/preview_*
+dashpilot-ios/dashpilot/Assets.xcassets/preview_*.imageset/preview_*
 *.xcuserstate
 xcuserdata/
