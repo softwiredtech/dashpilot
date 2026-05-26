@@ -24,7 +24,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Bluetooth
 import androidx.compose.material.icons.rounded.DirectionsCar
 import androidx.compose.material.icons.rounded.Lan
 import androidx.compose.material.icons.rounded.PhoneAndroid
@@ -76,7 +75,7 @@ private data class DataSource(
 private val dataSources = buildList {
     add(DataSource(DataSourceType.COMMA, "comma", null))
     if (BuildConfig.DEBUG) {
-        add(DataSource(DataSourceType.DASHKIT, "BLE", Icons.Rounded.Bluetooth))
+        // BLE pairing now happens in onboarding; only Comma + WebSocket are manual choices.
         add(DataSource(DataSourceType.WEBSOCKET, "WebSocket", Icons.Rounded.Lan))
     }
 }

@@ -17,6 +17,7 @@ const val PREF_ALWAYS_ON_BLIND_SPOT_MONITOR = "always_on_blind_spot_monitor"
 const val PREF_RENDER_QUALITY = "render_quality"
 const val PREF_DARK_MODE_BACKGROUND_GRAY = "dark_mode_background_gray"
 const val PREF_EXTRA_VEHICLE_BUS = "extra_vehicle_bus"
+const val PREF_ONBOARDING_COMPLETED = "onboarding_completed"
 
 // Display settings defaults
 const val DEFAULT_SHOW_PHONE_BATTERY = true
@@ -28,6 +29,7 @@ const val DEFAULT_ALWAYS_ON_BLIND_SPOT_MONITOR = true
 const val DEFAULT_RENDER_QUALITY = 3
 const val DEFAULT_DARK_MODE_BACKGROUND_GRAY = 0
 const val DEFAULT_EXTRA_VEHICLE_BUS = false
+const val DEFAULT_ONBOARDING_COMPLETED = false
 
 private const val DEFAULT_DASHBOARD_ID = "vanilla"
 
@@ -65,4 +67,13 @@ fun saveDevRiveFileUri(context: Context, uri: String) {
         .edit {
             putString(PREF_DEV_RIVE_FILE_URI, uri)
         }
+}
+
+fun isOnboardingCompleted(context: Context): Boolean =
+    context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
+        .getBoolean(PREF_ONBOARDING_COMPLETED, DEFAULT_ONBOARDING_COMPLETED)
+
+fun setOnboardingCompleted(context: Context, value: Boolean = true) {
+    context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
+        .edit { putBoolean(PREF_ONBOARDING_COMPLETED, value) }
 }
