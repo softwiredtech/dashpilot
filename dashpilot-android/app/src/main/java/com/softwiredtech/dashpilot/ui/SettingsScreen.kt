@@ -106,7 +106,12 @@ private val vehicleBusToggles = listOf(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySettings) -> Unit = {}, bleManager: DashKitBleManager? = null) {
+fun SettingsScreen(
+    onBack: () -> Unit,
+    onDisplaySettingsChanged: (DisplaySettings) -> Unit = {},
+    bleManager: DashKitBleManager? = null,
+    onReplayOnboarding: () -> Unit = {}
+) {
     val context = LocalContext.current
     val sharedPrefs = remember { context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE) }
 
@@ -391,6 +396,20 @@ fun SettingsScreen(onBack: () -> Unit, onDisplaySettingsChanged: (DisplaySetting
                 FirmwareUpdateSection(bleManager)
                 Spacer(modifier = Modifier.height(24.dp))
             }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onReplayOnboarding() }
+                    .padding(vertical = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = stringResource(R.string.settings_replay_onboarding), color = Color.White, fontSize = 16.sp)
+                Text(text = "›", color = DarkColors.TextMuted, fontSize = 20.sp)
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),

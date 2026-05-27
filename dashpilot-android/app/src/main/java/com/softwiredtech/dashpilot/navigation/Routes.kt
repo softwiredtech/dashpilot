@@ -3,6 +3,9 @@ package com.softwiredtech.dashpilot.navigation
 import kotlinx.serialization.Serializable
 
 @Serializable
+object OnboardingRoute
+
+@Serializable
 object SetupRoute
 
 @Serializable

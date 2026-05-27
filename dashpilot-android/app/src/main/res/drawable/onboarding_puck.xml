@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="220dp"
+    android:height="220dp"
+    android:viewportWidth="220"
+    android:viewportHeight="220">
+
+    <!-- Soft shadow under the puck -->
+    <path
+        android:fillColor="#66000000"
+        android:pathData="M110,118
+                          m -68,0
+                          a 68,68 0 1,0 136,0
+                          a 68,68 0 1,0 -136,0
+                          Z" />
+
+    <!-- Puck body -->
+    <path
+        android:fillColor="#1A1A1A"
+        android:pathData="M110,110
+                          m -68,0
+                          a 68,68 0 1,0 136,0
+                          a 68,68 0 1,0 -136,0
+                          Z" />
+
+    <!-- Top-left highlight via radial gradient -->
+    <path
+        android:pathData="M110,110
+                          m -68,0
+                          a 68,68 0 1,0 136,0
+                          a 68,68 0 1,0 -136,0
+                          Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:type="radial"
+                android:centerX="88"
+                android:centerY="78"
+                android:gradientRadius="55">
+                <item android:offset="0.0" android:color="#26FFFFFF" />
+                <item android:offset="1.0" android:color="#00FFFFFF" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+</vector>

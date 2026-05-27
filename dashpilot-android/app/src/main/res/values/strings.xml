@@ -49,4 +49,27 @@
     <string name="settings_firmware_rebooting">Update complete! Rebooting DashKit…</string>
     <string name="settings_firmware_error">Update failed: %1$s</string>
     <string name="settings_firmware_not_connected">Connect to DashKit first to update firmware</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_top_title">Setup</string>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_step_progress">%1$d of %2$d</string>
+
+    <string name="onboarding_pair_cta">Pair device</string>
+    <string name="onboarding_pair_searching_cta">Pairing…</string>
+    <string name="onboarding_pair_idle_title">Pair your DashKit</string>
+    <string name="onboarding_pair_idle_subtitle">Plug the DashKit into your car\'s OBD-II port, then tap below to pair over Bluetooth.</string>
+    <string name="onboarding_pair_searching_title">Looking for DashKit…</string>
+    <string name="onboarding_pair_searching_subtitle">Hold the device close to your phone. This usually takes a few seconds.</string>
+    <string name="onboarding_pair_success_title">You\'re all set!</string>
+    <string name="onboarding_pair_success_subtitle">DashKit is connected and ready to stream data to your dashboard.</string>
+    <string name="onboarding_pair_success_cta">Continue</string>
+
+    <string name="onboarding_tips_title">One more thing</string>
+    <string name="onboarding_tips_subtitle">You can pair additional devices and install firmware updates anytime from Settings.</string>
+    <string name="onboarding_tips_cta">Get started</string>
+    <string name="onboarding_tips_row_pair">Pair more DashKit devices</string>
+    <string name="onboarding_tips_row_firmware">Check for firmware updates</string>
+
+    <string name="settings_replay_onboarding">Replay onboarding</string>
 </resources>

@@ -32,14 +32,18 @@ import androidx.navigation.toRoute
 import androidx.startup.AppInitializer
 import app.rive.runtime.kotlin.RiveInitializer
 import com.softwiredtech.dashpilot.datamodel.dash.getSelectedDashboard
+import com.softwiredtech.dashpilot.datamodel.dash.isOnboardingCompleted
+import com.softwiredtech.dashpilot.datamodel.dash.setOnboardingCompleted
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.DataSourceType
 import com.softwiredtech.dashpilot.navigation.DashboardRoute
+import com.softwiredtech.dashpilot.navigation.OnboardingRoute
 import com.softwiredtech.dashpilot.navigation.SettingsRoute
 import com.softwiredtech.dashpilot.navigation.SetupRoute
 import com.softwiredtech.dashpilot.ui.DashboardScreen
 import com.softwiredtech.dashpilot.ui.SettingsScreen
 import com.softwiredtech.dashpilot.ui.SetupScreen
+import com.softwiredtech.dashpilot.ui.onboarding.OnboardingScreen
 import com.softwiredtech.dashpilot.ui.theme.DashPilotTheme
 import com.softwiredtech.dashpilot.util.NetworkUtil
 import com.softwiredtech.dashpilot.viewmodel.ConnectionViewModel
@@ -89,8 +93,13 @@ class MainActivity : ComponentActivity() {
         // Enable edge-to-edge for Compose
         enableEdgeToEdge()
 
-        // Start comma discovery as soon as we launch the app.
-        if (!BuildConfig.DEBUG) {
+        /* TODO: Once DashKit pairing is implemented in the firmware, add this back.
+         * The workflow should be that we auto-discover the advertised DashKit service
+         * and bring up the onboarding flow if the device is not yet paired.
+         */
+        val onboardingDone = true //isOnboardingCompleted(this)
+
+        if (onboardingDone && !BuildConfig.DEBUG) {
             connectionVM.connect(this, "", DataSourceType.COMMA)
         }
 
@@ -103,10 +112,11 @@ class MainActivity : ComponentActivity() {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val onDashboard = navBackStackEntry?.destination?.route
                     ?.contains("DashboardRoute") == true
+                val onOnboarding = navBackStackEntry?.destination?.route
+                    ?.contains("OnboardingRoute") == true
 
-                // Auto-open dashboard right after connection establishment
-                LaunchedEffect(connectionStatus, hasAutoNavigated) {
-                    if (connectionStatus is ConnectionStatus.Connected && !hasAutoNavigated) {
+                LaunchedEffect(connectionStatus, hasAutoNavigated, onOnboarding) {
+                    if (connectionStatus is ConnectionStatus.Connected && !hasAutoNavigated && !onOnboarding) {
                         connectionVM.markAutoNavigated()
                         val dashboard = getSelectedDashboard(context)
                         navController.navigate(DashboardRoute(
@@ -129,12 +139,30 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { _ ->
                     NavHost(
                         navController = navController,
-                        startDestination = SetupRoute,
+                        startDestination = if (onboardingDone) SetupRoute else OnboardingRoute,
                         enterTransition = { EnterTransition.None },
                         exitTransition = { ExitTransition.None },
                         popEnterTransition = { EnterTransition.None },
                         popExitTransition = { ExitTransition.None }
                     ) {
+                        composable<OnboardingRoute> {
+                            OnboardingScreen(
+                                connectionVM = connectionVM,
+                                onFinish = {
+                                    setOnboardingCompleted(context, true)
+                                    navController.navigate(SetupRoute) {
+                                        popUpTo(OnboardingRoute) { inclusive = true }
+                                    }
+                                },
+                                onSkip = {
+                                    connectionVM.disconnect()
+                                    setOnboardingCompleted(context, true)
+                                    navController.navigate(SetupRoute) {
+                                        popUpTo(OnboardingRoute) { inclusive = true }
+                                    }
+                                }
+                            )
+                        }
                         composable<SetupRoute> {
                             SetupScreen(
                                 connectionStatus = connectionStatus,
@@ -161,7 +189,14 @@ class MainActivity : ComponentActivity() {
                             SettingsScreen(
                                 onBack = { navController.popBackStack() },
                                 onDisplaySettingsChanged = { connectionVM.updateDisplaySettings(it) },
-                                bleManager = manager
+                                bleManager = manager,
+                                onReplayOnboarding = {
+                                    connectionVM.disconnect()
+                                    setOnboardingCompleted(context, false)
+                                    navController.navigate(OnboardingRoute) {
+                                        popUpTo(SetupRoute) { inclusive = false }
+                                    }
+                                }
                             )
                         }
                         composable<DashboardRoute> { backStackEntry ->

@@ -23,3 +23,14 @@ object DarkColors {
     val ContentDisabled = Color(0xFFAAAAAA)
     val Error = Color(0xFFFF5252)
 }
+
+object OnboardingColors {
+    val Accent = Color(0xFF22C55E)
+    val BgBase = Color(0xFF000000)
+    val Surface = Color.White.copy(alpha = 0.08f)
+    val TextPrimary = Color.White
+    val TextSecondary = Color.White.copy(alpha = 0.55f)
+    val TextMuted = Color.White.copy(alpha = 0.45f)
+    val StepInactive = Color.White.copy(alpha = 0.18f)
+    val LedDim = Color(0xFF1F3A1F)
+}
