@@ -31,9 +31,13 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import androidx.startup.AppInitializer
 import app.rive.runtime.kotlin.RiveInitializer
+import com.softwiredtech.dashpilot.datamodel.dash.DashboardType
+import com.softwiredtech.dashpilot.datamodel.dash.ManifestLoader
+import com.softwiredtech.dashpilot.datamodel.dash.availableDashboards
 import com.softwiredtech.dashpilot.datamodel.dash.getSelectedDashboard
 import com.softwiredtech.dashpilot.datamodel.dash.isOnboardingCompleted
 import com.softwiredtech.dashpilot.datamodel.dash.setOnboardingCompleted
+import com.softwiredtech.dashpilot.datamodel.dash.setLoadedManifests
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.DataSourceType
 import com.softwiredtech.dashpilot.navigation.DashboardRoute
@@ -41,6 +45,7 @@ import com.softwiredtech.dashpilot.navigation.OnboardingRoute
 import com.softwiredtech.dashpilot.navigation.SettingsRoute
 import com.softwiredtech.dashpilot.navigation.SetupRoute
 import com.softwiredtech.dashpilot.ui.DashboardScreen
+import com.softwiredtech.dashpilot.ui.LOCAL_ASSET_BASE_URL
 import com.softwiredtech.dashpilot.ui.SettingsScreen
 import com.softwiredtech.dashpilot.ui.SetupScreen
 import com.softwiredtech.dashpilot.ui.onboarding.OnboardingScreen
@@ -72,8 +77,17 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private fun loadDashboardManifests() {
+        val webIds = availableDashboards
+            .filter { it.type == DashboardType.WEB && it.url.startsWith(LOCAL_ASSET_BASE_URL) }
+            .map { it.id }
+        setLoadedManifests(ManifestLoader.loadFromAssets(applicationContext, webIds))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        loadDashboardManifests()
 
         connectionVM.bindSpeedCamera(speedCameraVM.nearestApproachingCamera)
 

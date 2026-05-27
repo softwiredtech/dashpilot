@@ -67,6 +67,7 @@ import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.datamodel.dash.DASH_PREFS_NAME
 import com.softwiredtech.dashpilot.datamodel.dash.DashboardType
 import com.softwiredtech.dashpilot.datamodel.dash.DisplaySettings
+import com.softwiredtech.dashpilot.datamodel.dash.ManifestDisplaySetting
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_ALWAYS_ON_BLIND_SPOT_MONITOR
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_DARK_MODE
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_DARK_MODE_BACKGROUND_GRAY
@@ -156,12 +157,25 @@ fun SettingsScreen(
             saveSelectedDashboard(context, dashboardById("dev_rive")!!)
         }
     }
-    val selectedDashboardCapabilities = remember(selectedDashboardId.value) {
-        dashboardById(selectedDashboardId.value)?.capabilities
+    val selectedDashboardManifest = remember(selectedDashboardId.value) {
+        dashboardById(selectedDashboardId.value)?.manifest
     }
-    val showVanillaSettings = selectedDashboardCapabilities?.supports3dVisualizerSettings ?: false
-    val showPhoneBatteryToggle = selectedDashboardCapabilities?.supportsPhoneBatteryToggle ?: true
-    val supportsVehicleBusWidgets = selectedDashboardCapabilities?.supportsVehicleBusWidgets == true
+
+    fun hasSetting(key: ManifestDisplaySetting): Boolean =
+        selectedDashboardManifest?.settings?.contains(key) == true
+
+    val showUseImperialToggle = hasSetting(ManifestDisplaySetting.USE_IMPERIAL)
+    val showAlwaysOnBlindSpotMonitorToggle = hasSetting(ManifestDisplaySetting.ALWAYS_ON_BLIND_SPOT_MONITOR)
+    val showDarkModeToggle = hasSetting(ManifestDisplaySetting.DARK_MODE)
+    val showDarkModeBackgroundGraySlider = hasSetting(ManifestDisplaySetting.DARK_MODE_BACKGROUND_GRAY) && showDarkModeToggle
+    val showRenderQualitySelector = hasSetting(ManifestDisplaySetting.RENDER_QUALITY)
+    val showVisualizerSettings = hasSetting(ManifestDisplaySetting.RENDER_QUALITY) ||
+                                 showDarkModeBackgroundGraySlider ||
+                                 showAlwaysOnBlindSpotMonitorToggle ||
+                                 showDarkModeToggle
+    val showCarBatteryToggle = hasSetting(ManifestDisplaySetting.SHOW_CAR_BATTERY)
+    val showOdometerToggle = hasSetting(ManifestDisplaySetting.SHOW_ODOMETER)
+    val showPhoneBatteryToggle = hasSetting(ManifestDisplaySetting.SHOW_PHONE_BATTERY)
 
     val vehicleBusToggleStates = remember {
         vehicleBusToggles.associate { toggle ->
@@ -296,22 +310,31 @@ fun SettingsScreen(
             Text(stringResource(R.string.settings_section_display), color = DarkColors.TextMuted, fontSize = 16.sp)
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (supportsVehicleBusWidgets) {
-                if (extraBusState.value) {
-                    vehicleBusToggleStates.forEach { (key, state) ->
-                        SettingsToggle(stringResource(vehicleBusToggles.first { it.key == key }.labelRes), state.value) { enabled ->
-                            state.value = enabled
-                            sharedPrefs.edit { putBoolean(key, enabled) }
-                            onDisplaySettingsChanged(buildDisplaySettings())
-                        }
-                    }
+            if (extraBusState.value && showCarBatteryToggle) {
+                val key = PREF_SHOW_CAR_BATTERY
+                val state = vehicleBusToggleStates.getValue(key)
+                SettingsToggle(stringResource(R.string.settings_toggle_show_car_battery), state.value) { enabled ->
+                    state.value = enabled
+                    sharedPrefs.edit { putBoolean(key, enabled) }
+                    onDisplaySettingsChanged(buildDisplaySettings())
+                }
+            }
+            if (extraBusState.value && showOdometerToggle) {
+                val key = PREF_SHOW_ODOMETER
+                val state = vehicleBusToggleStates.getValue(key)
+                SettingsToggle(stringResource(R.string.settings_toggle_show_odometer), state.value) { enabled ->
+                    state.value = enabled
+                    sharedPrefs.edit { putBoolean(key, enabled) }
+                    onDisplaySettingsChanged(buildDisplaySettings())
                 }
             }
 
-            SettingsToggle(stringResource(R.string.settings_toggle_use_imperial), useImperialState.value) { enabled ->
-                useImperialState.value = enabled
-                sharedPrefs.edit { putBoolean(PREF_USE_IMPERIAL, enabled) }
-                onDisplaySettingsChanged(buildDisplaySettings())
+            if (showUseImperialToggle) {
+                SettingsToggle(stringResource(R.string.settings_toggle_use_imperial), useImperialState.value) { enabled ->
+                    useImperialState.value = enabled
+                    sharedPrefs.edit { putBoolean(PREF_USE_IMPERIAL, enabled) }
+                    onDisplaySettingsChanged(buildDisplaySettings())
+                }
             }
 
             if (showPhoneBatteryToggle) {
@@ -324,24 +347,28 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (showVanillaSettings) {
+            if (showVisualizerSettings) {
                 Text(stringResource(R.string.settings_section_3d_visualizer), color = DarkColors.TextMuted, fontSize = 16.sp)
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                SettingsToggle(stringResource(R.string.settings_toggle_always_on_blind_spot_monitor), alwaysOnBlindSpotMonitorState.value) { enabled ->
-                    alwaysOnBlindSpotMonitorState.value = enabled
-                    sharedPrefs.edit { putBoolean(PREF_ALWAYS_ON_BLIND_SPOT_MONITOR, enabled) }
-                    onDisplaySettingsChanged(buildDisplaySettings())
+                if (showAlwaysOnBlindSpotMonitorToggle) {
+                    SettingsToggle(stringResource(R.string.settings_toggle_always_on_blind_spot_monitor), alwaysOnBlindSpotMonitorState.value) { enabled ->
+                        alwaysOnBlindSpotMonitorState.value = enabled
+                        sharedPrefs.edit { putBoolean(PREF_ALWAYS_ON_BLIND_SPOT_MONITOR, enabled) }
+                        onDisplaySettingsChanged(buildDisplaySettings())
+                    }
                 }
 
-                SettingsToggle(stringResource(R.string.settings_toggle_dark_mode), darkModeState.value) { enabled ->
-                    darkModeState.value = enabled
-                    sharedPrefs.edit { putBoolean(PREF_DARK_MODE, enabled) }
-                    onDisplaySettingsChanged(buildDisplaySettings())
+                if (showDarkModeToggle) {
+                    SettingsToggle(stringResource(R.string.settings_toggle_dark_mode), darkModeState.value) { enabled ->
+                        darkModeState.value = enabled
+                        sharedPrefs.edit { putBoolean(PREF_DARK_MODE, enabled) }
+                        onDisplaySettingsChanged(buildDisplaySettings())
+                    }
                 }
 
-                if (darkModeState.value) {
+                if (showDarkModeBackgroundGraySlider && darkModeState.value) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -380,12 +407,14 @@ fun SettingsScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                if (showRenderQualitySelector) {
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                RenderQualitySelector(renderQualityState.intValue) { quality ->
-                    renderQualityState.intValue = quality
-                    sharedPrefs.edit { putInt(PREF_RENDER_QUALITY, quality) }
-                    onDisplaySettingsChanged(buildDisplaySettings())
+                    RenderQualitySelector(renderQualityState.intValue) { quality ->
+                        renderQualityState.intValue = quality
+                        sharedPrefs.edit { putInt(PREF_RENDER_QUALITY, quality) }
+                        onDisplaySettingsChanged(buildDisplaySettings())
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
