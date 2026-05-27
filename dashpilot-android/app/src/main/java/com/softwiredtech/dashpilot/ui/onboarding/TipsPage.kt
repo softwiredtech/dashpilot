@@ -4,106 +4,71 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.DevicesOther
+import androidx.compose.material.icons.outlined.SystemUpdate
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.ui.theme.OnboardingColors
 
 @Composable
-fun TipsPage(
-    page: OnboardingPage.Tips,
-    onAdvance: () -> Unit
-) {
+fun TipsPage(onAdvance: () -> Unit) {
     OnboardingPageScaffold(
-        title = page.title,
-        subtitle = page.subtitle,
-        hero = null,
+        title = stringResource(R.string.onboarding_tips_title),
+        subtitle = stringResource(R.string.onboarding_tips_subtitle),
         extra = {
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                page.tipRows.forEach { TipRowItem(it) }
+                TipRow(Icons.Outlined.DevicesOther, stringResource(R.string.onboarding_tips_row_pair))
+                TipRow(Icons.Outlined.SystemUpdate, stringResource(R.string.onboarding_tips_row_firmware))
             }
         },
         cta = {
-            Button(
+            PrimaryCta(
+                label = stringResource(R.string.onboarding_tips_cta),
+                icon = Icons.Outlined.CheckCircle,
                 onClick = onAdvance,
-                shape = RoundedCornerShape(OnboardingTokens.RadiusButton),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = OnboardingColors.Accent,
-                    contentColor = Color.Black
-                ),
-                contentPadding = PaddingValues(vertical = 14.dp, horizontal = 24.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                if (page.primaryCta.icon != null) {
-                    Icon(
-                        imageVector = page.primaryCta.icon,
-                        contentDescription = null,
-                        tint = Color.Black,
-                        modifier = Modifier.size(18.dp)
-                    )
-                    Spacer(modifier = Modifier.size(10.dp))
-                }
-                Text(
-                    text = page.primaryCta.label,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-        }
+            )
+        },
     )
 }
 
 @Composable
-private fun TipRowItem(row: TipRow) {
+private fun TipRow(icon: ImageVector, text: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(
-                color = OnboardingColors.Surface,
-                shape = RoundedCornerShape(OnboardingTokens.RadiusSmall)
-            )
-            .padding(horizontal = 12.dp, vertical = 12.dp),
+            .background(OnboardingColors.Surface, RoundedCornerShape(OnboardingTokens.RadiusSmall))
+            .padding(12.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Box(
             modifier = Modifier
                 .size(24.dp)
                 .background(
-                    color = OnboardingColors.Accent.copy(alpha = 0.15f),
-                    shape = RoundedCornerShape(OnboardingTokens.RadiusSmall)
+                    OnboardingColors.Accent.copy(alpha = 0.15f),
+                    RoundedCornerShape(OnboardingTokens.RadiusSmall),
                 ),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
-            Icon(
-                imageVector = row.icon,
-                contentDescription = null,
-                tint = OnboardingColors.Accent,
-                modifier = Modifier.size(14.dp)
-            )
+            Icon(icon, contentDescription = null, tint = OnboardingColors.Accent, modifier = Modifier.size(14.dp))
         }
-        Text(
-            text = row.text,
-            color = OnboardingColors.TextPrimary,
-            fontSize = OnboardingTokens.Body
-        )
+        Text(text, color = OnboardingColors.TextPrimary, fontSize = OnboardingTokens.Body)
     }
 }

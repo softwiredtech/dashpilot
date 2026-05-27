@@ -25,8 +25,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -41,35 +39,31 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.viewmodel.ConnectionViewModel
-import kotlinx.coroutines.launch
 import com.softwiredtech.dashpilot.ui.theme.OnboardingColors
+import kotlinx.coroutines.launch
+
+private const val PAIRING_PAGE = 0
+private const val TIPS_PAGE = 1
+private const val PAGE_COUNT = 2
+private const val TOTAL_STEPS = 3
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OnboardingScreen(
-    config: OnboardingConfig,
     connectionVM: ConnectionViewModel,
     onFinish: () -> Unit,
-    onSkip: () -> Unit
+    onSkip: () -> Unit,
 ) {
-    val pagerState = rememberPagerState(pageCount = { config.pages.size })
+    val pagerState = rememberPagerState(pageCount = { PAGE_COUNT })
     val scope = rememberCoroutineScope()
+    var pairingState by rememberSaveable { mutableStateOf(PairingState.Idle) }
 
-    val canAdvance = remember { mutableStateMapOf<Int, Boolean>() }
-    var pairingSubStep by rememberSaveable { mutableIntStateOf(0) }
-
-    val currentCanAdvance = canAdvance[pagerState.currentPage] ?: true
-
-    val currentPage = config.pages[pagerState.currentPage]
-
-    val currentStepSlot = run {
-        var slot = 0
-        config.pages.take(pagerState.currentPage).forEach { slot += it.stepSlots }
-        slot += 1
-        if (currentPage is OnboardingPage.Pairing && pairingSubStep == 1) {
-            slot += 1
-        }
-        slot
+    val onPairingPage = pagerState.currentPage == PAIRING_PAGE
+    val canAdvance = !onPairingPage || pairingState == PairingState.Paired
+    val currentStep = when {
+        onPairingPage && pairingState != PairingState.Paired -> 1
+        onPairingPage -> 2
+        else -> 3
     }
 
     Column(
@@ -79,66 +73,29 @@ fun OnboardingScreen(
             .systemBarsPadding()
             .padding(horizontal = 16.dp)
     ) {
-        OnboardingTopBar(
-            showSkip = currentPage.showSkip,
-            onSkip = onSkip
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        if (currentPage.showStepIndicator) {
-            StepIndicator(
-                total = config.totalSteps,
-                current = currentStepSlot
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-        }
+        TopBar(showSkip = onPairingPage, onSkip = onSkip)
+        Spacer(Modifier.height(12.dp))
+        StepIndicator(total = TOTAL_STEPS, current = currentStep)
+        Spacer(Modifier.height(24.dp))
 
         HorizontalPager(
             state = pagerState,
-            userScrollEnabled = currentCanAdvance,
-            modifier = Modifier.fillMaxSize()
+            userScrollEnabled = canAdvance,
+            modifier = Modifier.fillMaxSize(),
         ) { pageIndex ->
-            val page = config.pages[pageIndex]
+            val advance: () -> Unit = {
+                if (pageIndex == PAGE_COUNT - 1) onFinish()
+                else scope.launch { pagerState.animateScrollToPage(pageIndex + 1) }
+            }
             FadeUpOnEnter(key = pageIndex) {
-                when (page) {
-                    is OnboardingPage.Pairing -> PairingPage(
-                        page = page,
+                when (pageIndex) {
+                    PAIRING_PAGE -> PairingPage(
                         connectionVM = connectionVM,
-                        onCanAdvanceChanged = { ok -> canAdvance[pageIndex] = ok },
-                        onPairingStateChanged = { st ->
-                            if (pageIndex == pagerState.currentPage) {
-                                pairingSubStep = if (st == PairingState.Paired) 1 else 0
-                            }
-                        },
-                        onAdvance = {
-                            if (pageIndex == config.pages.lastIndex) {
-                                onFinish()
-                            } else {
-                                scope.launch { pagerState.animateScrollToPage(pageIndex + 1) }
-                            }
-                        }
+                        state = pairingState,
+                        onStateChanged = { pairingState = it },
+                        onAdvance = advance,
                     )
-                    is OnboardingPage.Tips -> TipsPage(
-                        page = page,
-                        onAdvance = {
-                            if (pageIndex == config.pages.lastIndex) {
-                                onFinish()
-                            } else {
-                                scope.launch { pagerState.animateScrollToPage(pageIndex + 1) }
-                            }
-                        }
-                    )
-                    is OnboardingPage.Info -> InfoPage(
-                        page = page,
-                        onAdvance = {
-                            if (pageIndex == config.pages.lastIndex) {
-                                onFinish()
-                            } else {
-                                scope.launch { pagerState.animateScrollToPage(pageIndex + 1) }
-                            }
-                        }
-                    )
+                    TIPS_PAGE -> TipsPage(onAdvance = advance)
                 }
             }
         }
@@ -146,28 +103,25 @@ fun OnboardingScreen(
 }
 
 @Composable
-private fun OnboardingTopBar(
-    showSkip: Boolean,
-    onSkip: () -> Unit
-) {
+private fun TopBar(showSkip: Boolean, onSkip: () -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
             text = stringResource(R.string.onboarding_top_title),
             color = OnboardingColors.TextPrimary,
             fontSize = OnboardingTokens.TopTitle,
             fontWeight = FontWeight.Medium,
-            letterSpacing = (-0.5).sp
+            letterSpacing = (-0.5).sp,
         )
         if (showSkip) {
             TextButton(onClick = onSkip) {
                 Text(
                     text = stringResource(R.string.onboarding_skip),
                     color = OnboardingColors.TextMuted,
-                    fontSize = OnboardingTokens.Body
+                    fontSize = OnboardingTokens.Body,
                 )
             }
         }
@@ -179,26 +133,22 @@ private fun StepIndicator(total: Int, current: Int) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
         repeat(total) { i ->
-            val active = i < current
             Box(
                 modifier = Modifier
                     .width(16.dp)
                     .height(3.dp)
                     .clip(RoundedCornerShape(2.dp))
-                    .background(
-                        if (active) OnboardingColors.Accent
-                        else OnboardingColors.StepInactive
-                    )
+                    .background(if (i < current) OnboardingColors.Accent else OnboardingColors.StepInactive)
             )
         }
-        Spacer(modifier = Modifier.width(4.dp))
+        Spacer(Modifier.width(4.dp))
         Text(
             text = stringResource(R.string.onboarding_step_progress, current, total),
             color = OnboardingColors.TextMuted,
-            fontSize = OnboardingTokens.Caption
+            fontSize = OnboardingTokens.Caption,
         )
     }
 }
@@ -209,12 +159,7 @@ private fun FadeUpOnEnter(key: Any?, content: @Composable () -> Unit) {
     LaunchedEffect(key) { visible = true }
     AnimatedVisibility(
         visible = visible,
-        enter = slideInVertically(
-            initialOffsetY = { -8 },
-            animationSpec = tween(durationMillis = 350)
-        ) + fadeIn(animationSpec = tween(durationMillis = 350))
-    ) {
-        content()
-    }
+        enter = slideInVertically(initialOffsetY = { -8 }, animationSpec = tween(350)) +
+                fadeIn(animationSpec = tween(350)),
+    ) { content() }
 }
-

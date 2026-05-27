@@ -5,7 +5,6 @@ import androidx.compose.ui.unit.sp
 
 object OnboardingTokens {
     val RadiusButton = 12.dp
-    val RadiusChip = 12.dp
     val RadiusSmall = 8.dp
 
     val TopTitle = 22.sp

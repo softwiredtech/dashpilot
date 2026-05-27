@@ -44,7 +44,6 @@ import com.softwiredtech.dashpilot.ui.DashboardScreen
 import com.softwiredtech.dashpilot.ui.SettingsScreen
 import com.softwiredtech.dashpilot.ui.SetupScreen
 import com.softwiredtech.dashpilot.ui.onboarding.OnboardingScreen
-import com.softwiredtech.dashpilot.ui.onboarding.defaultOnboardingConfig
 import com.softwiredtech.dashpilot.ui.theme.DashPilotTheme
 import com.softwiredtech.dashpilot.util.NetworkUtil
 import com.softwiredtech.dashpilot.viewmodel.ConnectionViewModel
@@ -144,7 +143,6 @@ class MainActivity : ComponentActivity() {
                     ) {
                         composable<OnboardingRoute> {
                             OnboardingScreen(
-                                config = defaultOnboardingConfig(),
                                 connectionVM = connectionVM,
                                 onFinish = {
                                     setOnboardingCompleted(context, true)
