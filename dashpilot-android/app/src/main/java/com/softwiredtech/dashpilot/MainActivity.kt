@@ -93,7 +93,11 @@ class MainActivity : ComponentActivity() {
         // Enable edge-to-edge for Compose
         enableEdgeToEdge()
 
-        val onboardingDone = isOnboardingCompleted(this)
+        /* TODO: Once DashKit pairing is implemented in the firmware, add this back.
+         * The workflow should be that we auto-discover the advertised DashKit service
+         * and bring up the onboarding flow if the device is not yet paired.
+         */
+        val onboardingDone = true //isOnboardingCompleted(this)
 
         if (onboardingDone && !BuildConfig.DEBUG) {
             connectionVM.connect(this, "", DataSourceType.COMMA)
