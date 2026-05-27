@@ -1,0 +1,6 @@
+{
+  "$schema": "../../docs/dashapp-manifest.schema.json",
+  "manifestVersion": 1,
+  "id": "expo",
+  "settings": []
+}

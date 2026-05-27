@@ -1,0 +1,10 @@
+{
+  "$schema": "../../docs/dashapp-manifest.schema.json",
+  "manifestVersion": 1,
+  "id": "vanilla",
+  "settings": [
+    "showPhoneBattery", "showCarBattery", "showOdometer",
+    "alwaysOnBlindSpotMonitor", "useImperial", "darkMode",
+    "renderQuality", "darkModeBackgroundGray"
+  ]
+}
