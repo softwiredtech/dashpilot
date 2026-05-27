@@ -405,7 +405,7 @@ fun SettingsScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "Replay onboarding", color = Color.White, fontSize = 16.sp)
+                Text(text = stringResource(R.string.settings_replay_onboarding), color = Color.White, fontSize = 16.sp)
                 Text(text = "›", color = DarkColors.TextMuted, fontSize = 20.sp)
             }
 

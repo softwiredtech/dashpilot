@@ -12,6 +12,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -26,10 +27,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.softwiredtech.dashpilot.R
+import com.softwiredtech.dashpilot.ui.theme.OnboardingColors
 
 enum class PairingState { Idle, Searching, Paired }
 
@@ -72,24 +75,26 @@ fun DevicePuck(
     )
 
     Box(modifier = modifier, contentAlignment = Alignment.Center) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val w = size.width
-            val h = size.height
-            val side = minOf(w, h)
-            val puckRadius = side * 0.32f
-            val center = Offset(w / 2f, h / 2f)
+        Image(
+            painter = painterResource(id = R.drawable.onboarding_puck),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize()
+        )
 
-            val ledAngleDeg = -35.0
-            val ledDistance = puckRadius * 0.55f
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val center = Offset(size.width / 2f, size.height / 2f)
+            // Vector viewport is 220, puck radius is 68 → 68/220 ≈ 0.309
+            val puckRadius = size.minDimension * 0.309f
+            // LED sits in the upper-right quadrant of the puck face
             val ledCenter = Offset(
-                x = center.x + (ledDistance * kotlin.math.cos(Math.toRadians(ledAngleDeg))).toFloat(),
-                y = center.y + (ledDistance * kotlin.math.sin(Math.toRadians(ledAngleDeg))).toFloat()
+                x = center.x + 32.dp.toPx(),
+                y = center.y - 22.dp.toPx()
             )
 
             if (state == PairingState.Searching) {
                 ringAnims.forEach { (scaleAnim, alphaAnim) ->
                     drawCircle(
-                        color = OnboardingTokens.Accent.copy(alpha = alphaAnim.value),
+                        color = OnboardingColors.Accent.copy(alpha = alphaAnim.value),
                         radius = puckRadius * scaleAnim.value,
                         center = center,
                         style = Stroke(width = 1.dp.toPx())
@@ -97,74 +102,24 @@ fun DevicePuck(
                 }
             }
 
-            // Soft shadow under puck
-            drawCircle(
-                color = Color.Black.copy(alpha = 0.5f),
-                radius = puckRadius,
-                center = center.copy(y = center.y + 6f)
-            )
-
-            // Puck body
-            drawCircle(
-                color = OnboardingTokens.PuckBody,
-                radius = puckRadius,
-                center = center
-            )
-
-            // Top-left highlight
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(
-                        Color.White.copy(alpha = 0.10f),
-                        Color.Transparent
-                    ),
-                    center = Offset(center.x - puckRadius * 0.3f, center.y - puckRadius * 0.4f),
-                    radius = puckRadius * 0.8f
-                ),
-                radius = puckRadius,
-                center = center
-            )
-
-            // Subtle dot texture
-            val dotCount = 18
-            for (i in 0 until dotCount) {
-                val a = i * 137.5
-                val r = puckRadius * (0.15f + (i % 5) * 0.13f)
-                val x = center.x + (r * kotlin.math.cos(Math.toRadians(a))).toFloat()
-                val y = center.y + (r * kotlin.math.sin(Math.toRadians(a))).toFloat()
-                drawCircle(
-                    color = Color.White.copy(alpha = 0.04f),
-                    radius = 1.2f,
-                    center = Offset(x, y)
-                )
-            }
-
             if (state == PairingState.Paired) {
                 drawCircle(
-                    color = OnboardingTokens.Accent.copy(alpha = 0.15f),
+                    color = OnboardingColors.Accent.copy(alpha = 0.15f),
                     radius = 12.dp.toPx(),
                     center = ledCenter
                 )
                 drawCircle(
-                    color = OnboardingTokens.Accent.copy(alpha = 0.35f),
+                    color = OnboardingColors.Accent.copy(alpha = 0.35f),
                     radius = 7.dp.toPx(),
                     center = ledCenter
                 )
             }
 
-            val ledColor = when (state) {
-                PairingState.Paired -> OnboardingTokens.Accent
-                else -> OnboardingTokens.LedDim
-            }
-            val ledRadius = if (state == PairingState.Paired) {
-                4.dp.toPx() * ledPulse.value
-            } else {
-                4.dp.toPx()
-            }
+            val ledColor = if (state == PairingState.Paired) OnboardingColors.Accent else OnboardingColors.LedDim
+            val ledRadius = if (state == PairingState.Paired) 4.dp.toPx() * ledPulse.value else 4.dp.toPx()
             drawCircle(color = ledColor, radius = ledRadius, center = ledCenter)
         }
 
-        // Check badge — bottom-right relative to the puck center
         AnimatedVisibility(
             visible = state == PairingState.Paired,
             enter = scaleIn(
@@ -177,7 +132,6 @@ fun DevicePuck(
         ) {
             CheckBadge()
         }
-
     }
 }
 
@@ -187,7 +141,7 @@ private fun CheckBadge() {
         modifier = Modifier
             .size(36.dp)
             .border(width = 3.dp, color = Color.Black, shape = CircleShape)
-            .background(color = OnboardingTokens.Accent, shape = CircleShape),
+            .background(color = OnboardingColors.Accent, shape = CircleShape),
         contentAlignment = Alignment.Center
     ) {
         Icon(

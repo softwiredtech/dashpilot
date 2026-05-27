@@ -19,6 +19,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.softwiredtech.dashpilot.ui.theme.OnboardingColors
 
 @Composable
 fun InfoPage(
@@ -49,7 +50,7 @@ fun InfoPage(
                 onClick = onAdvance,
                 shape = RoundedCornerShape(OnboardingTokens.RadiusButton),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = OnboardingTokens.Accent,
+                    containerColor = OnboardingColors.Accent,
                     contentColor = Color.Black
                 ),
                 contentPadding = PaddingValues(vertical = 14.dp, horizontal = 24.dp),

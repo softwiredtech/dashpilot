@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.softwiredtech.dashpilot.ui.theme.OnboardingColors
 
 @Composable
 fun TipsPage(
@@ -45,7 +46,7 @@ fun TipsPage(
                 onClick = onAdvance,
                 shape = RoundedCornerShape(OnboardingTokens.RadiusButton),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = OnboardingTokens.Accent,
+                    containerColor = OnboardingColors.Accent,
                     contentColor = Color.Black
                 ),
                 contentPadding = PaddingValues(vertical = 14.dp, horizontal = 24.dp),
@@ -76,7 +77,7 @@ private fun TipRowItem(row: TipRow) {
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                color = OnboardingTokens.Surface,
+                color = OnboardingColors.Surface,
                 shape = RoundedCornerShape(OnboardingTokens.RadiusSmall)
             )
             .padding(horizontal = 12.dp, vertical = 12.dp),
@@ -87,7 +88,7 @@ private fun TipRowItem(row: TipRow) {
             modifier = Modifier
                 .size(24.dp)
                 .background(
-                    color = OnboardingTokens.Accent.copy(alpha = 0.15f),
+                    color = OnboardingColors.Accent.copy(alpha = 0.15f),
                     shape = RoundedCornerShape(OnboardingTokens.RadiusSmall)
                 ),
             contentAlignment = Alignment.Center
@@ -95,13 +96,13 @@ private fun TipRowItem(row: TipRow) {
             Icon(
                 imageVector = row.icon,
                 contentDescription = null,
-                tint = OnboardingTokens.Accent,
+                tint = OnboardingColors.Accent,
                 modifier = Modifier.size(14.dp)
             )
         }
         Text(
             text = row.text,
-            color = OnboardingTokens.TextPrimary,
+            color = OnboardingColors.TextPrimary,
             fontSize = OnboardingTokens.Body
         )
     }

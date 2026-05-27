@@ -21,12 +21,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.DataSourceType
 import com.softwiredtech.dashpilot.viewmodel.ConnectionViewModel
+import com.softwiredtech.dashpilot.ui.theme.OnboardingColors
 
 private data class PairingCopySnapshot(
     val title: String,
@@ -73,7 +76,7 @@ fun PairingPage(
         PairingState.Searching -> PairingCopySnapshot(
             title = page.pairingCopy.searchingTitle,
             subtitle = page.pairingCopy.searchingSubtitle,
-            ctaLabel = "Pairing…",
+            ctaLabel = stringResource(R.string.onboarding_pair_searching_cta),
             ctaEnabled = false,
             showSpinner = true
         )
@@ -110,9 +113,9 @@ fun PairingPage(
                 enabled = copy.ctaEnabled,
                 shape = RoundedCornerShape(OnboardingTokens.RadiusButton),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = OnboardingTokens.Accent,
+                    containerColor = OnboardingColors.Accent,
                     contentColor = Color.Black,
-                    disabledContainerColor = OnboardingTokens.Accent,
+                    disabledContainerColor = OnboardingColors.Accent,
                     disabledContentColor = Color.Black
                 ),
                 contentPadding = PaddingValues(vertical = 14.dp, horizontal = 24.dp),
@@ -146,7 +149,7 @@ fun PairingPage(
                 TextButton(onClick = { }) {
                     Text(
                         text = page.secondaryCta.label,
-                        color = OnboardingTokens.TextSecondary,
+                        color = OnboardingColors.TextSecondary,
                         fontSize = 12.sp
                     )
                 }

@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.softwiredtech.dashpilot.ui.theme.OnboardingColors
 
 /**
  * Shared vertical layout for every onboarding page.
@@ -47,7 +48,7 @@ fun OnboardingPageScaffold(
 
         Text(
             text = title,
-            color = OnboardingTokens.TextPrimary,
+            color = OnboardingColors.TextPrimary,
             fontSize = OnboardingTokens.PageTitle,
             fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center,
@@ -58,7 +59,7 @@ fun OnboardingPageScaffold(
 
         Text(
             text = subtitle,
-            color = OnboardingTokens.TextSecondary,
+            color = OnboardingColors.TextSecondary,
             fontSize = OnboardingTokens.Body,
             textAlign = TextAlign.Center,
             lineHeight = (OnboardingTokens.Body.value * 1.5f).sp,

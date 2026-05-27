@@ -35,11 +35,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.viewmodel.ConnectionViewModel
 import kotlinx.coroutines.launch
+import com.softwiredtech.dashpilot.ui.theme.OnboardingColors
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -72,7 +75,7 @@ fun OnboardingScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(OnboardingTokens.BgBase)
+            .background(OnboardingColors.BgBase)
             .systemBarsPadding()
             .padding(horizontal = 16.dp)
     ) {
@@ -153,8 +156,8 @@ private fun OnboardingTopBar(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "Setup",
-            color = OnboardingTokens.TextPrimary,
+            text = stringResource(R.string.onboarding_top_title),
+            color = OnboardingColors.TextPrimary,
             fontSize = OnboardingTokens.TopTitle,
             fontWeight = FontWeight.Medium,
             letterSpacing = (-0.5).sp
@@ -162,8 +165,8 @@ private fun OnboardingTopBar(
         if (showSkip) {
             TextButton(onClick = onSkip) {
                 Text(
-                    text = "Skip",
-                    color = OnboardingTokens.TextMuted,
+                    text = stringResource(R.string.onboarding_skip),
+                    color = OnboardingColors.TextMuted,
                     fontSize = OnboardingTokens.Body
                 )
             }
@@ -186,15 +189,15 @@ private fun StepIndicator(total: Int, current: Int) {
                     .height(3.dp)
                     .clip(RoundedCornerShape(2.dp))
                     .background(
-                        if (active) OnboardingTokens.Accent
-                        else OnboardingTokens.StepInactive
+                        if (active) OnboardingColors.Accent
+                        else OnboardingColors.StepInactive
                     )
             )
         }
         Spacer(modifier = Modifier.width(4.dp))
         Text(
-            text = "$current of $total",
-            color = OnboardingTokens.TextMuted,
+            text = stringResource(R.string.onboarding_step_progress, current, total),
+            color = OnboardingColors.TextMuted,
             fontSize = OnboardingTokens.Caption
         )
     }
