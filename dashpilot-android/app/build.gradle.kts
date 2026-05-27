@@ -71,7 +71,7 @@ val syncDashApps by tasks.registering(Exec::class) {
     }
 }
 
-tasks.matching { it.name.startsWith("merge") && it.name.endsWith("Assets") }.configureEach {
+tasks.named("preBuild") {
     dependsOn(syncDashApps)
 }
 
