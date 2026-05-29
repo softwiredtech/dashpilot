@@ -34,12 +34,12 @@ const val DEFAULT_ONBOARDING_COMPLETED = false
 private const val DEFAULT_DASHBOARD_ID = "vanilla"
 
 fun defaultDashboard(): DashboardConfig {
-    return dashboardById(DEFAULT_DASHBOARD_ID) ?: availableDashboards.first()
+    return dashboardById(DEFAULT_DASHBOARD_ID) ?: availableDashboards.first().withManifest()
 }
 
 fun dashboardById(id: String?): DashboardConfig? {
     val normalizedId = id?.trim()?.takeIf { it.isNotEmpty() } ?: return null
-    return availableDashboards.firstOrNull { it.id == normalizedId }
+    return availableDashboards.firstOrNull { it.id == normalizedId }?.withManifest()
 }
 
 fun getSelectedDashboard(context: Context): DashboardConfig {
