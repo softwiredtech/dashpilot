@@ -55,24 +55,6 @@ val availableDashboards = buildList {
             screenshotRes = R.drawable.preview_retro
         )
     )
-    add(
-        DashboardConfig(
-            id = "expo",
-            nameRes = R.string.dashboard_name_expo,
-            url = "https://dashpilot-expo.web.app",
-            type = DashboardType.WEB,
-            screenshotRes = R.drawable.preview_expo
-        )
-    )
-    add(
-        DashboardConfig(
-            id = "rive",
-            nameRes = R.string.dashboard_name_rive,
-            url = "dashboard_test",
-            type = DashboardType.RIVE,
-            screenshotRes = R.drawable.preview_rive
-        )
-    )
 
     if (BuildConfig.DEBUG) {
         add(
