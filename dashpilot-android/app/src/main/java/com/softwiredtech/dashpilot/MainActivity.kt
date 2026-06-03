@@ -35,7 +35,6 @@ import com.softwiredtech.dashpilot.datamodel.dash.DashboardType
 import com.softwiredtech.dashpilot.datamodel.dash.ManifestLoader
 import com.softwiredtech.dashpilot.datamodel.dash.availableDashboards
 import com.softwiredtech.dashpilot.datamodel.dash.getSelectedDashboard
-import com.softwiredtech.dashpilot.datamodel.dash.isOnboardingCompleted
 import com.softwiredtech.dashpilot.datamodel.dash.setOnboardingCompleted
 import com.softwiredtech.dashpilot.datamodel.dash.setLoadedManifests
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
@@ -66,7 +65,11 @@ class MainActivity : ComponentActivity() {
 
     private val bluetoothPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
-    ) { _ -> }
+    ) { _ ->
+        // Kick off the startup DashKit scan once the user has responded to the
+        // permission prompt (granted or not — runStartupDiscovery handles both).
+        connectionVM.runStartupDiscovery(this, hasBluetoothPermission())
+    }
 
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -97,7 +100,12 @@ class MainActivity : ComponentActivity() {
             requestLocationPermission()
         }
 
-        if (!hasBluetoothPermission()) {
+        // Decide the launch route by briefly scanning for an advertising DashKit.
+        // If we don't yet have BLE permission, the scan is kicked off from the
+        // permission launcher callback instead.
+        if (hasBluetoothPermission()) {
+            connectionVM.runStartupDiscovery(this, true)
+        } else {
             requestBluetoothPermission()
         }
 
@@ -107,18 +115,10 @@ class MainActivity : ComponentActivity() {
         // Enable edge-to-edge for Compose
         enableEdgeToEdge()
 
-        /* TODO: Once DashKit pairing is implemented in the firmware, add this back.
-         * The workflow should be that we auto-discover the advertised DashKit service
-         * and bring up the onboarding flow if the device is not yet paired.
-         */
-        val onboardingDone = true //isOnboardingCompleted(this)
-
-        if (onboardingDone && !BuildConfig.DEBUG) {
-            connectionVM.connect(this, "", DataSourceType.COMMA)
-        }
-
         setContent {
             DashPilotTheme {
+                val startupTarget by connectionVM.startupTarget.collectAsState()
+
                 val navController = rememberNavController()
                 val context = LocalContext.current
                 val connectionStatus by connectionVM.connectionStatus.collectAsState()
@@ -128,6 +128,24 @@ class MainActivity : ComponentActivity() {
                     ?.contains("DashboardRoute") == true
                 val onOnboarding = navBackStackEntry?.destination?.route
                     ?.contains("OnboardingRoute") == true
+
+                // One-shot routing once the startup DashKit scan resolves. The UI
+                // shows the normal Setup screen (disconnected/connecting) until then.
+                LaunchedEffect(startupTarget) {
+                    when (startupTarget) {
+                        ConnectionViewModel.StartupTarget.ONBOARDING_DASHKIT ->
+                            navController.navigate(OnboardingRoute) {
+                                popUpTo(SetupRoute) { inclusive = true }
+                            }
+                        ConnectionViewModel.StartupTarget.AUTOCONNECT_DASHKIT ->
+                            connectionVM.connect(context, "", DataSourceType.DASHKIT)
+                        ConnectionViewModel.StartupTarget.DEFAULT ->
+                            if (!BuildConfig.DEBUG) {
+                                connectionVM.connect(context, "", DataSourceType.COMMA)
+                            }
+                        ConnectionViewModel.StartupTarget.LOADING -> Unit
+                    }
+                }
 
                 LaunchedEffect(connectionStatus, hasAutoNavigated, onOnboarding) {
                     if (connectionStatus is ConnectionStatus.Connected && !hasAutoNavigated && !onOnboarding) {
@@ -153,7 +171,7 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { _ ->
                     NavHost(
                         navController = navController,
-                        startDestination = if (onboardingDone) SetupRoute else OnboardingRoute,
+                        startDestination = SetupRoute,
                         enterTransition = { EnterTransition.None },
                         exitTransition = { ExitTransition.None },
                         popEnterTransition = { EnterTransition.None },
@@ -180,6 +198,10 @@ class MainActivity : ComponentActivity() {
                         composable<SetupRoute> {
                             SetupScreen(
                                 connectionStatus = connectionStatus,
+                                preselectDashKit = startupTarget ==
+                                        ConnectionViewModel.StartupTarget.AUTOCONNECT_DASHKIT ||
+                                        startupTarget ==
+                                        ConnectionViewModel.StartupTarget.ONBOARDING_DASHKIT,
                                 onConnect = { serverAddress, dataSourceType ->
                                     connectionVM.connect(context, serverAddress, dataSourceType)
                                 },

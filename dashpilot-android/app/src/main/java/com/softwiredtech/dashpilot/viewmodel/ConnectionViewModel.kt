@@ -1,7 +1,14 @@
 package com.softwiredtech.dashpilot.viewmodel
 
+import android.annotation.SuppressLint
+import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothManager
+import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanResult
+import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.os.BatteryManager
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.softwiredtech.dashpilot.datamodel.dash.DASH_PREFS_NAME
@@ -47,6 +54,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withTimeoutOrNull
+import kotlin.coroutines.resume
 
 class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     private val _dataSource = MutableStateFlow<IDataSource?>(null)
@@ -64,6 +74,82 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     fun markAutoNavigated() {
         _hasAutoNavigatedToDashboard.value = true
     }
+
+    // Result of the one-shot startup BLE scan used to decide where to route the
+    // app on launch. LOADING until the scan resolves (or is skipped).
+    enum class StartupTarget { LOADING, ONBOARDING_DASHKIT, AUTOCONNECT_DASHKIT, DEFAULT }
+
+    private val _startupTarget = MutableStateFlow(StartupTarget.LOADING)
+    val startupTarget = _startupTarget.asStateFlow()
+    private var startupDiscoveryStarted = false
+
+    // Briefly scan for an advertising DashKit and decide the launch route:
+    //  - found + bonded   -> auto-connect DashKit
+    //  - found + unbonded -> open onboarding (pair flow)
+    //  - not found / no permission -> default (setup + comma)
+    fun runStartupDiscovery(context: Context, hasBlePermission: Boolean) {
+        if (startupDiscoveryStarted) return
+        startupDiscoveryStarted = true
+
+        if (!hasBlePermission) {
+            _startupTarget.value = StartupTarget.DEFAULT
+            return
+        }
+
+        viewModelScope.launch {
+            val target = withTimeoutOrNull(STARTUP_SCAN_TIMEOUT_MS) {
+                scanForDashKit(context)
+            } ?: StartupTarget.DEFAULT
+            _startupTarget.value = target
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private suspend fun scanForDashKit(context: Context): StartupTarget =
+        suspendCancellableCoroutine { cont ->
+            val adapter = (context.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager)
+                ?.adapter
+            val scanner = adapter?.bluetoothLeScanner
+            if (scanner == null) {
+                if (cont.isActive) cont.resume(StartupTarget.DEFAULT)
+                return@suspendCancellableCoroutine
+            }
+
+            val callback = object : ScanCallback() {
+                override fun onScanResult(callbackType: Int, result: ScanResult) {
+                    val name = result.device.name ?: result.scanRecord?.deviceName
+                    if (name != DASHKIT_DEVICE_NAME) return
+                    val bonded = result.device.bondState == BluetoothDevice.BOND_BONDED
+                    try { scanner.stopScan(this) } catch (_: Exception) {}
+                    if (cont.isActive) {
+                        cont.resume(
+                            if (bonded) StartupTarget.AUTOCONNECT_DASHKIT
+                            else StartupTarget.ONBOARDING_DASHKIT
+                        )
+                    }
+                }
+
+                override fun onScanFailed(errorCode: Int) {
+                    Log.e("ConnectionViewModel", "Startup scan failed: $errorCode")
+                    if (cont.isActive) cont.resume(StartupTarget.DEFAULT)
+                }
+            }
+
+            val settings = ScanSettings.Builder()
+                .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                .build()
+            try {
+                scanner.startScan(null, settings, callback)
+            } catch (e: Exception) {
+                Log.e("ConnectionViewModel", "Startup scan could not start: ${e.message}")
+                if (cont.isActive) cont.resume(StartupTarget.DEFAULT)
+                return@suspendCancellableCoroutine
+            }
+
+            cont.invokeOnCancellation {
+                try { scanner.stopScan(callback) } catch (_: Exception) {}
+            }
+        }
 
     private val _displaySettings = MutableStateFlow(DisplaySettings())
     private val _speedCameraDistance = MutableStateFlow(-1)
@@ -100,6 +186,18 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
                 DataSourceType.DASHKIT -> {
                     val manager = DashKitBleManager(context)
                     _bleManager.value = manager
+                    // Surface BLE/pairing failures so the UI doesn't hang in the
+                    // Connecting state forever. Connected is still driven by the
+                    // first CAN frame below.
+                    launch {
+                        manager.connectionState.collect { st ->
+                            if (st is ConnectionStatus.Error &&
+                                _connectionStatus.value is ConnectionStatus.Connecting
+                            ) {
+                                _connectionStatus.value = st
+                            }
+                        }
+                    }
                     val decoder = CanFrameDecoder(bridge, profile)
                     DashKitDataSource(manager, decoder)
                 }
@@ -177,5 +275,10 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         } else {
             ConnectionStatus.Disconnected
         }
+    }
+
+    companion object {
+        private const val DASHKIT_DEVICE_NAME = "DashKit"
+        private const val STARTUP_SCAN_TIMEOUT_MS = 3000L
     }
 }
