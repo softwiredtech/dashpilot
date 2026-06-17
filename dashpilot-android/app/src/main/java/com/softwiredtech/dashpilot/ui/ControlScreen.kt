@@ -1,7 +1,6 @@
 package com.softwiredtech.dashpilot.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,31 +14,51 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Bolt
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.DirectionsCar
+import androidx.compose.material.icons.rounded.EvStation
+import androidx.compose.material.icons.rounded.Flip
+import androidx.compose.material.icons.rounded.Inbox
+import androidx.compose.material.icons.rounded.Inventory2
+import androidx.compose.material.icons.rounded.Thermostat
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.softwiredtech.dashpilot.datasource.DashKitBleManager
 import com.softwiredtech.dashpilot.ble.VehicleControl
+import com.softwiredtech.dashpilot.datasource.DashKitBleManager
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
 import com.softwiredtech.dashpilot.ui.theme.DarkColors
 
 /**
- * Vehicle control screen. Currently exposes battery preconditioning (preheat),
- * which the firmware translates into a UI_vehicleControl2 CAN frame. Disabled
- * when there is no active DashKit connection.
+ * Vehicle control screen. Exposes the available DashKit commands as single
+ * toggle/action buttons. Disabled when there is no active DashKit connection.
  */
 @Composable
-fun ControlScreen(bleManager: DashKitBleManager?) {
+fun ControlScreen(
+    bleManager: DashKitBleManager?,
+    onBack: () -> Unit
+) {
     val enabled = bleManager != null
+
+    // Local UI state for toggles that the firmware exposes as separate
+    // on/off (or open/close) opcodes — there is no readback from the car.
+    var preheatOn by remember { mutableStateOf(false) }
+    var chargePortOpen by remember { mutableStateOf(false) }
+    var mirrorsFolded by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
@@ -50,147 +69,118 @@ fun ControlScreen(bleManager: DashKitBleManager?) {
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(horizontal = 24.dp, vertical = 24.dp)
         ) {
-            Text(
-                text = "Battery",
-                color = Color.White,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = onBack) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.size(8.dp))
+                Text(
+                    text = "Controls",
+                    color = Color.White,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
             if (!enabled) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Connect to DashKit to send commands",
                     color = DarkColors.TextMuted,
-                    fontSize = 13.sp
+                    fontSize = 13.sp,
+                    modifier = Modifier.padding(start = 8.dp)
                 )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            ControlCard(title = "Preconditioning") {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    ActionButton(
-                        label = "Preheat On",
-                        icon = true,
-                        enabled = enabled,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        bleManager?.let {
-                            VehicleControl.send(it, VehicleControl.CMD_BATTERY_PREHEAT, 1)
-                        }
-                    }
-                    ActionButton(
-                        label = "Off",
-                        icon = false,
-                        enabled = enabled,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        bleManager?.let {
-                            VehicleControl.send(it, VehicleControl.CMD_BATTERY_PREHEAT, 0)
-                        }
+            ControlButton(
+                label = if (preheatOn) "Battery Preheat: On" else "Battery Preheat: Off",
+                icon = Icons.Rounded.Thermostat,
+                active = preheatOn,
+                enabled = enabled
+            ) {
+                bleManager?.let {
+                    val next = !preheatOn
+                    if (VehicleControl.send(it, VehicleControl.CMD_BATTERY_PREHEAT, if (next) 1 else 0)) {
+                        preheatOn = next
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            Text(
-                text = "Closures",
-                color = Color.White,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.fillMaxWidth()
-            )
+            ControlButton(
+                label = "Frunk",
+                icon = Icons.Rounded.DirectionsCar,
+                active = false,
+                enabled = enabled
+            ) {
+                bleManager?.let {
+                    VehicleControl.send(it, VehicleControl.CMD_CLOSURE, VehicleControl.CLOSURE_FRONT_TRUNK)
+                }
+            }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            // Frunk and rear trunk use a single "move" request that toggles the
-            // closure open/closed, so each is one button rather than open/close.
-            ControlCard(title = "Frunk / Trunk") {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    ActionButton(
-                        label = "Frunk",
-                        icon = false,
-                        enabled = enabled,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        bleManager?.let {
-                            VehicleControl.send(
-                                it,
-                                VehicleControl.CMD_CLOSURE,
-                                VehicleControl.CLOSURE_FRONT_TRUNK
-                            )
-                        }
-                    }
-                    ActionButton(
-                        label = "Trunk",
-                        icon = false,
-                        enabled = enabled,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        bleManager?.let {
-                            VehicleControl.send(
-                                it,
-                                VehicleControl.CMD_CLOSURE,
-                                VehicleControl.CLOSURE_REAR_TRUNK
-                            )
-                        }
+            ControlButton(
+                label = "Trunk",
+                icon = Icons.Rounded.Inventory2,
+                active = false,
+                enabled = enabled
+            ) {
+                bleManager?.let {
+                    VehicleControl.send(it, VehicleControl.CMD_CLOSURE, VehicleControl.CLOSURE_REAR_TRUNK)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            ControlButton(
+                label = if (chargePortOpen) "Charge Port: Open" else "Charge Port: Closed",
+                icon = Icons.Rounded.EvStation,
+                active = chargePortOpen,
+                enabled = enabled
+            ) {
+                bleManager?.let {
+                    val opcode = if (chargePortOpen) VehicleControl.CMD_CHARGE_PORT_CLOSE
+                    else VehicleControl.CMD_CHARGE_PORT_OPEN
+                    if (VehicleControl.send(it, opcode, 1)) {
+                        chargePortOpen = !chargePortOpen
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-            ControlCard(title = "Charge Port") {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    ActionButton(
-                        label = "Open",
-                        icon = false,
-                        enabled = enabled,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        bleManager?.let {
-                            VehicleControl.send(it, VehicleControl.CMD_CHARGE_PORT_OPEN, 1)
-                        }
-                    }
-                    ActionButton(
-                        label = "Close",
-                        icon = false,
-                        enabled = enabled,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        bleManager?.let {
-                            VehicleControl.send(it, VehicleControl.CMD_CHARGE_PORT_CLOSE, 1)
-                        }
-                    }
-                }
+            // TODO: no firmware opcode for mirror fold yet — UI stub only.
+            ControlButton(
+                label = if (mirrorsFolded) "Mirrors: Folded" else "Mirrors: Unfolded",
+                icon = Icons.Rounded.Flip,
+                active = mirrorsFolded,
+                enabled = enabled
+            ) {
+                mirrorsFolded = !mirrorsFolded
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Glovebox is an electronic latch release: open only (closed by hand).
-            ControlCard(title = "Glovebox") {
-                ActionButton(
-                    label = "Open Glovebox",
-                    icon = false,
-                    enabled = enabled,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    bleManager?.let {
-                        VehicleControl.send(it, VehicleControl.CMD_GLOVEBOX, 1)
-                    }
+            ControlButton(
+                label = "Open Glovebox",
+                icon = Icons.Rounded.Inbox,
+                active = false,
+                enabled = enabled
+            ) {
+                bleManager?.let {
+                    VehicleControl.send(it, VehicleControl.CMD_GLOVEBOX, 1)
                 }
             }
         }
@@ -198,52 +188,38 @@ fun ControlScreen(bleManager: DashKitBleManager?) {
 }
 
 @Composable
-private fun ControlCard(title: String, content: @Composable () -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(DarkColors.Surface, RoundedCornerShape(16.dp))
-            .padding(16.dp)
-    ) {
-        Text(
-            text = title,
-            color = DarkColors.TextMuted,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Medium
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-        content()
-    }
-}
-
-@Composable
-private fun ActionButton(
+private fun ControlButton(
     label: String,
-    icon: Boolean,
+    icon: ImageVector,
+    active: Boolean,
     enabled: Boolean,
-    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     Button(
         onClick = onClick,
         enabled = enabled,
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (icon) AccentColor else DarkColors.SurfaceSelected,
+            containerColor = if (active) AccentColor else DarkColors.Surface,
             contentColor = Color.White,
             disabledContainerColor = DarkColors.Disabled,
             disabledContentColor = DarkColors.ContentDisabled
         ),
-        modifier = modifier.height(52.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
     ) {
-        if (icon) {
-            Icon(
-                imageVector = Icons.Rounded.Bolt,
-                contentDescription = null,
-                modifier = Modifier.size(20.dp)
-            )
-            Spacer(modifier = Modifier.size(8.dp))
-        }
-        Text(text = label, fontSize = 15.sp)
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.size(20.dp)
+        )
+        Spacer(modifier = Modifier.size(12.dp))
+        Text(
+            text = label,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.weight(1f)
+        )
     }
 }

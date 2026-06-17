@@ -12,6 +12,12 @@ object SetupRoute
 object SettingsRoute
 
 @Serializable
+object AutomationsRoute
+
+@Serializable
+object ControlsRoute
+
+@Serializable
 data class DashboardRoute(
     val dashboardType: String,
     val dashboardUrl: String

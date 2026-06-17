@@ -39,10 +39,14 @@ import com.softwiredtech.dashpilot.datamodel.dash.setOnboardingCompleted
 import com.softwiredtech.dashpilot.datamodel.dash.setLoadedManifests
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.DataSourceType
+import com.softwiredtech.dashpilot.navigation.AutomationsRoute
+import com.softwiredtech.dashpilot.navigation.ControlsRoute
 import com.softwiredtech.dashpilot.navigation.DashboardRoute
 import com.softwiredtech.dashpilot.navigation.OnboardingRoute
 import com.softwiredtech.dashpilot.navigation.SettingsRoute
 import com.softwiredtech.dashpilot.navigation.SetupRoute
+import com.softwiredtech.dashpilot.ui.AutomationsScreen
+import com.softwiredtech.dashpilot.ui.ControlScreen
 import com.softwiredtech.dashpilot.ui.DashboardScreen
 import com.softwiredtech.dashpilot.ui.HomeScreen
 import com.softwiredtech.dashpilot.ui.LOCAL_ASSET_BASE_URL
@@ -122,12 +126,9 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val context = LocalContext.current
                 val connectionStatus by connectionVM.connectionStatus.collectAsState()
-                val hasAutoNavigated by connectionVM.hasAutoNavigatedToDashboard.collectAsState()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val onDashboard = navBackStackEntry?.destination?.route
                     ?.contains("DashboardRoute") == true
-                val onOnboarding = navBackStackEntry?.destination?.route
-                    ?.contains("OnboardingRoute") == true
 
                 // One-shot routing once the startup DashKit scan resolves. The UI
                 // shows the normal Setup screen (disconnected/connecting) until then.
@@ -144,17 +145,6 @@ class MainActivity : ComponentActivity() {
                                 connectionVM.connect(context, "", DataSourceType.COMMA)
                             }
                         ConnectionViewModel.StartupTarget.LOADING -> Unit
-                    }
-                }
-
-                LaunchedEffect(connectionStatus, hasAutoNavigated, onOnboarding) {
-                    if (connectionStatus is ConnectionStatus.Connected && !hasAutoNavigated && !onOnboarding) {
-                        connectionVM.markAutoNavigated()
-                        val dashboard = getSelectedDashboard(context)
-                        navController.navigate(DashboardRoute(
-                            dashboard.type.name.lowercase(),
-                            dashboard.url)
-                        )
                     }
                 }
 
@@ -197,9 +187,18 @@ class MainActivity : ComponentActivity() {
                         }
                         composable<SetupRoute> {
                             val manager by connectionVM.bleManager.collectAsState()
+                            val dashStateFlow by connectionVM.dashState.collectAsState()
+                            val toDashboard = {
+                                val dashboard = getSelectedDashboard(context)
+                                navController.navigate(DashboardRoute(
+                                    dashboard.type.name.lowercase(),
+                                    dashboard.url)
+                                )
+                            }
                             HomeScreen(
                                 connectionStatus = connectionStatus,
                                 bleManager = manager,
+                                dashState = dashStateFlow,
                                 preselectDashKit = startupTarget ==
                                         ConnectionViewModel.StartupTarget.AUTOCONNECT_DASHKIT ||
                                         startupTarget ==
@@ -210,17 +209,28 @@ class MainActivity : ComponentActivity() {
                                 onDisconnect = {
                                     connectionVM.disconnect()
                                 },
-                                onNext = {
-                                    val dashboard = getSelectedDashboard(context)
-                                    navController.navigate(DashboardRoute(
-                                        dashboard.type.name.lowercase(),
-                                        dashboard.url)
-                                    )
+                                onNext = toDashboard,
+                                onAutomations = {
+                                    navController.navigate(AutomationsRoute)
                                 },
+                                onControls = {
+                                    navController.navigate(ControlsRoute)
+                                },
+                                onDrive = toDashboard,
                                 onSettingsClick = {
                                     navController.navigate(SettingsRoute)
                                 }
                             )
+                        }
+                        composable<ControlsRoute> {
+                            val manager by connectionVM.bleManager.collectAsState()
+                            ControlScreen(
+                                bleManager = manager,
+                                onBack = { navController.popBackStack() }
+                            )
+                        }
+                        composable<AutomationsRoute> {
+                            AutomationsScreen(onBack = { navController.popBackStack() })
                         }
                         composable<SettingsRoute> {
                             val manager by connectionVM.bleManager.collectAsState()
