@@ -18,6 +18,12 @@ const val PREF_RENDER_QUALITY = "render_quality"
 const val PREF_DARK_MODE_BACKGROUND_GRAY = "dark_mode_background_gray"
 const val PREF_EXTRA_VEHICLE_BUS = "extra_vehicle_bus"
 const val PREF_ONBOARDING_COMPLETED = "onboarding_completed"
+const val PREF_PINNED_CONTROL = "pinned_control"
+
+// Automations
+const val PREF_WIPER_OFF_AUTOMATION = "wiper_off_automation"
+const val PREF_THREE_FINGER_ACTION = "three_finger_action"
+const val DEFAULT_WIPER_OFF_AUTOMATION = false
 
 // Display settings defaults
 const val DEFAULT_SHOW_PHONE_BATTERY = true
@@ -76,4 +82,43 @@ fun isOnboardingCompleted(context: Context): Boolean =
 fun setOnboardingCompleted(context: Context, value: Boolean = true) {
     context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
         .edit { putBoolean(PREF_ONBOARDING_COMPLETED, value) }
+}
+
+fun getPinnedControl(context: Context): String? =
+    context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
+        .getString(PREF_PINNED_CONTROL, null)
+
+fun setPinnedControl(context: Context, id: String?) {
+    context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
+        .edit {
+            if (id.isNullOrBlank()) {
+                remove(PREF_PINNED_CONTROL)
+            } else {
+                putString(PREF_PINNED_CONTROL, id)
+            }
+        }
+}
+
+fun getWiperOffAutomation(context: Context): Boolean =
+    context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
+        .getBoolean(PREF_WIPER_OFF_AUTOMATION, DEFAULT_WIPER_OFF_AUTOMATION)
+
+fun setWiperOffAutomation(context: Context, value: Boolean) {
+    context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
+        .edit { putBoolean(PREF_WIPER_OFF_AUTOMATION, value) }
+}
+
+fun getThreeFingerAction(context: Context): String? =
+    context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
+        .getString(PREF_THREE_FINGER_ACTION, null)
+
+fun setThreeFingerAction(context: Context, id: String?) {
+    context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
+        .edit {
+            if (id.isNullOrBlank()) {
+                remove(PREF_THREE_FINGER_ACTION)
+            } else {
+                putString(PREF_THREE_FINGER_ACTION, id)
+            }
+        }
 }

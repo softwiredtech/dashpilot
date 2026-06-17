@@ -96,6 +96,9 @@ class MainActivity : ComponentActivity() {
 
         loadDashboardManifests()
 
+        connectionVM.loadPinnedControl(this)
+        connectionVM.loadAutomations(this)
+
         connectionVM.bindSpeedCamera(speedCameraVM.nearestApproachingCamera)
 
         if (hasLocationPermission()) {
@@ -126,6 +129,9 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val context = LocalContext.current
                 val connectionStatus by connectionVM.connectionStatus.collectAsState()
+                val pinnedControl by connectionVM.pinnedControl.collectAsState()
+                val wiperOffAutomation by connectionVM.wiperOffAutomation.collectAsState()
+                val threeFingerAction by connectionVM.threeFingerAction.collectAsState()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val onDashboard = navBackStackEntry?.destination?.route
                     ?.contains("DashboardRoute") == true
@@ -203,6 +209,7 @@ class MainActivity : ComponentActivity() {
                                         ConnectionViewModel.StartupTarget.AUTOCONNECT_DASHKIT ||
                                         startupTarget ==
                                         ConnectionViewModel.StartupTarget.ONBOARDING_DASHKIT,
+                                pinnedControlId = pinnedControl,
                                 onConnect = { serverAddress, dataSourceType ->
                                     connectionVM.connect(context, serverAddress, dataSourceType)
                                 },
@@ -226,11 +233,23 @@ class MainActivity : ComponentActivity() {
                             val manager by connectionVM.bleManager.collectAsState()
                             ControlScreen(
                                 bleManager = manager,
+                                pinnedControlId = pinnedControl,
+                                onTogglePin = { connectionVM.togglePinnedControl(context, it) },
                                 onBack = { navController.popBackStack() }
                             )
                         }
                         composable<AutomationsRoute> {
-                            AutomationsScreen(onBack = { navController.popBackStack() })
+                            AutomationsScreen(
+                                wiperOffEnabled = wiperOffAutomation,
+                                onWiperOffChange = {
+                                    connectionVM.updateWiperOffAutomation(context, it)
+                                },
+                                threeFingerActionId = threeFingerAction,
+                                onToggleThreeFinger = {
+                                    connectionVM.toggleThreeFingerAction(context, it)
+                                },
+                                onBack = { navController.popBackStack() }
+                            )
                         }
                         composable<SettingsRoute> {
                             val manager by connectionVM.bleManager.collectAsState()

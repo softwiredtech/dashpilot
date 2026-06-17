@@ -42,6 +42,8 @@ import com.softwiredtech.dashpilot.datamodel.dash.CarState
 import com.softwiredtech.dashpilot.datamodel.dash.DashState
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.DashKitBleManager
+import com.softwiredtech.dashpilot.ui.controls.ControlActionButton
+import com.softwiredtech.dashpilot.ui.controls.controlById
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
 import com.softwiredtech.dashpilot.ui.theme.DarkColors
 import kotlinx.coroutines.flow.Flow
@@ -59,6 +61,7 @@ fun HomeScreen(
     bleManager: DashKitBleManager?,
     dashState: Flow<DashState>?,
     preselectDashKit: Boolean,
+    pinnedControlId: String?,
     onConnect: (serverAddress: String, dataSourceType: String) -> Unit,
     onDisconnect: () -> Unit,
     onNext: () -> Unit,
@@ -77,6 +80,8 @@ fun HomeScreen(
         if (connectionStatus is ConnectionStatus.Connected || BuildConfig.DEBUG) {
             ConnectedHomeContent(
                 dashState = dashState,
+                bleManager = bleManager,
+                pinnedControlId = pinnedControlId,
                 onAutomations = onAutomations,
                 onControls = onControls,
                 onDrive = onDrive,
@@ -98,12 +103,17 @@ fun HomeScreen(
 @Composable
 private fun ConnectedHomeContent(
     dashState: Flow<DashState>?,
+    bleManager: DashKitBleManager?,
+    pinnedControlId: String?,
     onAutomations: () -> Unit,
     onControls: () -> Unit,
     onDrive: () -> Unit,
     onSettingsClick: () -> Unit
 ) {
-    val state by (dashState ?: flowOf(DashState())).collectAsState(initial = DashState())
+    // In debug builds without a live data source, show mock values so the
+    // widgets are populated for layout/testing instead of placeholders.
+    val fallback = if (BuildConfig.DEBUG) mockDashState() else DashState()
+    val state by (dashState ?: flowOf(fallback)).collectAsState(initial = fallback)
     val car = state.carState
     val useImperial = state.displaySettings.useImperial
 
@@ -112,12 +122,11 @@ private fun ConnectedHomeContent(
             .fillMaxSize()
             .padding(horizontal = 24.dp, vertical = 24.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onSettingsClick) {
+        Box(modifier = Modifier.fillMaxWidth()) {
+            IconButton(
+                onClick = onSettingsClick,
+                modifier = Modifier.align(Alignment.CenterStart)
+            ) {
                 Icon(
                     imageVector = Icons.Rounded.Settings,
                     contentDescription = "Settings",
@@ -125,6 +134,13 @@ private fun ConnectedHomeContent(
                     modifier = Modifier.size(24.dp)
                 )
             }
+            Text(
+                text = "DashPilot",
+                color = Color.White,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.align(Alignment.Center)
+            )
         }
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -168,6 +184,24 @@ private fun ConnectedHomeContent(
         }
 
         Spacer(modifier = Modifier.height(32.dp))
+
+        controlById(pinnedControlId)?.let { action ->
+            Text(
+                text = "Pinned",
+                color = DarkColors.TextMuted,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            ControlActionButton(
+                action = action,
+                pinned = true,
+                enabled = bleManager != null || BuildConfig.DEBUG,
+                onClick = { action.perform(bleManager) },
+                onLongClick = null
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+        }
 
         ActionButton(
             label = "Automations",
@@ -255,6 +289,15 @@ private fun ActionButton(
         Text(text = label, fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
     }
 }
+
+private fun mockDashState(): DashState = DashState(
+    carState = CarState(
+        fullPackEnergy = 78f,
+        nominalEnergyRemaining = 60f,
+        packTMax = 24f,
+        odometer = 12345f
+    )
+)
 
 private fun socText(car: CarState): String {
     if (car.fullPackEnergy <= 0f) return "—"

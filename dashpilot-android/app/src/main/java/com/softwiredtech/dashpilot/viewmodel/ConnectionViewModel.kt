@@ -32,6 +32,12 @@ import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_CAR_BATTERY
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_ODOMETER
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_PHONE_BATTERY
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_USE_IMPERIAL
+import com.softwiredtech.dashpilot.datamodel.dash.getPinnedControl
+import com.softwiredtech.dashpilot.datamodel.dash.setPinnedControl
+import com.softwiredtech.dashpilot.datamodel.dash.getThreeFingerAction
+import com.softwiredtech.dashpilot.datamodel.dash.setThreeFingerAction
+import com.softwiredtech.dashpilot.datamodel.dash.getWiperOffAutomation
+import com.softwiredtech.dashpilot.datamodel.dash.setWiperOffAutomation
 import com.softwiredtech.dashpilot.datasource.DataSourceType
 import com.softwiredtech.dashpilot.datasource.CommaDataSource
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
@@ -73,6 +79,44 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
 
     fun markAutoNavigated() {
         _hasAutoNavigatedToDashboard.value = true
+    }
+
+    private val _pinnedControl = MutableStateFlow<String?>(null)
+    val pinnedControl = _pinnedControl.asStateFlow()
+
+    fun loadPinnedControl(context: Context) {
+        _pinnedControl.value = getPinnedControl(context)
+    }
+
+    fun togglePinnedControl(context: Context, id: String) {
+        val next = if (_pinnedControl.value == id) null else id
+        setPinnedControl(context, next)
+        _pinnedControl.value = next
+    }
+
+    private val _wiperOffAutomation = MutableStateFlow(false)
+    val wiperOffAutomation = _wiperOffAutomation.asStateFlow()
+
+    // Single binding for the infotainment three-finger-press gesture (a control
+    // id, or null when unbound). Storing one value keeps the options mutually
+    // exclusive automatically.
+    private val _threeFingerAction = MutableStateFlow<String?>(null)
+    val threeFingerAction = _threeFingerAction.asStateFlow()
+
+    fun loadAutomations(context: Context) {
+        _wiperOffAutomation.value = getWiperOffAutomation(context)
+        _threeFingerAction.value = getThreeFingerAction(context)
+    }
+
+    fun updateWiperOffAutomation(context: Context, value: Boolean) {
+        setWiperOffAutomation(context, value)
+        _wiperOffAutomation.value = value
+    }
+
+    fun toggleThreeFingerAction(context: Context, id: String) {
+        val next = if (_threeFingerAction.value == id) null else id
+        setThreeFingerAction(context, next)
+        _threeFingerAction.value = next
     }
 
     // Result of the one-shot startup BLE scan used to decide where to route the
