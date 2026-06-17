@@ -44,9 +44,9 @@ import com.softwiredtech.dashpilot.navigation.OnboardingRoute
 import com.softwiredtech.dashpilot.navigation.SettingsRoute
 import com.softwiredtech.dashpilot.navigation.SetupRoute
 import com.softwiredtech.dashpilot.ui.DashboardScreen
+import com.softwiredtech.dashpilot.ui.HomeScreen
 import com.softwiredtech.dashpilot.ui.LOCAL_ASSET_BASE_URL
 import com.softwiredtech.dashpilot.ui.SettingsScreen
-import com.softwiredtech.dashpilot.ui.SetupScreen
 import com.softwiredtech.dashpilot.ui.onboarding.OnboardingScreen
 import com.softwiredtech.dashpilot.ui.theme.DashPilotTheme
 import com.softwiredtech.dashpilot.util.NetworkUtil
@@ -196,8 +196,10 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable<SetupRoute> {
-                            SetupScreen(
+                            val manager by connectionVM.bleManager.collectAsState()
+                            HomeScreen(
                                 connectionStatus = connectionStatus,
+                                bleManager = manager,
                                 preselectDashKit = startupTarget ==
                                         ConnectionViewModel.StartupTarget.AUTOCONNECT_DASHKIT ||
                                         startupTarget ==
