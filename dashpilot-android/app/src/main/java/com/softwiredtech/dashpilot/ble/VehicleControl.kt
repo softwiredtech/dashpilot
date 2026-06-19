@@ -28,6 +28,10 @@ object VehicleControl {
     const val CLOSURE_REAR_TRUNK: Int = 1
     const val CLOSURE_FRONT_TRUNK: Int = 2
 
+    const val CMD_MIRROR_FOLD: Int = 0x04  // UI_mirrorFoldRequest: 1=RETRACT(fold) 2=PRESENT(unfold)
+    const val MIRROR_FOLD: Int = 1
+    const val MIRROR_UNFOLD: Int = 2
+
     // --- UI_vehicleControl2 (0x3B3) ---
     const val CMD_GLOVEBOX: Int = 0x0F              // 1=open (UI_gloveboxRequest)
 

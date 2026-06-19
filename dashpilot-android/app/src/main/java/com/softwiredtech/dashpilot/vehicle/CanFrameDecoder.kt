@@ -56,7 +56,8 @@ class CanFrameDecoder(
                 selfdriveActive = values[26] > 0,
                 experimentalMode = values[27] > 0,
                 madsActive = values[28] > 0,
-                changingLane = values[29] > 0
+                changingLane = values[29] > 0,
+                acTemp = values[30].toFloat()
             )
         }
     }

@@ -37,7 +37,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.softwiredtech.dashpilot.BuildConfig
 import com.softwiredtech.dashpilot.datamodel.dash.CarState
 import com.softwiredtech.dashpilot.datamodel.dash.DashState
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
@@ -75,9 +74,7 @@ fun HomeScreen(
             .fillMaxSize()
             .background(DarkColors.Background)
     ) {
-        // In debug builds always show the connected home so the layout can be
-        // inspected without an active data source (widgets show placeholders).
-        if (connectionStatus is ConnectionStatus.Connected || BuildConfig.DEBUG) {
+        if (connectionStatus is ConnectionStatus.Connected) {
             ConnectedHomeContent(
                 dashState = dashState,
                 bleManager = bleManager,
@@ -110,9 +107,7 @@ private fun ConnectedHomeContent(
     onDrive: () -> Unit,
     onSettingsClick: () -> Unit
 ) {
-    // In debug builds without a live data source, show mock values so the
-    // widgets are populated for layout/testing instead of placeholders.
-    val fallback = if (BuildConfig.DEBUG) mockDashState() else DashState()
+    val fallback = DashState()
     val state by (dashState ?: flowOf(fallback)).collectAsState(initial = fallback)
     val car = state.carState
     val useImperial = state.displaySettings.useImperial
@@ -159,7 +154,7 @@ private fun ConnectedHomeContent(
             InfoWidget(
                 icon = Icons.Rounded.DeviceThermostat,
                 label = "Battery Temp",
-                value = tempText(car.packTMax),
+                value = batteryTempText(car),
                 modifier = Modifier.weight(1f)
             )
         }
@@ -171,8 +166,7 @@ private fun ConnectedHomeContent(
             InfoWidget(
                 icon = Icons.Rounded.AcUnit,
                 label = "AC Temp",
-                // TODO: wire real climate setpoint from CarState once available.
-                value = "21°",
+                value = tempText(car.acTemp),
                 modifier = Modifier.weight(1f)
             )
             InfoWidget(
@@ -196,7 +190,7 @@ private fun ConnectedHomeContent(
             ControlActionButton(
                 action = action,
                 pinned = true,
-                enabled = bleManager != null || BuildConfig.DEBUG,
+                enabled = bleManager != null,
                 onClick = { action.perform(bleManager) },
                 onLongClick = null
             )
@@ -290,24 +284,26 @@ private fun ActionButton(
     }
 }
 
-private fun mockDashState(): DashState = DashState(
-    carState = CarState(
-        fullPackEnergy = 78f,
-        nominalEnergyRemaining = 60f,
-        packTMax = 24f,
-        odometer = 12345f
-    )
-)
-
 private fun socText(car: CarState): String {
-    if (car.fullPackEnergy <= 0f) return "—"
-    val soc = (car.nominalEnergyRemaining / car.fullPackEnergy * 100f).roundToInt()
+    val fullPack = car.fullPackEnergy
+    val remaining = car.nominalEnergyRemaining
+    val buffer = car.energyBuffer
+    if (fullPack <= 0f || remaining <= 0f || (fullPack - buffer) <= 0f) return "—"
+    val soc = ((remaining - buffer) / (fullPack - buffer) * 100f).roundToInt()
     return "$soc%"
 }
 
 private fun tempText(temp: Float): String {
     if (temp == 0f) return "—"
     return "${temp.roundToInt()}°"
+}
+
+private fun batteryTempText(car: CarState): String {
+    val tMin = car.packTMin
+    val tMax = car.packTMax
+    if (tMin == 0f && tMax == 0f) return "—"
+    val avg = (tMin + tMax) / 2f
+    return "${avg.roundToInt()}°"
 }
 
 private fun odometerText(odometer: Float, useImperial: Boolean): String {

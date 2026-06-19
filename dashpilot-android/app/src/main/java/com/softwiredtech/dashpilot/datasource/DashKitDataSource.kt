@@ -42,6 +42,7 @@ class DashKitDataSource(
             0x132, // BMS_hvBusStatus            (306)
             0x332, // BMS_bmbMinMax              (818)
             0x3B6, // DI_odometerStatus          (950)
+            0x2F3, // UI_hvacRequest             (755)
         )
 
         private val CAN_FILTER: Map<Int, List<Int>> = mapOf(

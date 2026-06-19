@@ -32,6 +32,7 @@ struct CarState {
     double packTMin = 0;
     double packTMax = 0;
     double odometer = 0;
+    double acTemp = 0;
 
     // Openpilot state
     double madsActive = 0;
@@ -39,7 +40,7 @@ struct CarState {
     double experimentalMode = 0;
     double changingLane = 0;
 
-    static constexpr size_t FIELD_COUNT = 30;
+    static constexpr size_t FIELD_COUNT = 31;
 
     void toArray(double* out) const {
         // Party bus
@@ -77,5 +78,7 @@ struct CarState {
         out[27] = experimentalMode;
         out[28] = madsActive;
         out[29] = changingLane;
+
+        out[30] = acTemp;
     }
 };

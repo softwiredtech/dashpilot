@@ -111,13 +111,18 @@ val vehicleControls: List<ControlAction> = listOf(
             }
         }
     ),
-    // TODO: no firmware opcode for mirror fold yet — UI stub only.
     ControlAction(
         id = "mirror_fold",
         icon = Icons.Rounded.Flip,
         label = { if (ControlsState.mirrorsFolded) "Mirrors: Folded" else "Mirrors: Unfolded" },
         active = { ControlsState.mirrorsFolded },
-        perform = { ControlsState.mirrorsFolded = !ControlsState.mirrorsFolded }
+        perform = { manager ->
+            val value = if (ControlsState.mirrorsFolded) VehicleControl.MIRROR_UNFOLD
+            else VehicleControl.MIRROR_FOLD
+            if (manager == null || VehicleControl.send(manager, VehicleControl.CMD_MIRROR_FOLD, value)) {
+                ControlsState.mirrorsFolded = !ControlsState.mirrorsFolded
+            }
+        }
     ),
     // Glovebox is an electronic latch release: open only (closed by hand).
     ControlAction(
