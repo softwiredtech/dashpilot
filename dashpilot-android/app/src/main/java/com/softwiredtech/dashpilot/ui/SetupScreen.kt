@@ -24,6 +24,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Bluetooth
 import androidx.compose.material.icons.rounded.DirectionsCar
 import androidx.compose.material.icons.rounded.Lan
 import androidx.compose.material.icons.rounded.PhoneAndroid
@@ -39,6 +40,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -74,8 +76,8 @@ private data class DataSource(
 
 private val dataSources = buildList {
     add(DataSource(DataSourceType.COMMA, "comma", null))
+    add(DataSource(DataSourceType.DASHKIT, "DashKit", Icons.Rounded.Bluetooth))
     if (BuildConfig.DEBUG) {
-        // BLE pairing now happens in onboarding; only Comma + WebSocket are manual choices.
         add(DataSource(DataSourceType.WEBSOCKET, "WebSocket", Icons.Rounded.Lan))
     }
 }
@@ -86,11 +88,21 @@ fun SetupScreen(
     onConnect: (serverAddress: String, dataSourceType: String) -> Unit,
     onDisconnect: () -> Unit,
     onNext: () -> Unit,
-    onSettingsClick: () -> Unit = {}
+    onSettingsClick: () -> Unit = {},
+    preselectDashKit: Boolean = false
 ) {
     val context = LocalContext.current
     var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
     val currentSource = dataSources[selectedIndex]
+
+    // When the startup scan discovers a DashKit, preselect it in the source
+    // picker. Runs once when discovery flips true; manual changes afterwards stick.
+    LaunchedEffect(preselectDashKit) {
+        if (preselectDashKit) {
+            val idx = dataSources.indexOfFirst { it.key == DataSourceType.DASHKIT }
+            if (idx >= 0) selectedIndex = idx
+        }
+    }
     var serverAddress by rememberSaveable { mutableStateOf("") }
 
     Box(
@@ -116,7 +128,7 @@ fun SetupScreen(
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = if (BuildConfig.DEBUG) stringResource(R.string.setup_select_data_source) else stringResource(R.string.setup_connect_your_comma_device),
+                text = if (dataSources.size > 1) stringResource(R.string.setup_select_data_source) else stringResource(R.string.setup_connect_your_comma_device),
                 color = DarkColors.TextMuted,
                 fontSize = 14.sp
             )
@@ -323,7 +335,7 @@ private fun ConnectionVisualization(
 
         AnimatedDashedLine(phase = phase, animating = animating, color = dashLineColor)
 
-        if (BuildConfig.DEBUG && dataSources.size > 1) {
+        if (dataSources.size > 1) {
             var expanded by remember { mutableStateOf(false) }
             Box {
                 OutlinedButton(

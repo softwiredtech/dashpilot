@@ -35,19 +35,22 @@ import com.softwiredtech.dashpilot.datamodel.dash.DashboardType
 import com.softwiredtech.dashpilot.datamodel.dash.ManifestLoader
 import com.softwiredtech.dashpilot.datamodel.dash.availableDashboards
 import com.softwiredtech.dashpilot.datamodel.dash.getSelectedDashboard
-import com.softwiredtech.dashpilot.datamodel.dash.isOnboardingCompleted
 import com.softwiredtech.dashpilot.datamodel.dash.setOnboardingCompleted
 import com.softwiredtech.dashpilot.datamodel.dash.setLoadedManifests
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.DataSourceType
+import com.softwiredtech.dashpilot.navigation.AutomationsRoute
+import com.softwiredtech.dashpilot.navigation.ControlsRoute
 import com.softwiredtech.dashpilot.navigation.DashboardRoute
 import com.softwiredtech.dashpilot.navigation.OnboardingRoute
 import com.softwiredtech.dashpilot.navigation.SettingsRoute
 import com.softwiredtech.dashpilot.navigation.SetupRoute
+import com.softwiredtech.dashpilot.ui.AutomationsScreen
+import com.softwiredtech.dashpilot.ui.ControlScreen
 import com.softwiredtech.dashpilot.ui.DashboardScreen
+import com.softwiredtech.dashpilot.ui.HomeScreen
 import com.softwiredtech.dashpilot.ui.LOCAL_ASSET_BASE_URL
 import com.softwiredtech.dashpilot.ui.SettingsScreen
-import com.softwiredtech.dashpilot.ui.SetupScreen
 import com.softwiredtech.dashpilot.ui.onboarding.OnboardingScreen
 import com.softwiredtech.dashpilot.ui.theme.DashPilotTheme
 import com.softwiredtech.dashpilot.util.NetworkUtil
@@ -66,7 +69,11 @@ class MainActivity : ComponentActivity() {
 
     private val bluetoothPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
-    ) { _ -> }
+    ) { _ ->
+        // Kick off the startup DashKit scan once the user has responded to the
+        // permission prompt (granted or not — runStartupDiscovery handles both).
+        connectionVM.runStartupDiscovery(this, hasBluetoothPermission())
+    }
 
     private val locationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -89,6 +96,9 @@ class MainActivity : ComponentActivity() {
 
         loadDashboardManifests()
 
+        connectionVM.loadPinnedControl(this)
+        connectionVM.loadAutomations(this)
+
         connectionVM.bindSpeedCamera(speedCameraVM.nearestApproachingCamera)
 
         if (hasLocationPermission()) {
@@ -97,7 +107,12 @@ class MainActivity : ComponentActivity() {
             requestLocationPermission()
         }
 
-        if (!hasBluetoothPermission()) {
+        // Decide the launch route by briefly scanning for an advertising DashKit.
+        // If we don't yet have BLE permission, the scan is kicked off from the
+        // permission launcher callback instead.
+        if (hasBluetoothPermission()) {
+            connectionVM.runStartupDiscovery(this, true)
+        } else {
             requestBluetoothPermission()
         }
 
@@ -107,36 +122,35 @@ class MainActivity : ComponentActivity() {
         // Enable edge-to-edge for Compose
         enableEdgeToEdge()
 
-        /* TODO: Once DashKit pairing is implemented in the firmware, add this back.
-         * The workflow should be that we auto-discover the advertised DashKit service
-         * and bring up the onboarding flow if the device is not yet paired.
-         */
-        val onboardingDone = true //isOnboardingCompleted(this)
-
-        if (onboardingDone && !BuildConfig.DEBUG) {
-            connectionVM.connect(this, "", DataSourceType.COMMA)
-        }
-
         setContent {
             DashPilotTheme {
+                val startupTarget by connectionVM.startupTarget.collectAsState()
+
                 val navController = rememberNavController()
                 val context = LocalContext.current
                 val connectionStatus by connectionVM.connectionStatus.collectAsState()
-                val hasAutoNavigated by connectionVM.hasAutoNavigatedToDashboard.collectAsState()
+                val pinnedControl by connectionVM.pinnedControl.collectAsState()
+                val wiperOffAutomation by connectionVM.wiperOffAutomation.collectAsState()
+                val threeFingerAction by connectionVM.threeFingerAction.collectAsState()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val onDashboard = navBackStackEntry?.destination?.route
                     ?.contains("DashboardRoute") == true
-                val onOnboarding = navBackStackEntry?.destination?.route
-                    ?.contains("OnboardingRoute") == true
 
-                LaunchedEffect(connectionStatus, hasAutoNavigated, onOnboarding) {
-                    if (connectionStatus is ConnectionStatus.Connected && !hasAutoNavigated && !onOnboarding) {
-                        connectionVM.markAutoNavigated()
-                        val dashboard = getSelectedDashboard(context)
-                        navController.navigate(DashboardRoute(
-                            dashboard.type.name.lowercase(),
-                            dashboard.url)
-                        )
+                // One-shot routing once the startup DashKit scan resolves. The UI
+                // shows the normal Setup screen (disconnected/connecting) until then.
+                LaunchedEffect(startupTarget) {
+                    when (startupTarget) {
+                        ConnectionViewModel.StartupTarget.ONBOARDING_DASHKIT ->
+                            navController.navigate(OnboardingRoute) {
+                                popUpTo(SetupRoute) { inclusive = true }
+                            }
+                        ConnectionViewModel.StartupTarget.AUTOCONNECT_DASHKIT ->
+                            connectionVM.connect(context, "", DataSourceType.DASHKIT)
+                        ConnectionViewModel.StartupTarget.DEFAULT ->
+                            if (!BuildConfig.DEBUG) {
+                                connectionVM.connect(context, "", DataSourceType.COMMA)
+                            }
+                        ConnectionViewModel.StartupTarget.LOADING -> Unit
                     }
                 }
 
@@ -153,7 +167,7 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { _ ->
                     NavHost(
                         navController = navController,
-                        startDestination = if (onboardingDone) SetupRoute else OnboardingRoute,
+                        startDestination = SetupRoute,
                         enterTransition = { EnterTransition.None },
                         exitTransition = { ExitTransition.None },
                         popEnterTransition = { EnterTransition.None },
@@ -178,24 +192,63 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         composable<SetupRoute> {
-                            SetupScreen(
+                            val manager by connectionVM.bleManager.collectAsState()
+                            val dashStateFlow by connectionVM.dashState.collectAsState()
+                            val toDashboard = {
+                                val dashboard = getSelectedDashboard(context)
+                                navController.navigate(DashboardRoute(
+                                    dashboard.type.name.lowercase(),
+                                    dashboard.url)
+                                )
+                            }
+                            HomeScreen(
                                 connectionStatus = connectionStatus,
+                                bleManager = manager,
+                                dashState = dashStateFlow,
+                                preselectDashKit = startupTarget ==
+                                        ConnectionViewModel.StartupTarget.AUTOCONNECT_DASHKIT ||
+                                        startupTarget ==
+                                        ConnectionViewModel.StartupTarget.ONBOARDING_DASHKIT,
+                                pinnedControlId = pinnedControl,
                                 onConnect = { serverAddress, dataSourceType ->
                                     connectionVM.connect(context, serverAddress, dataSourceType)
                                 },
                                 onDisconnect = {
                                     connectionVM.disconnect()
                                 },
-                                onNext = {
-                                    val dashboard = getSelectedDashboard(context)
-                                    navController.navigate(DashboardRoute(
-                                        dashboard.type.name.lowercase(),
-                                        dashboard.url)
-                                    )
+                                onNext = toDashboard,
+                                onAutomations = {
+                                    navController.navigate(AutomationsRoute)
                                 },
+                                onControls = {
+                                    navController.navigate(ControlsRoute)
+                                },
+                                onDrive = toDashboard,
                                 onSettingsClick = {
                                     navController.navigate(SettingsRoute)
                                 }
+                            )
+                        }
+                        composable<ControlsRoute> {
+                            val manager by connectionVM.bleManager.collectAsState()
+                            ControlScreen(
+                                bleManager = manager,
+                                pinnedControlId = pinnedControl,
+                                onTogglePin = { connectionVM.togglePinnedControl(context, it) },
+                                onBack = { navController.popBackStack() }
+                            )
+                        }
+                        composable<AutomationsRoute> {
+                            AutomationsScreen(
+                                wiperOffEnabled = wiperOffAutomation,
+                                onWiperOffChange = {
+                                    connectionVM.updateWiperOffAutomation(context, it)
+                                },
+                                threeFingerActionId = threeFingerAction,
+                                onToggleThreeFinger = {
+                                    connectionVM.toggleThreeFingerAction(context, it)
+                                },
+                                onBack = { navController.popBackStack() }
                             )
                         }
                         composable<SettingsRoute> {

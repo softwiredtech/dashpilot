@@ -35,8 +35,12 @@ static inline void updateVehicleBus(const CANParsers& cp, CarState& cs) {
     cs.maxDischargePower = cp.get(1, "BMS_powerAvailable", "BMS_maxDischargePower");
     cs.packVoltage = cp.get(1, "BMS_hvBusStatus", "BMS_packVoltage");
     cs.packCurrent = cp.get(1, "BMS_hvBusStatus", "BMS_packCurrent");
-    cs.packTMin = cp.get(1, "BMS_bmbMinMax", "BMS_thermistorTMin");
-    cs.packTMax = cp.get(1, "BMS_bmbMinMax", "BMS_thermistorTMax");
+    // BMS_bmbMinMax is multiplexed: mux 0 (THERM) carries the thermistor min/max
+    // temps. Only update on that mux so other muxes don't zero out the last reading.
+    if (static_cast<int>(cp.get(1, "BMS_bmbMinMax", "BMS_bmbMinMaxMultiplexer")) == 0) {
+        cs.packTMin = cp.get(1, "BMS_bmbMinMax", "BMS_thermistorTMin");
+        cs.packTMax = cp.get(1, "BMS_bmbMinMax", "BMS_thermistorTMax");
+    }
     cs.odometer = cp.get(1, "DI_odometerStatus", "DI_odometer");
 }
 
@@ -85,6 +89,9 @@ public:
         // TODO: Fix these
         cs.anyDoorOpen = cp.get(0, "UI_warning", "anyDoorOpen");
         cs.buckleStatus = cp.get(0, "UI_warning", "buckleStatus");
+
+        // Climate setpoint temperature (degC) from the vehicle bus.
+        cs.acTemp = cp.get(1, "UI_hvacRequest", "UI_hvacReqTempSetpointLeft");
 
         updateVehicleBus(cp, cs);
     }

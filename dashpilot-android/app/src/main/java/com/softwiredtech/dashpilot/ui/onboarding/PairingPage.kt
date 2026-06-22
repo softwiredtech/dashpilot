@@ -68,7 +68,7 @@ fun PairingPage(
                     when (state) {
                         PairingState.Idle -> {
                             onStateChanged(PairingState.Searching)
-                            connectionVM.connect(context, "", DataSourceType.COMMA)
+                            connectionVM.connect(context, "", DataSourceType.DASHKIT)
                         }
                         PairingState.Searching -> Unit
                         PairingState.Paired -> onAdvance()

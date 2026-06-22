@@ -60,8 +60,8 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.core.content.edit
 import com.softwiredtech.dashpilot.datasource.DashKitBleManager
-import com.softwiredtech.dashpilot.datasource.DashKitOtaUpdate
-import com.softwiredtech.dashpilot.datasource.OtaState
+import com.softwiredtech.dashpilot.ble.DashKitOtaUpdate
+import com.softwiredtech.dashpilot.ble.OtaState
 
 import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.datamodel.dash.DASH_PREFS_NAME

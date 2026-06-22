@@ -1,4 +1,4 @@
-package com.softwiredtech.dashpilot.datasource
+package com.softwiredtech.dashpilot.ble
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
@@ -6,6 +6,9 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.os.Build
 import android.util.Log
+import com.softwiredtech.dashpilot.datasource.ConnectionStatus
+import com.softwiredtech.dashpilot.datasource.DashKitBleManager
+import com.softwiredtech.dashpilot.datasource.GattListener
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.util.UUID

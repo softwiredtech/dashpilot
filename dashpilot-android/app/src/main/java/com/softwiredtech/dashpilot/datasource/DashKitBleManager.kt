@@ -1,6 +1,7 @@
 package com.softwiredtech.dashpilot.datasource
 
 import android.annotation.SuppressLint
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
@@ -9,7 +10,10 @@ import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,6 +46,46 @@ class DashKitBleManager(private val context: Context) {
 
     private var scanning = false
     private val listeners = mutableListOf<GattListener>()
+
+    // Guards against running the post-bond discovery sequence more than once
+    // per connection (e.g. bonded-at-connect plus a stray bond broadcast).
+    private var discoveryStarted = false
+    private var bondReceiverRegistered = false
+
+    // Re-pairing after the phone "forgot" the bond fails the first attempt:
+    // DashKit reboots to clear residual pairing state, which drops the link
+    // before it is bonded. Reconnect once automatically so the freshly-booted
+    // DashKit pairs cleanly without the user having to tap "pair" again. Reset
+    // on each user-initiated connect().
+    private var rePairRetryDone = false
+
+    // DashKit uses "Just Works" pairing. Android must bond before it can touch
+    // the encryption-protected characteristics, so we wait for the bond to
+    // complete before requesting the MTU / discovering services.
+    private val bondReceiver = object : BroadcastReceiver() {
+        override fun onReceive(ctx: Context, intent: Intent) {
+            if (intent.action != BluetoothDevice.ACTION_BOND_STATE_CHANGED) return
+            val device = intent.bluetoothDevice() ?: return
+            val g = gatt ?: return
+            if (device.address != g.device.address) return
+
+            val state = intent.getIntExtra(
+                BluetoothDevice.EXTRA_BOND_STATE, BluetoothDevice.ERROR
+            )
+            if (state == BluetoothDevice.BOND_BONDED) {
+                Log.d(TAG, "Bonded with DashKit")
+                startDiscovery(g)
+            }
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    private fun Intent.bluetoothDevice(): BluetoothDevice? =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)
+        } else {
+            getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+        }
 
     fun addGattListener(listener: GattListener) {
         synchronized(listeners) { listeners.add(listener) }
@@ -85,22 +129,48 @@ class DashKitBleManager(private val context: Context) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
                 Log.d(TAG, "Connected to GATT server")
                 gatt = g
+                discoveryStarted = false
                 g.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH)
-                // Clear Android's GATT cache
-                try {
-                    val refresh = g.javaClass.getMethod("refresh")
-                    val result = refresh.invoke(g) as Boolean
-                    Log.d(TAG, "GATT cache refresh: $result")
-                } catch (e: Exception) {
-                    Log.w(TAG, "Could not clear GATT cache: ${e.message}")
+                // DashKit's characteristics require an encrypted (paired) link.
+                // Ensure we are bonded before discovering services.
+                when (g.device.bondState) {
+                    BluetoothDevice.BOND_BONDED -> {
+                        Log.d(TAG, "Already bonded; proceeding to discovery")
+                        startDiscovery(g)
+                    }
+                    BluetoothDevice.BOND_BONDING -> {
+                        Log.d(TAG, "Bonding already in progress; waiting")
+                    }
+                    else -> {
+                        Log.d(TAG, "Not bonded; starting pairing")
+                        if (!g.device.createBond()) {
+                            Log.e(TAG, "createBond() failed to start")
+                            _connectionState.value =
+                                ConnectionStatus.Error("Could not start pairing")
+                        }
+                    }
                 }
-                // Delay to let cache clear take effect, then request MTU
-                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
-                    g.requestMtu(512)
-                }, 600)
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                 Log.d(TAG, "Disconnected from GATT server")
+                val reachedConnected = _connectionState.value == ConnectionStatus.Connected
+                try { g.close() } catch (_: Exception) {}
                 gatt = null
+                discoveryStarted = false
+                if (!reachedConnected) {
+                    if (!rePairRetryDone) {
+                        // Pairing did not complete — DashKit reboots to clear
+                        // residual pairing state, dropping the link. Reconnect
+                        // once automatically to pair against the fresh boot.
+                        rePairRetryDone = true
+                        Log.d(TAG, "Link dropped before pairing completed; reconnecting once")
+                        startScan()
+                        return
+                    }
+                    Log.e(TAG, "Pairing failed")
+                    _connectionState.value = ConnectionStatus.Error("Pairing failed")
+                    forEachListener { it.onDisconnected() }
+                    return
+                }
                 _connectionState.value = ConnectionStatus.Disconnected
                 forEachListener { it.onDisconnected() }
             }
@@ -165,19 +235,56 @@ class DashKitBleManager(private val context: Context) {
         }
     }
 
+    // Runs once the link is bonded: clear Android's stale GATT cache, then
+    // request the MTU which (in onMtuChanged) kicks off service discovery.
+    private fun startDiscovery(g: BluetoothGatt) {
+        if (discoveryStarted) return
+        discoveryStarted = true
+        try {
+            val refresh = g.javaClass.getMethod("refresh")
+            val result = refresh.invoke(g) as Boolean
+            Log.d(TAG, "GATT cache refresh: $result")
+        } catch (e: Exception) {
+            Log.w(TAG, "Could not clear GATT cache: ${e.message}")
+        }
+        // Delay to let cache clear take effect, then request MTU
+        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+            g.requestMtu(512)
+        }, 600)
+    }
+
     fun connect() {
         if (_connectionState.value == ConnectionStatus.Connected ||
             _connectionState.value == ConnectionStatus.Connecting) return
         _connectionState.value = ConnectionStatus.Connecting
+        rePairRetryDone = false
+        registerBondReceiver()
         startScan()
     }
 
     fun disconnect() {
         stopScan()
+        unregisterBondReceiver()
         gatt?.close()
         gatt = null
+        discoveryStarted = false
         _connectionState.value = ConnectionStatus.Disconnected
         forEachListener { it.onDisconnected() }
+    }
+
+    private fun registerBondReceiver() {
+        if (bondReceiverRegistered) return
+        context.registerReceiver(
+            bondReceiver,
+            IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED)
+        )
+        bondReceiverRegistered = true
+    }
+
+    private fun unregisterBondReceiver() {
+        if (!bondReceiverRegistered) return
+        try { context.unregisterReceiver(bondReceiver) } catch (_: Exception) {}
+        bondReceiverRegistered = false
     }
 
     private fun startScan() {

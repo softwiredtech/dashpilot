@@ -30,6 +30,7 @@ data class CarState(
     val packTMin: Float = 0f,
     val packTMax: Float = 0f,
     val odometer: Float = 0f,
+    val acTemp: Float = 0f,
     // Openpilot
     val selfdriveActive: Boolean = false,
     val experimentalMode: Boolean = false,
@@ -41,11 +42,12 @@ data class CarState(
         odometer = odometer * KM_TO_MILES,
         packTMin = if (packTMin != 0f) packTMin * 1.8f + 32f else 0f,
         packTMax = if (packTMax != 0f) packTMax * 1.8f + 32f else 0f,
+        acTemp = if (acTemp != 0f) acTemp * 1.8f + 32f else 0f,
         fusedSpeedLimit = if (speedLimitSignsInKm()) fusedSpeedLimit * KM_TO_MILES else fusedSpeedLimit,
     )
 
     companion object {
-        const val FIELD_COUNT = 30
+        const val FIELD_COUNT = 31
         private const val KM_TO_MILES = 0.621371f
 
         private val MILES_COUNTRIES = setOf("US", "GB", "MM", "LR")
