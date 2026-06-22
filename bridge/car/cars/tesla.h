@@ -68,9 +68,7 @@ public:
         cs.egoSteeringAngle = cp.get(0, "SCCM_steeringAngleSensor", "SCCM_steeringAngle");
         cs.gear = cp.get(0, "DI_systemStatus", "DI_gear");
         cs.egoSpeed = cp.get(0, "DI_speed", "DI_uiSpeed");
-
-        // TODO: Invalid in case of DashKit. Should look for DAS_status -> DAS_autopilotState
-        cs.adasOn = cp.get(0, "DI_state", "DI_cruiseState") == 2.0 ? 1.0 : 0.0;
+        cs.adasOn = cp.get(0, "DAS_status2", "DAS_lssState") >= 2.0 ? 1.0 : 0.0;
 
         // TODO: Invalid in case of DashKit. Look for an equivalent.
         cs.accSetSpeed = cp.get(0, "DI_state", "DI_digitalSpeed");
@@ -88,9 +86,15 @@ public:
         cs.laneDepartureWarning = cp.get(0, "DAS_status", "DAS_laneDepartureWarning");
         cs.sideCollisionWarning = cp.get(0, "DAS_status", "DAS_sideCollisionWarning");
 
-        // TODO: Fix these
-        cs.anyDoorOpen = cp.get(0, "UI_warning", "anyDoorOpen");
-        cs.buckleStatus = cp.get(0, "UI_warning", "buckleStatus");
+        // VCFRONT_status is multiplexed: VCFRONT_anyDoorOpen lives on mux 0
+        if (static_cast<int>(cp.get(1, "VCFRONT_status", "VCFRONT_statusIndex")) == 0) {
+            cs.anyDoorOpen = cp.get(1, "VCFRONT_status", "VCFRONT_anyDoorOpen");
+        }
+
+        // VCLEFT_switchStatus is multiplexed: VCLEFT_frontBuckleSwitch lives on mux 0
+        if (static_cast<int>(cp.get(1, "VCLEFT_switchStatus", "VCLEFT_switchStatusIndex")) == 0) {
+            cs.buckleStatus = cp.get(1, "VCLEFT_switchStatus", "VCLEFT_frontBuckleSwitch") == 2.0 ? 1.0 : 0.0;
+        }
 
         updateVehicleBus(cp, cs);
     }
