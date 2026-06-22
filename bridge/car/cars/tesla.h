@@ -42,6 +42,8 @@ static inline void updateVehicleBus(const CANParsers& cp, CarState& cs) {
         cs.packTMax = cp.get(1, "BMS_bmbMinMax", "BMS_thermistorTMax");
     }
     cs.odometer = cp.get(1, "DI_odometerStatus", "DI_odometer");
+    // Climate setpoint temperature (degC) from the vehicle bus.
+    cs.acTemp = cp.get(1, "UI_hvacRequest", "UI_hvacReqTempSetpointLeft");
 }
 
 
@@ -89,9 +91,6 @@ public:
         // TODO: Fix these
         cs.anyDoorOpen = cp.get(0, "UI_warning", "anyDoorOpen");
         cs.buckleStatus = cp.get(0, "UI_warning", "buckleStatus");
-
-        // Climate setpoint temperature (degC) from the vehicle bus.
-        cs.acTemp = cp.get(1, "UI_hvacRequest", "UI_hvacReqTempSetpointLeft");
 
         updateVehicleBus(cp, cs);
     }

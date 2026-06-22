@@ -24,6 +24,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
+import app.rive.runtime.kotlin.core.Fit
 
 
 @Composable
@@ -82,7 +83,8 @@ fun RiveDashView(
                 val vmi = rememberViewModelInstance(file, vmiSource)
                 Rive(
                     riveFile.value,
-                    viewModelInstance = vmi
+                    viewModelInstance = vmi,
+                    fit= app.rive.Fit.Contain()
                 )
                 myFile.value = riveFile.value
                 vmi.setNumber("speed", 90f)
