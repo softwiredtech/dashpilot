@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.softwiredtech.dashpilot.BuildConfig
 import com.softwiredtech.dashpilot.datamodel.dash.CarState
 import com.softwiredtech.dashpilot.datamodel.dash.DashState
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
@@ -74,7 +75,9 @@ fun HomeScreen(
             .fillMaxSize()
             .background(DarkColors.Background)
     ) {
-        if (connectionStatus is ConnectionStatus.Connected) {
+        // In debug builds show the connected home content by default so the full
+        // UI can be exercised without a live DashKit connection.
+        if (connectionStatus is ConnectionStatus.Connected || BuildConfig.DEBUG) {
             ConnectedHomeContent(
                 dashState = dashState,
                 bleManager = bleManager,

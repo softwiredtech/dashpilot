@@ -131,7 +131,7 @@ class MainActivity : ComponentActivity() {
                 val connectionStatus by connectionVM.connectionStatus.collectAsState()
                 val pinnedControl by connectionVM.pinnedControl.collectAsState()
                 val wiperOffAutomation by connectionVM.wiperOffAutomation.collectAsState()
-                val threeFingerAction by connectionVM.threeFingerAction.collectAsState()
+                val fingerActions by connectionVM.fingerActions.collectAsState()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val onDashboard = navBackStackEntry?.destination?.route
                     ?.contains("DashboardRoute") == true
@@ -244,9 +244,15 @@ class MainActivity : ComponentActivity() {
                                 onWiperOffChange = {
                                     connectionVM.updateWiperOffAutomation(context, it)
                                 },
-                                threeFingerActionId = threeFingerAction,
-                                onToggleThreeFinger = {
-                                    connectionVM.toggleThreeFingerAction(context, it)
+                                fingerActions = fingerActions,
+                                onSetFingerAction = { fingers, id ->
+                                    connectionVM.setFingerAction(context, fingers, id)
+                                },
+                                onChangeFingerCount = { from, to ->
+                                    connectionVM.changeFingerCount(context, from, to)
+                                },
+                                onRemoveFingerAction = { fingers ->
+                                    connectionVM.removeFingerAction(context, fingers)
                                 },
                                 onBack = { navController.popBackStack() }
                             )
