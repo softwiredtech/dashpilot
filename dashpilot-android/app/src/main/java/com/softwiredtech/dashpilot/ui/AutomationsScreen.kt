@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Flip
 import androidx.compose.material.icons.rounded.Inbox
 import androidx.compose.material.icons.rounded.Thermostat
 import androidx.compose.material.icons.rounded.WaterDrop
@@ -42,13 +43,15 @@ private data class ThreeFingerOption(
 
 private val threeFingerOptions = listOf(
     ThreeFingerOption("glovebox", Icons.Rounded.Inbox, "Open Glovebox"),
-    ThreeFingerOption("battery_preheat", Icons.Rounded.Thermostat, "Preheat Battery")
+    ThreeFingerOption("battery_preheat", Icons.Rounded.Thermostat, "Preheat Battery"),
+    ThreeFingerOption("mirror_fold", Icons.Rounded.Flip, "Fold/Unfold Mirrors")
 )
 
 /**
  * Automations screen. Lets the user enable the wiper-off automation and bind a
  * single infotainment three-finger-press gesture to one vehicle action (the
- * options are mutually exclusive). Firmware support is not wired up yet.
+ * options are mutually exclusive). The binding is pushed to the DashKit
+ * firmware over BLE (VC_CMD_THREE_FINGER_ACTION).
  */
 @Composable
 fun AutomationsScreen(
