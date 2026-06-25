@@ -45,6 +45,7 @@ import com.softwiredtech.dashpilot.datasource.IDataSource
 import com.softwiredtech.dashpilot.datasource.DashKitBleManager
 import com.softwiredtech.dashpilot.datasource.DashKitDataSource
 import com.softwiredtech.dashpilot.datasource.WebsocketDataSource
+import com.softwiredtech.dashpilot.ble.VehicleControl
 import com.softwiredtech.dashpilot.jni.VehicleBridge
 import com.softwiredtech.dashpilot.util.NetworkUtil
 import com.softwiredtech.dashpilot.vehicle.CanFrameDecoder
@@ -117,6 +118,9 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         val next = if (_threeFingerAction.value == id) null else id
         setThreeFingerAction(context, next)
         _threeFingerAction.value = next
+        // Push the new binding to the firmware if connected (no-op otherwise;
+        // it is re-synced on the next connect).
+        _bleManager.value?.let { VehicleControl.sendThreeFingerAction(it, next) }
     }
 
     // Result of the one-shot startup BLE scan used to decide where to route the
@@ -291,6 +295,14 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
             launch(Dispatchers.IO) { ds.connect(finalServerAddress) }
             ds.incomingMessages.first()
             _connectionStatus.value = ConnectionStatus.Connected
+
+            // The firmware keeps the three-finger binding in RAM, so re-sync it
+            // on every connect (e.g. after a DashKit reboot). The GATT services
+            // are discovered by the time the first CAN frame arrives above.
+            _bleManager.value?.let { mgr ->
+                _threeFingerAction.value = getThreeFingerAction(context)
+                VehicleControl.sendThreeFingerAction(mgr, _threeFingerAction.value)
+            }
         }
     }
 
