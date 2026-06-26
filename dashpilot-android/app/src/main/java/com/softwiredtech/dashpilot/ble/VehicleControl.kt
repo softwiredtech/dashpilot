@@ -51,9 +51,18 @@ object VehicleControl {
     const val CMD_MULTI_FINGER_ACTION: Int = 0x40
     const val GESTURE_ACTION_NONE: Int = 0
 
+    // --- Auto wiper-off automation toggle ---
+    // Arms/disarms the firmware's auto wiper-off automation. 1=enable, 0=disable.
+    // The firmware persists it in NVS (wiper_off module).
+    const val CMD_WIPER_OFF_ENABLE: Int = 0x41
+
     /** Bind (or clear, with actionValue 0) an N-finger tap to a control action. */
     fun sendFingerAction(manager: DashKitBleManager, fingers: Int, actionValue: Int): Boolean =
         send(manager, CMD_MULTI_FINGER_ACTION, (fingers shl 8) or (actionValue and 0xFF))
+
+    /** Enable or disable the firmware's auto wiper-off automation. */
+    fun sendWiperOff(manager: DashKitBleManager, enabled: Boolean): Boolean =
+        send(manager, CMD_WIPER_OFF_ENABLE, if (enabled) 1 else 0)
 
     /**
      * Write a control command to the DashKit. Returns true if the write was

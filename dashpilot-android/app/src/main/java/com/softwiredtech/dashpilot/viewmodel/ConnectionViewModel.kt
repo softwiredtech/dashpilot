@@ -112,6 +112,13 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     fun updateWiperOffAutomation(context: Context, value: Boolean) {
         setWiperOffAutomation(context, value)
         _wiperOffAutomation.value = value
+        pushWiperOff(value)
+    }
+
+    // Push the wiper-off enabled flag to the firmware if connected (no-op
+    // otherwise; it is re-synced on the next connect).
+    private fun pushWiperOff(enabled: Boolean) {
+        _bleManager.value?.let { VehicleControl.sendWiperOff(it, enabled) }
     }
 
     /** Bind (id != null) or clear (id == null) the action for an N-finger tap. */
@@ -334,6 +341,11 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
                         ?: VehicleControl.GESTURE_ACTION_NONE
                     VehicleControl.sendFingerAction(mgr, fingers, actionValue)
                 }
+
+                // Re-sync the wiper-off automation flag for the same reason.
+                val wiperOff = getWiperOffAutomation(context)
+                _wiperOffAutomation.value = wiperOff
+                VehicleControl.sendWiperOff(mgr, wiperOff)
             }
         }
     }
