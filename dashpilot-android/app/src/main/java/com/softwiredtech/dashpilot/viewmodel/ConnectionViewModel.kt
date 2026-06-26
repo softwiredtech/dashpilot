@@ -34,10 +34,11 @@ import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_PHONE_BATTERY
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_USE_IMPERIAL
 import com.softwiredtech.dashpilot.datamodel.dash.getPinnedControl
 import com.softwiredtech.dashpilot.datamodel.dash.setPinnedControl
-import com.softwiredtech.dashpilot.datamodel.dash.getThreeFingerAction
-import com.softwiredtech.dashpilot.datamodel.dash.setThreeFingerAction
+import com.softwiredtech.dashpilot.datamodel.dash.getFingerActions
+import com.softwiredtech.dashpilot.datamodel.dash.setFingerActions
 import com.softwiredtech.dashpilot.datamodel.dash.getWiperOffAutomation
 import com.softwiredtech.dashpilot.datamodel.dash.setWiperOffAutomation
+import com.softwiredtech.dashpilot.ui.controls.controlById
 import com.softwiredtech.dashpilot.datasource.DataSourceType
 import com.softwiredtech.dashpilot.datasource.CommaDataSource
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
@@ -98,29 +99,60 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     private val _wiperOffAutomation = MutableStateFlow(false)
     val wiperOffAutomation = _wiperOffAutomation.asStateFlow()
 
-    // Single binding for the infotainment three-finger-press gesture (a control
-    // id, or null when unbound). Storing one value keeps the options mutually
-    // exclusive automatically.
-    private val _threeFingerAction = MutableStateFlow<String?>(null)
-    val threeFingerAction = _threeFingerAction.asStateFlow()
+    // Infotainment multi-finger gesture bindings: finger count (3..5) -> control
+    // id. Each gesture maps to at most one control.
+    private val _fingerActions = MutableStateFlow<Map<Int, String>>(emptyMap())
+    val fingerActions = _fingerActions.asStateFlow()
 
     fun loadAutomations(context: Context) {
         _wiperOffAutomation.value = getWiperOffAutomation(context)
-        _threeFingerAction.value = getThreeFingerAction(context)
+        _fingerActions.value = getFingerActions(context)
     }
 
     fun updateWiperOffAutomation(context: Context, value: Boolean) {
         setWiperOffAutomation(context, value)
         _wiperOffAutomation.value = value
+        pushWiperOff(value)
     }
 
-    fun toggleThreeFingerAction(context: Context, id: String) {
-        val next = if (_threeFingerAction.value == id) null else id
-        setThreeFingerAction(context, next)
-        _threeFingerAction.value = next
-        // Push the new binding to the firmware if connected (no-op otherwise;
-        // it is re-synced on the next connect).
-        _bleManager.value?.let { VehicleControl.sendThreeFingerAction(it, next) }
+    // Push the wiper-off enabled flag to the firmware if connected (no-op
+    // otherwise; it is re-synced on the next connect).
+    private fun pushWiperOff(enabled: Boolean) {
+        _bleManager.value?.let { VehicleControl.sendWiperOff(it, enabled) }
+    }
+
+    /** Bind (id != null) or clear (id == null) the action for an N-finger tap. */
+    fun setFingerAction(context: Context, fingers: Int, id: String?) {
+        val next = _fingerActions.value.toMutableMap()
+        if (id.isNullOrBlank()) next.remove(fingers) else next[fingers] = id
+        _fingerActions.value = next
+        setFingerActions(context, next)
+        pushFingerAction(fingers, id)
+    }
+
+    /** Move an existing binding from one finger count to another. */
+    fun changeFingerCount(context: Context, from: Int, to: Int) {
+        if (from == to) return
+        val current = _fingerActions.value
+        val id = current[from] ?: return
+        val next = current.toMutableMap()
+        next.remove(from)
+        next[to] = id
+        _fingerActions.value = next
+        setFingerActions(context, next)
+        pushFingerAction(from, null)  // clear the old slot on the firmware
+        pushFingerAction(to, id)
+    }
+
+    fun removeFingerAction(context: Context, fingers: Int) {
+        setFingerAction(context, fingers, null)
+    }
+
+    // Push a single binding to the firmware if connected (no-op otherwise; it is
+    // re-synced on the next connect).
+    private fun pushFingerAction(fingers: Int, id: String?) {
+        val actionValue = controlById(id)?.gestureValue ?: VehicleControl.GESTURE_ACTION_NONE
+        _bleManager.value?.let { VehicleControl.sendFingerAction(it, fingers, actionValue) }
     }
 
     // Result of the one-shot startup BLE scan used to decide where to route the
@@ -296,12 +328,24 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
             ds.incomingMessages.first()
             _connectionStatus.value = ConnectionStatus.Connected
 
-            // The firmware keeps the three-finger binding in RAM, so re-sync it
-            // on every connect (e.g. after a DashKit reboot). The GATT services
-            // are discovered by the time the first CAN frame arrives above.
+            // The firmware also persists the bindings in NVS, but re-sync every
+            // finger count on each connect so its state matches the app exactly
+            // (e.g. after a DashKit reboot or an edit made while disconnected).
+            // The GATT services are discovered by the time the first CAN frame
+            // arrives above.
             _bleManager.value?.let { mgr ->
-                _threeFingerAction.value = getThreeFingerAction(context)
-                VehicleControl.sendThreeFingerAction(mgr, _threeFingerAction.value)
+                val actions = getFingerActions(context)
+                _fingerActions.value = actions
+                for (fingers in 3..5) {
+                    val actionValue = controlById(actions[fingers])?.gestureValue
+                        ?: VehicleControl.GESTURE_ACTION_NONE
+                    VehicleControl.sendFingerAction(mgr, fingers, actionValue)
+                }
+
+                // Re-sync the wiper-off automation flag for the same reason.
+                val wiperOff = getWiperOffAutomation(context)
+                _wiperOffAutomation.value = wiperOff
+                VehicleControl.sendWiperOff(mgr, wiperOff)
             }
         }
     }

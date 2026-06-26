@@ -42,26 +42,27 @@ object VehicleControl {
     const val CMD_CHARGE_PORT_OPEN: Int = 0x0D   // 1=open
     const val CMD_CHARGE_PORT_CLOSE: Int = 0x0E  // 1=close
 
-    // --- Infotainment three-finger tap binding ---
-    // Tells the firmware which action to run when it sees a three-finger tap on
-    // UI_status2.UI_activeTouchPoints. The value is one of THREE_FINGER_* below.
-    const val CMD_THREE_FINGER_ACTION: Int = 0x40
-    const val THREE_FINGER_NONE: Int = 0         // unbound / disabled
-    const val THREE_FINGER_GLOVEBOX: Int = 1     // open glovebox
-    const val THREE_FINGER_PREHEAT: Int = 2      // toggle battery preheat
-    const val THREE_FINGER_MIRROR_FOLD: Int = 3  // toggle mirror fold/unfold
+    // --- Infotainment multi-finger tap binding ---
+    // Tells the firmware which action to run when it sees an N-finger tap on
+    // UI_status2.UI_activeTouchPoints. The value packs the finger count (3..5) in
+    // the high byte and the action code in the low byte. Action codes are the
+    // gestureValue each control carries in VehicleControls.kt (the source of
+    // truth); 0 means "unbound".
+    const val CMD_MULTI_FINGER_ACTION: Int = 0x40
+    const val GESTURE_ACTION_NONE: Int = 0
 
-    /** Map an AutomationsScreen option id (or null) to its firmware value. */
-    fun threeFingerValue(id: String?): Int = when (id) {
-        "glovebox" -> THREE_FINGER_GLOVEBOX
-        "battery_preheat" -> THREE_FINGER_PREHEAT
-        "mirror_fold" -> THREE_FINGER_MIRROR_FOLD
-        else -> THREE_FINGER_NONE
-    }
+    // --- Auto wiper-off automation toggle ---
+    // Arms/disarms the firmware's auto wiper-off automation. 1=enable, 0=disable.
+    // The firmware persists it in NVS (wiper_off module).
+    const val CMD_WIPER_OFF_ENABLE: Int = 0x41
 
-    /** Send the current three-finger binding to the firmware. */
-    fun sendThreeFingerAction(manager: DashKitBleManager, id: String?): Boolean =
-        send(manager, CMD_THREE_FINGER_ACTION, threeFingerValue(id))
+    /** Bind (or clear, with actionValue 0) an N-finger tap to a control action. */
+    fun sendFingerAction(manager: DashKitBleManager, fingers: Int, actionValue: Int): Boolean =
+        send(manager, CMD_MULTI_FINGER_ACTION, (fingers shl 8) or (actionValue and 0xFF))
+
+    /** Enable or disable the firmware's auto wiper-off automation. */
+    fun sendWiperOff(manager: DashKitBleManager, enabled: Boolean): Boolean =
+        send(manager, CMD_WIPER_OFF_ENABLE, if (enabled) 1 else 0)
 
     /**
      * Write a control command to the DashKit. Returns true if the write was

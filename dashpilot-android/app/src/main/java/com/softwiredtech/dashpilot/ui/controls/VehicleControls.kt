@@ -59,6 +59,11 @@ data class ControlAction(
     val icon: ImageVector,
     val label: () -> String,
     val active: () -> Boolean,
+    // Action code sent to the firmware when this control is bound to a
+    // multi-finger infotainment gesture (must match multi_finger_action_t in the
+    // firmware's multi_finger.h). This is the single source of truth for the
+    // gesture codes.
+    val gestureValue: Int,
     // Nullable manager: when null (e.g. debug testing without a DashKit) the
     // command is simulated — toggle state still flips, momentary actions no-op.
     val perform: (DashKitBleManager?) -> Unit
@@ -71,6 +76,7 @@ val vehicleControls: List<ControlAction> = listOf(
         icon = Icons.Rounded.Thermostat,
         label = { if (ControlsState.preheatOn) "Battery Preheat: On" else "Battery Preheat: Off" },
         active = { ControlsState.preheatOn },
+        gestureValue = 2,
         perform = { manager ->
             val next = !ControlsState.preheatOn
             if (manager == null ||
@@ -85,6 +91,7 @@ val vehicleControls: List<ControlAction> = listOf(
         icon = Icons.Rounded.DirectionsCar,
         label = { "Frunk" },
         active = { false },
+        gestureValue = 4,
         perform = { manager ->
             manager?.let { VehicleControl.send(it, VehicleControl.CMD_CLOSURE, VehicleControl.CLOSURE_FRONT_TRUNK) }
         }
@@ -94,6 +101,7 @@ val vehicleControls: List<ControlAction> = listOf(
         icon = Icons.Rounded.Inventory2,
         label = { "Trunk" },
         active = { false },
+        gestureValue = 5,
         perform = { manager ->
             manager?.let { VehicleControl.send(it, VehicleControl.CMD_CLOSURE, VehicleControl.CLOSURE_REAR_TRUNK) }
         }
@@ -103,6 +111,7 @@ val vehicleControls: List<ControlAction> = listOf(
         icon = Icons.Rounded.EvStation,
         label = { if (ControlsState.chargePortOpen) "Charge Port: Open" else "Charge Port: Closed" },
         active = { ControlsState.chargePortOpen },
+        gestureValue = 6,
         perform = { manager ->
             val opcode = if (ControlsState.chargePortOpen) VehicleControl.CMD_CHARGE_PORT_CLOSE
             else VehicleControl.CMD_CHARGE_PORT_OPEN
@@ -116,6 +125,7 @@ val vehicleControls: List<ControlAction> = listOf(
         icon = Icons.Rounded.Flip,
         label = { if (ControlsState.mirrorsFolded) "Mirrors: Folded" else "Mirrors: Unfolded" },
         active = { ControlsState.mirrorsFolded },
+        gestureValue = 3,
         perform = { manager ->
             val value = if (ControlsState.mirrorsFolded) VehicleControl.MIRROR_UNFOLD
             else VehicleControl.MIRROR_FOLD
@@ -130,6 +140,7 @@ val vehicleControls: List<ControlAction> = listOf(
         icon = Icons.Rounded.Inbox,
         label = { "Open Glovebox" },
         active = { false },
+        gestureValue = 1,
         perform = { manager ->
             manager?.let { VehicleControl.send(it, VehicleControl.CMD_GLOVEBOX, 1) }
         }
