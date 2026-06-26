@@ -23,10 +23,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
@@ -59,9 +61,11 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.core.content.edit
+import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.DashKitBleManager
 import com.softwiredtech.dashpilot.ble.DashKitOtaUpdate
 import com.softwiredtech.dashpilot.ble.OtaState
+import com.softwiredtech.dashpilot.ble.VehicleControl
 
 import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.datamodel.dash.DASH_PREFS_NAME
@@ -424,6 +428,9 @@ fun SettingsScreen(
             if (bleManager != null) {
                 FirmwareUpdateSection(bleManager)
                 Spacer(modifier = Modifier.height(24.dp))
+
+                PairNewDeviceSection(bleManager)
+                Spacer(modifier = Modifier.height(24.dp))
             }
 
             Row(
@@ -497,6 +504,69 @@ private fun RenderQualitySelector(selected: Int, onSelected: (Int) -> Unit) {
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun PairNewDeviceSection(bleManager: DashKitBleManager) {
+    val context = LocalContext.current
+    val connectionState by bleManager.connectionState.collectAsState()
+    val connected = connectionState == ConnectionStatus.Connected
+    val showDialog = remember { mutableStateOf(false) }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        SectionHeader(stringResource(R.string.settings_section_pairing))
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Button(
+            onClick = { showDialog.value = true },
+            enabled = connected,
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = AccentColor,
+                contentColor = Color.White,
+                disabledContainerColor = DarkColors.Border,
+                disabledContentColor = DarkColors.TextMuted
+            )
+        ) {
+            Text(text = stringResource(R.string.settings_pair_new_device), fontSize = 16.sp)
+        }
+
+        if (!connected) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = stringResource(R.string.settings_pair_not_connected),
+                color = DarkColors.TextMuted,
+                fontSize = 13.sp
+            )
+        }
+    }
+
+    if (showDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDialog.value = false },
+            title = { Text(stringResource(R.string.settings_pair_dialog_title)) },
+            text = { Text(stringResource(R.string.settings_pair_dialog_body)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDialog.value = false
+                    val ok = VehicleControl.sendEnterPairing(bleManager)
+                    val msg = if (ok) {
+                        context.getString(R.string.settings_pair_opened)
+                    } else {
+                        context.getString(R.string.settings_pair_not_connected)
+                    }
+                    android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_LONG).show()
+                }) {
+                    Text(stringResource(R.string.settings_pair_dialog_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog.value = false }) {
+                    Text(stringResource(R.string.settings_pair_dialog_cancel))
+                }
+            }
+        )
     }
 }
 

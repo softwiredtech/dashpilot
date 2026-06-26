@@ -50,6 +50,16 @@
     <string name="settings_firmware_error">Update failed: %1$s</string>
     <string name="settings_firmware_not_connected">Connect to DashKit first to update firmware</string>
 
+    <!-- Pair a new device -->
+    <string name="settings_section_pairing">Pairing</string>
+    <string name="settings_pair_new_device">Pair a new device</string>
+    <string name="settings_pair_not_connected">Connect to DashKit first to pair a new device</string>
+    <string name="settings_pair_dialog_title">Pair a new device?</string>
+    <string name="settings_pair_dialog_body">DashKit will allow one new device to pair for the next 2 minutes. Open DashPilot on the other phone and pair it now.</string>
+    <string name="settings_pair_dialog_confirm">Open pairing</string>
+    <string name="settings_pair_dialog_cancel">Cancel</string>
+    <string name="settings_pair_opened">DashKit is open for pairing. Pair the new phone within 2 minutes.</string>
+
     <!-- Onboarding -->
     <string name="onboarding_top_title">Setup</string>
     <string name="onboarding_skip">Skip</string>
