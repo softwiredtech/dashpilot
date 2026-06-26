@@ -56,6 +56,12 @@ object VehicleControl {
     // The firmware persists it in NVS (wiper_off module).
     const val CMD_WIPER_OFF_ENABLE: Int = 0x41
 
+    // --- Enter BLE pairing mode ---
+    // Opens a window on the firmware during which one new (not-yet-bonded) device
+    // may pair. Only this already-paired phone can send it (the control char
+    // requires an encrypted link). Value is ignored by the firmware.
+    const val CMD_ENTER_PAIRING: Int = 0x42
+
     /** Bind (or clear, with actionValue 0) an N-finger tap to a control action. */
     fun sendFingerAction(manager: DashKitBleManager, fingers: Int, actionValue: Int): Boolean =
         send(manager, CMD_MULTI_FINGER_ACTION, (fingers shl 8) or (actionValue and 0xFF))
@@ -63,6 +69,10 @@ object VehicleControl {
     /** Enable or disable the firmware's auto wiper-off automation. */
     fun sendWiperOff(manager: DashKitBleManager, enabled: Boolean): Boolean =
         send(manager, CMD_WIPER_OFF_ENABLE, if (enabled) 1 else 0)
+
+    /** Ask the DashKit to open a pairing window for one new device. */
+    fun sendEnterPairing(manager: DashKitBleManager): Boolean =
+        send(manager, CMD_ENTER_PAIRING, 1)
 
     /**
      * Write a control command to the DashKit. Returns true if the write was

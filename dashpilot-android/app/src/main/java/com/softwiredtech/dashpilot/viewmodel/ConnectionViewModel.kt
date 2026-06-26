@@ -121,6 +121,16 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         _bleManager.value?.let { VehicleControl.sendWiperOff(it, enabled) }
     }
 
+    /**
+     * Ask the connected DashKit to open a pairing window so one new device can
+     * pair. Only works while this (already-paired) phone is connected. Returns
+     * false if not connected.
+     */
+    fun enterPairingMode(): Boolean {
+        val mgr = _bleManager.value ?: return false
+        return VehicleControl.sendEnterPairing(mgr)
+    }
+
     /** Bind (id != null) or clear (id == null) the action for an N-finger tap. */
     fun setFingerAction(context: Context, fingers: Int, id: String?) {
         val next = _fingerActions.value.toMutableMap()
