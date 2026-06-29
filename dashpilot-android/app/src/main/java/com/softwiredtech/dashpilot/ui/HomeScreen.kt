@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AcUnit
@@ -74,6 +75,7 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(DarkColors.Background)
+            .systemBarsPadding()
     ) {
         // In debug builds show the connected home content by default so the full
         // UI can be exercised without a live DashKit connection.
