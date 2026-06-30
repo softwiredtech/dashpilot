@@ -62,6 +62,11 @@ object VehicleControl {
     // requires an encrypted link). Value is ignored by the firmware.
     const val CMD_ENTER_PAIRING: Int = 0x42
 
+    // --- Rear AC fan toggle (UI_hvacRequest 0x2F3) ---
+    // The firmware reads the live UI_hvacReqSecondRowState and flips it OFF <->
+    // HIGH, so this is a single momentary command with no value (value ignored).
+    const val CMD_REAR_FAN_TOGGLE: Int = 0x43
+
     /** Bind (or clear, with actionValue 0) an N-finger tap to a control action. */
     fun sendFingerAction(manager: DashKitBleManager, fingers: Int, actionValue: Int): Boolean =
         send(manager, CMD_MULTI_FINGER_ACTION, (fingers shl 8) or (actionValue and 0xFF))
@@ -73,6 +78,10 @@ object VehicleControl {
     /** Ask the DashKit to open a pairing window for one new device. */
     fun sendEnterPairing(manager: DashKitBleManager): Boolean =
         send(manager, CMD_ENTER_PAIRING, 1)
+
+    /** Toggle the rear AC fan (firmware flips OFF <-> HIGH; value ignored). */
+    fun sendRearFanToggle(manager: DashKitBleManager): Boolean =
+        send(manager, CMD_REAR_FAN_TOGGLE, 1)
 
     /**
      * Write a control command to the DashKit. Returns true if the write was

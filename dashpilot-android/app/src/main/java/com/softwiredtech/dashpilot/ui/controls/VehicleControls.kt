@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Air
 import androidx.compose.material.icons.rounded.DirectionsCar
 import androidx.compose.material.icons.rounded.EvStation
 import androidx.compose.material.icons.rounded.Flip
@@ -48,6 +49,10 @@ object ControlsState {
     var preheatOn by mutableStateOf(false)
     var chargePortOpen by mutableStateOf(false)
     var mirrorsFolded by mutableStateOf(false)
+    // Cosmetic only: whether our rear-fan override is active (firmware injecting).
+    // The firmware picks the injected value (HIGH/OFF) from the live bus when it
+    // starts, so there's no readback and this is just on/off for the override.
+    var rearFanOn by mutableStateOf(false)
 }
 
 /**
@@ -131,6 +136,18 @@ val vehicleControls: List<ControlAction> = listOf(
             else VehicleControl.MIRROR_FOLD
             if (manager == null || VehicleControl.send(manager, VehicleControl.CMD_MIRROR_FOLD, value)) {
                 ControlsState.mirrorsFolded = !ControlsState.mirrorsFolded
+            }
+        }
+    ),
+    ControlAction(
+        id = "rear_fan",
+        icon = Icons.Rounded.Air,
+        label = { if (ControlsState.rearFanOn) "Rear Fan: On" else "Rear Fan: Off" },
+        active = { ControlsState.rearFanOn },
+        gestureValue = 7,
+        perform = { manager ->
+            if (manager == null || VehicleControl.sendRearFanToggle(manager)) {
+                ControlsState.rearFanOn = !ControlsState.rearFanOn
             }
         }
     ),
