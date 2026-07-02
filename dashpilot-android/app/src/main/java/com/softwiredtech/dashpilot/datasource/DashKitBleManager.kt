@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.StateFlow
 interface GattListener {
     fun onServicesReady(gatt: BluetoothGatt) {}
     fun onCharacteristicChanged(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, value: ByteArray) {}
+    fun onCharacteristicRead(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, value: ByteArray, status: Int) {}
     fun onCharacteristicWrite(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, status: Int) {}
     fun onDescriptorWrite(gatt: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {}
     fun onDisconnected() {}
@@ -232,6 +233,28 @@ class DashKitBleManager(private val context: Context) {
             status: Int
         ) {
             forEachListener { it.onCharacteristicWrite(g, characteristic, status) }
+        }
+
+        // API 33+
+        override fun onCharacteristicRead(
+            g: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            value: ByteArray,
+            status: Int
+        ) {
+            forEachListener { it.onCharacteristicRead(g, characteristic, value, status) }
+        }
+
+        // API < 33
+        @Deprecated("Deprecated in API 33")
+        override fun onCharacteristicRead(
+            g: BluetoothGatt,
+            characteristic: BluetoothGattCharacteristic,
+            status: Int
+        ) {
+            @Suppress("DEPRECATION")
+            val value = characteristic.value ?: ByteArray(0)
+            forEachListener { it.onCharacteristicRead(g, characteristic, value, status) }
         }
     }
 

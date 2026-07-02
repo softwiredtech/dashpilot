@@ -34,6 +34,10 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -41,12 +45,14 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -63,9 +69,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.core.content.edit
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.DashKitBleManager
-import com.softwiredtech.dashpilot.ble.DashKitOtaUpdate
+import com.softwiredtech.dashpilot.ble.FirmwareUpdateManager
 import com.softwiredtech.dashpilot.ble.OtaState
 import com.softwiredtech.dashpilot.ble.VehicleControl
+import kotlinx.coroutines.launch
 
 import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.datamodel.dash.DASH_PREFS_NAME
@@ -107,6 +114,11 @@ private data class ToggleSetting(
 private val vehicleBusToggles = listOf(
     ToggleSetting(R.string.settings_toggle_show_car_battery, PREF_SHOW_CAR_BATTERY, DEFAULT_SHOW_CAR_BATTERY),
     ToggleSetting(R.string.settings_toggle_show_odometer, PREF_SHOW_ODOMETER, DEFAULT_SHOW_ODOMETER),
+)
+
+private val settingsTabs = listOf(
+    R.string.settings_tab_general,
+    R.string.settings_tab_dashkit,
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -198,6 +210,17 @@ fun SettingsScreen(
         darkModeBackgroundGray = darkModeBackgroundGrayState.floatValue.toInt(),
     )
 
+    val selectedTab = remember { mutableIntStateOf(0) }
+
+    // Hoisted so it survives tab switches (an in-progress OTA is not cancelled
+    // just because the user flips back to the General tab).
+    val dashkitUpdateManager = remember(bleManager) {
+        bleManager?.let { FirmwareUpdateManager(it) }
+    }
+    DisposableEffect(dashkitUpdateManager) {
+        onDispose { dashkitUpdateManager?.dispose() }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -222,9 +245,36 @@ fun SettingsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(horizontal = 24.dp, vertical = 16.dp)
-                .verticalScroll(rememberScrollState())
         ) {
+            TabRow(
+                selectedTabIndex = selectedTab.intValue,
+                containerColor = DarkColors.Background,
+                contentColor = Color.White,
+                indicator = { tabPositions ->
+                    TabRowDefaults.SecondaryIndicator(
+                        modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTab.intValue]),
+                        color = AccentColor
+                    )
+                }
+            ) {
+                settingsTabs.forEachIndexed { index, titleRes ->
+                    Tab(
+                        selected = selectedTab.intValue == index,
+                        onClick = { selectedTab.intValue = index },
+                        selectedContentColor = AccentColor,
+                        unselectedContentColor = DarkColors.TextMuted,
+                        text = { Text(stringResource(titleRes)) }
+                    )
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 24.dp, vertical = 16.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+            if (selectedTab.intValue == 0) {
             val packageInfo = remember {
                 context.packageManager.getPackageInfo(context.packageName, 0)
             }
@@ -424,15 +474,6 @@ fun SettingsScreen(
                 Spacer(modifier = Modifier.height(24.dp))
             }
 
-            // Firmware update (only for DashKit)
-            if (bleManager != null) {
-                FirmwareUpdateSection(bleManager)
-                Spacer(modifier = Modifier.height(24.dp))
-
-                PairNewDeviceSection(bleManager)
-                Spacer(modifier = Modifier.height(24.dp))
-            }
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -459,6 +500,20 @@ fun SettingsScreen(
                     fontSize = 16.sp
                 )
             }
+            } // end General tab
+
+            if (selectedTab.intValue == 1) {
+                if (bleManager != null && dashkitUpdateManager != null) {
+                    DashKitSettingsContent(bleManager, dashkitUpdateManager)
+                } else {
+                    Text(
+                        text = stringResource(R.string.settings_dashkit_not_connected),
+                        color = DarkColors.TextMuted,
+                        fontSize = 14.sp
+                    )
+                }
+            }
+            } // end scrollable content column
         }
     }
 }
@@ -571,29 +626,100 @@ private fun PairNewDeviceSection(bleManager: DashKitBleManager) {
 }
 
 @Composable
-private fun FirmwareUpdateSection(bleManager: DashKitBleManager) {
-    val context = LocalContext.current
-    val otaUpdate = remember(bleManager) { DashKitOtaUpdate(bleManager) }
-    val otaState by otaUpdate.state.collectAsState()
+private fun DashKitSettingsContent(
+    bleManager: DashKitBleManager,
+    updateManager: FirmwareUpdateManager
+) {
+    val connectionState by bleManager.connectionState.collectAsState()
+    val connected = connectionState == ConnectionStatus.Connected
 
-    val filePicker = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri ->
-        if (uri == null) return@rememberLauncherForActivityResult
-        val bytes = try {
-            context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
-        } catch (e: Exception) {
-            Log.e("FirmwareUpdate", "Failed to read file: ${e.message}")
-            null
-        }
-        if (bytes != null && bytes.isNotEmpty()) {
-            otaUpdate.start(bytes)
+    // On connect, read the installed version and check the server for updates.
+    LaunchedEffect(connectionState) {
+        if (connected) {
+            updateManager.start()
+            updateManager.checkForUpdate()
         }
     }
 
-    DisposableEffect(otaUpdate) {
-        onDispose { otaUpdate.cancel() }
+    FirmwareInfoSection(updateManager, connected)
+    Spacer(modifier = Modifier.height(24.dp))
+
+    FirmwareUpdateSection(updateManager)
+    Spacer(modifier = Modifier.height(24.dp))
+
+    PairNewDeviceSection(bleManager)
+    Spacer(modifier = Modifier.height(24.dp))
+
+    DashKitMaintenanceSection(connected)
+}
+
+@Composable
+private fun FirmwareInfoSection(updateManager: FirmwareUpdateManager, connected: Boolean) {
+    val installedVersion by updateManager.installedVersion.collectAsState()
+
+    SectionHeader(stringResource(R.string.settings_section_firmware_info))
+    Spacer(modifier = Modifier.height(12.dp))
+    InfoRow(
+        label = stringResource(R.string.settings_firmware_info_status),
+        value = stringResource(
+            if (connected) R.string.settings_firmware_info_connected
+            else R.string.settings_firmware_info_disconnected
+        )
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+    InfoRow(
+        label = stringResource(R.string.settings_firmware_info_version),
+        value = installedVersion ?: stringResource(R.string.settings_firmware_info_unknown)
+    )
+}
+
+@Composable
+private fun InfoRow(label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = label, color = Color.White, fontSize = 16.sp)
+        Text(text = value, color = DarkColors.TextMuted, fontSize = 16.sp)
     }
+}
+
+@Composable
+private fun DashKitMaintenanceSection(connected: Boolean) {
+    val passthrough = remember { mutableStateOf(false) }
+
+    SectionHeader(stringResource(R.string.settings_section_maintenance))
+    Spacer(modifier = Modifier.height(8.dp))
+
+    SettingsToggle(
+        label = stringResource(R.string.settings_passthrough),
+        checked = passthrough.value,
+        onCheckedChange = { passthrough.value = it }
+    )
+    Spacer(modifier = Modifier.height(12.dp))
+
+    Button(
+        onClick = { /* TODO: send reboot command over BLE */ },
+        enabled = connected,
+        modifier = Modifier.fillMaxWidth(),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = AccentColor,
+            contentColor = Color.White,
+            disabledContainerColor = DarkColors.Border,
+            disabledContentColor = DarkColors.TextMuted
+        )
+    ) {
+        Text(text = stringResource(R.string.settings_reboot), fontSize = 16.sp)
+    }
+}
+
+@Composable
+private fun FirmwareUpdateSection(updateManager: FirmwareUpdateManager) {
+    val scope = rememberCoroutineScope()
+    val otaState by updateManager.otaState.collectAsState()
+    val checkState by updateManager.check.collectAsState()
+    val downloadProgress by updateManager.downloadProgress.collectAsState()
 
     Text(
         text = stringResource(R.string.settings_section_firmware),
@@ -602,16 +728,85 @@ private fun FirmwareUpdateSection(bleManager: DashKitBleManager) {
     )
     Spacer(modifier = Modifier.height(8.dp))
 
-    when (val state = otaState) {
-        is OtaState.Idle -> {
-            Button(
-                onClick = { filePicker.launch("application/octet-stream") },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = AccentColor)
-            ) {
-                Text(stringResource(R.string.settings_firmware_update))
+    // While an upload is in progress (or just finished), show only OTA status.
+    val uploadActive = otaState is OtaState.Uploading ||
+        otaState is OtaState.Connecting ||
+        otaState is OtaState.Rebooting ||
+        otaState is OtaState.Error
+
+    val dlProgress = downloadProgress
+    when {
+        dlProgress != null -> {
+            val percent = (dlProgress * 100).toInt()
+            Text(
+                stringResource(R.string.settings_firmware_downloading, percent),
+                color = Color.White,
+                fontSize = 14.sp
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            LinearProgressIndicator(
+                progress = { dlProgress },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(6.dp)
+                    .clip(RoundedCornerShape(3.dp)),
+                color = AccentColor,
+                trackColor = DarkColors.Border
+            )
+        }
+        uploadActive -> OtaStatus(otaState, onRetry = { scope.launch { updateManager.checkForUpdate() } })
+        else -> {
+            when (val check = checkState) {
+                is FirmwareUpdateManager.Check.Checking -> {
+                    Text(
+                        stringResource(R.string.settings_firmware_checking),
+                        color = DarkColors.ContentDisabled,
+                        fontSize = 14.sp
+                    )
+                }
+                is FirmwareUpdateManager.Check.Available -> {
+                    Text(
+                        stringResource(R.string.settings_firmware_available, check.manifest.version),
+                        color = Color.White,
+                        fontSize = 14.sp
+                    )
+                    check.manifest.notes?.takeIf { it.isNotBlank() }?.let { notes ->
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(notes, color = DarkColors.ContentDisabled, fontSize = 13.sp)
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(
+                        onClick = { scope.launch { updateManager.install(check.manifest) } },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = AccentColor)
+                    ) {
+                        Text(stringResource(R.string.settings_firmware_install))
+                    }
+                }
+                is FirmwareUpdateManager.Check.UpToDate -> {
+                    Text(
+                        stringResource(R.string.settings_firmware_up_to_date),
+                        color = DarkColors.ContentDisabled,
+                        fontSize = 14.sp
+                    )
+                }
+                is FirmwareUpdateManager.Check.Error -> {
+                    Text(
+                        stringResource(R.string.settings_firmware_error, check.message),
+                        color = DarkColors.Error,
+                        fontSize = 14.sp
+                    )
+                }
+                FirmwareUpdateManager.Check.Idle -> {}
             }
         }
+    }
+}
+
+@Composable
+private fun OtaStatus(otaState: OtaState, onRetry: () -> Unit) {
+    when (val state = otaState) {
+        is OtaState.Idle -> {}
         is OtaState.Connecting -> {
             Text(
                 stringResource(R.string.settings_firmware_connecting),
@@ -652,7 +847,7 @@ private fun FirmwareUpdateSection(bleManager: DashKitBleManager) {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Button(
-                onClick = { filePicker.launch("application/octet-stream") },
+                onClick = onRetry,
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = AccentColor)
             ) {
