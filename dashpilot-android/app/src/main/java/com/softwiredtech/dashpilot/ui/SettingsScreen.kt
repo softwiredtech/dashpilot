@@ -688,18 +688,10 @@ private fun InfoRow(label: String, value: String) {
 @Composable
 private fun DashKitMaintenanceSection(bleManager: DashKitBleManager, connected: Boolean) {
     val context = LocalContext.current
-    val passthrough = remember { mutableStateOf(false) }
     val showRebootDialog = remember { mutableStateOf(false) }
 
     SectionHeader(stringResource(R.string.settings_section_maintenance))
     Spacer(modifier = Modifier.height(8.dp))
-
-    SettingsToggle(
-        label = stringResource(R.string.settings_passthrough),
-        checked = passthrough.value,
-        onCheckedChange = { passthrough.value = it }
-    )
-    Spacer(modifier = Modifier.height(12.dp))
 
     Button(
         onClick = { showRebootDialog.value = true },
