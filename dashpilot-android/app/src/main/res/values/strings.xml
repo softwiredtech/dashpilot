@@ -71,6 +71,12 @@
     <string name="settings_section_maintenance">Maintenance</string>
     <string name="settings_passthrough">Passthrough</string>
     <string name="settings_reboot">Reboot DashKit</string>
+    <string name="settings_reboot_dialog_title">Reboot DashKit?</string>
+    <string name="settings_reboot_dialog_body">DashKit will restart and briefly disconnect. It should reconnect automatically once it is back up.</string>
+    <string name="settings_reboot_dialog_confirm">Reboot</string>
+    <string name="settings_reboot_dialog_cancel">Cancel</string>
+    <string name="settings_reboot_sent">Reboot command sent. DashKit is restarting.</string>
+    <string name="settings_reboot_failed">Could not send reboot command.</string>
     <string name="settings_dashkit_not_connected">Connect to a DashKit device to manage it.</string>
 
     <!-- Pair a new device -->

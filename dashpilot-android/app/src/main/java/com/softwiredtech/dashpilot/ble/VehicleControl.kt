@@ -67,6 +67,10 @@ object VehicleControl {
     // HIGH, so this is a single momentary command with no value (value ignored).
     const val CMD_REAR_FAN_TOGGLE: Int = 0x43
 
+    // --- Reboot the DashKit ---
+    // Restarts the ESP32 (esp_restart). Value is ignored by the firmware.
+    const val CMD_REBOOT: Int = 0x44
+
     /** Bind (or clear, with actionValue 0) an N-finger tap to a control action. */
     fun sendFingerAction(manager: DashKitBleManager, fingers: Int, actionValue: Int): Boolean =
         send(manager, CMD_MULTI_FINGER_ACTION, (fingers shl 8) or (actionValue and 0xFF))
@@ -82,6 +86,10 @@ object VehicleControl {
     /** Toggle the rear AC fan (firmware flips OFF <-> HIGH; value ignored). */
     fun sendRearFanToggle(manager: DashKitBleManager): Boolean =
         send(manager, CMD_REAR_FAN_TOGGLE, 1)
+
+    /** Ask the DashKit to reboot (firmware calls esp_restart; value ignored). */
+    fun sendReboot(manager: DashKitBleManager): Boolean =
+        send(manager, CMD_REBOOT, 1)
 
     /**
      * Write a control command to the DashKit. Returns true if the write was
