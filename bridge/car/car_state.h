@@ -40,7 +40,15 @@ struct CarState {
     double experimentalMode = 0;
     double changingLane = 0;
 
-    static constexpr size_t FIELD_COUNT = 31;
+    // Virtual lane geometry (DAS_lanes) — forwarded to the adasviz renderer.
+    double virtualLaneWidth = 0;      // m
+    double virtualLaneViewRange = 0;  // m
+    double virtualLaneC0 = 0;         // cm  (lateral offset at x=0)
+    double virtualLaneC1 = 0;         // deg (heading offset)
+    double virtualLaneC2 = 0;         // m-1 (curvature)
+    double virtualLaneC3 = 0;         // m-2 (curvature rate)
+
+    static constexpr size_t FIELD_COUNT = 37;
 
     void toArray(double* out) const {
         // Party bus
@@ -80,5 +88,13 @@ struct CarState {
         out[29] = changingLane;
 
         out[30] = acTemp;
+
+        // Virtual lane geometry
+        out[31] = virtualLaneWidth;
+        out[32] = virtualLaneViewRange;
+        out[33] = virtualLaneC0;
+        out[34] = virtualLaneC1;
+        out[35] = virtualLaneC2;
+        out[36] = virtualLaneC3;
     }
 };

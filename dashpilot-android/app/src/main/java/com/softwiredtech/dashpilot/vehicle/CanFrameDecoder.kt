@@ -57,7 +57,14 @@ class CanFrameDecoder(
                 experimentalMode = values[27] > 0,
                 madsActive = values[28] > 0,
                 changingLane = values[29] > 0,
-                acTemp = values[30].toFloat()
+                acTemp = values[30].toFloat(),
+                // Virtual lane geometry (DAS_lanes)
+                virtualLaneWidth = values[31].toFloat(),
+                virtualLaneViewRange = values[32].toFloat(),
+                virtualLaneC0 = values[33].toFloat(),
+                virtualLaneC1 = values[34].toFloat(),
+                virtualLaneC2 = values[35].toFloat(),
+                virtualLaneC3 = values[36].toFloat()
             )
         }
     }

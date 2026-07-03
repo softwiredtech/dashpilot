@@ -107,6 +107,14 @@ public:
         // Climate setpoint temperature (degC) from the vehicle bus.
         cs.acTemp = cp.get(1, "UI_hvacRequest", "UI_hvacReqTempSetpointLeft");
 
+        // Virtual lane geometry (DAS_lanes, chassis bus) forwarded to adasviz.
+        cs.virtualLaneWidth = cp.get(0, "DAS_lanes", "DAS_virtualLaneWidth");
+        cs.virtualLaneViewRange = cp.get(0, "DAS_lanes", "DAS_virtualLaneViewRange");
+        cs.virtualLaneC0 = cp.get(0, "DAS_lanes", "DAS_virtualLaneC0");
+        cs.virtualLaneC1 = cp.get(0, "DAS_lanes", "DAS_virtualLaneC1");
+        cs.virtualLaneC2 = cp.get(0, "DAS_lanes", "DAS_virtualLaneC2");
+        cs.virtualLaneC3 = cp.get(0, "DAS_lanes", "DAS_virtualLaneC3");
+
         updateVehicleBus(cp, cs);
     }
 

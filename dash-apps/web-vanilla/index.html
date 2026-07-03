@@ -630,8 +630,22 @@
         world.ego_steering_angle = remappedRad;
         world.ego_speed = speedMs;
 
-        // Serialize for ADAS viz
-        world.lane = { laneWidth:4,viewRange:50,lanePolyC0:0,lanePolyC1:0,lanePolyC2:0,lanePolyC3:0 }
+        // Serialize the detected virtual lane (DAS_lanes) for the ADAS viz.
+        // adasviz expects metres for the polynomial: offset(x)=c0+c1·x+c2·x²+c3·x³.
+        // Convert Tesla units: C0 cm->m, C1 deg->slope (tan); C2/C3 already 1/m,1/m².
+        // adasviz uses +dy = left, opposite to Tesla's lateral sign, so negate the
+        // whole polynomial to flip in-lane position and curve direction together.
+        const laneWidth = car.virtualLaneWidth || 4;
+        const viewRange = car.virtualLaneViewRange || 50;
+        const c1Rad = (car.virtualLaneC1 || 0) * Math.PI / 180;
+        world.lane = {
+          laneWidth,
+          viewRange,
+          lanePolyC0: -(car.virtualLaneC0 || 0) / 100,
+          lanePolyC1: -Math.tan(c1Rad),
+          lanePolyC2: -(car.virtualLaneC2 || 0),
+          lanePolyC3: -(car.virtualLaneC3 || 0),
+        };
 
         // Show gears
         const gearMap = { 1: "P", 2: "R", 3: "N", 4: "D" };
@@ -849,6 +863,12 @@
         madsActive: NativeCarState.isMadsActive?.() ?? false,
         renderQuality: NativeCarState.getRenderQuality?.() ?? 3,
         darkModeBackgroundGray: NativeCarState.getDarkModeBackgroundGray?.() ?? 0,
+        virtualLaneWidth: NativeCarState.getVirtualLaneWidth?.() ?? undefined,
+        virtualLaneViewRange: NativeCarState.getVirtualLaneViewRange?.() ?? undefined,
+        virtualLaneC0: NativeCarState.getVirtualLaneC0?.() ?? undefined,
+        virtualLaneC1: NativeCarState.getVirtualLaneC1?.() ?? undefined,
+        virtualLaneC2: NativeCarState.getVirtualLaneC2?.() ?? undefined,
+        virtualLaneC3: NativeCarState.getVirtualLaneC3?.() ?? undefined,
       };
       receiveMessage(car);
     }

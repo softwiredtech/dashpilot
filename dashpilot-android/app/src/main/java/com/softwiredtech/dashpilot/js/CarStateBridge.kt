@@ -45,6 +45,12 @@ class CarStateBridge {
     @Volatile private var darkModeBackgroundGray: Int = 0
     @Volatile private var changingLane: Boolean = false
     @Volatile private var speedCameraDistance: Int = -1
+    @Volatile private var virtualLaneWidth: Float = 0f
+    @Volatile private var virtualLaneViewRange: Float = 0f
+    @Volatile private var virtualLaneC0: Float = 0f
+    @Volatile private var virtualLaneC1: Float = 0f
+    @Volatile private var virtualLaneC2: Float = 0f
+    @Volatile private var virtualLaneC3: Float = 0f
 
     fun update(state: CarState) {
         egoSteeringAngle = state.egoSteeringAngle
@@ -75,6 +81,12 @@ class CarStateBridge {
         experimentalMode = state.experimentalMode
         madsActive = state.madsActive
         changingLane = state.changingLane
+        virtualLaneWidth = state.virtualLaneWidth
+        virtualLaneViewRange = state.virtualLaneViewRange
+        virtualLaneC0 = state.virtualLaneC0
+        virtualLaneC1 = state.virtualLaneC1
+        virtualLaneC2 = state.virtualLaneC2
+        virtualLaneC3 = state.virtualLaneC3
     }
 
     @JavascriptInterface fun getEgoSteeringAngle(): Float = egoSteeringAngle
@@ -116,6 +128,12 @@ class CarStateBridge {
     @JavascriptInterface fun getDarkModeBackgroundGray(): Int = darkModeBackgroundGray
     @JavascriptInterface fun isChangingLane(): Boolean = changingLane
     @JavascriptInterface fun getSpeedCameraDistance(): Int = speedCameraDistance
+    @JavascriptInterface fun getVirtualLaneWidth(): Float = virtualLaneWidth
+    @JavascriptInterface fun getVirtualLaneViewRange(): Float = virtualLaneViewRange
+    @JavascriptInterface fun getVirtualLaneC0(): Float = virtualLaneC0
+    @JavascriptInterface fun getVirtualLaneC1(): Float = virtualLaneC1
+    @JavascriptInterface fun getVirtualLaneC2(): Float = virtualLaneC2
+    @JavascriptInterface fun getVirtualLaneC3(): Float = virtualLaneC3
 
     fun updateSpeedCameraDistance(distanceMeters: Int) {
         speedCameraDistance = distanceMeters

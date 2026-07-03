@@ -36,7 +36,15 @@ data class CarState(
     val experimentalMode: Boolean = false,
     val madsActive: Boolean = false,
 
-    val changingLane: Boolean = false
+    val changingLane: Boolean = false,
+
+    // Virtual lane geometry (DAS_lanes) forwarded to adasviz
+    val virtualLaneWidth: Float = 0f,      // m
+    val virtualLaneViewRange: Float = 0f,  // m
+    val virtualLaneC0: Float = 0f,         // cm
+    val virtualLaneC1: Float = 0f,         // deg
+    val virtualLaneC2: Float = 0f,         // m-1
+    val virtualLaneC3: Float = 0f          // m-2
 ) {
     fun toImperial(): CarState = copy(
         odometer = odometer * KM_TO_MILES,
@@ -47,7 +55,7 @@ data class CarState(
     )
 
     companion object {
-        const val FIELD_COUNT = 31
+        const val FIELD_COUNT = 37
         private const val KM_TO_MILES = 0.621371f
 
         private val MILES_COUNTRIES = setOf("US", "GB", "MM", "LR")
