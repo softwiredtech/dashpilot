@@ -11,51 +11,61 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.Inbox
-import androidx.compose.material.icons.rounded.Thermostat
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.ArrowDropDown
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.WaterDrop
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.softwiredtech.dashpilot.ui.controls.controlById
+import com.softwiredtech.dashpilot.ui.controls.vehicleControls
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
 import com.softwiredtech.dashpilot.ui.theme.DarkColors
 
-/** A three-finger-press option, bound to a vehicle control id. */
-private data class ThreeFingerOption(
-    val id: String,
-    val icon: ImageVector,
-    val title: String
-)
-
-private val threeFingerOptions = listOf(
-    ThreeFingerOption("glovebox", Icons.Rounded.Inbox, "Open Glovebox"),
-    ThreeFingerOption("battery_preheat", Icons.Rounded.Thermostat, "Preheat Battery")
-)
+// Finger counts that can be bound to an infotainment gesture (matches the
+// firmware's MULTI_FINGER_MIN/MAX_FINGERS).
+private val FINGER_COUNTS = 3..5
 
 /**
- * Automations screen. Lets the user enable the wiper-off automation and bind a
- * single infotainment three-finger-press gesture to one vehicle action (the
- * options are mutually exclusive). Firmware support is not wired up yet.
+ * Automations screen. Lets the user enable the wiper-off automation and bind
+ * 3-, 4-, and 5-finger infotainment taps each to a vehicle control. Bindings are
+ * pushed to the DashKit firmware over BLE (VC_CMD_MULTI_FINGER_ACTION).
+ *
+ * @param fingerActions current bindings: finger count -> control id.
  */
 @Composable
 fun AutomationsScreen(
     wiperOffEnabled: Boolean,
     onWiperOffChange: (Boolean) -> Unit,
-    threeFingerActionId: String?,
-    onToggleThreeFinger: (String) -> Unit,
+    fingerActions: Map<Int, String>,
+    onSetFingerAction: (fingers: Int, id: String?) -> Unit,
+    onChangeFingerCount: (from: Int, to: Int) -> Unit,
+    onRemoveFingerAction: (fingers: Int) -> Unit,
     onBack: () -> Unit
 ) {
     Box(
@@ -66,6 +76,8 @@ fun AutomationsScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .systemBarsPadding()
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp, vertical = 24.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -100,26 +112,35 @@ fun AutomationsScreen(
 
             Spacer(modifier = Modifier.height(28.dp))
 
-            SectionLabel("Three-finger press")
+            SectionLabel("Multi-touch infotainment trigger")
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Bind the infotainment three-finger press to one action",
+                text = "Bind 3-, 4-, or 5-finger infotainment taps to a control",
                 color = DarkColors.TextMuted,
                 fontSize = 13.sp,
                 modifier = Modifier.padding(start = 4.dp)
             )
             Spacer(modifier = Modifier.height(12.dp))
 
-            threeFingerOptions.forEachIndexed { index, option ->
-                if (index > 0) {
-                    Spacer(modifier = Modifier.height(12.dp))
-                }
-                AutomationRow(
-                    icon = option.icon,
-                    title = option.title,
-                    subtitle = null,
-                    checked = option.id == threeFingerActionId,
-                    onToggle = { onToggleThreeFinger(option.id) }
+            val usedCounts = fingerActions.keys
+            fingerActions.toSortedMap().forEach { (fingers, controlId) ->
+                // Allow this row to keep its own count plus any not used elsewhere.
+                val fingerOptions = FINGER_COUNTS.filter { it == fingers || it !in usedCounts }
+                FingerActionRow(
+                    fingers = fingers,
+                    controlId = controlId,
+                    fingerOptions = fingerOptions,
+                    onFingerCountChange = { onChangeFingerCount(fingers, it) },
+                    onActionChange = { onSetFingerAction(fingers, it) },
+                    onRemove = { onRemoveFingerAction(fingers) }
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+
+            val nextFree = FINGER_COUNTS.firstOrNull { it !in usedCounts }
+            if (nextFree != null) {
+                AddTriggerButton(
+                    onClick = { onSetFingerAction(nextFree, vehicleControls.first().id) }
                 )
             }
         }
@@ -135,6 +156,124 @@ private fun SectionLabel(text: String) {
         fontWeight = FontWeight.SemiBold,
         modifier = Modifier.padding(start = 4.dp)
     )
+}
+
+@Composable
+private fun FingerActionRow(
+    fingers: Int,
+    controlId: String,
+    fingerOptions: List<Int>,
+    onFingerCountChange: (Int) -> Unit,
+    onActionChange: (String) -> Unit,
+    onRemove: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(DarkColors.Surface, RoundedCornerShape(16.dp))
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        DropdownPicker(
+            selectedLabel = fingers.toString(),
+            options = fingerOptions,
+            optionLabel = { it.toString() },
+            onSelect = onFingerCountChange
+        )
+        Spacer(modifier = Modifier.size(6.dp))
+        Text(text = "fingers", color = DarkColors.TextMuted, fontSize = 14.sp)
+        Spacer(modifier = Modifier.size(10.dp))
+        Text(text = "action:", color = DarkColors.TextMuted, fontSize = 14.sp)
+        Spacer(modifier = Modifier.size(6.dp))
+        DropdownPicker(
+            selectedLabel = controlById(controlId)?.label?.invoke() ?: controlId,
+            options = vehicleControls,
+            optionLabel = { it.label() },
+            onSelect = { onActionChange(it.id) },
+            modifier = Modifier.weight(1f)
+        )
+        IconButton(onClick = onRemove) {
+            Icon(
+                imageVector = Icons.Rounded.Close,
+                contentDescription = "Remove",
+                tint = DarkColors.TextMuted,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+    }
+}
+
+/** A compact dropdown styled to sit inside a [DarkColors.Surface] row. */
+@Composable
+private fun <T> DropdownPicker(
+    selectedLabel: String,
+    options: List<T>,
+    optionLabel: (T) -> String,
+    onSelect: (T) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Box(modifier = modifier) {
+        Row(
+            modifier = Modifier
+                .clip(RoundedCornerShape(10.dp))
+                .background(DarkColors.Background)
+                .clickable { expanded = true }
+                .padding(start = 12.dp, end = 6.dp, top = 10.dp, bottom = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = selectedLabel,
+                color = Color.White,
+                fontSize = 15.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f, fill = false)
+            )
+            Icon(
+                imageVector = Icons.Rounded.ArrowDropDown,
+                contentDescription = null,
+                tint = DarkColors.TextMuted,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            options.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(optionLabel(option)) },
+                    onClick = {
+                        onSelect(option)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun AddTriggerButton(onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick)
+            .padding(vertical = 8.dp, horizontal = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Rounded.Add,
+            contentDescription = "Add trigger",
+            tint = AccentColor,
+            modifier = Modifier.size(22.dp)
+        )
+        Spacer(modifier = Modifier.size(8.dp))
+        Text(
+            text = "Add trigger",
+            color = AccentColor,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+    }
 }
 
 @Composable

@@ -22,6 +22,9 @@ const val PREF_PINNED_CONTROL = "pinned_control"
 
 // Automations
 const val PREF_WIPER_OFF_AUTOMATION = "wiper_off_automation"
+// Map of finger count (3..5) -> control id, serialized as "3=glovebox;4=frunk".
+const val PREF_FINGER_ACTIONS = "finger_actions"
+// Legacy single three-finger binding, migrated into PREF_FINGER_ACTIONS.
 const val PREF_THREE_FINGER_ACTION = "three_finger_action"
 const val DEFAULT_WIPER_OFF_AUTOMATION = false
 
@@ -108,17 +111,49 @@ fun setWiperOffAutomation(context: Context, value: Boolean) {
         .edit { putBoolean(PREF_WIPER_OFF_AUTOMATION, value) }
 }
 
-fun getThreeFingerAction(context: Context): String? =
-    context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
-        .getString(PREF_THREE_FINGER_ACTION, null)
+/**
+ * Returns the bindings of finger count (3..5) -> control id. Performs a one-time
+ * migration of the legacy single three-finger binding into the new map.
+ */
+fun getFingerActions(context: Context): Map<Int, String> {
+    val prefs = context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
+    val serialized = prefs.getString(PREF_FINGER_ACTIONS, null)
+    if (serialized != null) {
+        return parseFingerActions(serialized)
+    }
+    // Migrate the legacy single three-finger binding, if any.
+    val legacy = prefs.getString(PREF_THREE_FINGER_ACTION, null)
+    if (!legacy.isNullOrBlank()) {
+        val migrated = mapOf(3 to legacy)
+        setFingerActions(context, migrated)
+        prefs.edit { remove(PREF_THREE_FINGER_ACTION) }
+        return migrated
+    }
+    return emptyMap()
+}
 
-fun setThreeFingerAction(context: Context, id: String?) {
+fun setFingerActions(context: Context, actions: Map<Int, String>) {
     context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
         .edit {
-            if (id.isNullOrBlank()) {
-                remove(PREF_THREE_FINGER_ACTION)
+            if (actions.isEmpty()) {
+                remove(PREF_FINGER_ACTIONS)
             } else {
-                putString(PREF_THREE_FINGER_ACTION, id)
+                putString(PREF_FINGER_ACTIONS, serializeFingerActions(actions))
             }
         }
 }
+
+private fun serializeFingerActions(actions: Map<Int, String>): String =
+    actions.entries
+        .sortedBy { it.key }
+        .joinToString(";") { "${it.key}=${it.value}" }
+
+private fun parseFingerActions(serialized: String): Map<Int, String> =
+    serialized.split(";")
+        .mapNotNull { entry ->
+            val parts = entry.split("=", limit = 2)
+            val fingers = parts.getOrNull(0)?.toIntOrNull()
+            val id = parts.getOrNull(1)?.takeIf { it.isNotBlank() }
+            if (fingers != null && id != null) fingers to id else null
+        }
+        .toMap()

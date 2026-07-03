@@ -42,6 +42,55 @@ object VehicleControl {
     const val CMD_CHARGE_PORT_OPEN: Int = 0x0D   // 1=open
     const val CMD_CHARGE_PORT_CLOSE: Int = 0x0E  // 1=close
 
+    // --- Infotainment multi-finger tap binding ---
+    // Tells the firmware which action to run when it sees an N-finger tap on
+    // UI_status2.UI_activeTouchPoints. The value packs the finger count (3..5) in
+    // the high byte and the action code in the low byte. Action codes are the
+    // gestureValue each control carries in VehicleControls.kt (the source of
+    // truth); 0 means "unbound".
+    const val CMD_MULTI_FINGER_ACTION: Int = 0x40
+    const val GESTURE_ACTION_NONE: Int = 0
+
+    // --- Auto wiper-off automation toggle ---
+    // Arms/disarms the firmware's auto wiper-off automation. 1=enable, 0=disable.
+    // The firmware persists it in NVS (wiper_off module).
+    const val CMD_WIPER_OFF_ENABLE: Int = 0x41
+
+    // --- Enter BLE pairing mode ---
+    // Opens a window on the firmware during which one new (not-yet-bonded) device
+    // may pair. Only this already-paired phone can send it (the control char
+    // requires an encrypted link). Value is ignored by the firmware.
+    const val CMD_ENTER_PAIRING: Int = 0x42
+
+    // --- Rear AC fan toggle (UI_hvacRequest 0x2F3) ---
+    // The firmware reads the live UI_hvacReqSecondRowState and flips it OFF <->
+    // HIGH, so this is a single momentary command with no value (value ignored).
+    const val CMD_REAR_FAN_TOGGLE: Int = 0x43
+
+    // --- Reboot the DashKit ---
+    // Restarts the ESP32 (esp_restart). Value is ignored by the firmware.
+    const val CMD_REBOOT: Int = 0x44
+
+    /** Bind (or clear, with actionValue 0) an N-finger tap to a control action. */
+    fun sendFingerAction(manager: DashKitBleManager, fingers: Int, actionValue: Int): Boolean =
+        send(manager, CMD_MULTI_FINGER_ACTION, (fingers shl 8) or (actionValue and 0xFF))
+
+    /** Enable or disable the firmware's auto wiper-off automation. */
+    fun sendWiperOff(manager: DashKitBleManager, enabled: Boolean): Boolean =
+        send(manager, CMD_WIPER_OFF_ENABLE, if (enabled) 1 else 0)
+
+    /** Ask the DashKit to open a pairing window for one new device. */
+    fun sendEnterPairing(manager: DashKitBleManager): Boolean =
+        send(manager, CMD_ENTER_PAIRING, 1)
+
+    /** Toggle the rear AC fan (firmware flips OFF <-> HIGH; value ignored). */
+    fun sendRearFanToggle(manager: DashKitBleManager): Boolean =
+        send(manager, CMD_REAR_FAN_TOGGLE, 1)
+
+    /** Ask the DashKit to reboot (firmware calls esp_restart; value ignored). */
+    fun sendReboot(manager: DashKitBleManager): Boolean =
+        send(manager, CMD_REBOOT, 1)
+
     /**
      * Write a control command to the DashKit. Returns true if the write was
      * dispatched (not necessarily acknowledged). No-op returning false if the

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include "car/car_state_mapper.h"
 
 static inline void updatePartyBus(const CANParsers& cp, CarState& cs) {
@@ -79,9 +81,10 @@ public:
         cs.trafficLightColor = cp.get(0, "DAS_road", "DAS_trafficLightColor");
         cs.stopLineDist = cp.get(0, "DAS_road", "DAS_stopLineDist");
 
-        // NOTE: In case of DashKit, we use this turn signal, because UI_warning is only on Party bus
-        cs.leftBlinker = cp.get(1, "VCLEFT_lightStatus", "VCLEFT_turnSignalStatus") + 1.0;
-        cs.rightBlinker = cp.get(1, "VCRIGHT_lightStatus", "VCRIGHT_turnSignalStatus") + 1.0;
+        cs.leftBlinker = leftBlinkerHold_.update(
+            cp.get(1, "VCLEFT_lightStatus", "VCLEFT_turnSignalStatus"));
+        cs.rightBlinker = rightBlinkerHold_.update(
+            cp.get(1, "VCRIGHT_lightStatus", "VCRIGHT_turnSignalStatus"));
 
         cs.laneDepartureWarning = cp.get(0, "DAS_status", "DAS_laneDepartureWarning");
         cs.sideCollisionWarning = cp.get(0, "DAS_status", "DAS_sideCollisionWarning");
@@ -98,4 +101,29 @@ public:
 
         updateVehicleBus(cp, cs);
     }
+
+private:
+    // Turns the lamp-only turn-signal status (0=OFF, 1=ON, 2=FAULT, 3=SNA) into
+    // the party-bus tri-state (0=off, 1=blinking/lamp off, 2=blinking/lamp on).
+    struct BlinkerHold {
+        static constexpr std::chrono::milliseconds HOLD{1000};
+
+        std::chrono::steady_clock::time_point lastOn{};
+        bool seenOn = false;
+
+        double update(double rawStatus) {
+            bool lampOn = static_cast<int>(rawStatus) == 1;  // 1=ON
+            auto now = std::chrono::steady_clock::now();
+            if (lampOn) {
+                lastOn = now;
+                seenOn = true;
+            }
+            bool blinking = seenOn && (now - lastOn) <= HOLD;
+            if (!blinking) return 0.0;
+            return lampOn ? 2.0 : 1.0;
+        }
+    };
+
+    BlinkerHold leftBlinkerHold_;
+    BlinkerHold rightBlinkerHold_;
 };
