@@ -60,6 +60,11 @@ class DashKitBleManager(private val context: Context) {
     // on each user-initiated connect().
     private var rePairRetryDone = false
 
+    // Set only when the app itself tears down the link (disconnect()). Any other
+    // drop after a healthy connection — most commonly a DashKit reboot — is
+    // treated as transient and triggers an automatic reconnect.
+    private var userInitiatedDisconnect = false
+
     // DashKit uses "Just Works" pairing. Android must bond before it can touch
     // the encryption-protected characteristics, so we wait for the bond to
     // complete before requesting the MTU / discovering services.
@@ -172,6 +177,18 @@ class DashKitBleManager(private val context: Context) {
                     forEachListener { it.onDisconnected() }
                     return
                 }
+                if (!userInitiatedDisconnect) {
+                    // Unexpected drop after a healthy connection (typically a
+                    // DashKit reboot). The bond survives the reboot, so restart
+                    // the scan: it reconnects, re-discovers services and the
+                    // data source re-subscribes via onServicesReady.
+                    Log.d(TAG, "Link dropped after connect; auto-reconnecting")
+                    _connectionState.value = ConnectionStatus.Connecting
+                    forEachListener { it.onDisconnected() }
+                    rePairRetryDone = true  // already bonded; don't treat as re-pair
+                    startScan()
+                    return
+                }
                 _connectionState.value = ConnectionStatus.Disconnected
                 forEachListener { it.onDisconnected() }
             }
@@ -281,11 +298,13 @@ class DashKitBleManager(private val context: Context) {
             _connectionState.value == ConnectionStatus.Connecting) return
         _connectionState.value = ConnectionStatus.Connecting
         rePairRetryDone = false
+        userInitiatedDisconnect = false
         registerBondReceiver()
         startScan()
     }
 
     fun disconnect() {
+        userInitiatedDisconnect = true
         stopScan()
         unregisterBondReceiver()
         gatt?.close()

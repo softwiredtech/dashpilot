@@ -650,7 +650,7 @@ private fun DashKitSettingsContent(
     PairNewDeviceSection(bleManager)
     Spacer(modifier = Modifier.height(24.dp))
 
-    DashKitMaintenanceSection(connected)
+    DashKitMaintenanceSection(bleManager, connected)
 }
 
 @Composable
@@ -686,8 +686,10 @@ private fun InfoRow(label: String, value: String) {
 }
 
 @Composable
-private fun DashKitMaintenanceSection(connected: Boolean) {
+private fun DashKitMaintenanceSection(bleManager: DashKitBleManager, connected: Boolean) {
+    val context = LocalContext.current
     val passthrough = remember { mutableStateOf(false) }
+    val showRebootDialog = remember { mutableStateOf(false) }
 
     SectionHeader(stringResource(R.string.settings_section_maintenance))
     Spacer(modifier = Modifier.height(8.dp))
@@ -700,7 +702,7 @@ private fun DashKitMaintenanceSection(connected: Boolean) {
     Spacer(modifier = Modifier.height(12.dp))
 
     Button(
-        onClick = { /* TODO: send reboot command over BLE */ },
+        onClick = { showRebootDialog.value = true },
         enabled = connected,
         modifier = Modifier.fillMaxWidth(),
         colors = ButtonDefaults.buttonColors(
@@ -711,6 +713,33 @@ private fun DashKitMaintenanceSection(connected: Boolean) {
         )
     ) {
         Text(text = stringResource(R.string.settings_reboot), fontSize = 16.sp)
+    }
+
+    if (showRebootDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showRebootDialog.value = false },
+            title = { Text(stringResource(R.string.settings_reboot_dialog_title)) },
+            text = { Text(stringResource(R.string.settings_reboot_dialog_body)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showRebootDialog.value = false
+                    val ok = VehicleControl.sendReboot(bleManager)
+                    val msg = if (ok) {
+                        context.getString(R.string.settings_reboot_sent)
+                    } else {
+                        context.getString(R.string.settings_reboot_failed)
+                    }
+                    android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_LONG).show()
+                }) {
+                    Text(stringResource(R.string.settings_reboot_dialog_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRebootDialog.value = false }) {
+                    Text(stringResource(R.string.settings_reboot_dialog_cancel))
+                }
+            }
+        )
     }
 }
 
