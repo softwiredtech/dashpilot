@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include "car/car_state_mapper.h"
 
 static inline void updatePartyBus(const CANParsers& cp, CarState& cs) {
@@ -77,9 +79,17 @@ public:
         cs.trafficLightColor = cp.get(0, "DAS_road", "DAS_trafficLightColor");
         cs.stopLineDist = cp.get(0, "DAS_road", "DAS_stopLineDist");
 
-        // NOTE: In case of DashKit, we use this turn signal, because UI_warning is only on Party bus
-        cs.leftBlinker = cp.get(1, "VCLEFT_lightStatus", "VCLEFT_turnSignalStatus") + 1.0;
-        cs.rightBlinker = cp.get(1, "VCRIGHT_lightStatus", "VCRIGHT_turnSignalStatus") + 1.0;
+        // NOTE: On DashKit UI_warning (the party-bus tri-state blinker source)
+        // isn't available. The vehicle bus only reports the *lamp* state via
+        // VC{LEFT,RIGHT}_turnSignalStatus (0=OFF/dark, 1=ON), which can't tell
+        // "signal off" apart from the dark half of a blink. Reconstruct the
+        // party-bus tri-state (0=off, 1=blinking+lamp off, 2=blinking+lamp on)
+        // with a hold timer: a lamp-ON marks the blinker active; if no ON is
+        // seen for the hold window we treat it as off.
+        cs.leftBlinker = leftBlinkerHold_.update(
+            cp.get(1, "VCLEFT_lightStatus", "VCLEFT_turnSignalStatus"));
+        cs.rightBlinker = rightBlinkerHold_.update(
+            cp.get(1, "VCRIGHT_lightStatus", "VCRIGHT_turnSignalStatus"));
 
         cs.laneDepartureWarning = cp.get(0, "DAS_status", "DAS_laneDepartureWarning");
         cs.sideCollisionWarning = cp.get(0, "DAS_status", "DAS_sideCollisionWarning");
@@ -99,4 +109,32 @@ public:
 
         updateVehicleBus(cp, cs);
     }
+
+private:
+    // Turns the lamp-only turn-signal status (0=OFF, 1=ON, 2=FAULT, 3=SNA) into
+    // the party-bus tri-state (0=off, 1=blinking/lamp off, 2=blinking/lamp on).
+    // A lamp-ON refreshes a hold window; while the window is live the signal is
+    // "blinking", so the lamp-off phase reads 1 and the lamp-on phase reads 2.
+    // Once no ON has arrived for HOLD, the blinker is considered off (0).
+    struct BlinkerHold {
+        static constexpr std::chrono::milliseconds HOLD{1000};
+
+        std::chrono::steady_clock::time_point lastOn{};
+        bool seenOn = false;
+
+        double update(double rawStatus) {
+            bool lampOn = static_cast<int>(rawStatus) == 1;  // 1=ON
+            auto now = std::chrono::steady_clock::now();
+            if (lampOn) {
+                lastOn = now;
+                seenOn = true;
+            }
+            bool blinking = seenOn && (now - lastOn) <= HOLD;
+            if (!blinking) return 0.0;
+            return lampOn ? 2.0 : 1.0;
+        }
+    };
+
+    BlinkerHold leftBlinkerHold_;
+    BlinkerHold rightBlinkerHold_;
 };
