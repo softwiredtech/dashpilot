@@ -6,144 +6,23 @@ html, body {
   margin: 0;
 }
 
-:root,
-:root[data-theme="classic-911"] {
-  --safe-top: 0px;
-  --safe-right: 0px;
-  --safe-bottom: 0px;
-  --safe-left: 0px;
-  --dash-bg-rgb: 10 9 7;
-  --dash-cream-rgb: 239 226 196;
-  --toolbar-bg-rgb: 38 31 24;
-  --toolbar-fg-rgb: 239 226 196;
-  --page-bg: #0a0907;
-  --workspace-bg-rgb: 28 25 22;
-  --workspace-top-rgb: 31 28 24;
-  --workspace-surface-light-rgb: 66 55 42;
-  --workspace-surface-light-opacity: 0.12;
-  --workspace-texture-opacity: 0.44;
-  --workspace-vignette-opacity: 0.28;
-  --workspace-bg: rgb(var(--workspace-bg-rgb));
-  --cluster-plate-top-rgb: 28 23 18;
-  --cluster-plate-mid-rgb: 24 20 17;
-  --cluster-plate-bottom-rgb: 20 17 14;
-  --cluster-plate-highlight-opacity: 0.11;
-  --cluster-plate-edge-opacity: 0.06;
-  --cluster-plate-shadow-opacity: 0.16;
-  --gauge-well-top-rgb: 17 14 11;
-  --gauge-well-bottom-rgb: 15 13 11;
-  --gauge-well-highlight-opacity: 0.08;
-  --gauge-well-edge-opacity: 0.05;
-  --gauge-well-shadow-opacity: 0.3;
-  --gauge-contact-shadow-opacity: 0.24;
-  --highlight-rgb: 255 244 220;
-  --glass-highlight-rgb: 255 244 220;
-  --glass-rgb: 255 244 220;
-  --face-rgb: 19 16 13;
-  --face-core-rgb: 26 21 16;
-  --face: rgb(var(--face-rgb));
-  --face-core: #1a1510;
-  --face-mid: #110d09;
-  --face-edge: #070503;
-  --face-knockout: #19130e;
-  --face-sheen: rgb(255 248 230 / 0.045);
-  --face-sheen-mid: rgb(255 233 183 / 0.018);
-  --face-sheen-edge: rgb(255 233 183 / 0);
-  --face-grain: rgb(255 236 196 / 0.15);
-  --face-grain-opacity: 0.24;
-  --face-mottle-opacity-color: 0.2;
-  --face-mottle-opacity: 0.16;
-  --face-edge-shadow-color-opacity: 0.32;
-  --face-edge-shadow-opacity: 0.38;
-  --glass-scratch-opacity: 0.138;
-  --glass-streak-opacity: 0.059;
-  --glass-streak-soft-opacity: 0.021;
-  --glass-opacity: 0.5;
-  --face-stroke-mix: 96%;
-  --face-stroke-target: rgb(var(--highlight-rgb));
-  --ink: #efe2c4;
-  --tick: #c5ac82;
-  --muted: #7f6b50;
-  --bezel-rgb: 19 16 13;
-  --bezel: rgb(var(--bezel-rgb));
-  --bezel-highlight-opacity: 0.10;
-  --inner-shelf-rgb: 27 22 18;
-  --inner-shelf: rgb(var(--inner-shelf-rgb));
-  --inner-shelf-edge-opacity: 0.12;
-  --inner-shelf-highlight-opacity: 0.10;
-  --inner-shelf-shadow-opacity: 0.38;
-  --gear-bg-rgb: 13 9 6;
-  --gear-bg: rgb(var(--gear-bg-rgb));
-  --gear-stroke-mix: 92%;
-  --gear-window-highlight-opacity: 0.12;
-  --gear-window-shadow-opacity: 0.56;
-  --gear-text-fill: #efe2c4;
-  --gear-text-highlight-opacity: 0.22;
-  --gear-text-shadow-opacity: 0.72;
-  --needle-rgb: 165 40 31;
-  --needle: rgb(var(--needle-rgb));
-  --needle-edge-mix: 43%;
-  --needle-side-shade-mix: 12%;
-  --needle-side-shade-target-rgb: 16 0 0;
-  --needle-side-shade-opacity: 0.42;
-  --needle-highlight-mix: 40%;
-  --needle-highlight-target-rgb: 250 157 121;
-  --needle-highlight-opacity: 0.36;
-  --needle-edge-width: 0.55;
-  --hub-outer-rgb: 16 13 10;
-  --hub-outer: rgb(var(--hub-outer-rgb));
-  --hub-outer-stroke-mix: 18%;
-  --hub-highlight-opacity: 0.13;
-  --hub-shadow-opacity: 0.62;
-  --hub-cap-shadow-opacity: 0.52;
-  --guide: #00aaff;
+:root {
+  /* Shell stack: bezel outer lip, recessed shelf, then the face rim just inside. */
+  --limit-pointer-rgb: 201 75 55;
+  --limit-pointer-fill: rgb(var(--limit-pointer-rgb));
+  --limit-arc-hot-stroke: rgb(234 98 65);
+  --mode-arc-full-color: rgb(64 226 118);
+  --telltale-lit-color: var(--mode-arc-full-color);
   --set-marker-rgb: 220 217 208;
-  --set-marker: rgb(var(--set-marker-rgb));
-  --set-marker-stroke-mix: 36%;
-  --set-marker-stroke-target-rgb: 32 29 25;
-  --set-highlight-opacity: 0.15;
-  --set-shade-mix: 32%;
-  --set-shade-target-rgb: 0 0 0;
-  --set-shade-opacity: 0.36;
-  --set-contact-shadow-opacity: 0.26;
-  --set-crease-opacity: 0.42;
-  --set-wear-opacity: 0.18;
-  --limit-red-r: 169;
-  --limit-red-g: 40;
-  --limit-red-b: 33;
-  --limit-red-rgb: var(--limit-red-r) var(--limit-red-g) var(--limit-red-b);
-  --limit-red-hot-r: 230;
-  --limit-red-hot-g: 50;
-  --limit-red-hot-b: 35;
-  --limit-red-stroke-mix: 18%;
-  --limit-red-stroke-target-rgb: 39 3 1;
-  --limit-highlight-opacity: 0.1;
-  --limit-shade-mix: 20%;
-  --limit-shade-target-rgb: 39 2 1;
-  --limit-shade-opacity: 0.38;
-  --arc-limit-base-r: 128;
-  --arc-limit-base-g: 103;
-  --arc-limit-base-b: 58;
-  --arc-limit-base-opacity: 0.28;
-  --mode-off-rgb: 216 195 154;
-  --mode-mads-rgb: 0 200 200;
-  --mode-full-rgb: 0 255 38;
-  --telltale-off-rgb: 28 32 24;
-  --telltale-rim-rgb: 4 8 4;
-  --telltale-core-rgb: var(--mode-full-rgb);
-  --bsm-rgb: 226 60 38;
-  --bsm-glow-rgb: 255 96 58;
+  --set-marker-fill: rgb(var(--set-marker-rgb));
+  --set-marker-stroke: color-mix(in srgb, var(--set-marker-fill) 36%, rgb(32 29 25));
+  --set-marker-highlight-fill: rgb(var(--highlight-rgb) / 0.15);
+  --set-marker-shade-fill: color-mix(in srgb, rgb(var(--set-marker-rgb) / 0.36) 32%, rgb(0 0 0 / 0.36));
   --font-display: Bahnschrift, "DIN Alternate", "Arial Narrow", Arial, sans-serif;
   --font-mono: "Courier New", monospace;
-  --shadow-rgb: 0 0 0;
-  --stroke-dark-target: rgb(var(--shadow-rgb));
-  --gear-stroke-target: rgb(var(--highlight-rgb));
-  --bezel-shadow-tight-opacity: 0.5;
-  --bezel-shadow-soft-opacity: 0.22;
-  --moving-shadow-opacity: 0.34;
+  --needle-edge-width: 0.55;
   --major-tick-width: 1.85;
   --minor-tick-width: 0.72;
-  --minor-tick-opacity: 0.5;
   --number-size: 11.2px;
   --number-weight: 620;
   --number-opacity: 0.96;
@@ -154,56 +33,177 @@ html, body {
   --label-opacity: 0.9;
   --unit-label-size: 7.7px;
   --unit-label-weight: 500;
-  --unit-label-fill-mix: 68%;
-  --unit-label-opacity: 0.96;
-  --value-size: 22px;
-  --value-weight: 650;
-  --value-opacity: 0.92;
+  --needle-fill: rgb(var(--needle-rgb));
+  --dial-major-tick-color: color-mix(in srgb, var(--app-text-color) 80%, transparent);
+  --dial-minor-tick-color: color-mix(in srgb, var(--app-text-color) 48%, transparent);
+  --gear-strip-text-active: var(--app-text-color);
+  --gear-strip-text-inactive: color-mix(in srgb, var(--app-text-color) 26%, var(--dial-label-color));
+  --outer-flat-ring-fill:
+    radial-gradient(88% 86% at var(--backdrop-recessed-shadow-x, 45.34%) var(--backdrop-recessed-shadow-y, 32.61%), rgb(var(--shadow-rgb) / 0.08), transparent 44%),
+    radial-gradient(96% 92% at var(--backdrop-recessed-highlight-x, 54.66%) var(--backdrop-recessed-highlight-y, 67.39%), rgb(var(--highlight-rgb) / 0.08), transparent 40%),
+    linear-gradient(var(--lighting-direction-deg, 345deg), rgb(var(--ring-top-rgb)) 0%, rgb(var(--ring-bottom-rgb)) 100%);
+  --outer-flat-ring-shadow:
+    inset 0 1px 0 rgb(var(--ring-inner-highlight-rgb) / var(--ring-inner-highlight-opacity)),
+    inset 0 0 0 1px rgb(var(--ring-outline-rgb) / var(--ring-outline-opacity)),
+    inset 0 -18px 24px rgb(var(--shadow-rgb) / var(--ring-inner-shadow-opacity)),
+    4px 12px 14px rgb(var(--shadow-rgb) / var(--ring-drop-shadow-opacity));
+  --outer-frame-ring-shadow:
+    0 0 0 1px rgb(var(--frame-ring-highlight-rgb) / var(--frame-ring-highlight-opacity)),
+    0 0 0 2px rgb(var(--shadow-rgb) / 0.12);
 }
 
-:root {
-  --face-stroke: color-mix(in srgb, rgb(var(--face-rgb)) var(--face-stroke-mix), var(--face-stroke-target));
-  --face-mottle: rgb(var(--shadow-rgb) / var(--face-mottle-opacity-color));
-  --face-edge-shadow: rgb(var(--shadow-rgb) / var(--face-edge-shadow-color-opacity));
-  --bezel-highlight: rgb(var(--highlight-rgb) / var(--bezel-highlight-opacity));
-  --inner-shelf-edge: rgb(var(--highlight-rgb) / var(--inner-shelf-edge-opacity));
-  --inner-shelf-highlight: rgb(var(--highlight-rgb) / var(--inner-shelf-highlight-opacity));
-  --inner-shelf-shadow: rgb(var(--shadow-rgb) / var(--inner-shelf-shadow-opacity));
-  --gear-stroke: color-mix(in srgb, rgb(var(--gear-bg-rgb)) var(--gear-stroke-mix), var(--gear-stroke-target));
-  --gear-window-highlight: rgb(var(--highlight-rgb) / var(--gear-window-highlight-opacity));
-  --gear-window-shadow: rgb(var(--shadow-rgb) / var(--gear-window-shadow-opacity));
-  --gear-text-highlight: rgb(var(--highlight-rgb) / var(--gear-text-highlight-opacity));
-  --gear-text-shadow: rgb(var(--shadow-rgb) / var(--gear-text-shadow-opacity));
-  --bezel-shadow-tight: rgb(var(--shadow-rgb) / var(--bezel-shadow-tight-opacity));
-  --bezel-shadow-soft: rgb(var(--shadow-rgb) / var(--bezel-shadow-soft-opacity));
-  --hub-cap-shadow: drop-shadow(0 1px 1.2px rgb(var(--shadow-rgb) / var(--hub-cap-shadow-opacity)));
-  --moving-shadow-fill: rgb(var(--shadow-rgb) / var(--moving-shadow-opacity));
-  --needle-edge: color-mix(in srgb, rgb(var(--needle-rgb)) var(--needle-edge-mix), var(--stroke-dark-target));
-  --needle-side-shade: color-mix(in srgb, rgb(var(--needle-rgb) / var(--needle-side-shade-opacity)) var(--needle-side-shade-mix), rgb(var(--needle-side-shade-target-rgb) / var(--needle-side-shade-opacity)));
-  --needle-highlight: color-mix(in srgb, rgb(var(--needle-rgb)) var(--needle-highlight-mix), rgb(var(--needle-highlight-target-rgb)));
-  --hub-outer-stroke: color-mix(in srgb, rgb(var(--hub-outer-rgb)) var(--hub-outer-stroke-mix), var(--stroke-dark-target));
-  --hub-highlight: rgb(var(--highlight-rgb) / var(--hub-highlight-opacity));
-  --hub-shadow: rgb(var(--shadow-rgb) / var(--hub-shadow-opacity));
-  --set-marker-stroke: color-mix(in srgb, rgb(var(--set-marker-rgb)) var(--set-marker-stroke-mix), rgb(var(--set-marker-stroke-target-rgb)));
-  --set-highlight: rgb(var(--highlight-rgb) / var(--set-highlight-opacity));
-  --set-shade: color-mix(in srgb, rgb(var(--set-marker-rgb) / var(--set-shade-opacity)) var(--set-shade-mix), rgb(var(--set-shade-target-rgb) / var(--set-shade-opacity)));
-  --set-contact-shadow: rgb(var(--shadow-rgb) / var(--set-contact-shadow-opacity));
-  --set-crease: rgb(var(--shadow-rgb) / var(--set-crease-opacity));
-  --set-wear: rgb(var(--highlight-rgb) / var(--set-wear-opacity));
-  --limit-red-stroke: color-mix(in srgb, rgb(var(--limit-red-rgb)) var(--limit-red-stroke-mix), rgb(var(--limit-red-stroke-target-rgb)));
-  --limit-highlight: rgb(var(--highlight-rgb) / var(--limit-highlight-opacity));
-  --limit-shade: color-mix(in srgb, rgb(var(--limit-red-rgb) / var(--limit-shade-opacity)) var(--limit-shade-mix), rgb(var(--limit-shade-target-rgb) / var(--limit-shade-opacity)));
-  --glass-scratch: rgb(var(--glass-highlight-rgb) / var(--glass-scratch-opacity));
-  --glass-streak: rgb(var(--glass-highlight-rgb) / var(--glass-streak-opacity));
-  --glass-streak-soft: rgb(var(--glass-highlight-rgb) / var(--glass-streak-soft-opacity));
-  --unit-label-fill: color-mix(in srgb, var(--ink) var(--unit-label-fill-mix), var(--muted));
-  --gear-strip-inactive-fill: color-mix(in srgb, var(--gear-text-fill) 26%, var(--muted));
-  --gear-strip-active-fill: var(--gear-text-fill);
-  --tick-relief-highlight: rgb(var(--highlight-rgb) / 0.18);
-  --tick-relief-shadow: rgb(var(--shadow-rgb) / 0.34);
-  --mode-off: rgb(var(--mode-off-rgb));
-  --mode-mads: rgb(var(--mode-mads-rgb));
-  --mode-full: rgb(var(--mode-full-rgb));
+:root,
+:root[data-theme="classic-911"] {
+  /* 1. Primitives */
+  --dash-bg-rgb: 10 9 7;
+  --workspace-bg-rgb: 28 25 22;
+  --workspace-top-rgb: 31 28 24;
+  --workspace-surface-light-rgb: 66 55 42;
+  --workspace-surface-light-opacity: 0.12;
+  --workspace-texture-opacity: 0.44;
+  --workspace-vignette-opacity: 0.28;
+  --highlight-rgb: 255 244 220;
+  --shadow-rgb: 0 0 0;
+  --ring-top-rgb: 18 15 12;
+  --ring-bottom-rgb: 18 15 12;
+  --ring-inner-highlight-rgb: 255 244 220;
+  --ring-inner-highlight-opacity: 0.05;
+  --ring-outline-rgb: 255 244 220;
+  --ring-outline-opacity: 0.03;
+  --ring-inner-shadow-opacity: 0.3;
+  --ring-drop-shadow-opacity: 0.24;
+  --frame-ring-highlight-rgb: 255 244 220;
+  --frame-ring-highlight-opacity: 0.035;
+
+  /* 2. Workspace and backdrop */
+  --dial-face-gradient-start: #1a1510;
+  --dial-face-gradient-mid: #110d09;
+  --dial-face-gradient-end: #070503;
+  --dial-face-knockout: #19130e;
+  --dial-face-sheen-start: rgb(255 248 230 / 0.045);
+  --dial-face-sheen-mid: rgb(255 233 183 / 0.018);
+  --dial-face-sheen-end: rgb(255 233 183 / 0);
+  --dial-face-grain-stroke: rgb(255 236 196 / 0.15);
+  --dial-face-grain-layer-opacity: 0.24;
+  --dial-face-mottle-stroke: rgb(var(--shadow-rgb) / 0.2);
+  --dial-face-mottle-layer-opacity: 0.16;
+  --dial-face-edge-shadow-stroke: rgb(var(--shadow-rgb) / 0.32);
+  --dial-face-edge-shadow-layer-opacity: 0.38;
+
+  /* 3. Bezel and shell */
+  --bezel-ring-fill: rgb(19 16 13);
+  --bezel-ring-highlight: rgb(var(--highlight-rgb) / 0.1);
+  --shelf-fill: rgb(27 22 18);
+  --shelf-edge: rgb(var(--highlight-rgb) / 0.12);
+  --shelf-highlight: rgb(var(--highlight-rgb) / 0.1);
+  --shelf-shadow: rgb(0 0 0 / 0.38);
+  --face-rim-ring-stroke: color-mix(in srgb, var(--bezel-ring-fill) 96%, rgb(var(--highlight-rgb)));
+  --bezel-assembly-shadow: rgb(0 0 0 / 0.22);
+
+  /* 4. Dial ink */
+  --app-text-color: #efe2c4;
+  --dial-label-color: #927c60;
+  --dial-unit-text-color: color-mix(in srgb, var(--app-text-color) 68%, var(--dial-label-color));
+
+  /* 5. Accents */
+  --needle-rgb: 196 54 40;
+  --needle-edge-stroke: color-mix(in srgb, var(--needle-fill) 43%, rgb(var(--shadow-rgb)));
+  --needle-side-shade-fill: color-mix(in srgb, rgb(var(--needle-rgb) / 0.42) 12%, rgb(16 0 0 / 0.42));
+  --needle-highlight-fill: color-mix(in srgb, var(--needle-fill) 40%, rgb(250 157 121));
+  --needle-highlight-opacity: 0.36;
+  --hub-fill: rgb(16 13 10);
+  --hub-stroke: color-mix(in srgb, var(--hub-fill) 18%, rgb(var(--shadow-rgb)));
+  --hub-highlight-stroke: rgb(var(--highlight-rgb) / 0.13);
+  --hub-shadow-stroke: rgb(var(--shadow-rgb) / 0.62);
+  --hub-filter: drop-shadow(0 1px 1.2px rgb(var(--shadow-rgb) / 0.52));
+  --limit-pointer-stroke: color-mix(in srgb, var(--limit-pointer-fill) 18%, rgb(39 3 1));
+  --limit-pointer-highlight-fill: rgb(var(--highlight-rgb) / 0.1);
+  --limit-pointer-shade-fill: color-mix(in srgb, rgb(var(--limit-pointer-rgb) / 0.38) 20%, rgb(39 2 1 / 0.38));
+  --limit-arc-base-stroke: rgb(128 103 58 / 0.28);
+  --mode-arc-mads-color: rgb(0 200 200);
+  --telltale-print-color: rgb(28 32 24);
+  --bsm-bloom-core-color: rgb(226 60 38);
+  --bsm-bloom-glow-color: rgb(255 96 58);
+  --unit-label-opacity: 0.96;
+}
+
+:root[data-theme="classic-911-light"] {
+  /* 1. Primitives */
+  --dash-bg-rgb: 150 140 126;
+  --workspace-bg-rgb: 222 214 200;
+  --workspace-top-rgb: 235 228 216;
+  --workspace-surface-light-rgb: 255 250 242;
+  --workspace-surface-light-opacity: 0.38;
+  --workspace-texture-opacity: 0.16;
+  --workspace-vignette-opacity: 0.1;
+  --highlight-rgb: 255 246 226;
+  --shadow-rgb: 42 40 40;
+  --ring-top-rgb: 86 77 66;
+  --ring-bottom-rgb: 56 49 42;
+  --ring-inner-highlight-rgb: 255 255 255;
+  --ring-inner-highlight-opacity: 0.16;
+  --ring-outline-rgb: 255 255 255;
+  --ring-outline-opacity: 0.06;
+  --ring-inner-shadow-opacity: 0.3;
+  --ring-drop-shadow-opacity: 0.2;
+  --frame-ring-highlight-rgb: 255 255 255;
+  --frame-ring-highlight-opacity: 0.12;
+
+  /* 2. Workspace and backdrop */
+  --dial-face-gradient-start: #fbf6ee;
+  --dial-face-gradient-mid: #efe7d8;
+  --dial-face-gradient-end: #dccdb8;
+  --dial-face-knockout: #fefaf2;
+  --dial-face-sheen-start: rgb(255 255 255 / 0.28);
+  --dial-face-sheen-mid: rgb(255 252 242 / 0.11);
+  --dial-face-sheen-end: rgb(255 250 238 / 0);
+  --dial-face-grain-stroke: rgb(255 255 255 / 0.08);
+  --dial-face-grain-layer-opacity: 0.14;
+  --dial-face-mottle-stroke: rgb(var(--shadow-rgb) / 0.12);
+  --dial-face-mottle-layer-opacity: 0.14;
+  --dial-face-edge-shadow-stroke: rgb(var(--shadow-rgb) / 0.2);
+  --dial-face-edge-shadow-layer-opacity: 0.22;
+
+  /* 3. Bezel and shell */
+  /* Daylight gauge: dark frame, cream face, shadow-led metal modeling. */
+  --bezel-ring-fill: rgb(52 45 38);
+  --bezel-ring-highlight: rgb(255 255 255 / 0.26);
+  --shelf-fill: rgb(96 86 74);
+  --shelf-edge: rgb(255 246 232 / 0.28);
+  --shelf-highlight: rgb(255 255 255 / 0.22);
+  --shelf-shadow: rgb(76 58 38 / 0.26);
+  --face-rim-ring-stroke: color-mix(in srgb, var(--shelf-fill) 52%, rgb(84 69 53));
+  --bezel-assembly-shadow: rgb(var(--shadow-rgb) / 0.16);
+
+  /* 4. Dial ink */
+  --app-text-color: #2f261d;
+  --dial-label-color: #76624f;
+  --dial-unit-text-color: color-mix(in srgb, var(--app-text-color) 76%, var(--dial-label-color));
+
+  /* 5. Accents */
+  --needle-rgb: 186 38 30;
+  --set-marker-rgb: 74 66 56;
+  --needle-edge-stroke: color-mix(in srgb, var(--needle-fill) 34%, rgb(var(--shadow-rgb)));
+  --needle-side-shade-fill: color-mix(in srgb, rgb(var(--needle-rgb) / 0.28) 10%, rgb(48 6 0 / 0.28));
+  --needle-highlight-fill: color-mix(in srgb, var(--needle-fill) 36%, rgb(255 182 146));
+  --needle-highlight-opacity: 0.28;
+  --hub-fill: rgb(62 55 47);
+  --hub-stroke: color-mix(in srgb, var(--hub-fill) 38%, rgb(var(--shadow-rgb)));
+  --hub-highlight-stroke: rgb(var(--highlight-rgb) / 0.2);
+  --hub-shadow-stroke: rgb(var(--shadow-rgb) / 0.34);
+  --hub-filter: drop-shadow(0 1px 1.2px rgb(var(--shadow-rgb) / 0.24));
+  --limit-pointer-stroke: color-mix(in srgb, var(--limit-pointer-fill) 22%, rgb(88 18 8));
+  --limit-pointer-highlight-fill: rgb(var(--highlight-rgb) / 0.12);
+  --limit-pointer-shade-fill: color-mix(in srgb, rgb(var(--limit-pointer-rgb) / 0.28) 16%, rgb(72 14 7 / 0.28));
+  --limit-arc-base-stroke: rgb(126 101 58 / 0.18);
+  --limit-arc-hot-stroke: rgb(198 58 28);
+  --mode-arc-full-color: rgb(0 138 66);
+  --mode-arc-mads-color: rgb(0 124 132);
+  --telltale-lit-color: var(--mode-arc-full-color);
+  --telltale-print-color: rgb(84 92 79);
+  --bsm-bloom-core-color: rgb(236 46 24);
+  --bsm-bloom-glow-color: rgb(255 88 46);
+  --unit-label-opacity: 0.92;
 }
 
 body {
@@ -224,7 +224,7 @@ body {
       rgb(var(--workspace-bg-rgb)) 43%,
       rgb(var(--dash-bg-rgb)) 100%
     );
-  color: var(--ink);
+  color: var(--app-text-color);
   font-family: var(--font-display);
 }
 
@@ -255,10 +255,7 @@ analog-speed-gauge {
   display: block;
   width: 100%;
   height: 100%;
-}
-
-analog-speed-gauge {
-  --mode-arc-color: rgb(255 255 255);
+  --mode-arc-color: var(--mode-arc-full-color);
   position: relative;
 }
 
@@ -275,43 +272,24 @@ svg { display: block; width: 100%; height: 100%; overflow: visible; }
   inset: 0;
 }
 
-.analog-gauge-svg--static,
-.analog-gauge-svg--overlay {
+.analog-gauge-svg--static {
   pointer-events: none;
 }
 
 .bezel-assembly {
-  filter: drop-shadow(0 1.2px 1.8px var(--bezel-shadow-soft));
+  filter: drop-shadow(0 1.2px 1.8px var(--bezel-assembly-shadow));
 }
 
-.bezel { fill: var(--bezel); fill-rule: evenodd; }
+.bezel { fill: var(--bezel-ring-fill); fill-rule: evenodd; }
 .bezel-highlight-outer { fill: none; stroke-width: 2.7; stroke-linecap: round; opacity: 0.72; }
-.inner-shelf { fill: var(--inner-shelf); fill-rule: evenodd; stroke: var(--inner-shelf-edge); stroke-width: 0.8; }
-.inner-shelf-highlight { fill: none; stroke-width: 1.7; stroke-linecap: round; opacity: 0.78; }
-.inner-shelf-shadow { fill: none; stroke: var(--inner-shelf-shadow); stroke-width: 1; stroke-linecap: round; opacity: 0.58; }
-.face { fill: var(--face); }
-.face-rim { fill: none; stroke: var(--face-stroke); stroke-width: 1.1; }
+.shelf { fill: var(--shelf-fill); fill-rule: evenodd; stroke: var(--shelf-edge); stroke-width: 0.8; }
+.shelf-highlight { fill: none; stroke-width: 1.7; stroke-linecap: round; opacity: 0.78; }
+.shelf-shadow { fill: none; stroke: var(--shelf-shadow); stroke-width: 1; stroke-linecap: round; opacity: 0.58; }
+.face-rim { fill: none; stroke: var(--face-rim-ring-stroke); stroke-width: 1.1; }
 .face-sheen { opacity: 0.92; pointer-events: none; }
-.face-grain { opacity: var(--face-grain-opacity); pointer-events: none; mix-blend-mode: screen; }
-.face-mottle { opacity: var(--face-mottle-opacity); pointer-events: none; mix-blend-mode: multiply; }
-.face-edge-shadow { opacity: var(--face-edge-shadow-opacity); pointer-events: none; }
-.gauge-tick-shadow,
-.gauge-tick-highlight,
-.gauge-tick {
-  fill: none;
-  stroke-linecap: round;
-}
-
-.gauge-tick-shadow {
-  stroke: rgb(var(--shadow-rgb) / 0.28);
-  stroke-width: calc(var(--minor-tick-width) + 0.22);
-}
-
-.gauge-tick-highlight {
-  stroke: rgb(var(--highlight-rgb) / 0.18);
-  stroke-width: calc(var(--minor-tick-width) + 0.1);
-}
-
+.face-grain { opacity: var(--dial-face-grain-layer-opacity); pointer-events: none; mix-blend-mode: screen; }
+.face-mottle { opacity: var(--dial-face-mottle-layer-opacity); pointer-events: none; mix-blend-mode: multiply; }
+.face-edge-shadow { opacity: var(--dial-face-edge-shadow-layer-opacity); pointer-events: none; }
 .major-tick-shadow,
 .major-tick-highlight,
 .major-tick,
@@ -331,17 +309,17 @@ svg { display: block; width: 100%; height: 100%; overflow: visible; }
 }
 
 .major-tick {
-  stroke: rgb(var(--dash-cream-rgb) / 0.8);
+  stroke: var(--dial-major-tick-color);
   stroke-width: var(--major-tick-width);
 }
 
 .minor-tick {
-  stroke: rgb(var(--dash-cream-rgb) / 0.48);
+  stroke: var(--dial-minor-tick-color);
   stroke-width: var(--minor-tick-width);
 }
 
 .number {
-  fill: var(--ink);
+  fill: var(--app-text-color);
   font-family: var(--font-display);
   font-size: var(--number-size);
   font-weight: var(--number-weight);
@@ -355,7 +333,7 @@ svg { display: block; width: 100%; height: 100%; overflow: visible; }
 
 .number-knockout {
   fill: none;
-  stroke: var(--face-knockout);
+  stroke: var(--dial-face-knockout);
   stroke-width: var(--number-knockout-width);
   stroke-linejoin: round;
   text-anchor: middle;
@@ -368,7 +346,7 @@ svg { display: block; width: 100%; height: 100%; overflow: visible; }
 }
 
 .label {
-  fill: var(--muted);
+  fill: var(--dial-label-color);
   font-family: var(--font-mono);
   font-size: var(--label-size);
   font-weight: var(--label-weight);
@@ -379,7 +357,7 @@ svg { display: block; width: 100%; height: 100%; overflow: visible; }
 }
 
 .unit-label {
-  fill: var(--unit-label-fill);
+  fill: var(--dial-unit-text-color);
   font-family: var(--font-display);
   font-size: var(--unit-label-size);
   font-weight: var(--unit-label-weight);
@@ -388,7 +366,7 @@ svg { display: block; width: 100%; height: 100%; overflow: visible; }
 }
 
 .gear-strip-letter {
-  fill: var(--gear-strip-inactive-fill);
+  fill: var(--gear-strip-text-inactive);
   font-family: var(--font-display);
   font-size: 9px;
   font-weight: 700;
@@ -403,212 +381,75 @@ analog-speed-gauge[data-gear-state="p"] .gear-strip-letter[data-gear="P"],
 analog-speed-gauge[data-gear-state="r"] .gear-strip-letter[data-gear="R"],
 analog-speed-gauge[data-gear-state="n"] .gear-strip-letter[data-gear="N"],
 analog-speed-gauge[data-gear-state="d"] .gear-strip-letter[data-gear="D"] {
-  fill: var(--gear-strip-active-fill);
+  fill: var(--gear-strip-text-active);
   opacity: 0.96;
 }
 
-.needle { will-change: transform; }
-
-.set-bug-shadow,
-.limit-pointer-shadow {
-  fill: var(--moving-shadow-fill);
+.analog-gauge-needle-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  will-change: transform;
+  transform-origin: 50% 50%;
 }
 
-.limit-pointer-shadow-soft {
-  fill: rgb(var(--shadow-rgb) / 0.12);
-}
-
-.needle-body { fill: var(--needle); stroke: var(--needle-edge); stroke-width: var(--needle-edge-width); stroke-linejoin: round; }
-.needle-side-shade { fill: var(--needle-side-shade); }
-.needle-highlight { fill: var(--needle-highlight); opacity: var(--needle-highlight-opacity); }
-.hub { filter: var(--hub-cap-shadow); }
-.hub-outer { fill: var(--hub-outer); stroke: var(--hub-outer-stroke); stroke-width: 1.2; }
-.hub-highlight { fill: none; stroke: var(--hub-highlight); stroke-width: 1.15; stroke-linecap: round; opacity: 0.82; }
-.hub-shadow { fill: none; stroke: var(--hub-shadow); stroke-width: 1.15; stroke-linecap: round; opacity: 0.76; }
+.needle-body { fill: var(--needle-fill); stroke: var(--needle-edge-stroke); stroke-width: var(--needle-edge-width); stroke-linejoin: round; }
+.needle-side-shade { fill: var(--needle-side-shade-fill); }
+.needle-highlight { fill: var(--needle-highlight-fill); opacity: var(--needle-highlight-opacity); }
+.hub { filter: var(--hub-filter); }
+.hub-outer { fill: var(--hub-fill); stroke: var(--hub-stroke); stroke-width: 1.2; }
+.hub-highlight { fill: none; stroke: var(--hub-highlight-stroke); stroke-width: 1.15; stroke-linecap: round; opacity: 0.82; }
+.hub-shadow { fill: none; stroke: var(--hub-shadow-stroke); stroke-width: 1.15; stroke-linecap: round; opacity: 0.76; }
 .arc { fill: none; stroke-linecap: round; }
 
 .arc-limit-base,
 .arc-limit-hot {
-  stroke-width: var(--limit-arc-stroke-width, 3.2);
+  stroke-width: var(--limit-arc-stroke-width);
 }
 
 .arc-limit-base {
-  stroke: rgb(var(--arc-limit-base-r) var(--arc-limit-base-g) var(--arc-limit-base-b) / var(--arc-limit-base-opacity));
+  stroke: var(--limit-arc-base-stroke);
 }
 
 .arc-limit-hot {
-  stroke: rgb(var(--limit-red-hot-r) var(--limit-red-hot-g) var(--limit-red-hot-b));
+  stroke: var(--limit-arc-hot-stroke);
   opacity: var(--limit-glow, 0);
 }
 
 .mode-arc-band {
   fill: none;
-  stroke: var(--mode-arc-color, rgb(255 255 255));
-  stroke-width: var(--mode-arc-stroke-width, 5.2);
+  stroke-width: var(--mode-arc-stroke-width);
   stroke-linecap: round;
   opacity: 0.98;
   transition: opacity 180ms ease;
 }
 
+analog-speed-gauge[data-mode-state="mads"] {
+  --mode-arc-color: var(--mode-arc-mads-color);
+}
+
+analog-speed-gauge[data-mode-state="full"] {
+  --mode-arc-color: var(--mode-arc-full-color);
+}
+
+analog-speed-gauge:not([data-mode-state]) .mode-arc-band,
 analog-speed-gauge[data-mode-state="off"] .mode-arc-band {
   opacity: 0;
 }
 
-analog-speed-gauge[data-mode-state="mads"] .mode-arc-band {
-  opacity: 1;
-}
-
-analog-speed-gauge[data-mode-state="full"] .mode-arc-band {
-  opacity: 1;
-}
-
-.glass-layer { pointer-events: none; opacity: var(--glass-opacity); }
-.glass-streak { fill: none; stroke: var(--glass-streak); stroke-width: 2.35; stroke-linecap: round; opacity: 0.62; mix-blend-mode: screen; }
-.glass-streak-soft { fill: none; stroke: var(--glass-streak-soft); stroke-width: 4.9; stroke-linecap: round; opacity: 0.36; mix-blend-mode: screen; }
-.glass-scratch { fill: none; stroke: var(--glass-scratch); stroke-width: 0.36; stroke-linecap: round; opacity: 0.56; mix-blend-mode: screen; }
-.bezel-bug { will-change: transform; }
-.set-bug-contact-shadow {
-  fill: var(--set-contact-shadow);
-}
-
-.set-bug-shadow-soft {
-  fill: rgb(var(--shadow-rgb) / 0.12);
-}
-
-.set-bug-shadow {
-  fill: rgb(var(--shadow-rgb) / 0.22);
-}
-
-.set-bug-body { fill: var(--set-marker); stroke: var(--set-marker-stroke); stroke-width: 0.78; stroke-linejoin: round; }
-.set-bug-highlight { fill: var(--set-highlight); }
-.set-bug-shade { fill: var(--set-shade); }
-.set-bug-lip {
-  fill: none;
-  stroke: rgb(var(--highlight-rgb) / 0.2);
-  stroke-width: 0.7;
-  stroke-linecap: round;
-}
-
-.set-bug-edge-light {
-  fill: none;
-  stroke: rgb(var(--highlight-rgb) / 0.18);
-  stroke-width: 0.58;
-  stroke-linecap: round;
-}
-
-.set-bug-crease {
-  fill: none;
-  stroke: var(--set-crease);
-  stroke-width: 0.72;
-  stroke-linecap: round;
-}
-
-.set-bug-wear {
-  fill: none;
-  stroke: var(--set-wear);
-  stroke-width: 0.5;
-  stroke-linecap: round;
-}
-
-.set-marker--clean .set-bug-contact-shadow,
-.set-marker--clean .set-bug-lip,
-.set-marker--clean .set-bug-edge-light,
-.set-marker--clean .set-bug-crease,
-.set-marker--clean .set-bug-wear {
-  display: none;
-}
-
-.set-marker--grounded .set-bug-body {
-  fill: color-mix(in srgb, var(--set-marker) 94%, rgb(var(--highlight-rgb)));
-  stroke: color-mix(in srgb, var(--set-marker-stroke) 84%, rgb(var(--shadow-rgb)));
-  stroke-width: 1;
-}
-
-.set-marker--grounded .set-bug-contact-shadow {
-  fill: rgb(var(--shadow-rgb) / 0.36);
-}
-
-.set-marker--grounded .set-bug-highlight {
-  opacity: 0.66;
-}
-
-.set-marker--grounded .set-bug-lip {
-  stroke: rgb(var(--highlight-rgb) / 0.28);
-  stroke-width: 0.95;
-}
-
-.set-marker--grounded .set-bug-edge-light {
-  stroke: rgb(var(--highlight-rgb) / 0.24);
-  stroke-width: 0.72;
-}
-
-.set-marker--grounded .set-bug-shade {
-  opacity: 1;
-}
-
-.set-marker--beveled .set-bug-body,
-.set-marker--worn .set-bug-body {
-  stroke-width: 1.02;
-}
-
-.set-marker--beveled .set-bug-body {
-  fill: color-mix(in srgb, var(--set-marker) 94%, rgb(var(--highlight-rgb)));
-}
-
-.set-marker--beveled .set-bug-highlight {
-  opacity: 0.78;
-}
-
-.set-marker--beveled .set-bug-shade {
-  opacity: 1;
-}
-
-.set-marker--beveled .set-bug-lip {
-  stroke-width: 0.95;
-}
-
-.set-marker--beveled .set-bug-crease {
-  stroke-width: 0.88;
-}
-
-.set-marker--worn .set-bug-body {
-  fill: color-mix(in srgb, var(--set-marker) 70%, rgb(158 136 96));
-  stroke: color-mix(in srgb, var(--set-marker-stroke) 62%, rgb(var(--shadow-rgb)));
-  stroke-width: 1.1;
-}
-
-.set-marker--worn .set-bug-highlight {
-  opacity: 0.22;
-}
-
-.set-marker--worn .set-bug-shade {
-  opacity: 1;
-}
-
-.set-marker--worn .set-bug-contact-shadow {
-  fill: rgb(var(--shadow-rgb) / 0.38);
-}
-
-.set-marker--worn .set-bug-wear {
-  stroke-width: 0.8;
-}
-
-.limit-marker { will-change: transform; }
+.set-marker-body { fill: var(--set-marker-fill); stroke: var(--set-marker-stroke); stroke-width: 0.78; stroke-linejoin: round; }
+.set-marker-highlight { fill: var(--set-marker-highlight-fill); }
+.set-marker-shade { fill: var(--set-marker-shade-fill); }
 
 .limit-pointer {
-  fill: rgb(var(--limit-red-rgb));
-  stroke: var(--limit-red-stroke);
+  fill: var(--limit-pointer-fill);
+  stroke: var(--limit-pointer-stroke);
   stroke-width: 0.78;
   stroke-linejoin: round;
 }
 
-.limit-pointer-highlight { fill: var(--limit-highlight); }
-.limit-pointer-shade { fill: var(--limit-shade); }
-.analog-gauge-shell {
-  width: 100%;
-  height: 100%;
-}
-
+.limit-pointer-highlight { fill: var(--limit-pointer-highlight-fill); }
+.limit-pointer-shade { fill: var(--limit-pointer-shade-fill); }
 .analog-gauge-svg {
   display: block;
   width: 100%;
@@ -616,31 +457,24 @@ analog-speed-gauge[data-mode-state="full"] .mode-arc-band {
 }
 
 .gauge-value {
-  fill: var(--ink);
+  fill: var(--app-text-color);
   font-family: var(--font-display);
-}
-
-.gauge-value {
   font-size: 16px;
   font-weight: 600;
   letter-spacing: 0.05em;
   text-anchor: middle;
 }
 
-.gauge-value--small {
-  font-size: 16px;
-}
-
 /* Dial telltale arrows — turn signal indicators printed on the upper dial face */
 .dial-telltales { pointer-events: none; }
 
 .telltale-print {
-  fill: rgb(var(--telltale-off-rgb));
+  fill: var(--telltale-print-color);
   opacity: 0.5;
 }
 
 .telltale-lit {
-  fill: rgb(var(--telltale-core-rgb));
+  fill: var(--telltale-lit-color);
   opacity: 0;
   transition: opacity 130ms linear;
 }

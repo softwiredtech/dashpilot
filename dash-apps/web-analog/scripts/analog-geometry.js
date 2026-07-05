@@ -8,10 +8,6 @@
       return Number(value).toFixed(digits);
     },
 
-    degToRad(deg) {
-      return deg * Math.PI / 180;
-    },
-
     // Gauge angles are 0 at 12 o'clock and increase clockwise.
     gaugeDegToRad(deg) {
       return (deg - 90) * Math.PI / 180;
@@ -35,11 +31,6 @@
       };
     },
 
-    edgeForDirection(directionDeg) {
-      const normalized = ((directionDeg % 360) + 360) % 360;
-      return ["top", "right", "bottom", "left"][Math.round(normalized / 90) % 4];
-    },
-
     polar(cx, cy, radius, angleDeg) {
       const radians = geometry.gaugeDegToRad(angleDeg);
       return {
@@ -53,10 +44,6 @@
       const start = geometry.polar(cx, cy, innerRadius, angleDeg);
       const end = geometry.polar(cx, cy, outerRadius, angleDeg);
       return `M ${geometry.fmt(start.x)} ${geometry.fmt(start.y)} L ${geometry.fmt(end.x)} ${geometry.fmt(end.y)}`;
-    },
-
-    rotationTransform(angle, cx, cy) {
-      return `rotate(${angle} ${cx} ${cy})`;
     },
 
     ringPath(cx, cy, outerRadius, innerRadius) {

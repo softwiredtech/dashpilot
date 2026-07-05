@@ -12,8 +12,16 @@
     };
   }
 
+  function applyTheme(theme) {
+    if (!theme) return;
+    if (document.documentElement.dataset.theme !== theme) {
+      document.documentElement.dataset.theme = theme;
+    }
+  }
+
   function applyModel(model) {
     if (!gauges) gauges = queryGauges();
+    applyTheme(model.display?.theme);
     gauges.speed?.update(model.speed);
     if (gauges.root && model.signals) {
       const nextLeft = model.signals.leftBlindSpot ? "active" : "idle";
@@ -69,6 +77,7 @@
       accSetSpeed: readNative("getAccSetSpeed", 0),
       fusedSpeedLimit: readNative("getFusedSpeedLimit", 0),
       isImperial: readNative("isImperial", true),
+      darkMode: readNative("isDarkMode", true),
       leftBlinker: readNative("getLeftBlinker", 0),
       rightBlinker: readNative("getRightBlinker", 0),
       leftBlindSpot: readNative("getLeftBlindSpot", 0),
