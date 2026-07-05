@@ -21,8 +21,12 @@
   --safe-right: 0px;
   --safe-bottom: 0px;
   --safe-left: 0px;
-  --rgb-page-bg: 5 6 10;
+  --rgb-page-bg: 3 6 4;
   --color-page-bg: rgb(var(--rgb-page-bg));
+}
+
+:root[data-theme="light"] {
+  --rgb-page-bg: 184 196 199;
 }
 
 html, body {
@@ -73,12 +77,16 @@ body {
   --rgb-cluster: 92 232 69;
   --rgb-cluster-bright: 184 255 142;
   --rgb-mads: 96 208 255;
-  --rgb-warn: 255 100 24;
-  --rgb-urgent: 255 34 0;
+  --rgb-warn: 255 148 0;
+  --rgb-urgent: 255 64 28;
   --rgb-bg: 3 6 4;
   --rgb-face-top: 8 16 10;
   --rgb-black: 0 0 0;
-  --rgb-white: 255 255 255;
+  --rgb-glass: 214 255 198;
+  --alpha-ghost-mads: 0.14;
+  --alpha-ghost-warn: 0.15;
+  --alpha-ghost-urgent: 0.20;
+  --alpha-unit-active: 0.55;
   --display-digits: 3;
   --d14-gap-md: calc(4 * var(--u));
   --d14-gap-lg: calc(5 * var(--u));
@@ -100,15 +108,15 @@ body {
   --color-cluster-frame: rgb(var(--rgb-cluster) / 0.06);
   --color-cluster-divider: rgb(var(--rgb-cluster) / 0.08);
   --color-mads: rgb(var(--rgb-mads));
-  --color-mads-ghost: rgb(var(--rgb-mads) / 0.14);
+  --color-mads-ghost: rgb(var(--rgb-mads) / var(--alpha-ghost-mads));
   --color-warn: rgb(var(--rgb-warn));
   --color-urgent: rgb(var(--rgb-urgent));
-  --color-sheen-strong: rgb(var(--rgb-white) / 0.045);
-  --color-sheen-soft: rgb(var(--rgb-white) / 0.018);
-  --color-scanline-strong: rgb(var(--rgb-white) / 0.04);
-  --color-scanline-soft: rgb(var(--rgb-white) / 0.025);
-  --color-gridline-soft: rgb(var(--rgb-white) / 0.012);
-  --color-gridline-faint: rgb(var(--rgb-white) / 0.008);
+  --color-sheen-strong: rgb(var(--rgb-glass) / 0.045);
+  --color-sheen-soft: rgb(var(--rgb-glass) / 0.018);
+  --color-scanline-strong: rgb(var(--rgb-glass) / 0.04);
+  --color-scanline-soft: rgb(var(--rgb-glass) / 0.025);
+  --color-gridline-soft: rgb(var(--rgb-glass) / 0.012);
+  --color-gridline-faint: rgb(var(--rgb-glass) / 0.008);
   --color-vignette-mid: rgb(var(--rgb-black) / 0.18);
   --color-vignette-strong: rgb(var(--rgb-black) / 0.42);
   --glow-core-color: rgb(var(--rgb-bg) / 0.9);
@@ -133,6 +141,41 @@ body {
   flex-direction: column;
   height: 100%;
   justify-content: space-between;
+}
+
+/* ── LIGHT THEME ─────────────────────────── */
+/* Daylight counterpart: reflective STN LCD — dark ink segments on cool
+   blue-gray glass. Light falls onto the panel instead of coming from it:
+   segments cast parallax shadows on the reflector instead of glowing,
+   the sheen is specular glare, and the raster texture reads as the dark
+   segment grid rather than lit scanlines. */
+[data-theme="light"] .face {
+  --rgb-cluster: 22 60 46;
+  --rgb-cluster-bright: 8 26 20;
+  --rgb-mads: 12 62 102;
+  --rgb-warn: 118 64 0;
+  --rgb-urgent: 148 18 8;
+  --rgb-bg: 184 196 199;
+  --rgb-face-top: 200 210 212;
+  --rgb-glass: 24 46 42;
+  --alpha-ghost-mads: 0.12;
+  --alpha-ghost-warn: 0.14;
+  --alpha-ghost-urgent: 0.11;
+  --alpha-unit-active: 0.65;
+  --color-cluster-radial: transparent;
+  --color-sheen-strong: rgb(255 255 255 / 0.30);
+  --color-sheen-soft: rgb(255 255 255 / 0.10);
+  --color-vignette-mid: rgb(var(--rgb-black) / 0.08);
+  --color-vignette-strong: rgb(var(--rgb-black) / 0.20);
+  --seg-shadow: 0 1.5px 1px rgb(10 22 20 / 0.28);
+  --shadow-cluster-glow: var(--seg-shadow);
+  --shadow-mads-glow: var(--seg-shadow);
+  --shadow-warn-glow: var(--seg-shadow);
+  --shadow-urgent-glow: var(--seg-shadow);
+  --shadow-mads-strong: var(--seg-shadow);
+  --filter-cluster-glow: drop-shadow(0 1.5px 1px rgb(10 22 20 / 0.28));
+  --filter-mads-glow: drop-shadow(0 1.5px 1px rgb(10 22 20 / 0.28));
+  --filter-warn-glow: drop-shadow(0 1.5px 1px rgb(10 22 20 / 0.28));
 }
 
 .face::before {
@@ -310,7 +353,7 @@ body {
   color: rgb(var(--rgb-cluster) / 0.16);
 }
 .unit-label.active {
-  color: rgb(var(--rgb-mads) / 0.42);
+  color: rgb(var(--rgb-mads) / var(--alpha-unit-active));
   text-shadow: var(--shadow-mads-glow);
 }
 
@@ -354,7 +397,7 @@ body.portrait-layout .right-zone {
 
 .icon-lim {
   width: calc(15 * var(--u)); height: calc(15 * var(--u)); border-radius: 50%;
-  color: rgb(var(--rgb-urgent) / 0.18);
+  color: rgb(var(--rgb-urgent) / var(--alpha-ghost-urgent));
   border: calc(2.5 * var(--u)) solid currentColor;
   flex-shrink: 0; position: relative;
   transition: color 0.3s, opacity 0.3s, box-shadow 0.3s;
@@ -455,7 +498,7 @@ body.portrait-layout .right-zone {
 }
 .d14-base { fill: var(--color-cluster-ghost); }
 .d14-base.mads-c { fill: var(--color-mads-ghost); }
-.d14-base.limit-c { fill: rgb(var(--rgb-warn) / 0.14); }
+.d14-base.limit-c { fill: rgb(var(--rgb-warn) / var(--alpha-ghost-warn)); }
 .d14-on { fill: transparent; }
 .d14-on.on {
   fill: var(--color-cluster-bright);
@@ -778,6 +821,8 @@ function readNative(method, fallback) {
 }
 
 window.onCarStateUpdate = function() {
+  const isDarkMode = readNative('isDarkMode', true);
+  document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
   receiveMessage({
     egoSpeed:            readNative('getEgoSpeed',            0),
     leftBlinker:         readNative('getLeftBlinker',         0),
