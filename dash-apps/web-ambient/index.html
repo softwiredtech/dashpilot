@@ -19,10 +19,24 @@
       --muted: #aaa79d;
       --off: #d8c39a;
       --mads: #00C8C8;
-      --full: #00FF26;
+      --full: #60F594;
       --red: #ff7575;
       --edge: var(--off);
       --accent: var(--off);
+    }
+
+    /* Light theme — daylight glance: the warm/cool relationship inverts.
+       The night cabin's warm text becomes the paper field; the cool night
+       field becomes the ink. Mode colors keep their hue but flip from
+       emissive pastel to printed ink. */
+    :root[data-theme="light"] {
+      --bg: #ece9e2;
+      --fg: #16181c;
+      --muted: #6e695d;
+      --off: #7d6029;
+      --mads: #007078;
+      --full: #007a3c;
+      --red: #b32424;
     }
 
     html, body {
@@ -42,6 +56,12 @@
       background: radial-gradient(ellipse at 50% 50%, rgba(241, 239, 233, 0.07) 0%, var(--bg) 70%);
       transition: background 0.4s ease;
     }
+
+    [data-theme="light"] #app {
+      background: radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.55) 0%, var(--bg) 70%);
+    }
+
+    [data-theme="light"] #app::after { opacity: 0.045; }
 
     #app::after {
       content: '';
@@ -227,6 +247,16 @@
       color: #f5b942;
     }
 
+    [data-theme="light"] .chip-red {
+      background: rgba(179, 36, 36, 0.12);
+      color: var(--red);
+    }
+
+    [data-theme="light"] .chip-amber {
+      background: rgba(140, 92, 0, 0.14);
+      color: #8c5c00;
+    }
+
     #leftFlash,
     #rightFlash {
       position: absolute;
@@ -246,12 +276,12 @@
 
     #leftFlash {
       left: 0;
-      background: linear-gradient(to right, rgba(255, 48, 48, 0.85), rgba(255, 48, 48, 0));
+      background: linear-gradient(to right, rgba(255, 60, 60, 0.85), rgba(255, 60, 60, 0));
     }
 
     #rightFlash {
       right: 0;
-      background: linear-gradient(to left, rgba(255, 48, 48, 0.85), rgba(255, 48, 48, 0));
+      background: linear-gradient(to left, rgba(255, 60, 60, 0.85), rgba(255, 60, 60, 0));
     }
 
     #leftFlash.passive,
@@ -267,6 +297,22 @@
 
     #rightFlash.passive {
       background: linear-gradient(to left, rgba(245, 185, 66, 1.0), rgba(245, 185, 66, 0));
+    }
+
+    [data-theme="light"] #leftFlash {
+      background: linear-gradient(to right, rgba(211, 42, 42, 0.85), rgba(211, 42, 42, 0));
+    }
+
+    [data-theme="light"] #rightFlash {
+      background: linear-gradient(to left, rgba(211, 42, 42, 0.85), rgba(211, 42, 42, 0));
+    }
+
+    [data-theme="light"] #leftFlash.passive {
+      background: linear-gradient(to right, rgba(178, 116, 0, 1.0), rgba(178, 116, 0, 0));
+    }
+
+    [data-theme="light"] #rightFlash.passive {
+      background: linear-gradient(to left, rgba(178, 116, 0, 1.0), rgba(178, 116, 0, 0));
     }
 
     @keyframes flashPulse {
@@ -286,12 +332,20 @@
 
     #leftBlink {
       left: 0;
-      background: linear-gradient(to right, rgba(77, 214, 106, 0.80), rgba(77, 214, 106, 0));
+      background: linear-gradient(to right, rgba(0, 208, 82, 0.80), rgba(0, 208, 82, 0));
     }
 
     #rightBlink {
       right: 0;
-      background: linear-gradient(to left, rgba(77, 214, 106, 0.80), rgba(77, 214, 106, 0));
+      background: linear-gradient(to left, rgba(0, 208, 82, 0.80), rgba(0, 208, 82, 0));
+    }
+
+    [data-theme="light"] #leftBlink {
+      background: linear-gradient(to right, rgba(0, 152, 56, 0.80), rgba(0, 152, 56, 0));
+    }
+
+    [data-theme="light"] #rightBlink {
+      background: linear-gradient(to left, rgba(0, 152, 56, 0.80), rgba(0, 152, 56, 0));
     }
 
     #units {
@@ -379,31 +433,90 @@
 
   <script>
     const ASSIST_META = {
-      off: {
-        short: "OFF",
-        long: "Manual",
-        accent: "#d8c39a",
-        tint: "rgba(216, 195, 154, 0.28)",
-        dimGlow24: "rgba(216, 195, 154, 0.30)",
-        dimGlow48: "rgba(216, 195, 154, 0.20)",
+      dark: {
+        off: {
+          short: "OFF",
+          long: "Manual",
+          accent: "#d8c39a",
+          tint: "rgba(216, 195, 154, 0.28)",
+          dimGlow24: "rgba(216, 195, 154, 0.30)",
+          dimGlow48: "rgba(216, 195, 154, 0.20)",
+        },
+        mads: {
+          short: "MADS",
+          long: "Lane Assist",
+          accent: "#00C8C8",
+          tint: "rgba(0, 200, 200, 0.28)",
+          dimGlow24: "rgba(0, 200, 200, 0.30)",
+          dimGlow48: "rgba(0, 200, 200, 0.20)",
+        },
+        full: {
+          short: "AUTO",
+          long: "Full Assist",
+          accent: "#60F594",
+          tint: "rgba(96, 245, 148, 0.28)",
+          dimGlow24: "rgba(96, 245, 148, 0.30)",
+          dimGlow48: "rgba(96, 245, 148, 0.20)",
+        },
       },
-      mads: {
-        short: "MADS",
-        long: "Lane Assist",
-        accent: "#00C8C8",
-        tint: "rgba(0, 200, 200, 0.28)",
-        dimGlow24: "rgba(0, 200, 200, 0.30)",
-        dimGlow48: "rgba(0, 200, 200, 0.20)",
-      },
-      full: {
-        short: "AUTO",
-        long: "Full Assist",
-        accent: "#00FF26",
-        tint: "rgba(0, 255, 38, 0.28)",
-        dimGlow24: "rgba(0, 255, 38, 0.30)",
-        dimGlow48: "rgba(0, 255, 38, 0.20)",
+      light: {
+        off: {
+          short: "OFF",
+          long: "Manual",
+          accent: "#7d6029",
+          tint: "rgba(125, 96, 41, 0.20)",
+          dimGlow24: "rgba(125, 96, 41, 0.15)",
+          dimGlow48: "rgba(125, 96, 41, 0.10)",
+        },
+        mads: {
+          short: "MADS",
+          long: "Lane Assist",
+          accent: "#007078",
+          tint: "rgba(0, 112, 120, 0.20)",
+          dimGlow24: "rgba(0, 112, 120, 0.15)",
+          dimGlow48: "rgba(0, 112, 120, 0.10)",
+        },
+        full: {
+          short: "AUTO",
+          long: "Full Assist",
+          accent: "#007a3c",
+          tint: "rgba(0, 122, 60, 0.20)",
+          dimGlow24: "rgba(0, 122, 60, 0.15)",
+          dimGlow48: "rgba(0, 122, 60, 0.10)",
+        },
       },
     };
+
+    const THEME_STYLES = {
+      dark: {
+        knockout: "0 0 3px rgba(10, 11, 13, 0.97), 0 0 8px rgba(10, 11, 13, 0.92), 0 0 12px rgba(10, 11, 13, 0.5)",
+        knockoutSmall: "0 0 1px rgba(10, 11, 13, 0.98), 0 0 4px rgba(10, 11, 13, 0.94), 0 0 8px rgba(10, 11, 13, 0.72)",
+        speedHighlight: "0 -1px 0 rgba(241, 239, 233, 0.15)",
+        fgRGB: [241, 239, 233],
+        redRGB: [255, 117, 117],
+        overGlowRGB: "255,60,60",
+        gearBg: "#1a1a17",
+        gearFg: "#f1efe9",
+        gearRevBg: "#b22a2a",
+        gearRevFg: "#f1efe9",
+      },
+      light: {
+        knockout: "0 0 3px rgba(236, 233, 226, 0.97), 0 0 8px rgba(236, 233, 226, 0.92), 0 0 12px rgba(236, 233, 226, 0.5)",
+        knockoutSmall: "0 0 1px rgba(236, 233, 226, 0.98), 0 0 4px rgba(236, 233, 226, 0.94), 0 0 8px rgba(236, 233, 226, 0.72)",
+        speedHighlight: "0 1px 0 rgba(22, 24, 28, 0.10)",
+        fgRGB: [22, 24, 28],
+        redRGB: [179, 36, 36],
+        overGlowRGB: "211,42,42",
+        gearBg: "#e0dcd2",
+        gearFg: "#16181c",
+        gearRevBg: "#b22a2a",
+        gearRevFg: "#f6f4ee",
+      },
+    };
+
+    function activeThemeKey() {
+      return document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark";
+    }
 
     const gearMap = { 1: "P", 2: "R", 3: "N", 4: "D" };
 
@@ -466,33 +579,27 @@
       }
     }
 
-    const BG_KNOCKOUT = "0 0 3px rgba(10, 11, 13, 0.97), 0 0 8px rgba(10, 11, 13, 0.92), 0 0 12px rgba(10, 11, 13, 0.5)";
-    const BG_KNOCKOUT_SMALL = "0 0 1px rgba(10, 11, 13, 0.98), 0 0 4px rgba(10, 11, 13, 0.94), 0 0 8px rgba(10, 11, 13, 0.72)";
-
-    const FG_RGB = [241, 239, 233];
-    const RED_RGB = [255, 117, 117];
-
     function lerpColor(a, b, t) {
       return `rgb(${Math.round(a[0]+(b[0]-a[0])*t)},${Math.round(a[1]+(b[1]-a[1])*t)},${Math.round(a[2]+(b[2]-a[2])*t)})`;
     }
 
-    function applySpeedStyle({ speed, assistMeta }) {
+    function applySpeedStyle({ speed, theme }) {
       speedEl.textContent = String(speed);
       speedEl.style.color = "var(--fg)";
-      speedEl.style.textShadow = BG_KNOCKOUT + ", 0 -1px 0 rgba(241, 239, 233, 0.15)";
+      speedEl.style.textShadow = theme.knockout + ", " + theme.speedHighlight;
     }
 
-    function applySpeedLimitStyle({ overT, speedLimitValueNum }) {
+    function applySpeedLimitStyle({ overT, speedLimitValueNum, theme }) {
       if (speedLimitValueNum > 0) {
         speedLimit.style.display = "flex";
         speedLimitValue.textContent = String(speedLimitValueNum);
         if (overT > 0) {
-          speedLimitValue.style.color = lerpColor(FG_RGB, RED_RGB, overT);
-          speedLimitLabel.style.color = lerpColor(FG_RGB, RED_RGB, overT);
+          speedLimitValue.style.color = lerpColor(theme.fgRGB, theme.redRGB, overT);
+          speedLimitLabel.style.color = lerpColor(theme.fgRGB, theme.redRGB, overT);
           speedLimitValue.style.textShadow =
-            BG_KNOCKOUT + `, 0 0 28px rgba(255,60,60,${(0.7 * overT).toFixed(2)}), 0 0 64px rgba(255,60,60,${(0.4 * overT).toFixed(2)})`;
+            theme.knockout + `, 0 0 28px rgba(${theme.overGlowRGB},${(0.7 * overT).toFixed(2)}), 0 0 64px rgba(${theme.overGlowRGB},${(0.4 * overT).toFixed(2)})`;
           speedLimitLabel.style.textShadow =
-            BG_KNOCKOUT_SMALL + `, 0 0 16px rgba(255,60,60,${(0.7 * overT).toFixed(2)}), 0 0 32px rgba(255,60,60,${(0.35 * overT).toFixed(2)})`;
+            theme.knockoutSmall + `, 0 0 16px rgba(${theme.overGlowRGB},${(0.7 * overT).toFixed(2)}), 0 0 32px rgba(${theme.overGlowRGB},${(0.35 * overT).toFixed(2)})`;
         } else {
           speedLimitValue.style.color = "var(--fg)";
           speedLimitLabel.style.color = "var(--muted)";
@@ -505,11 +612,14 @@
     }
 
     function receiveMessage(car) {
+      lastCar = car;
+      const themeKey = activeThemeKey();
+      const theme = THEME_STYLES[themeKey];
       const speed = Math.max(0, Math.round(Number(car.egoSpeed) || 0));
       const setSpeed = Math.max(0, Math.round(Number(car.accSetSpeed) || 0));
       const speedLimitValueNum = Math.max(0, Math.round(Number(car.fusedSpeedLimit) || 0));
       const assist = mapAssist(car);
-      const assistMeta = ASSIST_META[assist];
+      const assistMeta = ASSIST_META[themeKey][assist];
       const isAssistOn = assist !== "off";
       const accent = assistMeta.accent;
 
@@ -524,14 +634,14 @@
       const isDrive = gear === "D";
       const pctOver = isDrive && speedLimitValueNum > 0 ? (speed - speedLimitValueNum) / speedLimitValueNum : 0;
       const overT = Math.min(1, Math.max(0, (pctOver - 0.15) / 0.10));
-      applySpeedStyle({ speed, assistMeta });
+      applySpeedStyle({ speed, theme });
 
       const showSetSpeed = assist === "full" && setSpeed > 0;
       setSpeedWrap.style.display = showSetSpeed ? "flex" : "none";
       if (showSetSpeed) {
         setSpeedEl.textContent = String(setSpeed);
         setSpeedEl.style.textShadow =
-          BG_KNOCKOUT + ", 0 0 18px " + assistMeta.dimGlow24 + ", 0 0 36px " + assistMeta.dimGlow48;
+          theme.knockout + ", 0 0 18px " + assistMeta.dimGlow24 + ", 0 0 36px " + assistMeta.dimGlow48;
       }
 
       assistLabel.style.display = isAssistOn ? "flex" : "none";
@@ -542,8 +652,8 @@
       } else {
         gearChip.style.display = "block";
         gearChip.textContent = gear;
-        gearChip.style.background = gear === "R" ? "#c43838" : "#1a1a17";
-        gearChip.style.color = "#f1efe9";
+        gearChip.style.background = gear === "R" ? theme.gearRevBg : theme.gearBg;
+        gearChip.style.color = gear === "R" ? theme.gearRevFg : theme.gearFg;
       }
 
       drawWarningChips(car);
@@ -572,17 +682,23 @@
       setBlinker(leftBlink, leftActive ? 0 : car.leftBlinker);
       setBlinker(rightBlink, rightActive ? 0 : car.rightBlinker);
 
-      applySpeedLimitStyle({ overT, speedLimitValueNum });
+      applySpeedLimitStyle({ overT, speedLimitValueNum, theme });
 
       unitsEl.textContent = car.isImperial ? "mph" : "km/h";
       const edgeGradient =
         "linear-gradient(to right, transparent 0%, " +
         accent + " 50%, transparent 100%)";
       edgeAccent.style.background = edgeGradient;
-      bottomRow.style.textShadow = BG_KNOCKOUT_SMALL;
+      bottomRow.style.textShadow = theme.knockoutSmall;
     }
 
+    let lastCar = null;
+
     window.receiveMessage = receiveMessage;
+
+    new MutationObserver(() => {
+      if (lastCar) receiveMessage(lastCar);
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
 
     function readNative(method, fallback) {
       try {
@@ -596,6 +712,8 @@
     }
 
     window.onCarStateUpdate = function() {
+      const isDarkMode = readNative("isDarkMode", true);
+      document.documentElement.setAttribute("data-theme", isDarkMode ? "dark" : "light");
       const car = {
         egoSpeed: readNative("getEgoSpeed", 0),
         leftBlinker: readNative("getLeftBlinker", 0),
