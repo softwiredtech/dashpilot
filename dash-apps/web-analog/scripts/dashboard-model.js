@@ -53,6 +53,14 @@
     return Number(raw) > 0;
   }
 
+  function normalizeTheme(raw) {
+    const explicit = String(raw?.theme || "").toLowerCase();
+    if (explicit === "classic-911-light") return "classic-911-light";
+    if (explicit === "classic-911") return "classic-911";
+    if (typeof raw?.darkMode === "boolean") return raw.darkMode ? "classic-911" : "classic-911-light";
+    return "classic-911";
+  }
+
   function carStateToDashboardModel(raw = {}) {
     const unit = normalizeUnit(raw);
     const scale = scaleForUnit(unit);
@@ -70,6 +78,9 @@
         modeState: normalizeModeState(raw),
         leftBlinker: normalizeBlinker(raw.leftBlinker),
         rightBlinker: normalizeBlinker(raw.rightBlinker),
+      },
+      display: {
+        theme: normalizeTheme(raw),
       },
       signals: {
         leftBlindSpot: normalizeBlindSpot(raw.leftBlindSpot),

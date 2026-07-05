@@ -3,7 +3,7 @@
   const shell = window.DashPilotAnalogShell;
 
   function renderMissingDependency(message) {
-    return `<div class="analog-gauge-shell"><svg class="analog-gauge-svg" viewBox="0 0 200 200" role="img" aria-label="Gauge unavailable"><text class="gauge-value gauge-value--small" x="100" y="102" text-anchor="middle">${message}</text></svg></div>`;
+    return `<svg class="analog-gauge-svg" viewBox="0 0 200 200" role="img" aria-label="Gauge unavailable"><text class="gauge-value" x="100" y="102" text-anchor="middle">${message}</text></svg>`;
   }
 
   if (!geometry || !shell) {
@@ -32,26 +32,39 @@
   const CLASSIC_911_SHELL = shell.CLASSIC_911_SHELL;
   const reliefOffsetForSurface = shell.reliefOffsetForSurface;
 
+  /*
+   * Radial cross-section, outside-in:
+   * 100.0 ACC set marker track
+   * 97.5-90.5 bezel outer lip
+   * 90.85-89.35 shelf
+   * 89.2 face rim
+   * 89.0 / 88.0 major / minor tick outer
+   * 88.5 mode arc band
+   * 78.0 / 82.0 major / minor tick inner
+   * 74.8 dial text safe radius
+   * 74.0 needle tip
+   * 66.8 / 62.0 limit marker / compliance arc
+   * 8.8 hub
+   */
   const GAUGE = {
     ...VIEWBOX,
     startAngle: -120,
     sweepAngle: 240,
-    maxTickCount: 200,
-    glowStartRatio: 1.15,
-    glowRampRatio: 0.1,
+    radii: {
+      minorTickInner: 82,
+      minorTickOuter: 88,
+      majorTickInner: 78,
+      majorTickOuter: 89,
+    },
+  };
+
+  const DIAL_TEXT = {
     textSafeRadius: 74.8,
     unitLabelWidth: 18,
     unitLabelY: -24,
     gearStrip: {
       y: 52,
       spacing: 16,
-    },
-    hub: { outer: 8.8 },
-    radii: {
-      minorTickInner: 82,
-      minorTickOuter: 88,
-      majorTickInner: 78,
-      majorTickOuter: 89,
     },
   };
 
@@ -61,11 +74,11 @@
       arcRadius: 62,
       markerRadius: 66.8,
       arcStrokeWidth: 2.8,
+      glowStartRatio: 1.15,
+      glowRampRatio: 0.1,
     },
     // Reserve the bottom-tail gap for mode state so it never collides with the compliance arc.
     mode: {
-      cx: 100,
-      cy: 100,
       arcRadius: 88.5,
       arcStrokeWidth: 4.8,
     },
@@ -102,46 +115,19 @@
   const TELLTALE = {
     // Bold arrow, points right (tip at +x), centered at origin. ~12 wide × 13.52 tall.
     path: "M 6 0 L -0.76 6.76 L -0.76 2.26 L -6 2.26 L -6 -2.26 L -0.76 -2.26 L -0.76 -6.76 Z",
-    positions: {
-      left: { x: 75, y: 55, rotate: 180 },
-      right: { x: 125, y: 55, rotate: 0 },
-    },
-  };
-
-  const TELLTALE_CONFIG = {
     scale: 0.95,
     spacing: 37,
     y: 59,
   };
 
   const MARKER_PATHS = {
-    setBody: "M -4.3 -4.6 H 4.3 V 12.2 L 0 17.1 L -4.3 12.2 Z",
-    setBodySimple: "M -3.6 -4.6 H 3.6 V 12.2 L 0 17.1 L -3.6 12.2 Z",
-    setBodyTab: "M -4.55 -7.05 H 4.05 V 12.05 L 0.15 17.15 L -4.1 12.35 Z",
-    setBodyGrounded: "M -4.45 -4.6 H 4.2 V 12.25 L 0.12 17.2 L -4.35 12.45 Z",
-    setBodyBeveled: "M -4.95 -4.55 H 3.65 L 4.75 -3.45 V 11.55 L 0.4 17.05 L -4.55 12.2 V -3.65 Z",
-    setBodyWorn: "M -4.7 -4.3 H 3.25 L 4.05 -3.5 V 11.2 L -0.15 16.1 L -4.35 11.7 V -3.6 Z",
-    setHighlight: "M -3.0 -3 H 3.0 V -1.6 H -3.0 Z",
-    setHighlightSimple: "M -2.5 -3 H 2.5 V -1.6 H -2.5 Z",
-    setHighlightGrounded: "M -3.15 -2.95 H 2.95 V -1.75 H -3.15 Z",
-    setHighlightBeveled: "M -3.35 -3.1 H 2.35 L 2.95 -2.48 H -3.35 Z",
-    setHighlightWorn: "M -2.8 -2.65 H 1.9 L 2.3 -2.2 H -2.8 Z",
-    setLip: "M -2.95 -2.65 H 2.45",
-    setSeat: "M -2.6 12.05 H 2.55",
-    setEdgeLight: "M -3.55 -2.3 V 10.65",
-    setCrease: "M -2.25 10.6 L 0.05 13.95 L 2.2 10.55",
-    setWear: "M -2.7 0.6 L -1.35 7.45",
-    setShade: "M -4.3 11.75 H 4.3 L 0 17.1 Z",
-    setShadeSimple: "M -3.6 11.75 H 3.6 L 0 17.1 Z",
-    setShadeGrounded: "M -4.2 11.9 H 4.15 L 0.1 16.95 L -3.95 12.05 Z",
-    setShadeBeveled: "M -4.55 11.5 H 4.2 L 0.45 16.7 L -3.6 12.0 Z",
-    setShadeWorn: "M -4.1 10.95 H 3.7 L -0.05 15.65 L -3.35 11.8 Z",
+    setBody: "M -3.6 -4.6 H 3.6 V 12.2 L 0 17.1 L -3.6 12.2 Z",
+    setHighlight: "M -2.5 -3 H 2.5 V -1.6 H -2.5 Z",
+    setShade: "M -3.6 11.75 H 3.6 L 0 17.1 Z",
     limitPointer: "M -5.6 -9.6 H 5.6 L 0 0 Z",
     limitHighlight: "M -4.35 -9.1 H 4.35 V -8 H -4.35 Z",
-    limitShade: "M -3.55 -3.25 H 3.55 L 0 -0.25 Z",
+    limitShade: "M -2.50 -3.25 H 2.50 L 0 -0.25 Z",
   };
-
-  const SET_MARKER_SCALE_X = 0.84;
 
   const NEEDLE = {
     halfWidth: 1.6,
@@ -172,8 +158,8 @@
 
   const PERFORMANCE = {
     glowQuantum: 1 / 32,
-    needleAngleQuantum: 0.12,
     indicatorAngleQuantum: 0.24,
+    maxTickCount: 200,
   };
 
   let gaugeId = 0;
@@ -193,18 +179,12 @@
     rightBlinker: "right-blinker",
   };
 
-  const TUNE_ATTRS = {
-    modeArcCy: "mode-arc-cy",
-    modeArcRadius: "mode-arc-radius",
-  };
-
   const FULL_RENDER_ATTRS = [
     DATA_ATTRS.min,
     DATA_ATTRS.max,
     DATA_ATTRS.majorStep,
     DATA_ATTRS.minorStep,
     DATA_ATTRS.unit,
-    ...Object.values(TUNE_ATTRS),
   ];
 
   const requiresFullRender = (attr) => FULL_RENDER_ATTRS.includes(attr);
@@ -219,12 +199,6 @@
   const normalizeModeState = (rawState) => {
     const state = String(rawState || "off").toLowerCase();
     return state === "mads" || state === "full" ? state : "off";
-  };
-
-  const modeArcColorForState = (modeState) => {
-    if (modeState === "mads") return "rgb(var(--mode-mads-rgb))";
-    if (modeState === "full") return "rgb(var(--mode-full-rgb))";
-    return null;
   };
 
   const normalizeGearState = (rawGear) => {
@@ -242,11 +216,6 @@
       default:
         return { key: "d", label: "D" };
     }
-  };
-
-  const normalizeSetMarkerStyle = (rawStyle) => {
-    const style = String(rawStyle || "clean").trim().toLowerCase();
-    return style === "grounded" || style === "beveled" || style === "worn" ? style : "clean";
   };
 
   const normalizeBlinker = (raw) => {
@@ -326,7 +295,6 @@
     node.dataset[key] = value;
   };
 
-  const quantizedNeedleAngle = (angle) => quantize(angle, PERFORMANCE.needleAngleQuantum);
   const quantizedIndicatorAngle = (angle) => quantize(angle, PERFORMANCE.indicatorAngleQuantum);
 
   const text = (className, x, y, value) => `<text class="${className}" x="${fmt(x)}" y="${fmt(y)}">${value}</text>`;
@@ -350,11 +318,7 @@
 
   const setSvgPartVisible = (part, visible) => {
     if (!part) return;
-    part.toggleAttribute("hidden", !visible);
-    if (visible) {
-      part.removeAttribute("display");
-      part.style.removeProperty("display");
-    }
+    if (visible) part.style.removeProperty("display");
     else part.style.setProperty("display", "none");
   };
 
@@ -362,48 +326,42 @@
 
   class AnalogSpeedGauge extends HTMLElement {
     static get observedAttributes() {
-      return [...Object.values(DATA_ATTRS), ...Object.values(TUNE_ATTRS), "data-detail", "data-set-marker-style"];
+      return Object.values(DATA_ATTRS);
     }
 
     constructor() {
       super();
+      const instanceId = ++gaugeId;
       this.ids = {
-        setBug: `set-bug-${++gaugeId}`,
-        limitPointer: `limit-pointer-${gaugeId}`,
-        needle: `needle-${gaugeId}`,
-        modeArcGradient: `mode-arc-gradient-${gaugeId}`,
-        faceGradient: `face-gradient-${gaugeId}`,
-        faceSheen: `face-sheen-${gaugeId}`,
-        faceEdgeShadow: `face-edge-shadow-${gaugeId}`,
-        faceGrain: `face-grain-${gaugeId}`,
-        faceMottle: `face-mottle-${gaugeId}`,
-        faceClip: `face-clip-${gaugeId}`,
-        outerLipHighlightFade: `outer-lip-highlight-fade-${gaugeId}`,
-        innerShelfHighlightFade: `inner-shelf-highlight-fade-${gaugeId}`,
+        limitPointer: `limit-pointer-${instanceId}`,
+        modeArcGradient: `mode-arc-gradient-${instanceId}`,
+        faceGradient: `face-gradient-${instanceId}`,
+        faceSheen: `face-sheen-${instanceId}`,
+        faceEdgeShadow: `face-edge-shadow-${instanceId}`,
+        faceGrain: `face-grain-${instanceId}`,
+        faceMottle: `face-mottle-${instanceId}`,
+        faceClip: `face-clip-${instanceId}`,
+        outerLipHighlightFade: `outer-lip-highlight-fade-${instanceId}`,
+        shelfHighlightFade: `shelf-highlight-fade-${instanceId}`,
       };
-      this.currentShellDetail = null;
-      this.definitionsHtml = {
-        shell: "",
-        symbols: "",
-        mode: "",
-      };
-      this.staticLayerHtml = undefined;
-      this.staticLayersDirty = false;
       this.animationRaf = 0;
       this.lastFrameAt = undefined;
       this._cachedData = null;
       this._cachedFacePrint = null;
       this._facePrintKey = null;
-      this._staticDefinitionsHtml = null;
-      this._lastStaticDetail = null;
-      this._symbolDefinitionsHtml = null;
+      this._staticMarkup = null;
       this._layers = null;
       this.lastLimitGlow = undefined;
-      this.lastModeArcColor = undefined;
+      this.lastDisplayedNeedleAngle = undefined;
       this.lastAriaLabel = undefined;
     }
 
-    connectedCallback() { this.render(); }
+    connectedCallback() {
+      // Deferred from the constructor: custom element constructors must not add attributes,
+      // and setting inline style properties creates the style attribute.
+      this.applyTrackCssVars();
+      this.render();
+    }
 
     disconnectedCallback() {
       cancelAnimationFrame(this.animationRaf);
@@ -413,14 +371,11 @@
       this.currentSetAngle = undefined;
       this.currentLimitAngle = undefined;
       this.lastLimitGlow = undefined;
-      this.lastModeArcColor = undefined;
+      this.lastDisplayedNeedleAngle = undefined;
       this.lastAriaLabel = undefined;
       this._cachedData = null;
       this._cachedFacePrint = null;
       this._facePrintKey = null;
-      this._staticDefinitionsHtml = null;
-      this._lastStaticDetail = null;
-      this._symbolDefinitionsHtml = null;
       this._layers = null;
       this.parts = undefined;
     }
@@ -429,34 +384,11 @@
       if (!this.isConnected) return;
       if (this.suppressAttributeUpdates) return;
       this.invalidateDataCache();
-      if (name === "data-detail" || requiresFullRender(name)) {
+      if (requiresFullRender(name)) {
         this.render();
       } else {
         this.updateDynamicParts();
       }
-    }
-
-    shellDetail() {
-      return this.dataset.detail === "compact" ? "compact" : "full";
-    }
-
-    refreshStaticLayers() {
-      const detail = this.shellDetail();
-      const detailChanged = this.currentShellDetail !== detail || !this.staticLayerHtml;
-      this.definitionsHtml = {
-        shell: this.renderShellDefinitions(detail),
-        symbols: this.renderSymbolDefinitions(),
-        mode: this.renderModeDefinitions(),
-      };
-      this.staticLayersDirty = detailChanged;
-      if (!detailChanged) return;
-
-      this.currentShellDetail = detail;
-      this.staticLayerHtml = {
-        bezelAssembly: this.renderBezelAssembly(),
-        hub: this.renderHub(),
-        glass: this.renderGlass(),
-      };
     }
 
     update(nextState = {}) {
@@ -497,18 +429,10 @@
 
     cacheLayers() {
       this._layers = {
-        shellDefs: this.querySelector('[data-layer="shell-defs"]'),
-        overlayShellDefs: this.querySelector('[data-layer="overlay-shell-defs"]'),
-        symbolDefs: this.querySelector('[data-layer="symbol-defs"]'),
-        modeDefs: this.querySelector('[data-layer="mode-defs"]'),
         face: this.querySelector('[data-layer="face"]'),
-        bezel: this.querySelector('[data-layer="bezel"]'),
         compliance: this.querySelector('[data-layer="compliance"]'),
         markers: this.querySelector('[data-layer="markers"]'),
         readout: this.querySelector('[data-layer="readout"]'),
-        hub: this.querySelector('[data-layer="hub"]'),
-        needle: this.querySelector('[data-layer="needle"]'),
-        glass: this.querySelector('[data-layer="glass"]'),
       };
     }
 
@@ -526,25 +450,21 @@
       this._cachedData = null;
     }
 
-    modeTrack() {
-      return {
-        ...TRACKS.mode,
-        cy: this.numberAttr(TUNE_ATTRS.modeArcCy, TRACKS.mode.cy),
-        arcRadius: this.positiveNumberAttr(TUNE_ATTRS.modeArcRadius, TRACKS.mode.arcRadius),
-      };
-    }
-
     telltaleConfig() {
-      const { scale, spacing, y } = TELLTALE_CONFIG;
-      const centerX = 100;
+      const { scale, spacing, y } = TELLTALE;
       const halfSpacing = spacing / 2;
       return {
         scale,
         positions: {
-          left: { x: centerX - halfSpacing, y, rotate: 180 },
-          right: { x: centerX + halfSpacing, y, rotate: 0 },
+          left: { x: GAUGE.cx - halfSpacing, y, rotate: 180 },
+          right: { x: GAUGE.cx + halfSpacing, y, rotate: 0 },
         },
       };
+    }
+
+    applyTrackCssVars() {
+      this.style.setProperty("--limit-arc-stroke-width", String(TRACKS.speedLimit.arcStrokeWidth));
+      this.style.setProperty("--mode-arc-stroke-width", String(TRACKS.mode.arcStrokeWidth));
     }
 
     readData() {
@@ -586,6 +506,7 @@
     }
 
     complianceArcCapAngle() {
+      if (TRACKS.speedLimit.arcRadius <= 0) return 0;
       return (TRACKS.speedLimit.arcStrokeWidth / 2) / TRACKS.speedLimit.arcRadius * 180 / Math.PI;
     }
 
@@ -596,7 +517,7 @@
       const halfWidth = Math.max(label.length, mirrorLabel.length) * TEXT_METRICS.numberCharHalfWidth;
       const halfHeight = TEXT_METRICS.numberHalfHeight;
       const outwardTextExtent = halfWidth * Math.abs(Math.cos(rad)) + halfHeight * Math.abs(Math.sin(rad));
-      return geometry.polar(GAUGE.cx, GAUGE.cy, GAUGE.textSafeRadius - outwardTextExtent, angle);
+      return geometry.polar(GAUGE.cx, GAUGE.cy, DIAL_TEXT.textSafeRadius - outwardTextExtent, angle);
     }
 
     complianceArcVisibleAngle(data, limitEdgeAngle = this.angleFor(data, clamp(data.speedLimit, data.min, data.max))) {
@@ -628,29 +549,34 @@
     }
 
     modeArcCircle() {
-      const track = this.modeTrack();
       return `
-        <circle class="mode-arc-band" cx="${fmt(track.cx)}" cy="${fmt(track.cy)}" r="${fmt(track.arcRadius)}" style="stroke:url(#${this.ids.modeArcGradient});--mode-arc-stroke-width:${track.arcStrokeWidth}" />`;
+        <circle class="mode-arc-band" cx="${fmt(GAUGE.cx)}" cy="${fmt(GAUGE.cy)}" r="${fmt(TRACKS.mode.arcRadius)}" stroke="url(#${this.ids.modeArcGradient})" />`;
     }
 
     limitGlowForValue(value, speedLimit) {
       if (speedLimit <= 0) return 0;
       const ratio = value / speedLimit;
-      return clamp((ratio - GAUGE.glowStartRatio) / GAUGE.glowRampRatio, 0, 1);
+      return clamp((ratio - TRACKS.speedLimit.glowStartRatio) / TRACKS.speedLimit.glowRampRatio, 0, 1);
     }
 
-    setLimitGlow(svg, glow) {
-      if (!svg) return;
+    setLimitGlow(part, glow) {
+      if (!part) return;
       const quantizedGlow = clamp(quantize(glow, PERFORMANCE.glowQuantum), 0, 1);
       if (this.lastLimitGlow === quantizedGlow) return;
       this.lastLimitGlow = quantizedGlow;
-      svg.style.setProperty("--limit-glow", quantizedGlow);
+      part.style.setProperty("--limit-glow", quantizedGlow);
     }
 
-    setModeArcColor(color) {
-      if (!color || this.lastModeArcColor === color) return;
-      this.lastModeArcColor = color;
-      this.style.setProperty("--mode-arc-color", color);
+    needleRotation(angle) {
+      return `rotate(${fmt(angle, 3)}deg)`;
+    }
+
+    applyNeedleAngle(displayedAngle) {
+      const needle = this.parts?.needle;
+      if (!needle) return;
+      if (this.lastDisplayedNeedleAngle === displayedAngle) return;
+      this.lastDisplayedNeedleAngle = displayedAngle;
+      needle.style.transform = this.needleRotation(displayedAngle);
     }
 
     markerTransformForAngle(angle, radius) {
@@ -662,43 +588,39 @@
       return `translate(${fmt(point.x)} ${fmt(point.y)}) rotate(${angle})`;
     }
 
-    renderShellDefinitions(detail) {
-      if (this._staticDefinitionsHtml && this._lastStaticDetail === detail) return this._staticDefinitionsHtml;
-
-      this._lastStaticDetail = detail;
-      this._staticDefinitionsHtml = unwrapDefs(shell.renderClassicShellDefinitions({
-        ids: this.ids,
-        viewBox: GAUGE,
-        profile: CLASSIC_911_SHELL,
-        detail,
-      }));
-      return this._staticDefinitionsHtml;
+    staticMarkup() {
+      if (this._staticMarkup) return this._staticMarkup;
+      this._staticMarkup = {
+        shellDefinitions: unwrapDefs(shell.renderClassicShellDefinitions({
+          ids: this.ids,
+          viewBox: GAUGE,
+          profile: CLASSIC_911_SHELL,
+        })),
+        modeDefinitions: this.renderModeDefinitions(),
+        symbolDefinitions: this.renderSymbolDefinitions(),
+        bezelAssembly: this.renderBezelAssembly(),
+        hub: this.renderHub(),
+      };
+      return this._staticMarkup;
     }
 
     renderSymbolDefinitions() {
-      if (this._symbolDefinitionsHtml) return this._symbolDefinitionsHtml;
+      return this.renderLimitPointerSymbol();
+    }
 
-      this._symbolDefinitionsHtml = `
+    renderLimitPointerSymbol() {
+      return `
         <g id="${this.ids.limitPointer}">
-          <ellipse class="limit-pointer-shadow-soft" cx="0" cy="-5.4" rx="4.8" ry="1.9" />
-          <ellipse class="limit-pointer-shadow" cx="0" cy="-5.5" rx="3.5" ry="1.15" />
           <path class="limit-pointer" d="${MARKER_PATHS.limitPointer}" />
           <path class="limit-pointer-highlight" d="${MARKER_PATHS.limitHighlight}" />
           <path class="limit-pointer-shade" d="${MARKER_PATHS.limitShade}" />
         </g>
-        <g id="${this.ids.needle}">
-          <polygon class="needle-body" points="${needlePoints(NEEDLE)}" />
-          <polygon class="needle-side-shade" points="${needleSideShadePoints(NEEDLE)}" />
-          <polygon class="needle-highlight" points="${needlePoints(NEEDLE.highlight)}" />
-        </g>
       `;
-      return this._symbolDefinitionsHtml;
     }
 
     renderModeDefinitions() {
-      const modeTrack = this.modeTrack();
       return `
-        <radialGradient id="${this.ids.modeArcGradient}" cx="${modeTrack.cx}" cy="${modeTrack.cy}" r="${modeTrack.arcRadius + modeTrack.arcStrokeWidth / 2}" gradientUnits="userSpaceOnUse">
+        <radialGradient id="${this.ids.modeArcGradient}" cx="${GAUGE.cx}" cy="${GAUGE.cy}" r="${TRACKS.mode.arcRadius + TRACKS.mode.arcStrokeWidth / 2}" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stop-color="var(--mode-arc-color)" stop-opacity="0" />
           <stop offset="84%" stop-color="var(--mode-arc-color)" stop-opacity="0" />
           <stop offset="88%" stop-color="var(--mode-arc-color)" stop-opacity="0.12" />
@@ -709,86 +631,26 @@
       `;
     }
 
-    renderMarkers() {
-      const style = normalizeSetMarkerStyle(this.getAttribute("data-set-marker-style"));
-      const variants = {
-        clean: {
-          body: MARKER_PATHS.setBodySimple,
-          contactShadow: "",
-          highlight: MARKER_PATHS.setHighlightSimple,
-          lip: "",
-          edgeLight: "",
-          crease: "",
-          wear: "",
-          shade: MARKER_PATHS.setShadeSimple,
-          useScaleX: false,
-        },
-        grounded: {
-          body: MARKER_PATHS.setBodyGrounded,
-          contactShadow: MARKER_PATHS.setBodyGrounded,
-          highlight: MARKER_PATHS.setHighlightGrounded,
-          lip: MARKER_PATHS.setSeat,
-          edgeLight: MARKER_PATHS.setEdgeLight,
-          crease: "",
-          wear: "",
-          shade: MARKER_PATHS.setShadeGrounded,
-          useScaleX: true,
-        },
-        beveled: {
-          body: MARKER_PATHS.setBodyBeveled,
-          contactShadow: MARKER_PATHS.setBodyBeveled,
-          highlight: MARKER_PATHS.setHighlightBeveled,
-          lip: MARKER_PATHS.setLip,
-          edgeLight: "",
-          crease: MARKER_PATHS.setCrease,
-          wear: "",
-          shade: MARKER_PATHS.setShadeBeveled,
-          useScaleX: true,
-        },
-        worn: {
-          body: MARKER_PATHS.setBodyWorn,
-          contactShadow: MARKER_PATHS.setBodyWorn,
-          highlight: MARKER_PATHS.setHighlightWorn,
-          lip: MARKER_PATHS.setLip,
-          edgeLight: "",
-          crease: MARKER_PATHS.setCrease,
-          wear: MARKER_PATHS.setWear,
-          shade: MARKER_PATHS.setShadeWorn,
-          useScaleX: true,
-        },
-      };
-      const marker = variants[style];
-      const shadowMarkup = marker.useScaleX === false
-        ? `
-            <ellipse class="set-bug-shadow-soft" cx="0" cy="14.05" rx="4.2" ry="1.95" />
-            <ellipse class="set-bug-shadow" cx="0" cy="14.0" rx="3.2" ry="1.2" />`
-        : `
-            <ellipse class="set-bug-shadow-soft" cx="0" cy="14.05" rx="4.95" ry="1.95" />
-            <ellipse class="set-bug-shadow" cx="0" cy="14.0" rx="3.8" ry="1.2" />`;
-      const contactShadow = marker.contactShadow ? `<path class="set-bug-contact-shadow" d="${marker.contactShadow}" transform="translate(0.95 1.4)" />` : "";
-      const lip = marker.lip ? `<path class="set-bug-lip" d="${marker.lip}" />` : "";
-      const edgeLight = marker.edgeLight ? `<path class="set-bug-edge-light" d="${marker.edgeLight}" />` : "";
-      const crease = marker.crease ? `<path class="set-bug-crease" d="${marker.crease}" />` : "";
-      const wear = marker.wear ? `<path class="set-bug-wear" d="${marker.wear}" />` : "";
-      const markerContent = `
-            ${shadowMarkup}
-            ${contactShadow}
-            <path class="set-bug-body" d="${marker.body}" />
-            <path class="set-bug-highlight" d="${marker.highlight}" />
-            ${lip}
-            ${edgeLight}
-            ${crease}
-            ${wear}
-            <path class="set-bug-shade" d="${marker.shade}" />`;
+    renderSetMarker() {
       return `
-        <g class="bezel-bug set-marker set-marker--${style}" data-part="set-marker">
-          ${marker.useScaleX === false ? markerContent : `<g transform="scale(${SET_MARKER_SCALE_X} 1)">${markerContent}
-          </g>`}
+        <g class="set-marker" data-part="set-marker">
+          <path class="set-marker-body" d="${MARKER_PATHS.setBody}" />
+          <path class="set-marker-highlight" d="${MARKER_PATHS.setHighlight}" />
+          <path class="set-marker-shade" d="${MARKER_PATHS.setShade}" />
         </g>
+      `;
+    }
+
+    renderLimitMarker() {
+      return `
         <g class="limit-marker" data-part="limit-marker">
           <use href="#${this.ids.limitPointer}" />
         </g>
       `;
+    }
+
+    renderMarkers() {
+      return `${this.renderSetMarker()}${this.renderLimitMarker()}`;
     }
 
     renderFacePrint(data) {
@@ -803,7 +665,7 @@
       const includeMinorTicks = data.scale.majorStep !== data.scale.minorStep;
       const densityStep = includeMinorTicks ? data.scale.minorStep : data.scale.majorStep;
 
-      if (!validateScaleRange(data, "renderFacePrint") || range / densityStep > GAUGE.maxTickCount) {
+      if (!validateScaleRange(data, "renderFacePrint") || range / densityStep > PERFORMANCE.maxTickCount) {
         const empty = { ticks: "", labels: "" };
         this._facePrintKey = key;
         this._cachedFacePrint = empty;
@@ -811,13 +673,17 @@
       }
 
       if (includeMinorTicks) {
-        for (let value = data.min; value <= data.max; value += data.scale.minorStep) {
+        const minorTickCount = Math.round(range / data.scale.minorStep);
+        for (let index = 0; index <= minorTickCount; index += 1) {
+          const value = data.min + index * data.scale.minorStep;
           const angle = this.angleFor(data, value);
           minorSegments.push(geometry.segment(GAUGE.cx, GAUGE.cy, GAUGE.radii.minorTickInner, GAUGE.radii.minorTickOuter, angle));
         }
       }
 
-      for (let value = data.min; value <= data.max; value += data.scale.majorStep) {
+      const majorTickCount = Math.round(range / data.scale.majorStep);
+      for (let index = 0; index <= majorTickCount; index += 1) {
+        const value = data.min + index * data.scale.majorStep;
         const angle = this.angleFor(data, value);
         const { x: tx, y: ty } = this.numberPosition(data, value, angle);
         majorSegments.push(geometry.segment(GAUGE.cx, GAUGE.cy, GAUGE.radii.majorTickInner, GAUGE.radii.majorTickOuter, angle));
@@ -841,12 +707,10 @@
 
     renderFace(data) {
       const print = this.renderFacePrint(data);
-      const detail = this.shellDetail();
       return shell.renderClassicShellFace({
         ids: this.ids,
         viewBox: GAUGE,
         profile: CLASSIC_911_SHELL,
-        detail,
         contentMarkup: `
           <g>${this.modeArcCircle()}</g>
           ${print.ticks}
@@ -895,13 +759,13 @@
     renderReadout(data) {
       const unit = data.unit.toLowerCase();
       return `
-        <text class="label unit-label" data-part="unit" x="${GAUGE.cx}" y="${GAUGE.cy + GAUGE.unitLabelY}" textLength="${GAUGE.unitLabelWidth}" lengthAdjust="spacing">${escapeHtml(unit)}</text>
+        <text class="label unit-label" data-part="unit" x="${GAUGE.cx}" y="${GAUGE.cy + DIAL_TEXT.unitLabelY}" textLength="${DIAL_TEXT.unitLabelWidth}" lengthAdjust="spacing">${escapeHtml(unit)}</text>
         ${this.renderGearStrip()}
       `;
     }
 
     renderGearStrip() {
-      const { y, spacing } = GAUGE.gearStrip;
+      const { y, spacing } = DIAL_TEXT.gearStrip;
       const gears = ["P", "R", "N", "D"];
       const centerIndex = (gears.length - 1) / 2;
       return gears.map((gear, index) => {
@@ -910,12 +774,15 @@
       }).join("");
     }
 
-    renderNeedle(data) {
-      const angle = quantizedNeedleAngle(this.currentNeedleAngle ?? this.angleFor(data, data.value));
+    renderNeedle() {
       return `
-        <g class="needle" data-part="needle" transform="${geometry.rotationTransform(angle, GAUGE.cx, GAUGE.cy)}">
-          <use href="#${this.ids.needle}" />
-        </g>
+        <svg class="analog-gauge-svg" viewBox="0 0 ${GAUGE.width} ${GAUGE.height}" role="presentation" aria-hidden="true">
+          <g>
+            <polygon class="needle-body" points="${needlePoints(NEEDLE)}" />
+            <polygon class="needle-side-shade" points="${needleSideShadePoints(NEEDLE)}" />
+            <polygon class="needle-highlight" points="${needlePoints(NEEDLE.highlight)}" />
+          </g>
+        </svg>
       `;
     }
 
@@ -926,98 +793,62 @@
       });
     }
 
-    overlayFaceClipId() {
-      return `${this.ids.faceClip}-overlay`;
-    }
-
-    renderOverlayDefs() {
-      return `
-        <clipPath id="${this.overlayFaceClipId()}">
-          <circle cx="${GAUGE.cx}" cy="${GAUGE.cy}" r="${CLASSIC_911_SHELL.dial.faceRadius}" />
-        </clipPath>
-      `;
-    }
-
-    renderGlass() {
-      const detail = this.shellDetail();
-      return shell.renderClassicShellGlass({
-        ids: { faceClip: this.overlayFaceClipId() },
-        profile: CLASSIC_911_SHELL,
-        detail,
-      });
-    }
-
     renderStaticSvg(data) {
+      const staticMarkup = this.staticMarkup();
       return `
-        <svg class="analog-gauge-svg analog-gauge-svg--static" data-svg="static" viewBox="0 0 ${GAUGE.width} ${GAUGE.height}" role="presentation" aria-hidden="true" style="--mode-arc-stroke-width: ${TRACKS.mode.arcStrokeWidth}">
-          <defs data-layer="shell-defs">${this.definitionsHtml.shell}</defs>
-          <defs data-layer="mode-defs">${this.definitionsHtml.mode}</defs>
+        <svg class="analog-gauge-svg analog-gauge-svg--static" data-svg="static" viewBox="0 0 ${GAUGE.width} ${GAUGE.height}" role="presentation" aria-hidden="true">
+          <defs data-layer="shell-defs">${staticMarkup.shellDefinitions}</defs>
+          <defs data-layer="mode-defs">${staticMarkup.modeDefinitions}</defs>
           <g data-layer="face">${this.renderFace(data)}</g>
-          <g class="bezel-assembly" data-layer="bezel">${this.staticLayerHtml.bezelAssembly}</g>
+          <g class="bezel-assembly" data-layer="bezel">${staticMarkup.bezelAssembly}</g>
           <g data-layer="readout">${this.renderReadout(data)}</g>
-          <g data-layer="hub">${this.staticLayerHtml.hub}</g>
+          <g data-layer="hub">${staticMarkup.hub}</g>
         </svg>
       `;
     }
 
     renderDynamicSvg(data) {
+      const staticMarkup = this.staticMarkup();
       return `
-        <svg class="analog-gauge-svg analog-gauge-svg--dynamic" data-svg="dynamic" viewBox="0 0 ${GAUGE.width} ${GAUGE.height}" role="img" aria-label="${escapeHtml(this.ariaLabel(data))}" style="--limit-arc-stroke-width: ${TRACKS.speedLimit.arcStrokeWidth}">
-          <defs data-layer="symbol-defs">${this.definitionsHtml.symbols}</defs>
+        <svg class="analog-gauge-svg analog-gauge-svg--dynamic" data-svg="dynamic" viewBox="0 0 ${GAUGE.width} ${GAUGE.height}" role="img" aria-label="${escapeHtml(this.ariaLabel(data))}">
+          <defs data-layer="symbol-defs">${staticMarkup.symbolDefinitions}</defs>
           <g data-layer="compliance">${this.renderComplianceArc(data)}</g>
           <g data-layer="markers">${this.renderMarkers()}</g>
-          <g data-layer="needle">${this.renderNeedle(data)}</g>
         </svg>
       `;
     }
 
-    renderOverlaySvg() {
+    renderNeedleLayer(data) {
+      const angle = this.currentNeedleAngle ?? this.angleFor(data, data.value);
       return `
-        <svg class="analog-gauge-svg analog-gauge-svg--overlay" data-svg="overlay" viewBox="0 0 ${GAUGE.width} ${GAUGE.height}" role="presentation" aria-hidden="true">
-          <defs data-layer="overlay-shell-defs">${this.renderOverlayDefs()}</defs>
-          <g data-layer="glass">${this.staticLayerHtml.glass}</g>
-        </svg>
+        <div class="analog-gauge-needle-layer" data-part="needle" style="transform: ${this.needleRotation(angle)}">
+          ${this.renderNeedle()}
+        </div>
       `;
     }
 
     render() {
-      const previousNeedleAngle = this.currentNeedleAngle;
-      const previousSetAngle = this.currentSetAngle;
-      const previousLimitAngle = this.currentLimitAngle;
       cancelAnimationFrame(this.animationRaf);
       this.animationRaf = 0;
       this.lastFrameAt = undefined;
-      this.currentNeedleAngle = previousNeedleAngle;
-      this.currentSetAngle = previousSetAngle;
-      this.currentLimitAngle = previousLimitAngle;
 
       this.invalidateDataCache();
       const data = this.readData();
-      this.refreshStaticLayers();
 
       if (!this._layers) {
         this.innerHTML = `
           <div class="analog-gauge-layer-stack" data-part="gauge-stack">
             ${this.renderStaticSvg(data)}
             ${this.renderDynamicSvg(data)}
-            ${this.renderOverlaySvg()}
+            ${this.renderNeedleLayer(data)}
           </div>
         `;
         this.cacheLayers();
       } else {
-        this._layers.modeDefs.innerHTML = this.definitionsHtml.mode;
         this._layers.face.innerHTML = this.renderFace(data);
         this._layers.compliance.innerHTML = this.renderComplianceArc(data);
         this._layers.markers.innerHTML = this.renderMarkers();
         this._layers.readout.innerHTML = this.renderReadout(data);
-        this._layers.needle.innerHTML = this.renderNeedle(data);
-        if (this.staticLayersDirty) {
-          this._layers.shellDefs.innerHTML = this.definitionsHtml.shell;
-          this._layers.overlayShellDefs.innerHTML = this.renderOverlayDefs();
-          this._layers.bezel.innerHTML = this.staticLayerHtml.bezelAssembly;
-          this._layers.hub.innerHTML = this.staticLayerHtml.hub;
-          this._layers.glass.innerHTML = this.staticLayerHtml.glass;
-        }
       }
       this.lastLimitGlow = undefined;
       this.lastAriaLabel = undefined;
@@ -1041,8 +872,6 @@
 
       if (needle) this.setNeedleTarget(this.angleFor(data, data.value));
       if (unit) setTextIfChanged(unit, data.unit.toLowerCase());
-      const modeArcColor = modeArcColorForState(data.modeState);
-      this.setModeArcColor(modeArcColor);
       setDatasetIfChanged(this, "gearState", data.gearState);
       setDatasetIfChanged(this, "modeState", data.modeState);
       setDatasetIfChanged(this, "leftBlinker", blinkerKey(data.leftBlinker));
@@ -1051,23 +880,29 @@
       if (complianceArc) {
         setSvgPartVisible(complianceArc, data.speedLimit > 0);
         const visibleLimitAngle = this.currentLimitAngle === undefined
-          ? this.angleFor(data, data.speedLimit)
+          ? quantizedIndicatorAngle(this.angleFor(data, data.speedLimit))
           : quantizedIndicatorAngle(this.currentLimitAngle);
         const dasharray = data.speedLimit > 0 ? this.complianceArcDasharray(data, visibleLimitAngle) : "0 1";
         setAttrIfChanged(complianceArcBase, "stroke-dasharray", dasharray);
         setAttrIfChanged(complianceArcHot, "stroke-dasharray", dasharray);
       }
 
-      this.setLimitGlow(svg, data.speedLimit > 0 ? this.limitGlowForValue(data.value, data.speedLimit) : 0);
+      this.setLimitGlow(complianceArcHot, data.speedLimit > 0 ? this.limitGlowForValue(data.value, data.speedLimit) : 0);
 
       if (setMarker) {
-        setSvgPartVisible(setMarker, true);
-        this.setIndicatorTarget("set", this.angleFor(data, clamp(data.accSetSpeed, data.min, data.max)));
+        const hasAccSetSpeed = data.accSetSpeed > 0;
+        setSvgPartVisible(setMarker, hasAccSetSpeed);
+        if (hasAccSetSpeed) {
+          this.setIndicatorTarget("set", this.angleFor(data, clamp(data.accSetSpeed, data.min, data.max)));
+        }
       }
 
       if (limitMarker) {
-        setSvgPartVisible(limitMarker, true);
-        this.setIndicatorTarget("limit", this.angleFor(data, clamp(data.speedLimit, data.min, data.max)));
+        const hasSpeedLimit = data.speedLimit > 0;
+        setSvgPartVisible(limitMarker, hasSpeedLimit);
+        if (hasSpeedLimit) {
+          this.setIndicatorTarget("limit", this.angleFor(data, clamp(data.speedLimit, data.min, data.max)));
+        }
       }
 
       if (svg) {
@@ -1088,113 +923,110 @@
       return parts.join(". ");
     }
 
+    channelDefinitions(data, parts = this.parts) {
+      const { needle, setMarker, limitMarker, complianceArc, complianceArcBase, complianceArcHot } = parts || {};
+      return {
+        needle: {
+          part: needle,
+          currentKey: "currentNeedleAngle",
+          targetKey: "targetNeedleAngle",
+          deadband: ANIMATION.deadbandDegrees,
+          responsePerSecond: ANIMATION.responsePerSecond,
+          displayAngle: (angle) => angle,
+          apply: (displayedAngle) => {
+            this.applyNeedleAngle(displayedAngle);
+            const displayedValue = this.valueForAngle(data, this.currentNeedleAngle);
+            this.setLimitGlow(complianceArcHot, this.limitGlowForValue(displayedValue, data.speedLimit));
+          },
+        },
+        set: {
+          part: setMarker,
+          currentKey: "currentSetAngle",
+          targetKey: "targetSetAngle",
+          deadband: ANIMATION.indicatorDeadbandDegrees,
+          responsePerSecond: ANIMATION.indicatorResponsePerSecond,
+          displayAngle: quantizedIndicatorAngle,
+          apply: (displayedAngle) => {
+            setAttrIfChanged(setMarker, "transform", this.markerTransformForAngle(displayedAngle, TRACKS.accSet.radius));
+          },
+        },
+        limit: {
+          part: limitMarker,
+          currentKey: "currentLimitAngle",
+          targetKey: "targetLimitAngle",
+          deadband: ANIMATION.indicatorDeadbandDegrees,
+          responsePerSecond: ANIMATION.indicatorResponsePerSecond,
+          displayAngle: quantizedIndicatorAngle,
+          apply: (displayedAngle) => this.applyLimitAngle(displayedAngle, data, { limitMarker, complianceArc, complianceArcBase, complianceArcHot }),
+        },
+      };
+    }
+
+    setChannelTarget(kind, angle) {
+      const data = this._cachedData ?? this.readData();
+      const channel = this.channelDefinitions(data)[kind];
+      if (!channel) return;
+      this[channel.targetKey] = angle;
+      if (this[channel.currentKey] === undefined) {
+        this[channel.currentKey] = angle;
+        channel.apply(channel.displayAngle(angle));
+        return;
+      }
+      const shouldAnimate = Math.abs(this[channel.targetKey] - this[channel.currentKey]) >= channel.deadband;
+      if (shouldAnimate && !this.animationRaf) this.animateAll(performance.now());
+    }
+
     setNeedleTarget(angle) {
-      this.targetNeedleAngle = angle;
-      if (this.currentNeedleAngle === undefined) this.currentNeedleAngle = angle;
-      if (!this.animationRaf) this.animateAll(performance.now());
+      this.setChannelTarget("needle", angle);
+    }
+
+    applyLimitAngle(displayedAngle, data, parts = this.parts) {
+      setAttrIfChanged(parts?.limitMarker, "transform", this.markerTransformForAngle(displayedAngle, TRACKS.speedLimit.markerRadius));
+      if (!parts?.complianceArc || data.speedLimit <= 0) return;
+      const dasharray = this.complianceArcDasharray(data, displayedAngle);
+      setAttrIfChanged(parts.complianceArcBase, "stroke-dasharray", dasharray);
+      setAttrIfChanged(parts.complianceArcHot, "stroke-dasharray", dasharray);
     }
 
     setIndicatorTarget(kind, angle) {
-      let shouldAnimate = false;
-      if (kind === "set") {
-        this.targetSetAngle = angle;
-        if (this.currentSetAngle === undefined) {
-          this.currentSetAngle = angle;
-          setAttrIfChanged(this.parts?.setMarker, "transform", this.markerTransformForAngle(quantizedIndicatorAngle(this.currentSetAngle), TRACKS.accSet.radius));
-        } else {
-          shouldAnimate = Math.abs(this.targetSetAngle - this.currentSetAngle) >= ANIMATION.indicatorDeadbandDegrees;
+      this.setChannelTarget(kind, angle);
+    }
+
+    animateChannel(channel, isFirstFrame, now) {
+      if (!channel.part) return false;
+      const currentAngle = this[channel.currentKey];
+      const targetAngle = this[channel.targetKey];
+      if (currentAngle === undefined || targetAngle === undefined) return false;
+      const factor = animationFactor(this.lastFrameAt, now, channel.responsePerSecond);
+      const diff = targetAngle - currentAngle;
+      if (Math.abs(diff) < channel.deadband) {
+        if (isFirstFrame || currentAngle !== targetAngle) {
+          this[channel.currentKey] = targetAngle;
+          channel.apply(channel.displayAngle(targetAngle));
         }
-      } else {
-        this.targetLimitAngle = angle;
-        if (this.currentLimitAngle === undefined) {
-          this.currentLimitAngle = angle;
-          const displayedLimitAngle = quantizedIndicatorAngle(this.currentLimitAngle);
-          setAttrIfChanged(this.parts?.limitMarker, "transform", this.markerTransformForAngle(displayedLimitAngle, TRACKS.speedLimit.markerRadius));
-          const data = this._cachedData ?? this.readData();
-          if (this.parts?.complianceArc && data.speedLimit > 0) {
-            const dasharray = this.complianceArcDasharray(data, displayedLimitAngle);
-            setAttrIfChanged(this.parts.complianceArcBase, "stroke-dasharray", dasharray);
-            setAttrIfChanged(this.parts.complianceArcHot, "stroke-dasharray", dasharray);
-          }
-        } else {
-          shouldAnimate = Math.abs(this.targetLimitAngle - this.currentLimitAngle) >= ANIMATION.indicatorDeadbandDegrees;
-        }
+        return false;
       }
-      if (shouldAnimate && !this.animationRaf) this.animateAll(performance.now());
+      this[channel.currentKey] = currentAngle + diff * factor;
+      channel.apply(channel.displayAngle(this[channel.currentKey]));
+      return true;
     }
 
     animateAll(now) {
       const data = this._cachedData ?? this.readData();
-      const { needle, setMarker, limitMarker, complianceArc, complianceArcBase, complianceArcHot, svg } = this.parts || {};
+      const channels = Object.values(this.channelDefinitions(data));
+      const visibleChannels = channels.filter((channel) => channel.part);
 
-      if (!needle && !setMarker && !limitMarker) {
+      if (!visibleChannels.length) {
         this.animationRaf = 0;
         this.lastFrameAt = undefined;
         return;
       }
 
-      const factor = animationFactor(this.lastFrameAt, now);
-      const indicatorFactor = animationFactor(this.lastFrameAt, now, ANIMATION.indicatorResponsePerSecond);
       const isFirstFrame = this.lastFrameAt === undefined;
       let moving = false;
-
-      if (needle && this.currentNeedleAngle !== undefined) {
-        const needleDiff = this.targetNeedleAngle - this.currentNeedleAngle;
-        if (Math.abs(needleDiff) < ANIMATION.deadbandDegrees) {
-          if (isFirstFrame || this.currentNeedleAngle !== this.targetNeedleAngle) {
-            this.currentNeedleAngle = this.targetNeedleAngle;
-            setAttrIfChanged(needle, "transform", geometry.rotationTransform(quantizedNeedleAngle(this.currentNeedleAngle), GAUGE.cx, GAUGE.cy));
-          }
-        } else {
-          this.currentNeedleAngle += needleDiff * factor;
-          moving = true;
-          setAttrIfChanged(needle, "transform", geometry.rotationTransform(quantizedNeedleAngle(this.currentNeedleAngle), GAUGE.cx, GAUGE.cy));
-        }
-        if (complianceArc && svg) {
-          const displayedValue = this.valueForAngle(data, this.currentNeedleAngle);
-          this.setLimitGlow(svg, this.limitGlowForValue(displayedValue, data.speedLimit));
-        }
-      }
-
-      if (setMarker && this.currentSetAngle !== undefined) {
-        const setDiff = this.targetSetAngle - this.currentSetAngle;
-        if (Math.abs(setDiff) < ANIMATION.indicatorDeadbandDegrees) {
-          if (isFirstFrame || this.currentSetAngle !== this.targetSetAngle) {
-            this.currentSetAngle = this.targetSetAngle;
-            setAttrIfChanged(setMarker, "transform", this.markerTransformForAngle(quantizedIndicatorAngle(this.currentSetAngle), TRACKS.accSet.radius));
-          }
-        } else {
-          this.currentSetAngle += setDiff * indicatorFactor;
-          moving = true;
-          setAttrIfChanged(setMarker, "transform", this.markerTransformForAngle(quantizedIndicatorAngle(this.currentSetAngle), TRACKS.accSet.radius));
-        }
-      }
-
-      if (limitMarker && this.currentLimitAngle !== undefined) {
-        const limitDiff = this.targetLimitAngle - this.currentLimitAngle;
-        if (Math.abs(limitDiff) < ANIMATION.indicatorDeadbandDegrees) {
-          if (isFirstFrame || this.currentLimitAngle !== this.targetLimitAngle) {
-            this.currentLimitAngle = this.targetLimitAngle;
-            const displayedLimitAngle = quantizedIndicatorAngle(this.currentLimitAngle);
-            setAttrIfChanged(limitMarker, "transform", this.markerTransformForAngle(displayedLimitAngle, TRACKS.speedLimit.markerRadius));
-            if (complianceArc && data.speedLimit > 0) {
-              const dasharray = this.complianceArcDasharray(data, displayedLimitAngle);
-              setAttrIfChanged(complianceArcBase, "stroke-dasharray", dasharray);
-              setAttrIfChanged(complianceArcHot, "stroke-dasharray", dasharray);
-            }
-          }
-        } else {
-          this.currentLimitAngle += limitDiff * indicatorFactor;
-          moving = true;
-          const displayedLimitAngle = quantizedIndicatorAngle(this.currentLimitAngle);
-          setAttrIfChanged(limitMarker, "transform", this.markerTransformForAngle(displayedLimitAngle, TRACKS.speedLimit.markerRadius));
-          if (complianceArc && data.speedLimit > 0) {
-            const dasharray = this.complianceArcDasharray(data, displayedLimitAngle);
-            setAttrIfChanged(complianceArcBase, "stroke-dasharray", dasharray);
-            setAttrIfChanged(complianceArcHot, "stroke-dasharray", dasharray);
-          }
-        }
-      }
+      visibleChannels.forEach((channel) => {
+        moving = this.animateChannel(channel, isFirstFrame, now) || moving;
+      });
 
       this.lastFrameAt = moving ? now : undefined;
       this.animationRaf = moving ? requestAnimationFrame((frameAt) => this.animateAll(frameAt)) : 0;
