@@ -97,39 +97,32 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 8) {
             sectionTitle("Dashboard")
                 .padding(.horizontal, 24)
-            Text("Choose a dashboard")
-                .foregroundColor(mutedText)
-                .font(.system(size: 13))
-                .padding(.horizontal, 24)
-            Spacer().frame(height: 4)
 
-            ScrollView(.horizontal, showsIndicators: false) {
+            NavigationLink(value: AppRoute.themePicker) {
                 HStack(spacing: 12) {
-                    ForEach(availableDashboards.filter { $0.type != .devRive }) { dashboard in
-                        let isSelected = dashboard.id == currentDashboardId
-                        VStack(spacing: 0) {
-                            dashboardThumbnail(for: dashboard)
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                            Text(dashboard.name)
-                                .font(.system(size: 12, weight: .medium))
-                                .foregroundColor(isSelected ? dashGreen : mutedText)
-                                .padding(.vertical, 8)
-                        }
-                        .frame(width: 148)
-                        .background(Color(white: 0.1))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(isSelected ? dashGreen : Color.clear, lineWidth: 2)
-                        )
-                        .onTapGesture {
-                            selectedDashboardId = dashboard.id
-                        }
+                    dashboardThumbnail(for: currentDashboard)
+                        .frame(width: 96)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(currentDashboard.name)
+                            .foregroundColor(.white)
+                            .font(.system(size: 16))
+                        Text("Choose a dashboard")
+                            .foregroundColor(mutedText)
+                            .font(.system(size: 13))
                     }
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .foregroundColor(mutedText)
+                        .font(.system(size: 14, weight: .medium))
                 }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 4)
+                .padding(12)
+                .background(Color(white: 0.1))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
             }
+            .buttonStyle(.plain)
+            .padding(.horizontal, 24)
+
             Spacer().frame(height: 8)
         }
     }
