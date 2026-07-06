@@ -83,7 +83,10 @@ fun HomeScreen(
             ConnectedHomeContent(
                 dashState = dashState,
                 bleManager = bleManager,
+                connectionStatus = connectionStatus,
                 pinnedControlId = pinnedControlId,
+                onConnect = onConnect,
+                onDisconnect = onDisconnect,
                 onAutomations = onAutomations,
                 onControls = onControls,
                 onDrive = onDrive,
@@ -106,7 +109,10 @@ fun HomeScreen(
 private fun ConnectedHomeContent(
     dashState: Flow<DashState>?,
     bleManager: DashKitBleManager?,
+    connectionStatus: ConnectionStatus,
     pinnedControlId: String?,
+    onConnect: (serverAddress: String, dataSourceType: String) -> Unit,
+    onDisconnect: () -> Unit,
     onAutomations: () -> Unit,
     onControls: () -> Unit,
     onDrive: () -> Unit,
@@ -222,6 +228,12 @@ private fun ConnectedHomeContent(
             accent = true,
             onClick = onDrive
         )
+        if (BuildConfig.DEBUG) {
+            Spacer(modifier = Modifier.height(12.dp))
+            Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                DebugDataSourceMenu(connectionStatus, onConnect, onDisconnect)
+            }
+        }
     }
 }
 
