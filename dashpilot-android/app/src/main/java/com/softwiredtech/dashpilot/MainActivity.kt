@@ -17,9 +17,11 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.core.content.ContextCompat
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.animation.EnterTransition
@@ -31,6 +33,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import androidx.startup.AppInitializer
 import app.rive.runtime.kotlin.RiveInitializer
+import com.softwiredtech.dashpilot.ble.FirmwareUpdateManager
 import com.softwiredtech.dashpilot.datamodel.dash.DashboardType
 import com.softwiredtech.dashpilot.datamodel.dash.ManifestLoader
 import com.softwiredtech.dashpilot.datamodel.dash.availableDashboards
@@ -45,12 +48,14 @@ import com.softwiredtech.dashpilot.navigation.DashboardRoute
 import com.softwiredtech.dashpilot.navigation.OnboardingRoute
 import com.softwiredtech.dashpilot.navigation.SettingsRoute
 import com.softwiredtech.dashpilot.navigation.SetupRoute
+import com.softwiredtech.dashpilot.navigation.ThemePickerRoute
 import com.softwiredtech.dashpilot.ui.AutomationsScreen
 import com.softwiredtech.dashpilot.ui.ControlScreen
 import com.softwiredtech.dashpilot.ui.DashboardScreen
 import com.softwiredtech.dashpilot.ui.HomeScreen
 import com.softwiredtech.dashpilot.ui.LOCAL_ASSET_BASE_URL
 import com.softwiredtech.dashpilot.ui.SettingsScreen
+import com.softwiredtech.dashpilot.ui.ThemePickerScreen
 import com.softwiredtech.dashpilot.ui.onboarding.OnboardingScreen
 import com.softwiredtech.dashpilot.ui.theme.DashPilotTheme
 import com.softwiredtech.dashpilot.util.NetworkUtil
@@ -135,6 +140,17 @@ class MainActivity : ComponentActivity() {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val onDashboard = navBackStackEntry?.destination?.route
                     ?.contains("DashboardRoute") == true
+
+                // Activity-scoped so an in-progress OTA survives navigation away
+                // from Settings (tab switches, theme picker); it is only disposed
+                // when the BLE manager changes or the Activity's content goes away.
+                val bleManager by connectionVM.bleManager.collectAsState()
+                val dashkitUpdateManager = remember(bleManager) {
+                    bleManager?.let { FirmwareUpdateManager(it) }
+                }
+                DisposableEffect(dashkitUpdateManager) {
+                    onDispose { dashkitUpdateManager?.dispose() }
+                }
 
                 // One-shot routing once the startup DashKit scan resolves. The UI
                 // shows the normal Setup screen (disconnected/connecting) until then.
@@ -263,13 +279,25 @@ class MainActivity : ComponentActivity() {
                                 onBack = { navController.popBackStack() },
                                 onDisplaySettingsChanged = { connectionVM.updateDisplaySettings(it) },
                                 bleManager = manager,
+                                dashkitUpdateManager = dashkitUpdateManager,
                                 onReplayOnboarding = {
                                     connectionVM.disconnect()
                                     setOnboardingCompleted(context, false)
                                     navController.navigate(OnboardingRoute) {
                                         popUpTo(SetupRoute) { inclusive = false }
                                     }
+                                },
+                                onThemeClick = {
+                                    navController.navigate(ThemePickerRoute)
                                 }
+                            )
+                        }
+                        composable<ThemePickerRoute> {
+                            ThemePickerScreen(
+                                // Route-targeted pop is a no-op once the picker is
+                                // already off the stack, so a second rapid tap (two
+                                // cards, or card + back arrow) can't pop Settings too.
+                                onBack = { navController.popBackStack(ThemePickerRoute, inclusive = true) }
                             )
                         }
                         composable<DashboardRoute> { backStackEntry ->

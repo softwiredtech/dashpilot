@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,7 +17,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -41,10 +39,7 @@ import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -76,7 +71,6 @@ import kotlinx.coroutines.launch
 
 import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.datamodel.dash.DASH_PREFS_NAME
-import com.softwiredtech.dashpilot.datamodel.dash.DashboardType
 import com.softwiredtech.dashpilot.datamodel.dash.DisplaySettings
 import com.softwiredtech.dashpilot.datamodel.dash.ManifestDisplaySetting
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_ALWAYS_ON_BLIND_SPOT_MONITOR
@@ -97,11 +91,8 @@ import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_CAR_BATTERY
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_ODOMETER
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_PHONE_BATTERY
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_USE_IMPERIAL
-import com.softwiredtech.dashpilot.datamodel.dash.availableDashboards
 import com.softwiredtech.dashpilot.datamodel.dash.dashboardById
 import com.softwiredtech.dashpilot.datamodel.dash.getSelectedDashboard
-import com.softwiredtech.dashpilot.datamodel.dash.saveDevRiveFileUri
-import com.softwiredtech.dashpilot.datamodel.dash.saveSelectedDashboard
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
 import com.softwiredtech.dashpilot.ui.theme.DarkColors
 
@@ -127,7 +118,9 @@ fun SettingsScreen(
     onBack: () -> Unit,
     onDisplaySettingsChanged: (DisplaySettings) -> Unit = {},
     bleManager: DashKitBleManager? = null,
-    onReplayOnboarding: () -> Unit = {}
+    dashkitUpdateManager: FirmwareUpdateManager? = null,
+    onReplayOnboarding: () -> Unit = {},
+    onThemeClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val sharedPrefs = remember { context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE) }
@@ -164,15 +157,6 @@ fun SettingsScreen(
         mutableStateOf(getSelectedDashboard(context).id)
     }
 
-    val filePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument()
-    ) { uri ->
-        if (uri != null) {
-            saveDevRiveFileUri(context, uri.toString())
-            selectedDashboardId.value = "dev_rive"
-            saveSelectedDashboard(context, dashboardById("dev_rive")!!)
-        }
-    }
     val selectedDashboardManifest = remember(selectedDashboardId.value) {
         dashboardById(selectedDashboardId.value)?.manifest
     }
@@ -211,15 +195,6 @@ fun SettingsScreen(
     )
 
     val selectedTab = remember { mutableIntStateOf(0) }
-
-    // Hoisted so it survives tab switches (an in-progress OTA is not cancelled
-    // just because the user flips back to the General tab).
-    val dashkitUpdateManager = remember(bleManager) {
-        bleManager?.let { FirmwareUpdateManager(it) }
-    }
-    DisposableEffect(dashkitUpdateManager) {
-        onDispose { dashkitUpdateManager?.dispose() }
-    }
 
     Scaffold(
         topBar = {
@@ -280,77 +255,52 @@ fun SettingsScreen(
             }
 
             SectionHeader(stringResource(R.string.settings_section_dashboard))
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                stringResource(R.string.settings_dashboard_subtitle),
-                color = DarkColors.TextSubtle,
-                fontSize = 13.sp
-            )
             Spacer(modifier = Modifier.height(10.dp))
 
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            val currentTheme = dashboardById(selectedDashboardId.value)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(DarkColors.Surface)
+                    .clickable { onThemeClick() }
+                    .padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                availableDashboards.forEach { dashboard ->
-                    item {
-                        val isSelected = dashboard.id == selectedDashboardId.value
-                        Column(
-                            modifier = Modifier
-                                .width(160.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                                .then(
-                                    if (isSelected) Modifier.border(2.dp, AccentColor, RoundedCornerShape(12.dp))
-                                    else Modifier
-                                )
-                                .background(DarkColors.Surface)
-                                .clickable {
-                                    if (dashboard.type == DashboardType.DEV_RIVE) {
-                                        filePickerLauncher.launch(arrayOf("*/*"))
-                                    } else {
-                                        selectedDashboardId.value = dashboard.id
-                                        saveSelectedDashboard(context, dashboard)
-                                    }
-                                },
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            val dashboardName = stringResource(dashboard.nameRes)
-                            if (dashboard.screenshotRes != 0) {
-                                Image(
-                                    painter = painterResource(id = dashboard.screenshotRes),
-                                    contentDescription = dashboardName,
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .aspectRatio(16f / 9f)
-                                        .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
-                                )
-                            } else {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .aspectRatio(16f / 9f)
-                                        .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
-                                        .background(DarkColors.SurfaceSelected)
-                                )
-                            }
-                            Text(
-                                text = dashboardName,
-                                color = if (isSelected) AccentColor else DarkColors.ContentDisabled,
-                                fontSize = 13.sp,
-                                modifier = Modifier.padding(vertical = 10.dp)
-                            )
-                        }
-                    }
+                if (currentTheme != null && currentTheme.screenshotRes != 0) {
+                    Image(
+                        painter = painterResource(id = currentTheme.screenshotRes),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .width(96.dp)
+                            .aspectRatio(16f / 9f)
+                            .clip(RoundedCornerShape(8.dp))
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .width(96.dp)
+                            .aspectRatio(16f / 9f)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(DarkColors.SurfaceSelected)
+                    )
                 }
+                Spacer(modifier = Modifier.width(12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = currentTheme?.let { stringResource(it.nameRes) } ?: "",
+                        color = Color.White,
+                        fontSize = 16.sp
+                    )
+                    Text(
+                        text = stringResource(R.string.settings_dashboard_subtitle),
+                        color = DarkColors.TextMuted,
+                        fontSize = 13.sp
+                    )
+                }
+                Text(text = "›", color = DarkColors.TextMuted, fontSize = 20.sp)
             }
-
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = stringResource(R.string.settings_theme_availability_note),
-                color = DarkColors.TextSubtle,
-                fontSize = 13.sp
-            )
 
             Spacer(modifier = Modifier.height(8.dp))
 
