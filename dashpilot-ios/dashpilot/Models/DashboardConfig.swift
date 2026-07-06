@@ -6,28 +6,13 @@ enum DashboardType: String {
     case devRive
 }
 
-struct DashboardCapabilities {
-    var supports3dVisualizerSettings: Bool = false
-    var supportsVehicleBusWidgets: Bool = false
-    var supportsPhoneBatteryToggle: Bool = false
-}
-
 struct DashboardConfig: Identifiable {
     let id: String
     let name: String
     let url: String
     let type: DashboardType
     let screenshotName: String?
-    let capabilities: DashboardCapabilities
-
-    init(id: String, name: String, url: String, type: DashboardType, screenshotName: String? = nil, capabilities: DashboardCapabilities = DashboardCapabilities()) {
-        self.id = id
-        self.name = name
-        self.url = url
-        self.type = type
-        self.screenshotName = screenshotName
-        self.capabilities = capabilities
-    }
+    var manifest: DashboardManifest? = nil
 }
 
 let availableDashboards: [DashboardConfig] = [
@@ -36,12 +21,7 @@ let availableDashboards: [DashboardConfig] = [
         name: "Vanilla Dashboard",
         url: "vanilla",
         type: .web,
-        screenshotName: "preview_vanilla",
-        capabilities: DashboardCapabilities(
-            supports3dVisualizerSettings: true,
-            supportsVehicleBusWidgets: true,
-            supportsPhoneBatteryToggle: true
-        )
+        screenshotName: "preview_vanilla"
     ),
     DashboardConfig(
         id: "ambient",
@@ -73,12 +53,26 @@ let availableDashboards: [DashboardConfig] = [
     ),
 ]
 
+// Written once at app startup by dashpilotApp.init() via setLoadedManifests().
+// Reads happen via dashboardById() — always use that to get a hydrated config.
+private var loadedManifests: [String: DashboardManifest] = [:]
+
+func setLoadedManifests(_ map: [String: DashboardManifest]) {
+    loadedManifests = map
+}
+
+private let defaultDashboardId = "vanilla"
+
 func dashboardById(_ id: String?) -> DashboardConfig? {
     guard let id = id?.trimmingCharacters(in: .whitespaces), !id.isEmpty else { return nil }
-    return availableDashboards.first { $0.id == id }
+    guard var config = availableDashboards.first(where: { $0.id == id }) else { return nil }
+    if config.type == .web {
+        config.manifest = loadedManifests[id]
+    }
+    return config
 }
 
 func selectedDashboard() -> DashboardConfig {
     let savedId = UserDefaults.standard.string(forKey: DisplaySettings.keySelectedDashboardId)
-    return dashboardById(savedId) ?? availableDashboards[0]
+    return dashboardById(savedId) ?? dashboardById(defaultDashboardId) ?? availableDashboards[0]
 }
