@@ -30,6 +30,8 @@ struct dashpilotApp: App {
                             DashboardView(dashboardType: type, dashboardUrl: url)
                         case .settings:
                             SettingsView()
+                        case .themePicker:
+                            ThemePickerView()
                         }
                     }
             }
