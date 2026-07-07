@@ -1,5 +1,6 @@
 package com.softwiredtech.dashpilot.viewmodel
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
@@ -7,8 +8,11 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.BatteryManager
+import android.os.Build
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.softwiredtech.dashpilot.datamodel.dash.DASH_PREFS_NAME
@@ -75,6 +79,13 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
 
     private val _bleManager = MutableStateFlow<DashKitBleManager?>(null)
     val bleManager: StateFlow<DashKitBleManager?> = _bleManager.asStateFlow()
+
+    // Wired up by the Activity, the only component that can show the runtime
+    // permission prompt. Given a callback, it ensures the BLUETOOTH_SCAN /
+    // BLUETOOTH_CONNECT permissions are held — requesting them if needed — and
+    // invokes the callback once they are granted (never if denied). Guarantees
+    // we hold BLE permission before any scan/connect begins.
+    var blePermissionGate: ((onGranted: () -> Unit) -> Unit)? = null
 
     private val _hasAutoNavigatedToDashboard = MutableStateFlow(false)
     val hasAutoNavigatedToDashboard = _hasAutoNavigatedToDashboard.asStateFlow()
@@ -256,7 +267,32 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         }
     }
 
+    // Android 12+ requires the BLUETOOTH_SCAN / BLUETOOTH_CONNECT runtime
+    // permissions before any BLE scan or connect. Pre-12 these are install-time
+    // permissions, so this always holds.
+    private fun hasBluetoothPermission(context: Context): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return true
+        return ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) ==
+                PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN) ==
+                PackageManager.PERMISSION_GRANTED
+    }
+
     fun connect(context: Context, manualServerAddress: String, dataSourceType: String) {
+        // DashKit is a BLE device: make sure we hold the runtime permission
+        // before we start scanning/connecting. If it isn't granted yet, request
+        // it via the Activity gate and re-enter connect() once the user grants
+        // it (permission now held, so this branch is skipped and no recursion).
+        if (dataSourceType == DataSourceType.DASHKIT && !hasBluetoothPermission(context)) {
+            val gate = blePermissionGate
+            if (gate != null) {
+                gate { connect(context, manualServerAddress, dataSourceType) }
+            } else {
+                _connectionStatus.value = ConnectionStatus.Error("Missing BLE permission")
+            }
+            return
+        }
+
         val current = _connectionStatus.value
         if (current !is ConnectionStatus.Disconnected && current !is ConnectionStatus.Error) return
 

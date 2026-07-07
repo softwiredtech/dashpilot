@@ -40,6 +40,9 @@
 -keep class * extends com.google.gson.reflect.TypeToken
 -keep class com.softwiredtech.dashpilot.datamodel.api.** { *; }
 
+# --- Firmware OTA update manifest (parsed by Gson via reflection) ---
+-keep class com.softwiredtech.dashpilot.api.FirmwareManifest { *; }
+
 # --- OkHttp ---
 -dontwarn okhttp3.internal.platform.**
 -dontwarn org.conscrypt.**

@@ -67,21 +67,50 @@ class MainActivity : ComponentActivity() {
 
     private val speedCameraVM: SpeedCameraViewModel by viewModels()
 
+    // A BLE connection attempt that arrived before we held permission. Run once
+    // the user grants the prompt (see bluetoothPermissionLauncher).
+    private var pendingBleAction: (() -> Unit)? = null
+
     private val bluetoothPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { _ ->
+        val granted = hasBluetoothPermission()
         // Kick off the startup DashKit scan once the user has responded to the
         // permission prompt (granted or not — runStartupDiscovery handles both).
-        connectionVM.runStartupDiscovery(this, hasBluetoothPermission())
+        connectionVM.runStartupDiscovery(this, granted)
+        // Resume any connection that was waiting on permission, but only if the
+        // user actually granted it.
+        val action = pendingBleAction
+        pendingBleAction = null
+        if (granted) action?.invoke()
     }
 
-    private val locationPermissionLauncher = registerForActivityResult(
+    // Ensures BLE permission is held before running a BLE action, requesting it
+    // first if needed. Wired into ConnectionViewModel so every connect path is
+    // gated. onGranted runs immediately when permission is already held, or from
+    // the permission-launcher callback once the user grants it.
+    private fun ensureBluetoothPermission(onGranted: () -> Unit) {
+        if (hasBluetoothPermission()) {
+            onGranted()
+        } else {
+            pendingBleAction = onGranted
+            requestBluetoothPermission()
+        }
+    }
+
+    // Startup permissions — location (for speed cameras) and BLE (for DashKit) —
+    // are requested together in one flow. Android only surfaces one permission
+    // dialog at a time, so launching them from separate launchers would drop all
+    // but the first (which is why the BLE prompt never appeared).
+    private val startupPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        val granted = permissions.any { it.value }
-        if (granted) {
+    ) { _ ->
+        if (hasLocationPermission()) {
             speedCameraVM.startUpdating(this)
         }
+        // Kick off the startup DashKit scan once the user has responded
+        // (granted or not — runStartupDiscovery handles both).
+        connectionVM.runStartupDiscovery(this, hasBluetoothPermission())
     }
 
     private fun loadDashboardManifests() {
@@ -96,24 +125,40 @@ class MainActivity : ComponentActivity() {
 
         loadDashboardManifests()
 
+        // Route every BLE connect through the runtime-permission gate so we
+        // never start a scan/connect before the user has granted permission.
+        connectionVM.blePermissionGate = { onGranted -> ensureBluetoothPermission(onGranted) }
+
         connectionVM.loadPinnedControl(this)
         connectionVM.loadAutomations(this)
 
         connectionVM.bindSpeedCamera(speedCameraVM.nearestApproachingCamera)
 
-        if (hasLocationPermission()) {
-            speedCameraVM.startUpdating(this)
-        } else {
-            requestLocationPermission()
+        // Request every missing startup permission (location + BLE) in a single
+        // prompt flow via startupPermissionLauncher. If BLE is already granted,
+        // kick off DashKit discovery immediately so route selection isn't blocked
+        // behind the location prompt.
+        val bleGranted = hasBluetoothPermission()
+        if (bleGranted) {
+            connectionVM.runStartupDiscovery(this, true)
         }
 
-        // Decide the launch route by briefly scanning for an advertising DashKit.
-        // If we don't yet have BLE permission, the scan is kicked off from the
-        // permission launcher callback instead.
-        if (hasBluetoothPermission()) {
-            connectionVM.runStartupDiscovery(this, true)
+        val startupPermissions = buildList {
+            if (!hasLocationPermission()) {
+                add(Manifest.permission.ACCESS_FINE_LOCATION)
+                add(Manifest.permission.ACCESS_COARSE_LOCATION)
+            }
+            if (!bleGranted && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                add(Manifest.permission.BLUETOOTH_CONNECT)
+                add(Manifest.permission.BLUETOOTH_SCAN)
+            }
+        }
+        if (startupPermissions.isEmpty()) {
+            if (hasLocationPermission()) {
+                speedCameraVM.startUpdating(this)
+            }
         } else {
-            requestBluetoothPermission()
+            startupPermissionLauncher.launch(startupPermissions.toTypedArray())
         }
 
         AppInitializer.getInstance(applicationContext)
@@ -321,19 +366,6 @@ class MainActivity : ComponentActivity() {
                 PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun requestLocationPermission() {
-        val needed = arrayOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        ).filter {
-            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
-        }.toTypedArray()
-
-        if (needed.isNotEmpty()) {
-            locationPermissionLauncher.launch(needed)
-        }
     }
 
     private fun hideSystemBars() {
