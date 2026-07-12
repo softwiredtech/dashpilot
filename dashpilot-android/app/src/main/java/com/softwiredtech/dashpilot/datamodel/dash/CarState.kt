@@ -39,6 +39,8 @@ data class CarState(
     val changingLane: Boolean = false
 ) {
     fun toImperial(): CarState = copy(
+        egoSpeed = egoSpeed * KM_TO_MILES,
+        accSetSpeed = accSetSpeed * KM_TO_MILES,
         odometer = odometer * KM_TO_MILES,
         packTMin = if (packTMin != 0f) packTMin * 1.8f + 32f else 0f,
         packTMax = if (packTMax != 0f) packTMax * 1.8f + 32f else 0f,
