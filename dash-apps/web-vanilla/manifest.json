@@ -2,6 +2,10 @@
   "$schema": "../../docs/dashapp-manifest.schema.json",
   "manifestVersion": 1,
   "id": "vanilla",
+  "perf": {
+    "gate": "exempt",
+    "reason": "WASM/Bevy 3D renderer; SwiftShader + CPU throttle in CI misrepresents real-device GPU performance. Needs a renderer-specific gate."
+  },
   "settings": [
     "showPhoneBattery", "showCarBattery", "showOdometer",
     "alwaysOnBlindSpotMonitor", "useImperial", "darkMode",

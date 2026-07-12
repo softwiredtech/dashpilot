@@ -2,5 +2,6 @@
   "$schema": "../../docs/dashapp-manifest.schema.json",
   "manifestVersion": 1,
   "id": "expo",
+  "perf": { "gate": "standard", "root": "dist" },
   "settings": []
 }

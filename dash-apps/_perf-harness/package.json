@@ -1,0 +1,14 @@
+{
+  "name": "dashpilot-perf-harness",
+  "private": true,
+  "description": "Performance gate for web dash-apps. See dash-apps/README.md.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "playwright": "^1.45.0"
+  }
+}

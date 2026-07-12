@@ -9,6 +9,30 @@
     "$schema": { "type": "string" },
     "manifestVersion": { "type": "integer", "const": 1 },
     "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "perf": {
+      "description": "Performance-gate declaration. Absent means gate: standard.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "gate": { "enum": ["standard", "exempt"], "default": "standard" },
+        "reason": {
+          "type": "string",
+          "minLength": 10,
+          "description": "Required when gate is exempt: why this app cannot be fairly benchmarked by the CPU-throttled gate."
+        },
+        "root": {
+          "type": "string",
+          "default": ".",
+          "description": "Servable directory relative to the app folder (e.g. dist for built apps)."
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "gate": { "const": "exempt" } }, "required": ["gate"] },
+          "then": { "required": ["reason"] }
+        }
+      ]
+    },
     "settings": {
       "type": "array",
       "uniqueItems": true,
