@@ -32,8 +32,9 @@ for (const folder of dirs) {
   for (const key of Object.keys(m)) {
     if (!ROOT_KEYS.has(key)) errors.push(`${folder}: unknown property "${key}"`);
   }
-  if (!Number.isInteger(m.manifestVersion) || m.manifestVersion !== 1) {
-    errors.push(`${folder}: manifestVersion must be 1`);
+  const expectedVersion = schema.properties.manifestVersion.const;
+  if (!Number.isInteger(m.manifestVersion) || m.manifestVersion !== expectedVersion) {
+    errors.push(`${folder}: manifestVersion must be ${expectedVersion}`);
   }
   if (typeof m.id !== "string" || !idRe.test(m.id)) {
     errors.push(`${folder}: id must match ${schema.properties.id.pattern}`);
