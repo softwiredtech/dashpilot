@@ -117,6 +117,9 @@ DashboardConfig(
 - `id` must match the `id` field in `manifest.json`.
 - `url` is the folder name **without the `web-` prefix** — `WebDashView`
   resolves it to the bundled `web-<url>/` folder.
+- Add `"mytheme"` to `WebDashView.swift:88`'s `localApps` set — without this,
+  the iOS `app://` scheme handler skips the new dashboard and the WebView
+  silently fails to load.
 
 ## 7. iOS imageset (Xcode asset catalog)
 
