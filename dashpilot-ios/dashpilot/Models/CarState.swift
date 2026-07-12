@@ -83,6 +83,8 @@ struct CarState: Codable {
 
     func toImperial() -> CarState {
         var c = self
+        c.egoSpeed = egoSpeed * Self.kmToMiles
+        c.accSetSpeed = accSetSpeed * Self.kmToMiles
         c.odometer = odometer * Self.kmToMiles
         c.packTMin = packTMin != 0 ? packTMin * 1.8 + 32 : 0
         c.packTMax = packTMax != 0 ? packTMax * 1.8 + 32 : 0
