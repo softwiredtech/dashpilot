@@ -30,6 +30,7 @@ declare global {
       getTrafficLightColor(): number;
     };
     onCarStateUpdate?: () => void;
+    receiveMessage?: (car: CarState) => void;
   }
 }
 
@@ -72,8 +73,12 @@ export function useCarState(): CarState {
   }, []);
 
   useEffect(() => {
-    // Register the bridge callback
+    // Register the bridge callbacks
     window.onCarStateUpdate = readNative;
+    window.receiveMessage = (car) => {
+      stateRef.current = car;
+      setState(car);
+    };
 
     // If running outside WebView, simulate demo data
     if (typeof window.NativeCarState === "undefined") {
@@ -96,11 +101,16 @@ export function useCarState(): CarState {
         stateRef.current = demo;
         setState(demo);
       }, 50);
-      return () => clearInterval(interval);
+      return () => {
+        clearInterval(interval);
+        window.onCarStateUpdate = undefined;
+        window.receiveMessage = undefined;
+      };
     }
 
     return () => {
       window.onCarStateUpdate = undefined;
+      window.receiveMessage = undefined;
     };
   }, [readNative]);
 
