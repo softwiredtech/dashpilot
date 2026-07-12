@@ -12,6 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Validate dash-app manifests
+        run: node scripts/validate-manifests.js
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
