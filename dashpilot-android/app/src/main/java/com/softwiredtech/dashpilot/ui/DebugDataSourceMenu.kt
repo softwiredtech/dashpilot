@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.edit
+import com.softwiredtech.dashpilot.BuildConfig
 import com.softwiredtech.dashpilot.datamodel.dash.DASH_PREFS_NAME
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.DataSourceType
@@ -30,11 +31,13 @@ import com.softwiredtech.dashpilot.ui.theme.DarkColors
 
 private const val PREF_LAST_WEBSOCKET_ADDRESS = "last_websocket_address"
 
-private val debugSources = listOf(
-    DataSourceType.COMMA to "comma",
-    DataSourceType.DASHKIT to "DashKit",
-    DataSourceType.WEBSOCKET to "WebSocket…",
-)
+private val debugSources = buildList {
+    add(DataSourceType.COMMA to "comma")
+    add(DataSourceType.DASHKIT to "DashKit")
+    if (BuildConfig.DEBUG) {
+        add(DataSourceType.WEBSOCKET to "WebSocket")
+    }
+}
 
 @Composable
 fun DebugDataSourceMenu(
