@@ -80,11 +80,6 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     private val _bleManager = MutableStateFlow<DashKitBleManager?>(null)
     val bleManager: StateFlow<DashKitBleManager?> = _bleManager.asStateFlow()
 
-    // Wired up by the Activity, the only component that can show the runtime
-    // permission prompt. Given a callback, it ensures the BLUETOOTH_SCAN /
-    // BLUETOOTH_CONNECT permissions are held — requesting them if needed — and
-    // invokes the callback once they are granted (never if denied). Guarantees
-    // we hold BLE permission before any scan/connect begins.
     var blePermissionGate: ((onGranted: () -> Unit) -> Unit)? = null
 
     private val _hasAutoNavigatedToDashboard = MutableStateFlow(false)
@@ -110,8 +105,6 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     private val _wiperOffAutomation = MutableStateFlow(false)
     val wiperOffAutomation = _wiperOffAutomation.asStateFlow()
 
-    // Infotainment multi-finger gesture bindings: finger count (3..5) -> control
-    // id. Each gesture maps to at most one control.
     private val _fingerActions = MutableStateFlow<Map<Int, String>>(emptyMap())
     val fingerActions = _fingerActions.asStateFlow()
 
@@ -126,23 +119,10 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         pushWiperOff(value)
     }
 
-    // Push the wiper-off enabled flag to the firmware if connected (no-op
-    // otherwise; it is re-synced on the next connect).
     private fun pushWiperOff(enabled: Boolean) {
         _bleManager.value?.let { VehicleControl.sendWiperOff(it, enabled) }
     }
 
-    /**
-     * Ask the connected DashKit to open a pairing window so one new device can
-     * pair. Only works while this (already-paired) phone is connected. Returns
-     * false if not connected.
-     */
-    fun enterPairingMode(): Boolean {
-        val mgr = _bleManager.value ?: return false
-        return VehicleControl.sendEnterPairing(mgr)
-    }
-
-    /** Bind (id != null) or clear (id == null) the action for an N-finger tap. */
     fun setFingerAction(context: Context, fingers: Int, id: String?) {
         val next = _fingerActions.value.toMutableMap()
         if (id.isNullOrBlank()) next.remove(fingers) else next[fingers] = id
@@ -151,7 +131,6 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         pushFingerAction(fingers, id)
     }
 
-    /** Move an existing binding from one finger count to another. */
     fun changeFingerCount(context: Context, from: Int, to: Int) {
         if (from == to) return
         val current = _fingerActions.value
@@ -169,15 +148,11 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         setFingerAction(context, fingers, null)
     }
 
-    // Push a single binding to the firmware if connected (no-op otherwise; it is
-    // re-synced on the next connect).
     private fun pushFingerAction(fingers: Int, id: String?) {
         val actionValue = controlById(id)?.gestureValue ?: VehicleControl.GESTURE_ACTION_NONE
         _bleManager.value?.let { VehicleControl.sendFingerAction(it, fingers, actionValue) }
     }
 
-    // Result of the one-shot startup BLE scan used to decide where to route the
-    // app on launch. LOADING until the scan resolves (or is skipped).
     enum class StartupTarget { LOADING, ONBOARDING_DASHKIT, AUTOCONNECT_DASHKIT, DEFAULT }
 
     private val _startupTarget = MutableStateFlow(StartupTarget.LOADING)
@@ -270,9 +245,6 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         }
     }
 
-    // Android 12+ requires the BLUETOOTH_SCAN / BLUETOOTH_CONNECT runtime
-    // permissions before any BLE scan or connect. Pre-12 these are install-time
-    // permissions, so this always holds.
     private fun hasBluetoothPermission(context: Context): Boolean {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return true
         return ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) ==
@@ -282,10 +254,6 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     }
 
     fun connect(context: Context, manualServerAddress: String, dataSourceType: String) {
-        // DashKit is a BLE device: make sure we hold the runtime permission
-        // before we start scanning/connecting. If it isn't granted yet, request
-        // it via the Activity gate and re-enter connect() once the user grants
-        // it (permission now held, so this branch is skipped and no recursion).
         if (dataSourceType == DataSourceType.DASHKIT && !hasBluetoothPermission(context)) {
             val gate = blePermissionGate
             if (gate != null) {
@@ -318,9 +286,6 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
                 DataSourceType.DASHKIT -> {
                     val manager = DashKitBleManager(context)
                     _bleManager.value = manager
-                    // Surface BLE/pairing failures so the UI doesn't hang in the
-                    // Connecting state forever. Connected is still driven by the
-                    // first CAN frame below.
                     launch {
                         manager.connectionState.collect { st ->
                             if (st is ConnectionStatus.Error &&
