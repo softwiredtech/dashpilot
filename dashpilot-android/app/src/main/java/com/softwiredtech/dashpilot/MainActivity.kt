@@ -72,21 +72,34 @@ class MainActivity : ComponentActivity() {
 
     private val speedCameraVM: SpeedCameraViewModel by viewModels()
 
+    private var pendingBleAction: (() -> Unit)? = null
+
     private val bluetoothPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { _ ->
-        // Kick off the startup DashKit scan once the user has responded to the
-        // permission prompt (granted or not — runStartupDiscovery handles both).
-        connectionVM.runStartupDiscovery(this, hasBluetoothPermission())
+        val granted = hasBluetoothPermission()
+        connectionVM.runStartupDiscovery(this, granted)
+        val action = pendingBleAction
+        pendingBleAction = null
+        if (granted) action?.invoke()
     }
 
-    private val locationPermissionLauncher = registerForActivityResult(
+    private fun ensureBluetoothPermission(onGranted: () -> Unit) {
+        if (hasBluetoothPermission()) {
+            onGranted()
+        } else {
+            pendingBleAction = onGranted
+            requestBluetoothPermission()
+        }
+    }
+
+    private val startupPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        val granted = permissions.any { it.value }
-        if (granted) {
+    ) { _ ->
+        if (hasLocationPermission()) {
             speedCameraVM.startUpdating(this)
         }
+        connectionVM.runStartupDiscovery(this, hasBluetoothPermission())
     }
 
     private fun loadDashboardManifests() {
@@ -101,24 +114,34 @@ class MainActivity : ComponentActivity() {
 
         loadDashboardManifests()
 
+        connectionVM.blePermissionGate = { onGranted -> ensureBluetoothPermission(onGranted) }
+
         connectionVM.loadPinnedControl(this)
         connectionVM.loadAutomations(this)
 
         connectionVM.bindSpeedCamera(speedCameraVM.nearestApproachingCamera)
 
-        if (hasLocationPermission()) {
-            speedCameraVM.startUpdating(this)
-        } else {
-            requestLocationPermission()
+        val bleGranted = hasBluetoothPermission()
+        if (bleGranted) {
+            connectionVM.runStartupDiscovery(this, true)
         }
 
-        // Decide the launch route by briefly scanning for an advertising DashKit.
-        // If we don't yet have BLE permission, the scan is kicked off from the
-        // permission launcher callback instead.
-        if (hasBluetoothPermission()) {
-            connectionVM.runStartupDiscovery(this, true)
+        val startupPermissions = buildList {
+            if (!hasLocationPermission()) {
+                add(Manifest.permission.ACCESS_FINE_LOCATION)
+                add(Manifest.permission.ACCESS_COARSE_LOCATION)
+            }
+            if (!bleGranted && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                add(Manifest.permission.BLUETOOTH_CONNECT)
+                add(Manifest.permission.BLUETOOTH_SCAN)
+            }
+        }
+        if (startupPermissions.isEmpty()) {
+            if (hasLocationPermission()) {
+                speedCameraVM.startUpdating(this)
+            }
         } else {
-            requestBluetoothPermission()
+            startupPermissionLauncher.launch(startupPermissions.toTypedArray())
         }
 
         AppInitializer.getInstance(applicationContext)
@@ -141,9 +164,6 @@ class MainActivity : ComponentActivity() {
                 val onDashboard = navBackStackEntry?.destination?.route
                     ?.contains("DashboardRoute") == true
 
-                // Activity-scoped so an in-progress OTA survives navigation away
-                // from Settings (tab switches, theme picker); it is only disposed
-                // when the BLE manager changes or the Activity's content goes away.
                 val bleManager by connectionVM.bleManager.collectAsState()
                 val dashkitUpdateManager = remember(bleManager) {
                     bleManager?.let { FirmwareUpdateManager(it) }
@@ -152,8 +172,6 @@ class MainActivity : ComponentActivity() {
                     onDispose { dashkitUpdateManager?.dispose() }
                 }
 
-                // One-shot routing once the startup DashKit scan resolves. The UI
-                // shows the normal Setup screen (disconnected/connecting) until then.
                 LaunchedEffect(startupTarget) {
                     when (startupTarget) {
                         ConnectionViewModel.StartupTarget.ONBOARDING_DASHKIT ->
@@ -294,9 +312,6 @@ class MainActivity : ComponentActivity() {
                         }
                         composable<ThemePickerRoute> {
                             ThemePickerScreen(
-                                // Route-targeted pop is a no-op once the picker is
-                                // already off the stack, so a second rapid tap (two
-                                // cards, or card + back arrow) can't pop Settings too.
                                 onBack = { navController.popBackStack(ThemePickerRoute, inclusive = true) }
                             )
                         }
@@ -316,6 +331,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        connectionVM.onAppForegrounded(this)
     }
 
     private fun hasBluetoothPermission(): Boolean {
@@ -349,19 +369,6 @@ class MainActivity : ComponentActivity() {
                 PackageManager.PERMISSION_GRANTED ||
                 ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED
-    }
-
-    private fun requestLocationPermission() {
-        val needed = arrayOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        ).filter {
-            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
-        }.toTypedArray()
-
-        if (needed.isNotEmpty()) {
-            locationPermissionLauncher.launch(needed)
-        }
     }
 
     private fun hideSystemBars() {

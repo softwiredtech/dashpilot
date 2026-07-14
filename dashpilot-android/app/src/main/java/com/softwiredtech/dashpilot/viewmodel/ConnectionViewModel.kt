@@ -1,5 +1,6 @@
 package com.softwiredtech.dashpilot.viewmodel
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
@@ -7,8 +8,11 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.BatteryManager
+import android.os.Build
 import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.softwiredtech.dashpilot.datamodel.dash.DASH_PREFS_NAME
@@ -76,6 +80,8 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     private val _bleManager = MutableStateFlow<DashKitBleManager?>(null)
     val bleManager: StateFlow<DashKitBleManager?> = _bleManager.asStateFlow()
 
+    var blePermissionGate: ((onGranted: () -> Unit) -> Unit)? = null
+
     private val _hasAutoNavigatedToDashboard = MutableStateFlow(false)
     val hasAutoNavigatedToDashboard = _hasAutoNavigatedToDashboard.asStateFlow()
 
@@ -99,8 +105,6 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     private val _wiperOffAutomation = MutableStateFlow(false)
     val wiperOffAutomation = _wiperOffAutomation.asStateFlow()
 
-    // Infotainment multi-finger gesture bindings: finger count (3..5) -> control
-    // id. Each gesture maps to at most one control.
     private val _fingerActions = MutableStateFlow<Map<Int, String>>(emptyMap())
     val fingerActions = _fingerActions.asStateFlow()
 
@@ -115,23 +119,10 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         pushWiperOff(value)
     }
 
-    // Push the wiper-off enabled flag to the firmware if connected (no-op
-    // otherwise; it is re-synced on the next connect).
     private fun pushWiperOff(enabled: Boolean) {
         _bleManager.value?.let { VehicleControl.sendWiperOff(it, enabled) }
     }
 
-    /**
-     * Ask the connected DashKit to open a pairing window so one new device can
-     * pair. Only works while this (already-paired) phone is connected. Returns
-     * false if not connected.
-     */
-    fun enterPairingMode(): Boolean {
-        val mgr = _bleManager.value ?: return false
-        return VehicleControl.sendEnterPairing(mgr)
-    }
-
-    /** Bind (id != null) or clear (id == null) the action for an N-finger tap. */
     fun setFingerAction(context: Context, fingers: Int, id: String?) {
         val next = _fingerActions.value.toMutableMap()
         if (id.isNullOrBlank()) next.remove(fingers) else next[fingers] = id
@@ -140,7 +131,6 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         pushFingerAction(fingers, id)
     }
 
-    /** Move an existing binding from one finger count to another. */
     fun changeFingerCount(context: Context, from: Int, to: Int) {
         if (from == to) return
         val current = _fingerActions.value
@@ -158,20 +148,19 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         setFingerAction(context, fingers, null)
     }
 
-    // Push a single binding to the firmware if connected (no-op otherwise; it is
-    // re-synced on the next connect).
     private fun pushFingerAction(fingers: Int, id: String?) {
         val actionValue = controlById(id)?.gestureValue ?: VehicleControl.GESTURE_ACTION_NONE
         _bleManager.value?.let { VehicleControl.sendFingerAction(it, fingers, actionValue) }
     }
 
-    // Result of the one-shot startup BLE scan used to decide where to route the
-    // app on launch. LOADING until the scan resolves (or is skipped).
     enum class StartupTarget { LOADING, ONBOARDING_DASHKIT, AUTOCONNECT_DASHKIT, DEFAULT }
 
     private val _startupTarget = MutableStateFlow(StartupTarget.LOADING)
     val startupTarget = _startupTarget.asStateFlow()
     private var startupDiscoveryStarted = false
+
+    private var lastDataSourceType: String? = null
+    private var lastServerAddress: String = ""
 
     // Briefly scan for an advertising DashKit and decide the launch route:
     //  - found + bonded   -> auto-connect DashKit
@@ -256,9 +245,30 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         }
     }
 
+    private fun hasBluetoothPermission(context: Context): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return true
+        return ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) ==
+                PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_SCAN) ==
+                PackageManager.PERMISSION_GRANTED
+    }
+
     fun connect(context: Context, manualServerAddress: String, dataSourceType: String) {
+        if (dataSourceType == DataSourceType.DASHKIT && !hasBluetoothPermission(context)) {
+            val gate = blePermissionGate
+            if (gate != null) {
+                gate { connect(context, manualServerAddress, dataSourceType) }
+            } else {
+                _connectionStatus.value = ConnectionStatus.Error("Missing BLE permission")
+            }
+            return
+        }
+
         val current = _connectionStatus.value
         if (current !is ConnectionStatus.Disconnected && current !is ConnectionStatus.Error) return
+
+        lastDataSourceType = dataSourceType
+        lastServerAddress = manualServerAddress
 
         var finalServerAddress = manualServerAddress
         _connectionStatus.value = ConnectionStatus.Connecting
@@ -276,9 +286,6 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
                 DataSourceType.DASHKIT -> {
                     val manager = DashKitBleManager(context)
                     _bleManager.value = manager
-                    // Surface BLE/pairing failures so the UI doesn't hang in the
-                    // Connecting state forever. Connected is still driven by the
-                    // first CAN frame below.
                     launch {
                         manager.connectionState.collect { st ->
                             if (st is ConnectionStatus.Error &&
@@ -370,8 +377,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         }
     }
 
-    fun disconnect() {
-        val wasConnecting = _connectionStatus.value is ConnectionStatus.Connecting
+    private fun teardownConnection() {
         connectionJob?.cancel()
         connectionJob = null
         _dataSource.value?.disconnect()
@@ -380,11 +386,24 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         _bleManager.value = null
         _dashState.value = null
         _hasAutoNavigatedToDashboard.value = false
+    }
+
+    fun disconnect() {
+        val wasConnecting = _connectionStatus.value is ConnectionStatus.Connecting
+        teardownConnection()
         _connectionStatus.value = if (wasConnecting) {
             ConnectionStatus.Error("Discovery cancelled")
         } else {
             ConnectionStatus.Disconnected
         }
+    }
+
+    fun onAppForegrounded(context: Context) {
+        val type = lastDataSourceType ?: return
+        val address = lastServerAddress
+        teardownConnection()
+        _connectionStatus.value = ConnectionStatus.Disconnected
+        connect(context, address, type)
     }
 
     companion object {
