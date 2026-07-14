@@ -98,18 +98,12 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    // Startup permissions — location (for speed cameras) and BLE (for DashKit) —
-    // are requested together in one flow. Android only surfaces one permission
-    // dialog at a time, so launching them from separate launchers would drop all
-    // but the first (which is why the BLE prompt never appeared).
     private val startupPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { _ ->
         if (hasLocationPermission()) {
             speedCameraVM.startUpdating(this)
         }
-        // Kick off the startup DashKit scan once the user has responded
-        // (granted or not — runStartupDiscovery handles both).
         connectionVM.runStartupDiscovery(this, hasBluetoothPermission())
     }
 
@@ -125,8 +119,6 @@ class MainActivity : ComponentActivity() {
 
         loadDashboardManifests()
 
-        // Route every BLE connect through the runtime-permission gate so we
-        // never start a scan/connect before the user has granted permission.
         connectionVM.blePermissionGate = { onGranted -> ensureBluetoothPermission(onGranted) }
 
         connectionVM.loadPinnedControl(this)
@@ -134,10 +126,6 @@ class MainActivity : ComponentActivity() {
 
         connectionVM.bindSpeedCamera(speedCameraVM.nearestApproachingCamera)
 
-        // Request every missing startup permission (location + BLE) in a single
-        // prompt flow via startupPermissionLauncher. If BLE is already granted,
-        // kick off DashKit discovery immediately so route selection isn't blocked
-        // behind the location prompt.
         val bleGranted = hasBluetoothPermission()
         if (bleGranted) {
             connectionVM.runStartupDiscovery(this, true)
@@ -333,6 +321,11 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        connectionVM.onAppForegrounded(this)
     }
 
     private fun hasBluetoothPermission(): Boolean {

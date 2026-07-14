@@ -184,6 +184,9 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     val startupTarget = _startupTarget.asStateFlow()
     private var startupDiscoveryStarted = false
 
+    private var lastDataSourceType: String? = null
+    private var lastServerAddress: String = ""
+
     // Briefly scan for an advertising DashKit and decide the launch route:
     //  - found + bonded   -> auto-connect DashKit
     //  - found + unbonded -> open onboarding (pair flow)
@@ -296,6 +299,9 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         val current = _connectionStatus.value
         if (current !is ConnectionStatus.Disconnected && current !is ConnectionStatus.Error) return
 
+        lastDataSourceType = dataSourceType
+        lastServerAddress = manualServerAddress
+
         var finalServerAddress = manualServerAddress
         _connectionStatus.value = ConnectionStatus.Connecting
         connectionJob = viewModelScope.launch(Dispatchers.IO) {
@@ -406,8 +412,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         }
     }
 
-    fun disconnect() {
-        val wasConnecting = _connectionStatus.value is ConnectionStatus.Connecting
+    private fun teardownConnection() {
         connectionJob?.cancel()
         connectionJob = null
         _dataSource.value?.disconnect()
@@ -416,11 +421,24 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         _bleManager.value = null
         _dashState.value = null
         _hasAutoNavigatedToDashboard.value = false
+    }
+
+    fun disconnect() {
+        val wasConnecting = _connectionStatus.value is ConnectionStatus.Connecting
+        teardownConnection()
         _connectionStatus.value = if (wasConnecting) {
             ConnectionStatus.Error("Discovery cancelled")
         } else {
             ConnectionStatus.Disconnected
         }
+    }
+
+    fun onAppForegrounded(context: Context) {
+        val type = lastDataSourceType ?: return
+        val address = lastServerAddress
+        teardownConnection()
+        _connectionStatus.value = ConnectionStatus.Disconnected
+        connect(context, address, type)
     }
 
     companion object {
