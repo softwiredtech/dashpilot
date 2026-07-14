@@ -39,6 +39,7 @@ private val debugSources = listOf(
 @Composable
 fun DebugDataSourceMenu(
     connectionStatus: ConnectionStatus,
+    onSelectDataSource: (String) -> Unit,
     onConnect: (serverAddress: String, dataSourceType: String) -> Unit,
     onDisconnect: () -> Unit
 ) {
@@ -76,6 +77,7 @@ fun DebugDataSourceMenu(
                             if (key == DataSourceType.WEBSOCKET) {
                                 showIpDialog = true
                             } else {
+                                onSelectDataSource(key)
                                 onConnect("", key)
                             }
                         }
@@ -119,6 +121,7 @@ fun DebugDataSourceMenu(
                     onClick = {
                         showIpDialog = false
                         setLastWebsocketAddress(context, address)
+                        onSelectDataSource(DataSourceType.WEBSOCKET)
                         onConnect(address.trim(), DataSourceType.WEBSOCKET)
                     }
                 ) { Text("Connect") }

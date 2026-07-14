@@ -40,9 +40,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -85,24 +83,17 @@ private val dataSources = buildList {
 @Composable
 fun SetupScreen(
     connectionStatus: ConnectionStatus,
+    selectedDataSource: String,
+    onSelectDataSource: (String) -> Unit,
     onConnect: (serverAddress: String, dataSourceType: String) -> Unit,
     onDisconnect: () -> Unit,
     onNext: () -> Unit,
-    onSettingsClick: () -> Unit = {},
-    preselectDashKit: Boolean = false
+    onSettingsClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
-    var selectedIndex by rememberSaveable { mutableIntStateOf(0) }
+    val selectedIndex = dataSources.indexOfFirst { it.key == selectedDataSource }
+        .takeIf { it >= 0 } ?: 0
     val currentSource = dataSources[selectedIndex]
-
-    // When the startup scan discovers a DashKit, preselect it in the source
-    // picker. Runs once when discovery flips true; manual changes afterwards stick.
-    LaunchedEffect(preselectDashKit) {
-        if (preselectDashKit) {
-            val idx = dataSources.indexOfFirst { it.key == DataSourceType.DASHKIT }
-            if (idx >= 0) selectedIndex = idx
-        }
-    }
     var serverAddress by rememberSaveable { mutableStateOf("") }
 
     Box(
@@ -139,7 +130,7 @@ fun SetupScreen(
             connectionStatus = connectionStatus,
             currentSource = currentSource,
             selectedIndex = selectedIndex,
-            onSourceSelected = { selectedIndex = it }
+            onSourceSelected = { onSelectDataSource(dataSources[it].key) }
         )
 
         Spacer(modifier = Modifier.height(32.dp))

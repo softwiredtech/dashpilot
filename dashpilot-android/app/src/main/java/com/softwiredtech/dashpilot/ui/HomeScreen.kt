@@ -31,6 +31,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,11 +41,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.softwiredtech.dashpilot.BuildConfig
 import com.softwiredtech.dashpilot.datamodel.dash.CarState
 import com.softwiredtech.dashpilot.datamodel.dash.DashState
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.DashKitBleManager
+import com.softwiredtech.dashpilot.datasource.DataSourceType
 import com.softwiredtech.dashpilot.ui.controls.ControlActionButton
 import com.softwiredtech.dashpilot.ui.controls.controlById
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
@@ -52,16 +55,15 @@ import kotlinx.coroutines.flow.flowOf
 import kotlin.math.roundToInt
 
 /**
- * Landing screen. While disconnected/connecting it hosts the data-source setup
- * flow; once connected it shows a grid of vehicle info widgets plus the primary
- * actions (Automations, Controls, Drive).
+ * Landing screen. DashKit is the default source and shows the connected home
+ * content (vehicle info widgets + primary actions) regardless of connection
+ * state. Selecting any other source switches to the data-source setup flow.
  */
 @Composable
 fun HomeScreen(
     connectionStatus: ConnectionStatus,
     bleManager: DashKitBleManager?,
     dashState: Flow<DashState>?,
-    preselectDashKit: Boolean,
     pinnedControlId: String?,
     onConnect: (serverAddress: String, dataSourceType: String) -> Unit,
     onDisconnect: () -> Unit,
@@ -71,15 +73,14 @@ fun HomeScreen(
     onDrive: () -> Unit,
     onSettingsClick: () -> Unit
 ) {
+    var selectedDataSource by rememberSaveable { mutableStateOf(DataSourceType.DASHKIT) }
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(DarkColors.Background)
             .systemBarsPadding()
     ) {
-        // In debug builds show the connected home content by default so the full
-        // UI can be exercised without a live DashKit connection.
-        if (connectionStatus is ConnectionStatus.Connected || BuildConfig.DEBUG) {
+        if (selectedDataSource == DataSourceType.DASHKIT) {
             ConnectedHomeContent(
                 dashState = dashState,
                 bleManager = bleManager,
@@ -87,6 +88,7 @@ fun HomeScreen(
                 pinnedControlId = pinnedControlId,
                 onConnect = onConnect,
                 onDisconnect = onDisconnect,
+                onSelectDataSource = { selectedDataSource = it },
                 onAutomations = onAutomations,
                 onControls = onControls,
                 onDrive = onDrive,
@@ -95,7 +97,8 @@ fun HomeScreen(
         } else {
             SetupScreen(
                 connectionStatus = connectionStatus,
-                preselectDashKit = preselectDashKit,
+                selectedDataSource = selectedDataSource,
+                onSelectDataSource = { selectedDataSource = it },
                 onConnect = onConnect,
                 onDisconnect = onDisconnect,
                 onNext = onNext,
@@ -113,6 +116,7 @@ private fun ConnectedHomeContent(
     pinnedControlId: String?,
     onConnect: (serverAddress: String, dataSourceType: String) -> Unit,
     onDisconnect: () -> Unit,
+    onSelectDataSource: (String) -> Unit,
     onAutomations: () -> Unit,
     onControls: () -> Unit,
     onDrive: () -> Unit,
@@ -228,11 +232,9 @@ private fun ConnectedHomeContent(
             accent = true,
             onClick = onDrive
         )
-        if (BuildConfig.DEBUG) {
-            Spacer(modifier = Modifier.height(12.dp))
-            Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                DebugDataSourceMenu(connectionStatus, onConnect, onDisconnect)
-            }
+        Spacer(modifier = Modifier.height(12.dp))
+        Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
+            DebugDataSourceMenu(connectionStatus, onSelectDataSource, onConnect, onDisconnect)
         }
     }
 }
