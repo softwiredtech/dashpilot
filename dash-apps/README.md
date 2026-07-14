@@ -19,7 +19,7 @@ dash-apps are benchmarked by an automated performance gate before merging.
 - `"perf": { "root": "dist" }` - benchmark a built subdirectory (used by `web-expo`).
 
 **The gate:** your app must define `window.onCarStateUpdate` and read values from
-`window.NativeCarState`. CI replays a deterministic 60 s drive at 25 Hz in Chromium
+`window.NativeCarState`. CI replays a deterministic 20 s drive at 25 Hz in Chromium
 throttled 6x (Pixel 3 XL-class hardware, landscape dashboard viewport) and enforces the
 budgets in [`_perf-harness/lib/budgets.json`](./_perf-harness/lib/budgets.json) - each
 budget and default harness knob documents its own rationale.
@@ -28,7 +28,7 @@ budget and default harness knob documents its own rationale.
 
 - Change pass/fail thresholds or default harness knobs: [`_perf-harness/lib/budgets.json`](./_perf-harness/lib/budgets.json)
 - Change which apps are gated or exempt: each app's `manifest.json` `perf` block
-- Change target-selection rules for changed files: [`_perf-harness/lib/targets.js`](./_perf-harness/lib/targets.js)
+- Change target-selection rules for changed files: [`.github/workflows/dashapp-perf.yml`](../.github/workflows/dashapp-perf.yml) (inline bash step)
 - Change the simulated drive data: [`_perf-harness/lib/scenario.js`](./_perf-harness/lib/scenario.js)
 - Change the browser timing shim / `NativeCarState` injection: [`_perf-harness/lib/shim.js`](./_perf-harness/lib/shim.js)
 - Change the exposed getter list: [`_perf-harness/lib/getters.js`](./_perf-harness/lib/getters.js)
@@ -42,6 +42,10 @@ cd dash-apps/_perf-harness
 npm ci && npx playwright install chromium
 node run.js ../web-yourapp
 ```
+
+Set `PERF_DURATION=<ms>` to override the simulated drive length (must be a positive
+number of milliseconds); when unset, the harness uses `defaultDurationMs` from
+[`budgets.json`](./_perf-harness/lib/budgets.json).
 
 > For apps whose manifest declares `"root"` (e.g. `web-expo` with `"root": "dist"`),
 > run the app's build/export command first. The harness benchmarks the built

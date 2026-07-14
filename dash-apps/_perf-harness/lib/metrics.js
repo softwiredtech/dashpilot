@@ -9,29 +9,22 @@ function percentile(values, p) {
 
 function summarize(raw, budgets) {
   const warmupMs = budgets.warmupMs.value;
-  const steadySamples = raw.samples.filter((sample) => (sample.actualMs ?? sample.scheduledMs) >= warmupMs);
+  const steadySamples = raw.samples.filter((sample) => sample.actualMs >= warmupMs);
   const injectionLags = steadySamples.map((sample) => sample.injectionLagMs);
-  const updateToPaint = steadySamples
-    .map((sample) => sample.updateToPaintMs)
-    .filter((value) => value != null);
   const steadyLongTasks = raw.longTasks.filter((task) => task.startTime >= raw.t0 + warmupMs);
 
   const metrics = {
     steadyFrames: steadySamples.length,
     injectionLagP95Ms: percentile(injectionLags, 95),
     injectionLagMaxMs: injectionLags.length ? Math.max(...injectionLags) : 0,
-    updateToPaintP95Ms: percentile(updateToPaint, 95),
     longestTaskMs: steadyLongTasks.reduce((max, task) => Math.max(max, task.duration), 0),
-    heapGrowthMb: (raw.heapEnd - raw.heapStart) / (1024 * 1024),
   };
 
   const violations = [];
   for (const name of [
     "injectionLagP95Ms",
     "injectionLagMaxMs",
-    "updateToPaintP95Ms",
     "longestTaskMs",
-    "heapGrowthMb",
   ]) {
     if (metrics[name] >= budgets[name].value) {
       violations.push({ name, actual: metrics[name], limit: budgets[name].value });

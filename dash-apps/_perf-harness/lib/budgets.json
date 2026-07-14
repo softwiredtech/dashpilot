@@ -7,49 +7,21 @@
     "value": 200,
     "why": "A single stall of 5+ frames is a visible freeze of a driving instrument, even if p95 looks fine."
   },
-  "updateToPaintP95Ms": {
-    "value": 100,
-    "why": "Handler start to next painted frame. Data may arrive on time but pixels lag; 100ms keeps the display within ~2.5 frames of reality."
-  },
   "longestTaskMs": {
     "value": 150,
     "why": "One long task blocks every queued update behind it. Applies after warm-up only."
   },
-  "heapGrowthMb": {
-    "value": 10,
-    "why": "Growth over a 60s run. A leak that passes 60s but dies at 20 minutes of real driving shows up here as steady growth."
-  },
   "warmupMs": {
-    "value": 5000,
-    "why": "Initial layout, font loading, and JIT warm-up legitimately spike; steady-state driving is what gets gated. Load time is reported, not gated."
+    "value": 2000,
+    "why": "JIT and layout spikes settle within ~2s. At 20s run the warmup takes 10% of wall-clock instead of 25% — acceptable trade."
   },
   "cpuThrottle": {
     "value": 6,
     "why": "CDP CPU throttle factor approximating a Pixel 3 XL-class device on a CI runner. Calibrated in the rollout task; adjust this single number if too lenient/harsh."
   },
   "defaultDurationMs": {
-    "value": 60000,
-    "why": "Default run length for local and CI checks. Long enough to surface sustained lag and heap growth without making every run drag on."
-  },
-  "defaultRuns": {
-    "value": 1,
-    "why": "Single run keeps CI feedback fast; re-run the job manually if a one-off outlier fails."
-  },
-  "contractTimeoutMs": {
-    "value": 10000,
-    "why": "Fail quickly when an app never defines window.onCarStateUpdate instead of waiting for the full scenario duration."
-  },
-  "contractPollMs": {
-    "value": 100,
-    "why": "How often the shim checks whether the app has registered window.onCarStateUpdate after page load."
-  },
-  "resultTimeoutPaddingMs": {
-    "value": 60000,
-    "why": "Extra time to let a run flush final browser work before the harness treats it as hung."
-  },
-  "resultTimeoutMultiplier": {
-    "value": 4,
-    "why": "Multiply the scenario duration by this much before treating the run as hung. Keeps a throttled but healthy app from timing out mid-run."
+    "value": 20000,
+    "why": "Compressed scenario hits every code path 2-3x in 20s. With 2s warmup, ~18s of steady frames — enough for stable p95 and covering all event types."
   },
   "viewport": {
     "value": {

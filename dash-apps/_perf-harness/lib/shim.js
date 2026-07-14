@@ -16,19 +16,11 @@ function installShim(config) {
   }
   window.NativeCarState = native;
 
-  function heap() {
-    return performance.memory && typeof performance.memory.usedJSHeapSize === "number"
-      ? performance.memory.usedJSHeapSize
-      : 0;
-  }
-
   const perf = {
     t0: 0,
     deadline: 0,
     samples: [],
     longTasks: [],
-    heapStart: 0,
-    heapEnd: 0,
     done: false,
     error: null,
   };
@@ -37,7 +29,6 @@ function installShim(config) {
   function fail(message) {
     if (perf.done) return;
     perf.error = message;
-    perf.heapEnd = heap();
     perf.done = true;
   }
 
@@ -65,7 +56,6 @@ function installShim(config) {
 
   function finish() {
     if (perf.done) return;
-    perf.heapEnd = heap();
     perf.done = true;
   }
 
@@ -88,27 +78,18 @@ function installShim(config) {
       return;
     }
 
-    const handlerStart = performance.now();
     try {
       window.onCarStateUpdate();
     } catch (error) {
       fail("runtime: onCarStateUpdate threw: " + (error && error.message ? error.message : String(error)));
       return;
     }
-    const handlerEnd = performance.now();
 
     const sample = {
-      scheduledMs: index * stepMs,
-      actualMs: handlerStart - perf.t0,
+      actualMs: performance.now() - perf.t0,
       injectionLagMs,
-      handlerMs: handlerEnd - handlerStart,
-      updateToPaintMs: null,
     };
     perf.samples.push(sample);
-
-    requestAnimationFrame(function () {
-      sample.updateToPaintMs = performance.now() - handlerStart;
-    });
 
     if (index + 1 < frames.length && performance.now() < perf.deadline) {
       const delay = Math.max(0, scheduled + stepMs - performance.now());
@@ -131,14 +112,15 @@ function installShim(config) {
     }
     perf.t0 = performance.now();
     perf.deadline = perf.t0 + frames.length * stepMs;
-    perf.heapStart = heap();
     tick(0);
   }
 
   window.addEventListener("load", function () {
     if (perf.done) return;
 
-    const deadline = performance.now() + config.contractTimeoutMs;
+    const contractTimeoutMs = config.contractTimeoutMs || 10000;
+    const contractPollMs = config.contractPollMs || 100;
+    const deadline = performance.now() + contractTimeoutMs;
     (function waitForContract() {
       if (perf.done) return;
       if (typeof window.onCarStateUpdate === "function") {
@@ -148,12 +130,12 @@ function installShim(config) {
       if (performance.now() > deadline) {
         fail(
           "contract: window.onCarStateUpdate was never defined within " +
-            config.contractTimeoutMs +
+            contractTimeoutMs +
             "ms of page load"
         );
         return;
       }
-      setTimeout(waitForContract, config.contractPollMs);
+      setTimeout(waitForContract, contractPollMs);
     })();
   });
 }

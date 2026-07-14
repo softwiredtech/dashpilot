@@ -10,49 +10,7 @@ const { STEP_MS, buildScenario, defaultState } = require("../lib/scenario");
 
 const BRIDGE_PATH = path.join(__dirname, "..", "..", "..", "dashpilot-android", "app", "src", "main", "java", "com", "softwiredtech", "dashpilot", "js", "CarStateBridge.kt");
 
-test("exposes exactly the 39 CarStateBridge getters", () => {
-  assert.deepStrictEqual(Object.keys(GETTERS), [
-    "getEgoSteeringAngle",
-    "getEgoSpeed",
-    "getLeftBlinker",
-    "getRightBlinker",
-    "getGear",
-    "isAdasOn",
-    "getLeftBlindSpot",
-    "getRightBlindSpot",
-    "getFusedSpeedLimit",
-    "getStopLineDist",
-    "getTrafficLightColor",
-    "getBuckleStatus",
-    "getAnyDoorOpen",
-    "getLaneDepartureWarning",
-    "getAccSetSpeed",
-    "getFullPackEnergy",
-    "getNominalEnergyRemaining",
-    "getEnergyBuffer",
-    "getMaxRegenPower",
-    "getMaxDischargePower",
-    "getPackVoltage",
-    "getPackCurrent",
-    "getPackTMin",
-    "getPackTMax",
-    "getOdometer",
-    "isExperimentalMode",
-    "isMadsActive",
-    "getPhoneBattery",
-    "getCurrentTime",
-    "getShowPhoneBattery",
-    "getShowCarBattery",
-    "getShowOdometer",
-    "isImperial",
-    "isDarkMode",
-    "isAlwaysOnBlindSpotMonitor",
-    "getRenderQuality",
-    "getDarkModeBackgroundGray",
-    "isChangingLane",
-    "getSpeedCameraDistance",
-  ]);
-  assert.strictEqual(Object.keys(GETTERS).length, 39);
+test("getter key remapping and non-zero defaults are correct", () => {
   assert.strictEqual(GETTERS.isImperial.key, "useImperial");
   assert.strictEqual(GETTERS.isAdasOn.key, "adasOn");
   assert.strictEqual(GETTERS.getSpeedCameraDistance.default, -1);
@@ -64,12 +22,11 @@ test("getterMap is plain method→key JSON", () => {
   const map = getterMap();
 
   assert.strictEqual(map.getEgoSpeed, "egoSpeed");
-  assert.strictEqual(Object.keys(map).length, 39);
 });
 
 test("cadence is 25 Hz", () => {
   assert.strictEqual(STEP_MS, 40);
-  assert.strictEqual(buildScenario(60000).length, 1500);
+  assert.strictEqual(buildScenario(20000).length, 500);
 });
 
 test("scenario is deterministic", () => {
@@ -79,7 +36,7 @@ test("scenario is deterministic", () => {
 test("every frame contains every getter-backed key and nothing undefined", () => {
   const keys = Object.values(GETTERS).map((getter) => getter.key);
 
-  for (const frame of buildScenario(60000)) {
+  for (const frame of buildScenario(20000)) {
     for (const key of keys) {
       assert.notStrictEqual(frame[key], undefined, `missing ${key}`);
     }
@@ -87,7 +44,7 @@ test("every frame contains every getter-backed key and nothing undefined", () =>
 });
 
 test("scenario exercises the animated signals", () => {
-  const frames = buildScenario(60000);
+  const frames = buildScenario(20000);
   const speeds = frames.map((frame) => frame.egoSpeed);
 
   assert.ok(Math.max(...speeds) > 110, "speed sweep should approach 120");

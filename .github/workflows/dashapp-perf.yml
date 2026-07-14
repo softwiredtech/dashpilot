@@ -50,72 +50,76 @@ jobs:
         working-directory: dash-apps/_perf-harness
         run: npm test
 
-      - name: Determine target apps
-        id: targets
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          PUSH_BEFORE_SHA: ${{ github.event.before }}
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          if [ "$EVENT_NAME" = "pull_request" ]; then
-            base="$PR_BASE_SHA"
-          else
-            base="$PUSH_BEFORE_SHA"
-          fi
-
-          if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ]; then
-            # Force the harness-changed path so a no-base event still rechecks every gated app.
-            targets_json="$(printf 'dash-apps/_perf-harness/package.json\n' | node dash-apps/_perf-harness/lib/targets.js)"
-          else
-            targets_json="$(git diff --name-only "$base"...HEAD | node dash-apps/_perf-harness/lib/targets.js)"
-          fi
-
-          echo "$targets_json"
-
-          {
-            echo 'targets<<EOF'
-            echo "$targets_json"
-            echo 'EOF'
-            echo "export_web_expo=$(echo "$targets_json" | jq -r '.gated | any(.name == "web-expo")')"
-          } >> "$GITHUB_OUTPUT"
-
-      - name: Export web-expo for benchmarking
-        if: steps.targets.outputs.export_web_expo == 'true'
-        working-directory: dash-apps/web-expo
-        run: |
-          npm ci
-          npx expo export --platform web
-
-      - name: Benchmark gated dash-apps
+      - name: Benchmark dash-apps
         working-directory: dash-apps/_perf-harness
-        env:
-          TARGETS_JSON: ${{ steps.targets.outputs.targets }}
         shell: bash
         run: |
           set -euo pipefail
 
-          skipped="$(echo "$TARGETS_JSON" | jq -r '.skipped[] | "- `\(.name)` skipped: \(.reason)"')"
-          if [ -n "$skipped" ]; then
-            printf '### dash-app perf: exempt apps\n%s\n\n' "$skipped" >> "$GITHUB_STEP_SUMMARY"
+          # The self-test wrote fixture reports into results/ — start clean
+          rm -rf results
+
+          # Determine git diff range — PR vs push
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            range="${{ github.event.pull_request.base.sha }}...HEAD"
+          elif [ "${{ github.event.before }}" != "0000000000000000000000000000000000000000" ]; then
+            range="${{ github.event.before }}..${{ github.event.after }}"
+          else
+            range=""  # no usable base — re-check everything
           fi
 
-          gated="$(echo "$TARGETS_JSON" | jq -r '.gated[] | "\(.name)\t\(.root)"')"
-          if [ -z "$gated" ]; then
+          if [ -n "$range" ]; then
+            changed_files=$(git -C ../.. diff --name-only "$range")
+          else
+            changed_files="dash-apps/_perf-harness/"
+          fi
+
+          # Apps whose source files changed → blocking (fail the build)
+          changed_apps=$(echo "$changed_files" | sed -n 's#^dash-apps/\(web-[^/]*\)/.*#\1#p' | sort -u)
+
+          # Harness/budget change → re-check all gated apps
+          harness_changed=$(echo "$changed_files" | grep -q '^dash-apps/_perf-harness/' && echo true || echo false)
+          if [ "$harness_changed" = "true" ]; then
+            apps_to_run=$(ls -d ../web-*/ 2>/dev/null | xargs -n1 basename | sort)
+          else
+            apps_to_run="$changed_apps"
+          fi
+
+          if [ -z "$apps_to_run" ]; then
             echo "No gated dash-apps to benchmark."
             echo "No gated dash-apps to benchmark." >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
 
           failed=0
-          while IFS=$'\t' read -r name root; do
-            [ -n "$name" ] || continue
-            echo "::group::$name"
-            node run.js "../$name/$root" --app-name "$name" || failed=1
+          for app in $apps_to_run; do
+            # Deleted/renamed in this diff — nothing to benchmark
+            [ -d "../$app" ] || continue
+
+            perf=$(jq -r '[(.perf.gate // "standard"), (.perf.root // ".")] | @tsv' "../$app/manifest.json" 2>/dev/null || printf 'standard\t.')
+            IFS=$'\t' read -r gate root <<<"$perf"
+
+            if [ "$gate" = "exempt" ]; then
+              reason=$(jq -r '.perf.reason // ""' "../$app/manifest.json" 2>/dev/null || echo "")
+              if [ "${#reason}" -lt 10 ]; then
+                echo "::error::$app: perf.gate \"exempt\" requires a perf.reason explaining why"
+                echo "- \`$app\` FAILED: gate \"exempt\" requires a perf.reason explaining why" >> "$GITHUB_STEP_SUMMARY"
+                failed=1
+              else
+                echo "- \`$app\` skipped (exempt): $reason" >> "$GITHUB_STEP_SUMMARY"
+              fi
+              continue
+            fi
+
+            # Build web-expo from source before benchmarking
+            if [ "$app" = "web-expo" ]; then
+              (cd ../web-expo && npm ci && npx expo export --platform web)
+            fi
+
+            echo "::group::$app"
+            node run.js "../$app/$root" --app-name "$app" || failed=1
             echo '::endgroup::'
-          done <<< "$gated"
+          done
 
           exit $failed
 

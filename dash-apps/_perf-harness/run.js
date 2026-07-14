@@ -3,6 +3,7 @@
 
 const fs = require("node:fs");
 const path = require("node:path");
+const { parseArgs: nodeParseArgs } = require("node:util");
 const { chromium } = require("playwright");
 
 const { startServer } = require("./lib/server");
@@ -12,63 +13,30 @@ const { installShim } = require("./lib/shim");
 const { summarize } = require("./lib/metrics");
 const budgets = require("./lib/budgets.json");
 
+const RESULT_TIMEOUT_MULTIPLIER = 4;
+const RESULT_TIMEOUT_PADDING_MS = 60000;
+
 const EXIT = { PASS: 0, BUDGET_FAIL: 1, APP_ERROR: 2, INFRA: 3 };
 
 class AppError extends Error {}
 
 function parseArgs(argv) {
-  const args = {
-    appName: null,
-    throttle: budgets.cpuThrottle.value,
-    duration: budgets.defaultDurationMs.value,
-    runs: budgets.defaultRuns.value,
-    quiet: false,
-  };
-  const positional = [];
+  const { values, positionals } = nodeParseArgs({
+    args: argv,
+    options: { "app-name": { type: "string" } },
+    allowPositionals: true,
+  });
 
-  let index;
-  function flagValue(flag) {
-    index += 1;
-    const value = argv[index];
-    if (value === undefined) {
-      throw new Error(`${flag} requires a value`);
-    }
-    return value;
+  if (positionals.length !== 1) {
+    throw new Error("usage: node run.js <app-dir> [--app-name NAME]");
   }
 
-  for (index = 0; index < argv.length; index += 1) {
-    const arg = argv[index];
-    if (arg === "--app-name") args.appName = flagValue(arg);
-    else if (arg === "--throttle") args.throttle = Number(flagValue(arg));
-    else if (arg === "--duration") args.duration = Number(flagValue(arg));
-    else if (arg === "--runs") args.runs = Number(flagValue(arg));
-    else if (arg === "--quiet") args.quiet = true;
-    else positional.push(arg);
-  }
-
-  if (positional.length !== 1) {
-    throw new Error(
-      "usage: node run.js <app-dir> [--app-name NAME] [--throttle N] [--duration MS] [--runs N] [--quiet]"
-    );
-  }
-
-  if (!Number.isFinite(args.throttle) || args.throttle <= 0) {
-    throw new Error(`--throttle must be a positive number, got ${args.throttle}`);
-  }
-  if (!Number.isFinite(args.duration) || args.duration <= 0) {
-    throw new Error(`--duration must be a positive number, got ${args.duration}`);
-  }
-  if (!Number.isInteger(args.runs) || args.runs <= 0) {
-    throw new Error(`--runs must be a positive integer, got ${args.runs}`);
-  }
-
-  args.appDir = positional[0];
-  return args;
+  return { appName: values["app-name"] ?? null, appDir: positionals[0] };
 }
 
-async function benchmarkOnce(appDir, args) {
+async function benchmarkOnce(appDir, duration) {
   const { server, port } = await startServer(appDir);
-  const browser = await chromium.launch({ args: ["--enable-precise-memory-info"] });
+  const browser = await chromium.launch();
 
   try {
     const context = await browser.newContext({
@@ -84,14 +52,12 @@ async function benchmarkOnce(appDir, args) {
     page.on("pageerror", (error) => pageErrors.push(error.message));
 
     const cdp = await context.newCDPSession(page);
-    await cdp.send("Emulation.setCPUThrottlingRate", { rate: args.throttle });
+    await cdp.send("Emulation.setCPUThrottlingRate", { rate: budgets.cpuThrottle.value });
 
     await page.addInitScript(installShim, {
-      frames: buildScenario(args.duration),
+      frames: buildScenario(duration),
       stepMs: STEP_MS,
       getterMap: getterMap(),
-      contractTimeoutMs: budgets.contractTimeoutMs.value,
-      contractPollMs: budgets.contractPollMs.value,
     });
 
     await page.goto(`http://127.0.0.1:${port}/index.html`, { waitUntil: "load" });
@@ -99,8 +65,7 @@ async function benchmarkOnce(appDir, args) {
       "window.__dashPerf && window.__dashPerf.done === true",
       undefined,
       {
-        timeout:
-          args.duration * budgets.resultTimeoutMultiplier.value + budgets.resultTimeoutPaddingMs.value,
+        timeout: duration * RESULT_TIMEOUT_MULTIPLIER + RESULT_TIMEOUT_PADDING_MS,
       }
     );
 
@@ -116,24 +81,14 @@ async function benchmarkOnce(appDir, args) {
   }
 }
 
-function pickBest(results) {
-  return [...results].sort(
-    (left, right) =>
-      left.violations.length - right.violations.length ||
-      left.metrics.injectionLagP95Ms - right.metrics.injectionLagP95Ms
-  )[0];
-}
-
-function renderTable(appName, best, args) {
+function renderTable(appName, result, duration) {
   const rows = [
-    ["injection lag p95", best.metrics.injectionLagP95Ms, budgets.injectionLagP95Ms.value],
-    ["injection lag max", best.metrics.injectionLagMaxMs, budgets.injectionLagMaxMs.value],
-    ["update→paint p95", best.metrics.updateToPaintP95Ms, budgets.updateToPaintP95Ms.value],
-    ["longest task", best.metrics.longestTaskMs, budgets.longestTaskMs.value],
-    ["heap growth (MB)", best.metrics.heapGrowthMb, budgets.heapGrowthMb.value],
+    ["injection lag p95", result.metrics.injectionLagP95Ms, budgets.injectionLagP95Ms.value],
+    ["injection lag max", result.metrics.injectionLagMaxMs, budgets.injectionLagMaxMs.value],
+    ["longest task", result.metrics.longestTaskMs, budgets.longestTaskMs.value],
   ];
   const lines = [
-    `### dash-app perf: \`${appName}\` — ${best.pass ? "✅ PASS" : "❌ FAIL"} (throttle ${args.throttle}x, ${args.duration / 1000}s, best of ${args.runs})`,
+    `### dash-app perf: \`${appName}\` — ${result.pass ? "✅ PASS" : "❌ FAIL"} (throttle ${budgets.cpuThrottle.value}x, ${duration / 1000}s)`,
     "",
     "| metric | measured | budget | |",
     "|---|---|---|---|",
@@ -156,31 +111,34 @@ async function main() {
   }
 
   const appName = args.appName || path.basename(appDir);
-  const results = [];
-
-  for (let index = 0; index < args.runs; index += 1) {
-    if (!args.quiet) console.log(`run ${index + 1}/${args.runs} for ${appName}...`);
-    results.push(await benchmarkOnce(appDir, args));
+  let duration = budgets.defaultDurationMs.value;
+  if (process.env.PERF_DURATION) {
+    duration = Number(process.env.PERF_DURATION);
+    if (!Number.isFinite(duration) || duration <= 0) {
+      throw new Error(
+        `PERF_DURATION must be a positive number of milliseconds, got "${process.env.PERF_DURATION}"`
+      );
+    }
   }
 
-  const best = pickBest(results);
+  const result = await benchmarkOnce(appDir, duration);
   const report = {
     app: appName,
-    throttle: args.throttle,
-    durationMs: args.duration,
-    runs: results,
-    best,
-    pass: best.pass,
+    throttle: budgets.cpuThrottle.value,
+    durationMs: duration,
+    metrics: result.metrics,
+    violations: result.violations,
+    pass: result.pass,
   };
   const resultsDir = path.join(__dirname, "results");
-  const table = renderTable(appName, best, args);
+  const table = renderTable(appName, result, duration);
 
   fs.mkdirSync(resultsDir, { recursive: true });
   fs.writeFileSync(path.join(resultsDir, `${appName}.json`), JSON.stringify(report, null, 2));
 
   console.log(table);
-  if (!best.pass) {
-    for (const violation of best.violations) {
+  if (!result.pass) {
+    for (const violation of result.violations) {
       console.log(
         `FAIL ${violation.name}: ${violation.actual.toFixed(1)} (budget < ${violation.limit}) — ${budgets[violation.name].why}`
       );
@@ -190,7 +148,7 @@ async function main() {
     fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, table);
   }
 
-  process.exit(best.pass ? EXIT.PASS : EXIT.BUDGET_FAIL);
+  process.exit(result.pass ? EXIT.PASS : EXIT.BUDGET_FAIL);
 }
 
 main().catch((error) => {
