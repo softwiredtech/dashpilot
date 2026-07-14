@@ -38,6 +38,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.softwiredtech.dashpilot.BuildConfig
 import com.softwiredtech.dashpilot.datamodel.dash.CarState
 import com.softwiredtech.dashpilot.datamodel.dash.DashState
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
@@ -51,9 +52,9 @@ import kotlinx.coroutines.flow.flowOf
 import kotlin.math.roundToInt
 
 /**
- * Landing screen. Always shows a grid of vehicle info widgets plus the primary
- * actions (Automations, Controls, Drive); widgets show placeholders until the
- * connection (started automatically on launch) delivers data.
+ * Landing screen. While disconnected/connecting it hosts the data-source setup
+ * flow; once connected it shows a grid of vehicle info widgets plus the primary
+ * actions (Automations, Controls, Drive).
  */
 @Composable
 fun HomeScreen(
@@ -76,21 +77,31 @@ fun HomeScreen(
             .background(DarkColors.Background)
             .systemBarsPadding()
     ) {
-        // Always land on the home content (widgets + actions) rather than the
-        // data-source setup flow. The connection is started automatically on
-        // launch; widgets show placeholders until data arrives.
-        ConnectedHomeContent(
-            dashState = dashState,
-            bleManager = bleManager,
-            connectionStatus = connectionStatus,
+        // In debug builds show the connected home content by default so the full
+        // UI can be exercised without a live DashKit connection.
+        if (connectionStatus is ConnectionStatus.Connected || BuildConfig.DEBUG) {
+            ConnectedHomeContent(
+                dashState = dashState,
+                bleManager = bleManager,
+                connectionStatus = connectionStatus,
                 pinnedControlId = pinnedControlId,
                 onConnect = onConnect,
                 onDisconnect = onDisconnect,
-            onAutomations = onAutomations,
-            onControls = onControls,
-            onDrive = onDrive,
-            onSettingsClick = onSettingsClick
-        )
+                onAutomations = onAutomations,
+                onControls = onControls,
+                onDrive = onDrive,
+                onSettingsClick = onSettingsClick
+            )
+        } else {
+            SetupScreen(
+                connectionStatus = connectionStatus,
+                preselectDashKit = preselectDashKit,
+                onConnect = onConnect,
+                onDisconnect = onDisconnect,
+                onNext = onNext,
+                onSettingsClick = onSettingsClick
+            )
+        }
     }
 }
 
