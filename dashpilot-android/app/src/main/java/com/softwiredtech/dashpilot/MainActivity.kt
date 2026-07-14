@@ -72,28 +72,18 @@ class MainActivity : ComponentActivity() {
 
     private val speedCameraVM: SpeedCameraViewModel by viewModels()
 
-    // A BLE connection attempt that arrived before we held permission. Run once
-    // the user grants the prompt (see bluetoothPermissionLauncher).
     private var pendingBleAction: (() -> Unit)? = null
 
     private val bluetoothPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { _ ->
         val granted = hasBluetoothPermission()
-        // Kick off the startup DashKit scan once the user has responded to the
-        // permission prompt (granted or not — runStartupDiscovery handles both).
         connectionVM.runStartupDiscovery(this, granted)
-        // Resume any connection that was waiting on permission, but only if the
-        // user actually granted it.
         val action = pendingBleAction
         pendingBleAction = null
         if (granted) action?.invoke()
     }
 
-    // Ensures BLE permission is held before running a BLE action, requesting it
-    // first if needed. Wired into ConnectionViewModel so every connect path is
-    // gated. onGranted runs immediately when permission is already held, or from
-    // the permission-launcher callback once the user grants it.
     private fun ensureBluetoothPermission(onGranted: () -> Unit) {
         if (hasBluetoothPermission()) {
             onGranted()
@@ -174,9 +164,6 @@ class MainActivity : ComponentActivity() {
                 val onDashboard = navBackStackEntry?.destination?.route
                     ?.contains("DashboardRoute") == true
 
-                // Activity-scoped so an in-progress OTA survives navigation away
-                // from Settings (tab switches, theme picker); it is only disposed
-                // when the BLE manager changes or the Activity's content goes away.
                 val bleManager by connectionVM.bleManager.collectAsState()
                 val dashkitUpdateManager = remember(bleManager) {
                     bleManager?.let { FirmwareUpdateManager(it) }
@@ -185,8 +172,6 @@ class MainActivity : ComponentActivity() {
                     onDispose { dashkitUpdateManager?.dispose() }
                 }
 
-                // One-shot routing once the startup DashKit scan resolves. The UI
-                // shows the normal Setup screen (disconnected/connecting) until then.
                 LaunchedEffect(startupTarget) {
                     when (startupTarget) {
                         ConnectionViewModel.StartupTarget.ONBOARDING_DASHKIT ->
@@ -327,9 +312,6 @@ class MainActivity : ComponentActivity() {
                         }
                         composable<ThemePickerRoute> {
                             ThemePickerScreen(
-                                // Route-targeted pop is a no-op once the picker is
-                                // already off the stack, so a second rapid tap (two
-                                // cards, or card + back arrow) can't pop Settings too.
                                 onBack = { navController.popBackStack(ThemePickerRoute, inclusive = true) }
                             )
                         }
