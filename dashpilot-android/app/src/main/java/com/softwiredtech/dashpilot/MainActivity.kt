@@ -239,10 +239,6 @@ class MainActivity : ComponentActivity() {
                                 connectionStatus = connectionStatus,
                                 bleManager = manager,
                                 dashState = dashStateFlow,
-                                preselectDashKit = startupTarget ==
-                                        ConnectionViewModel.StartupTarget.AUTOCONNECT_DASHKIT ||
-                                        startupTarget ==
-                                        ConnectionViewModel.StartupTarget.ONBOARDING_DASHKIT,
                                 pinnedControlId = pinnedControl,
                                 onConnect = { serverAddress, dataSourceType ->
                                     connectionVM.connect(context, serverAddress, dataSourceType)
