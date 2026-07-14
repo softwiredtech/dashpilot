@@ -19,9 +19,32 @@ struct SettingsView: View {
     @AppStorage(DisplaySettings.keyRenderQuality)             private var renderQuality = 3
     @AppStorage(DisplaySettings.keySelectedDashboardId)       private var selectedDashboardId = ""
 
-    private var showVanillaSettings: Bool {
-        selectedDashboardId == "vanilla"
+    private var currentDashboard: DashboardConfig {
+        dashboardById(selectedDashboardId) ?? selectedDashboard()
     }
+
+    private var currentDashboardId: String {
+        currentDashboard.id
+    }
+
+    private var selectedManifest: DashboardManifest? {
+        currentDashboard.manifest
+    }
+
+    private func hasSetting(_ setting: ManifestDisplaySetting) -> Bool {
+        selectedManifest?.settings.contains(setting) == true
+    }
+
+    private var showAlwaysOnBlindSpotMonitorToggle: Bool { hasSetting(.alwaysOnBlindSpotMonitor) }
+    private var showDarkModeToggle: Bool { hasSetting(.darkMode) }
+    private var showRenderQualityControl: Bool { hasSetting(.renderQuality) }
+    private var showVisualizerSettings: Bool {
+        showRenderQualityControl || showAlwaysOnBlindSpotMonitorToggle || showDarkModeToggle
+    }
+    private var showPhoneBatteryToggle: Bool { hasSetting(.showPhoneBattery) }
+    private var showUseImperialToggle: Bool { hasSetting(.useImperial) }
+    private var showCarBatteryToggle: Bool { hasSetting(.showCarBattery) }
+    private var showOdometerToggle: Bool { hasSetting(.showOdometer) }
 
     var body: some View {
         ZStack {
@@ -35,7 +58,7 @@ struct SettingsView: View {
                         dashboardSection
                         configurationSection
                         displaySection
-                        if showVanillaSettings {
+                        if showVisualizerSettings {
                             visualizerSection
                         }
                         versionRow
@@ -74,39 +97,32 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 8) {
             sectionTitle("Dashboard")
                 .padding(.horizontal, 24)
-            Text("Choose a dashboard")
-                .foregroundColor(mutedText)
-                .font(.system(size: 13))
-                .padding(.horizontal, 24)
-            Spacer().frame(height: 4)
 
-            ScrollView(.horizontal, showsIndicators: false) {
+            NavigationLink(value: AppRoute.themePicker) {
                 HStack(spacing: 12) {
-                    ForEach(availableDashboards.filter { $0.type != .devRive }) { dashboard in
-                        let isSelected = dashboard.id == selectedDashboardId
-                        VStack(spacing: 0) {
-                            dashboardThumbnail(for: dashboard)
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                            Text(dashboard.name)
-                                .font(.system(size: 12, weight: .medium))
-                                .foregroundColor(isSelected ? dashGreen : mutedText)
-                                .padding(.vertical, 8)
-                        }
-                        .frame(width: 148)
-                        .background(Color(white: 0.1))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(isSelected ? dashGreen : Color.clear, lineWidth: 2)
-                        )
-                        .onTapGesture {
-                            selectedDashboardId = dashboard.id
-                        }
+                    dashboardThumbnail(for: currentDashboard)
+                        .frame(width: 96)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(currentDashboard.name)
+                            .foregroundColor(.white)
+                            .font(.system(size: 16))
+                        Text("Choose a dashboard")
+                            .foregroundColor(mutedText)
+                            .font(.system(size: 13))
                     }
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .foregroundColor(mutedText)
+                        .font(.system(size: 14, weight: .medium))
                 }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 4)
+                .padding(12)
+                .background(Color(white: 0.1))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
             }
+            .buttonStyle(.plain)
+            .padding(.horizontal, 24)
+
             Spacer().frame(height: 8)
         }
     }
@@ -142,12 +158,18 @@ struct SettingsView: View {
     private var displaySection: some View {
         VStack(alignment: .leading, spacing: 8) {
             sectionTitle("Display")
-            if extraVehicleBus {
+            if extraVehicleBus && showCarBatteryToggle {
                 SettingsToggleRow(label: "Show Car Battery", isOn: $showCarBattery)
+            }
+            if extraVehicleBus && showOdometerToggle {
                 SettingsToggleRow(label: "Show Odometer", isOn: $showOdometer)
             }
-            SettingsToggleRow(label: "Use Imperial Units", isOn: $useImperial)
-            SettingsToggleRow(label: "Show Phone Battery", isOn: $showPhoneBattery)
+            if showUseImperialToggle {
+                SettingsToggleRow(label: "Use Imperial Units", isOn: $useImperial)
+            }
+            if showPhoneBatteryToggle {
+                SettingsToggleRow(label: "Show Phone Battery", isOn: $showPhoneBattery)
+            }
             Spacer().frame(height: 8)
         }
         .padding(.horizontal, 24)
@@ -158,9 +180,15 @@ struct SettingsView: View {
     private var visualizerSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             sectionTitle("3D Visualizer")
-            SettingsToggleRow(label: "Always On Blind-Spot Monitor", isOn: $alwaysOnBlindSpotMonitor)
-            SettingsToggleRow(label: "Dark Mode", isOn: $darkMode)
-            renderQualityRow
+            if showAlwaysOnBlindSpotMonitorToggle {
+                SettingsToggleRow(label: "Always On Blind-Spot Monitor", isOn: $alwaysOnBlindSpotMonitor)
+            }
+            if showDarkModeToggle {
+                SettingsToggleRow(label: "Dark Mode", isOn: $darkMode)
+            }
+            if showRenderQualityControl {
+                renderQualityRow
+            }
             Spacer().frame(height: 8)
         }
         .padding(.horizontal, 24)

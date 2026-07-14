@@ -12,6 +12,9 @@ object SetupRoute
 object SettingsRoute
 
 @Serializable
+object ThemePickerRoute
+
+@Serializable
 object AutomationsRoute
 
 @Serializable

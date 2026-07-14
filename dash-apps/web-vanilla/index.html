@@ -570,6 +570,7 @@
     }
 
     var receiveMessage = function(car) {
+      if (!window._assetsReady) return;
       try {
         document.body.classList.toggle("dark-mode", !!car.darkMode);
 
@@ -811,7 +812,6 @@
     };
 
     window.onCarStateUpdate = function() {
-      if (!window._assetsReady) return;
       var car = {
         egoSteeringAngle: NativeCarState.getEgoSteeringAngle(),
         egoSpeed: NativeCarState.getEgoSpeed(),
@@ -852,6 +852,8 @@
       };
       receiveMessage(car);
     }
+
+    window.receiveMessage = receiveMessage;
 
   </script>
 

@@ -13,6 +13,11 @@ struct dashpilotApp: App {
     @State private var connectionVM = ConnectionViewModel()
     @State private var navigationPath = NavigationPath()
 
+    init() {
+        let webIds = availableDashboards.filter { $0.type == .web }.map { $0.id }
+        setLoadedManifests(ManifestLoader.loadFromBundle(dashboardIds: webIds))
+    }
+
     var body: some Scene {
         WindowGroup {
             NavigationStack(path: $navigationPath) {
@@ -25,6 +30,8 @@ struct dashpilotApp: App {
                             DashboardView(dashboardType: type, dashboardUrl: url)
                         case .settings:
                             SettingsView()
+                        case .themePicker:
+                            ThemePickerView()
                         }
                     }
             }
