@@ -18,7 +18,7 @@
         "reason": {
           "type": "string",
           "minLength": 10,
-          "description": "Required when gate is exempt: why this app cannot be fairly benchmarked by the CPU-throttled gate."
+          "description": "Required when gate is exempt: why the perf harness cannot fairly benchmark this app."
         },
         "root": {
           "type": "string",

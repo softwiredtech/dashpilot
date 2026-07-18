@@ -10,6 +10,12 @@
     window.onCarStateUpdate = function () {
       speedEl.textContent = Math.round(window.NativeCarState.getEgoSpeed());
       blinkerEl.textContent = window.NativeCarState.getLeftBlinker() ? "◀" : "";
+      // Burn measurable CPU per tick: Windows reports process.cpuUsage() in
+      // ~16ms quanta, so a trivial tick would read 0 and fail the
+      // steadyProcessCpuMs > 0 assertion. Still ~0.4ms/tick — far under budget.
+      for (let i = 0; i < 1500000; i++) {
+        Math.sqrt(i);
+      }
     };
   </script>
 </body>

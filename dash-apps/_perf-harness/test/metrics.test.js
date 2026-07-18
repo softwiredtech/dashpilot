@@ -4,15 +4,14 @@ const assert = require("node:assert");
 const { percentile, summarize } = require("../lib/metrics");
 const budgets = require("../lib/budgets.json");
 
-function sample(actualMs, injectionLagMs) {
-  return { actualMs, injectionLagMs };
+function sample(actualMs, tickCpuMs, mutations) {
+  return { actualMs, tickCpuMs, mutations };
 }
 
 function rawWith(overrides = {}) {
   return {
-    t0: 1000,
-    samples: [sample(6000, 5), sample(6040, 6), sample(6080, 4)],
-    longTasks: [],
+    samples: [sample(6000, 0.2, 1), sample(6040, 0.3, 2), sample(6080, 0.1, 0)],
+    steadyProcessCpuMs: 3,
     ...overrides,
   };
 }
@@ -28,28 +27,63 @@ test("clean run passes", () => {
   const result = summarize(rawWith(), budgets);
   assert.strictEqual(result.pass, true);
   assert.deepStrictEqual(result.violations, []);
+  assert.strictEqual(result.metrics.steadyFrames, 3);
 });
 
-test("warm-up samples and long tasks are excluded", () => {
+test("warm-up samples are excluded", () => {
   const result = summarize(
-    rawWith({
-      samples: [sample(100, 900), sample(6000, 5)],
-      longTasks: [{ startTime: 1000 + 100, duration: 800 }],
-    }),
+    rawWith({ samples: [sample(100, 50, 500), sample(6000, 0.2, 1)] }),
     budgets
   );
   assert.strictEqual(result.pass, true);
+  assert.strictEqual(result.metrics.steadyFrames, 1);
 });
 
-test("injection lag violation is reported", () => {
-  const result = summarize(rawWith({ samples: [sample(6000, 400)] }), budgets);
+test("tick cpu violation is reported", () => {
+  const result = summarize(rawWith({ samples: [sample(6000, 10, 1)] }), budgets);
   assert.strictEqual(result.pass, false);
-  assert.ok(result.violations.some((violation) => violation.name === "injectionLagP95Ms"));
-  assert.ok(result.violations.some((violation) => violation.name === "injectionLagMaxMs"));
+  assert.ok(result.violations.some((violation) => violation.name === "tickCpuP95Ms"));
 });
 
-test("post-warmup long task violation is reported", () => {
-  const result = summarize(rawWith({ longTasks: [{ startTime: 1000 + 9000, duration: 500 }] }), budgets);
+test("mutation churn violation is reported", () => {
+  const result = summarize(rawWith({ samples: [sample(6000, 0.2, 60)] }), budgets);
   assert.strictEqual(result.pass, false);
-  assert.ok(result.violations.some((violation) => violation.name === "longestTaskMs"));
+  assert.ok(result.violations.some((violation) => violation.name === "mutationsPerTickP95"));
+});
+
+test("deferred work is charged via mean process cpu", () => {
+  const result = summarize(rawWith({ steadyProcessCpuMs: 100 }), budgets);
+  assert.strictEqual(result.pass, false);
+  assert.ok(result.violations.some((violation) => violation.name === "meanProcessCpuPerTickMs"));
+});
+
+test("mean process cpu divides steady cpu by steady frames only", () => {
+  const result = summarize(
+    rawWith({
+      samples: [sample(100, 50, 500), sample(6000, 0.2, 1), sample(6040, 0.2, 1)],
+      steadyProcessCpuMs: 8,
+    }),
+    budgets
+  );
+  assert.strictEqual(result.metrics.meanProcessCpuPerTickMs, 4);
+  assert.strictEqual(result.pass, true);
+});
+
+test("truncated run fails the min steady sample guard", () => {
+  const result = summarize(rawWith(), budgets, 450);
+
+  assert.strictEqual(result.pass, false);
+  const violation = result.violations.find((v) => v.name === "minSteadySampleRatio");
+  assert.ok(violation, "expected a minSteadySampleRatio violation");
+  assert.strictEqual(violation.actual, 3);
+  assert.strictEqual(violation.limit, 225);
+  assert.strictEqual(violation.op, ">=");
+});
+
+test("full run passes the min steady sample guard", () => {
+  const samples = Array.from({ length: 450 }, (_, i) => sample(2000 + i * 40, 0.2, 1));
+  const result = summarize(rawWith({ samples }), budgets, 450);
+
+  assert.strictEqual(result.pass, true);
+  assert.strictEqual(result.limits.minSteadyFrames, 225);
 });

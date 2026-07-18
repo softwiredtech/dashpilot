@@ -4,7 +4,7 @@
   "id": "vanilla",
   "perf": {
     "gate": "exempt",
-    "reason": "WASM/Bevy 3D renderer; SwiftShader + CPU throttle in CI misrepresents real-device GPU performance. Needs a renderer-specific gate."
+    "reason": "WASM/Bevy 3D renderer does all its work in WebGL/canvas, which the jsdom tripwire cannot observe — the gate would pass trivially regardless of regressions. Needs a renderer-specific gate."
   },
   "settings": [
     "showPhoneBattery", "showCarBattery", "showOdometer",

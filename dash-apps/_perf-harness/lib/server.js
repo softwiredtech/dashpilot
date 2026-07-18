@@ -18,9 +18,6 @@ const MIME = {
   ".woff": "font/woff",
   ".woff2": "font/woff2",
   ".ttf": "font/ttf",
-  ".wasm": "application/wasm",
-  ".glb": "model/gltf-binary",
-  ".wgsl": "text/plain",
 };
 
 function startServer(rootDir) {

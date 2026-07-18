@@ -36,24 +36,6 @@ test("serves index.html at / with text/html", async () => {
   });
 });
 
-test("serves .wasm with application/wasm", async () => {
-  await withServer({ "mod.wasm": "\0asm" }, async (port) => {
-    const res = await fetch(`http://127.0.0.1:${port}/mod.wasm`);
-
-    assert.strictEqual(res.headers.get("content-type"), "application/wasm");
-  });
-});
-
-test("serves .glb and .wgsl with WebView-matching MIME", async () => {
-  await withServer({ "m.glb": "x", "s.wgsl": "x" }, async (port) => {
-    const glb = await fetch(`http://127.0.0.1:${port}/m.glb`);
-    const wgsl = await fetch(`http://127.0.0.1:${port}/s.wgsl`);
-
-    assert.strictEqual(glb.headers.get("content-type"), "model/gltf-binary");
-    assert.strictEqual(wgsl.headers.get("content-type"), "text/plain");
-  });
-});
-
 test("404 on missing file", async () => {
   await withServer({}, async (port) => {
     const res = await fetch(`http://127.0.0.1:${port}/nope.js`);
