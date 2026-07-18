@@ -53,6 +53,7 @@ When the benchmark runs, it evaluates the app against these four metrics:
 - Change the exposed getter list: [`_perf-harness/lib/getters.js`](./_perf-harness/lib/getters.js)
 - Change CLI behavior or validation: [`_perf-harness/run.js`](./_perf-harness/run.js)
 - Change CI trigger behavior: [`.github/workflows/dashapp-perf.yml`](../.github/workflows/dashapp-perf.yml)
+- Develop an app outside the phone: `cd _perf-harness && npm run dev -- ../web-retro`
 
 Run the identical check locally while developing:
 
