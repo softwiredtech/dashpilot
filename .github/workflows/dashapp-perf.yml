@@ -35,17 +35,6 @@ jobs:
       - name: Install harness
         working-directory: dash-apps/_perf-harness
         run: npm ci
-
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('dash-apps/_perf-harness/package-lock.json') }}
-
-      - name: Install Chromium
-        working-directory: dash-apps/_perf-harness
-        run: npx playwright install --with-deps chromium
-
       - name: Harness self-test
         working-directory: dash-apps/_perf-harness
         run: npm test

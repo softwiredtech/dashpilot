@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    #speed { color: light-dark(#111, #eee); }
+  </style>
+</head>
+<body>
+  <canvas id="c" width="100" height="100"></canvas>
+  <div id="speed">0</div>
+  <script>
+    const ctx = document.getElementById("c").getContext("2d");
+    window.scrollTo(0, 0);
+
+    window.onCarStateUpdate = function () {
+      document.getElementById("speed").textContent = Math.round(window.NativeCarState.getEgoSpeed());
+    };
+  </script>
+</body>
+</html>

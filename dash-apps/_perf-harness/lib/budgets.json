@@ -1,34 +1,26 @@
 {
-  "injectionLagP95Ms": {
-    "value": 50,
-    "why": "Scheduled-vs-actual update fire time. Backlog here is exactly the 'stale data' symptom seen on Pixel 3 XL. p95 must stay near one 40ms frame."
+  "tickCpuP95Ms": {
+    "value": 3,
+    "why": "p95 synchronous cost of one onCarStateUpdate call in jsdom, post-warmup. The DOM-rebuild regression (web-retro 0a32362) measures ~3ms on a dev machine and more on CI; every current app is under 0.75ms. Absolute Node time — no CPU throttle."
   },
-  "injectionLagMaxMs": {
-    "value": 200,
-    "why": "A single stall of 5+ frames is a visible freeze of a driving instrument, even if p95 looks fine."
+  "mutationsPerTickP95": {
+    "value": 25,
+    "why": "p95 DOM mutation records per tick, post-warmup. In-place updates cost 0-7 records; wholesale innerHTML rebuilds cost 50+. Deterministic — immune to CI timing noise, so it backstops the CPU budgets."
   },
-  "longestTaskMs": {
-    "value": 150,
-    "why": "One long task blocks every queued update behind it. Applies after warm-up only."
+  "meanProcessCpuPerTickMs": {
+    "value": 5,
+    "why": "Whole-process CPU per post-warmup tick. Charges work deferred to timers/rAF between ticks (React schedulers), which the synchronous per-tick measure cannot see. Startup and mount cost are excluded so the verdict does not depend on run duration."
+  },
+  "minSteadySampleRatio": {
+    "value": 0.5,
+    "why": "Fail closed on truncated runs. Under heavy runner contention the wall-clock deadline can gut the sample base (observed: 50 of 450 steady frames), which makes the percentile budgets meaningless — the gate must not pass on a starved run. Requires at least this fraction of the scheduled post-warmup frames."
   },
   "warmupMs": {
     "value": 2000,
     "why": "JIT and layout spikes settle within ~2s. At 20s run the warmup takes 10% of wall-clock instead of 25% — acceptable trade."
   },
-  "cpuThrottle": {
-    "value": 6,
-    "why": "CDP CPU throttle factor approximating a Pixel 3 XL-class device on a CI runner. Calibrated in the rollout task; adjust this single number if too lenient/harsh."
-  },
   "defaultDurationMs": {
     "value": 20000,
     "why": "Compressed scenario hits every code path 2-3x in 20s. With 2s warmup, ~18s of steady frames — enough for stable p95 and covering all event types."
-  },
-  "viewport": {
-    "value": {
-      "width": 846,
-      "height": 411,
-      "deviceScaleFactor": 3.5
-    },
-    "why": "Landscape dashboard viewport on phone-class hardware. The apps render sideways in-car, so CI should not benchmark a portrait phone page."
   }
 }

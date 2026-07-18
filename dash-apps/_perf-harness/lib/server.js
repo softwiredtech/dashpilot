@@ -18,12 +18,9 @@ const MIME = {
   ".woff": "font/woff",
   ".woff2": "font/woff2",
   ".ttf": "font/ttf",
-  ".wasm": "application/wasm",
-  ".glb": "model/gltf-binary",
-  ".wgsl": "text/plain",
 };
 
-function startServer(rootDir) {
+function startServer(rootDir, { virtualFiles } = {}) {
   const root = path.resolve(rootDir);
 
   return new Promise((resolve) => {
@@ -35,6 +32,16 @@ function startServer(rootDir) {
       } catch {
         res.writeHead(400);
         res.end("bad request");
+        return;
+      }
+
+      if (virtualFiles && Object.prototype.hasOwnProperty.call(virtualFiles, pathname)) {
+        const ext = path.extname(pathname).toLowerCase();
+        const contentType = MIME[ext] || (pathname === "/" ? "text/html" : "text/javascript");
+        res.writeHead(200, {
+          "Content-Type": contentType,
+        });
+        res.end(virtualFiles[pathname]);
         return;
       }
 
@@ -55,8 +62,9 @@ function startServer(rootDir) {
           return;
         }
 
+        const ext = path.extname(filePath).toLowerCase();
         res.writeHead(200, {
-          "Content-Type": MIME[path.extname(filePath).toLowerCase()] || "application/octet-stream",
+          "Content-Type": MIME[ext] || "application/octet-stream",
         });
         res.end(data);
       });

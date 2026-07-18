@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <div id="speed">0</div>
+  <script>
+    window.onerror = () => true;
+
+    window.onCarStateUpdate = function () {
+      document.getElementById("speed").textContent = Math.round(window.NativeCarState.getEgoSpeed());
+    };
+
+    setTimeout(() => {
+      throw new Error("hidden crash");
+    }, 200);
+  </script>
+</body>
+</html>
