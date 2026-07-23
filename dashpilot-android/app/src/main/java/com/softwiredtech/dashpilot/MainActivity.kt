@@ -173,18 +173,23 @@ class MainActivity : ComponentActivity() {
                 }
 
                 LaunchedEffect(startupTarget) {
-                    when (startupTarget) {
-                        ConnectionViewModel.StartupTarget.ONBOARDING_DASHKIT ->
-                            navController.navigate(OnboardingRoute) {
-                                popUpTo(SetupRoute) { inclusive = true }
+                    when (startupTarget.route) {
+                        ConnectionViewModel.StartupRoute.ONBOARDING_DASHKIT -> {
+                            val onOnboarding = navController.currentDestination?.route
+                                ?.contains("OnboardingRoute") == true
+                            if (!onOnboarding) {
+                                navController.navigate(OnboardingRoute) {
+                                    popUpTo(SetupRoute) { inclusive = true }
+                                }
                             }
-                        ConnectionViewModel.StartupTarget.AUTOCONNECT_DASHKIT ->
+                        }
+                        ConnectionViewModel.StartupRoute.AUTOCONNECT_DASHKIT ->
                             connectionVM.connect(context, "", DataSourceType.DASHKIT)
-                        ConnectionViewModel.StartupTarget.DEFAULT ->
+                        ConnectionViewModel.StartupRoute.DEFAULT ->
                             if (!BuildConfig.DEBUG) {
                                 connectionVM.connect(context, "", DataSourceType.COMMA)
                             }
-                        ConnectionViewModel.StartupTarget.LOADING -> Unit
+                        ConnectionViewModel.StartupRoute.LOADING -> Unit
                     }
                 }
 
@@ -241,7 +246,10 @@ class MainActivity : ComponentActivity() {
                                 dashState = dashStateFlow,
                                 pinnedControlId = pinnedControl,
                                 onConnect = { serverAddress, dataSourceType ->
-                                    connectionVM.connect(context, serverAddress, dataSourceType)
+                                    connectionVM.connect(
+                                        context, serverAddress, dataSourceType,
+                                        userInitiated = true
+                                    )
                                 },
                                 onDisconnect = {
                                     connectionVM.disconnect()
@@ -331,7 +339,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        connectionVM.onAppForegrounded(this)
+        connectionVM.onAppForegrounded(this, hasBluetoothPermission())
     }
 
     private fun hasBluetoothPermission(): Boolean {
