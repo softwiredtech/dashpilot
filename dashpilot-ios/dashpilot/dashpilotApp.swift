@@ -21,7 +21,7 @@ struct dashpilotApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack(path: $navigationPath) {
-                SetupView(navigationPath: $navigationPath)
+                HomeView(navigationPath: $navigationPath)
                     .navigationDestination(for: AppRoute.self) { route in
                         switch route {
                         case .dashboardSelection:
@@ -32,6 +32,12 @@ struct dashpilotApp: App {
                             SettingsView()
                         case .themePicker:
                             ThemePickerView()
+                        case .automations:
+                            AutomationsView()
+                        case .controls:
+                            ControlsView()
+                        case .setup:
+                            SetupView(navigationPath: $navigationPath)
                         }
                     }
             }

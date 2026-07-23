@@ -6,6 +6,7 @@ struct SetupView: View {
 
     @Binding var navigationPath: NavigationPath
     @Environment(ConnectionViewModel.self) var connectionVM
+    @Environment(\.dismiss) private var dismiss
 
     @State private var serverAddress: String =
         UserDefaults.standard.string(forKey: "device_ip") ?? "192.168.1.105"
@@ -30,16 +31,24 @@ struct SetupView: View {
 
             VStack {
                 HStack {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(.white)
+                            .font(.system(size: 20, weight: .semibold))
+                            .frame(width: 44, height: 44)
+                    }
+                    Spacer()
                     NavigationLink(value: AppRoute.settings) {
                         Image(systemName: "gear")
                             .foregroundColor(Color(white: 0.53))
                             .font(.system(size: 22))
                             .frame(width: 44, height: 44)
                     }
-                    Spacer()
                 }
                 .padding(.top, 12)
-                .padding(.leading, 12)
+                .padding(.horizontal, 12)
                 Spacer()
             }
         }
