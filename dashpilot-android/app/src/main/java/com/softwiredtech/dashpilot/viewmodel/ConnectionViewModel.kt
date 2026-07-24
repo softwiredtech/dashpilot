@@ -153,14 +153,23 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         _bleManager.value?.let { VehicleControl.sendFingerAction(it, fingers, actionValue) }
     }
 
-    enum class StartupTarget { LOADING, ONBOARDING_DASHKIT, AUTOCONNECT_DASHKIT, DEFAULT }
+    enum class StartupRoute { LOADING, ONBOARDING_DASHKIT, AUTOCONNECT_DASHKIT, DEFAULT }
 
-    private val _startupTarget = MutableStateFlow(StartupTarget.LOADING)
+    // generation increments on every discovery run so the UI's routing effect
+    // re-fires even when two consecutive runs resolve to the same route.
+    data class StartupTarget(val route: StartupRoute, val generation: Int)
+
+    private val _startupTarget = MutableStateFlow(StartupTarget(StartupRoute.LOADING, 0))
     val startupTarget = _startupTarget.asStateFlow()
     private var startupDiscoveryStarted = false
+    private var discoveryGeneration = 0
 
     private var lastDataSourceType: String? = null
     private var lastServerAddress: String = ""
+
+    // Data source the user explicitly chose this session (via the data source
+    // menu). Restored on foreground instead of being overridden by discovery.
+    private var userSelectedType: String? = null
 
     // Briefly scan for an advertising DashKit and decide the launch route:
     //  - found + bonded   -> auto-connect DashKit
@@ -169,28 +178,29 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     fun runStartupDiscovery(context: Context, hasBlePermission: Boolean) {
         if (startupDiscoveryStarted) return
         startupDiscoveryStarted = true
+        val generation = ++discoveryGeneration
 
         if (!hasBlePermission) {
-            _startupTarget.value = StartupTarget.DEFAULT
+            _startupTarget.value = StartupTarget(StartupRoute.DEFAULT, generation)
             return
         }
 
         viewModelScope.launch {
-            val target = withTimeoutOrNull(STARTUP_SCAN_TIMEOUT_MS) {
+            val route = withTimeoutOrNull(STARTUP_SCAN_TIMEOUT_MS) {
                 scanForDashKit(context)
-            } ?: StartupTarget.DEFAULT
-            _startupTarget.value = target
+            } ?: StartupRoute.DEFAULT
+            _startupTarget.value = StartupTarget(route, generation)
         }
     }
 
     @SuppressLint("MissingPermission")
-    private suspend fun scanForDashKit(context: Context): StartupTarget =
+    private suspend fun scanForDashKit(context: Context): StartupRoute =
         suspendCancellableCoroutine { cont ->
             val adapter = (context.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager)
                 ?.adapter
             val scanner = adapter?.bluetoothLeScanner
             if (scanner == null) {
-                if (cont.isActive) cont.resume(StartupTarget.DEFAULT)
+                if (cont.isActive) cont.resume(StartupRoute.DEFAULT)
                 return@suspendCancellableCoroutine
             }
 
@@ -202,15 +212,15 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
                     try { scanner.stopScan(this) } catch (_: Exception) {}
                     if (cont.isActive) {
                         cont.resume(
-                            if (bonded) StartupTarget.AUTOCONNECT_DASHKIT
-                            else StartupTarget.ONBOARDING_DASHKIT
+                            if (bonded) StartupRoute.AUTOCONNECT_DASHKIT
+                            else StartupRoute.ONBOARDING_DASHKIT
                         )
                     }
                 }
 
                 override fun onScanFailed(errorCode: Int) {
                     Log.e("ConnectionViewModel", "Startup scan failed: $errorCode")
-                    if (cont.isActive) cont.resume(StartupTarget.DEFAULT)
+                    if (cont.isActive) cont.resume(StartupRoute.DEFAULT)
                 }
             }
 
@@ -221,7 +231,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
                 scanner.startScan(null, settings, callback)
             } catch (e: Exception) {
                 Log.e("ConnectionViewModel", "Startup scan could not start: ${e.message}")
-                if (cont.isActive) cont.resume(StartupTarget.DEFAULT)
+                if (cont.isActive) cont.resume(StartupRoute.DEFAULT)
                 return@suspendCancellableCoroutine
             }
 
@@ -253,11 +263,16 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
                 PackageManager.PERMISSION_GRANTED
     }
 
-    fun connect(context: Context, manualServerAddress: String, dataSourceType: String) {
+    fun connect(
+        context: Context,
+        manualServerAddress: String,
+        dataSourceType: String,
+        userInitiated: Boolean = false,
+    ) {
         if (dataSourceType == DataSourceType.DASHKIT && !hasBluetoothPermission(context)) {
             val gate = blePermissionGate
             if (gate != null) {
-                gate { connect(context, manualServerAddress, dataSourceType) }
+                gate { connect(context, manualServerAddress, dataSourceType, userInitiated) }
             } else {
                 _connectionStatus.value = ConnectionStatus.Error("Missing BLE permission")
             }
@@ -267,6 +282,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         val current = _connectionStatus.value
         if (current !is ConnectionStatus.Disconnected && current !is ConnectionStatus.Error) return
 
+        if (userInitiated) userSelectedType = dataSourceType
         lastDataSourceType = dataSourceType
         lastServerAddress = manualServerAddress
 
@@ -398,8 +414,37 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         }
     }
 
-    fun onAppForegrounded(context: Context) {
-        val type = lastDataSourceType ?: return
+    fun onAppForegrounded(context: Context, hasBlePermission: Boolean) {
+        // First onStart after a cold launch (or while the permission dialog is
+        // up): startup discovery is still deciding the route — let it finish.
+        if (_startupTarget.value.route == StartupRoute.LOADING) return
+
+        val type = lastDataSourceType
+        if (type != null && (type == DataSourceType.DASHKIT || type == userSelectedType)) {
+            // A DashKit session, or a source the user picked by hand: restore
+            // it directly instead of re-running discovery.
+            reconnect(context, type)
+            return
+        }
+
+        if (!hasBlePermission) {
+            // Can't scan for DashKit; just restore whatever ran before.
+            if (type != null) reconnect(context, type)
+            return
+        }
+
+        // No DashKit session and no explicit user choice — the app may have
+        // been opened away from the car, so decide the route again exactly
+        // like a fresh launch: auto-connect a bonded DashKit, onboard an
+        // unbonded one, otherwise fall back to the default source.
+        teardownConnection()
+        _connectionStatus.value = ConnectionStatus.Disconnected
+        startupDiscoveryStarted = false
+        _startupTarget.value = StartupTarget(StartupRoute.LOADING, discoveryGeneration)
+        runStartupDiscovery(context, hasBlePermission)
+    }
+
+    private fun reconnect(context: Context, type: String) {
         val address = lastServerAddress
         teardownConnection()
         _connectionStatus.value = ConnectionStatus.Disconnected
