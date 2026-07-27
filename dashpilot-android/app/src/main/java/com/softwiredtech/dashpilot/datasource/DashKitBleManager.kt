@@ -8,6 +8,7 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.ScanCallback
+import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.BroadcastReceiver
@@ -15,6 +16,8 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,6 +42,16 @@ class DashKitBleManager(private val context: Context) {
     companion object {
         private const val TAG = "DashKitBleManager"
         private const val DEVICE_NAME = "DashKit"
+
+        // A connection attempt is one scan + connect cycle. Retry a few times
+        // with a pause in between (DashKit may be mid-reboot, or the previous
+        // link may still be tearing down) before surfacing an error. The pause
+        // also keeps us under Android's 5-scans-per-30s throttle, which
+        // silently suppresses scan results when exceeded.
+        private const val MAX_ATTEMPTS = 3
+        private const val SCAN_TIMEOUT_MS = 15_000L
+        private const val CONNECT_TIMEOUT_MS = 10_000L
+        private const val RETRY_DELAY_MS = 2_000L
     }
 
     private val crashlytics = FirebaseCrashlytics.getInstance()
@@ -60,17 +73,66 @@ class DashKitBleManager(private val context: Context) {
     private var discoveryStarted = false
     private var bondReceiverRegistered = false
 
-    // Re-pairing after the phone "forgot" the bond fails the first attempt:
-    // DashKit reboots to clear residual pairing state, which drops the link
-    // before it is bonded. Reconnect once automatically so the freshly-booted
-    // DashKit pairs cleanly without the user having to tap "pair" again. Reset
-    // on each user-initiated connect().
-    private var rePairRetryDone = false
-
     // Set only when the app itself tears down the link (disconnect()). Any other
     // drop after a healthy connection — most commonly a DashKit reboot — is
     // treated as transient and triggers an automatic reconnect.
+    @Volatile
     private var userInitiatedDisconnect = false
+
+    // Connect attempt issued from a scan result but not yet CONNECTED. Tracked
+    // so disconnect() and the connect timeout can cancel it — an abandoned
+    // connectGatt() would otherwise keep running (and eventually hold an
+    // unmanaged link to DashKit).
+    @Volatile
+    private var pendingGatt: BluetoothGatt? = null
+
+    // Scan+connect cycles used so far for the current connection intent.
+    // Reset on connect(), on a successful connection, and when starting an
+    // auto-reconnect after an unexpected drop.
+    @Volatile
+    private var attemptCount = 0
+
+    // All timeout/retry scheduling (plus the post-bond discovery delay) runs on
+    // this handler; disconnect() clears it wholesale.
+    private val handler = Handler(Looper.getMainLooper())
+
+    private val retryRunnable = Runnable {
+        if (!userInitiatedDisconnect && _connectionState.value == ConnectionStatus.Connecting) {
+            startScan()
+        }
+    }
+
+    private val scanTimeoutRunnable = Runnable {
+        if (!scanning) return@Runnable
+        Log.w(TAG, "Scan timed out without finding DashKit (attempt $attemptCount/$MAX_ATTEMPTS)")
+        crashlytics.log("BLE: scan timed out (attempt $attemptCount/$MAX_ATTEMPTS)")
+        stopScan()
+        retryOrFail("DashKit not found")
+    }
+
+    private val connectTimeoutRunnable = Runnable {
+        val pending = pendingGatt ?: return@Runnable
+        pendingGatt = null
+        Log.w(TAG, "Connect attempt timed out (attempt $attemptCount/$MAX_ATTEMPTS)")
+        crashlytics.log("BLE: connect attempt timed out (attempt $attemptCount/$MAX_ATTEMPTS)")
+        try { pending.close() } catch (_: Exception) {}
+        retryOrFail("Could not connect to DashKit")
+    }
+
+    // Retry after a short pause while attempts remain, otherwise publish an
+    // error so the UI leaves "Connecting…" instead of hanging forever.
+    private fun retryOrFail(errorMessage: String) {
+        if (userInitiatedDisconnect) return
+        if (attemptCount < MAX_ATTEMPTS) {
+            handler.postDelayed(retryRunnable, RETRY_DELAY_MS)
+            return
+        }
+        crashlytics.recordException(
+            BleConnectionException("$errorMessage (after $attemptCount attempts)")
+        )
+        _connectionState.value = ConnectionStatus.Error(errorMessage)
+        forEachListener { it.onDisconnected() }
+    }
 
     // DashKit uses "Just Works" pairing. Android must bond before it can touch
     // the encryption-protected characteristics, so we wait for the bond to
@@ -121,15 +183,20 @@ class DashKitBleManager(private val context: Context) {
     private val scanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             val name = result.device.name ?: result.scanRecord?.deviceName
-            if (name == DEVICE_NAME) {
-                Log.d(TAG, "Found DashKit: ${result.device.address}")
-                crashlytics.log("BLE: found DashKit, connecting")
-                stopScan()
-                result.device.connectGatt(
-                    context, false, gattCallback,
-                    android.bluetooth.BluetoothDevice.TRANSPORT_LE
-                )
-            }
+            if (name != DEVICE_NAME) return
+            // Duplicate advertisements are often delivered after stopScan();
+            // never issue a second connectGatt() while one attempt or a live
+            // connection exists.
+            if (pendingGatt != null || gatt != null) return
+            Log.d(TAG, "Found DashKit: ${result.device.address}")
+            crashlytics.log("BLE: found DashKit, connecting")
+            stopScan()
+            handler.removeCallbacks(scanTimeoutRunnable)
+            pendingGatt = result.device.connectGatt(
+                context, false, gattCallback,
+                android.bluetooth.BluetoothDevice.TRANSPORT_LE
+            )
+            handler.postDelayed(connectTimeoutRunnable, CONNECT_TIMEOUT_MS)
         }
 
         override fun onScanFailed(errorCode: Int) {
@@ -142,6 +209,15 @@ class DashKitBleManager(private val context: Context) {
     private val gattCallback = object : BluetoothGattCallback() {
         override fun onConnectionStateChange(g: BluetoothGatt, status: Int, newState: Int) {
             if (newState == BluetoothProfile.STATE_CONNECTED) {
+                if (pendingGatt !== g) {
+                    // This attempt was already abandoned (timed out or torn
+                    // down by disconnect()); don't let it hold a link.
+                    Log.w(TAG, "Ignoring stale GATT connection")
+                    try { g.close() } catch (_: Exception) {}
+                    return
+                }
+                handler.removeCallbacks(connectTimeoutRunnable)
+                pendingGatt = null
                 Log.d(TAG, "Connected to GATT server")
                 crashlytics.log("BLE: GATT connected (bondState=${g.device.bondState})")
                 gatt = g
@@ -168,26 +244,32 @@ class DashKitBleManager(private val context: Context) {
                     }
                 }
             } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                val wasPending = pendingGatt === g
+                if (wasPending) {
+                    handler.removeCallbacks(connectTimeoutRunnable)
+                    pendingGatt = null
+                }
+                if (!wasPending && g !== gatt) {
+                    // A client we already abandoned or closed; nothing to do
+                    // beyond making sure it releases its resources.
+                    try { g.close() } catch (_: Exception) {}
+                    return
+                }
                 Log.d(TAG, "Disconnected from GATT server")
                 val reachedConnected = _connectionState.value == ConnectionStatus.Connected
                 try { g.close() } catch (_: Exception) {}
                 gatt = null
                 discoveryStarted = false
                 if (!reachedConnected) {
-                    if (!rePairRetryDone) {
-                        // Pairing did not complete — DashKit reboots to clear
-                        // residual pairing state, dropping the link. Reconnect
-                        // once automatically to pair against the fresh boot.
-                        rePairRetryDone = true
-                        Log.d(TAG, "Link dropped before pairing completed; reconnecting once")
-                        crashlytics.log("BLE: link dropped before pairing completed; re-pair retry")
-                        startScan()
-                        return
-                    }
-                    Log.e(TAG, "Pairing failed")
-                    crashlytics.recordException(BleConnectionException("Pairing failed (link dropped before pairing completed, status=$status)"))
-                    _connectionState.value = ConnectionStatus.Error("Pairing failed")
-                    forEachListener { it.onDisconnected() }
+                    // Link dropped before the connection was fully up: either
+                    // DashKit rebooted to clear residual pairing state mid-pair
+                    // (it reboots on a failed encryption change), or the
+                    // connect attempt itself failed (e.g. status 133). Retry a
+                    // few times so the freshly-booted DashKit pairs cleanly
+                    // without the user having to tap "pair" again.
+                    Log.w(TAG, "Link dropped before setup completed (status=$status)")
+                    crashlytics.log("BLE: link dropped before setup completed (status=$status, attempt $attemptCount/$MAX_ATTEMPTS)")
+                    retryOrFail("Could not connect to DashKit")
                     return
                 }
                 if (!userInitiatedDisconnect) {
@@ -199,7 +281,7 @@ class DashKitBleManager(private val context: Context) {
                     crashlytics.recordException(BleConnectionException("Link dropped unexpectedly after connect (status=$status); auto-reconnecting"))
                     _connectionState.value = ConnectionStatus.Connecting
                     forEachListener { it.onDisconnected() }
-                    rePairRetryDone = true  // already bonded; don't treat as re-pair
+                    attemptCount = 0  // fresh retry budget for the reconnect
                     startScan()
                     return
                 }
@@ -231,6 +313,7 @@ class DashKitBleManager(private val context: Context) {
                 }
             }
             crashlytics.log("BLE: connected (${g.services.size} services, mtu=$mtu)")
+            attemptCount = 0
             _connectionState.value = ConnectionStatus.Connected
             forEachListener { it.onServicesReady(g) }
         }
@@ -304,7 +387,7 @@ class DashKitBleManager(private val context: Context) {
             Log.w(TAG, "Could not clear GATT cache: ${e.message}")
         }
         // Delay to let cache clear take effect, then request MTU
-        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+        handler.postDelayed({
             g.requestMtu(512)
         }, 600)
     }
@@ -313,7 +396,7 @@ class DashKitBleManager(private val context: Context) {
         if (_connectionState.value == ConnectionStatus.Connected ||
             _connectionState.value == ConnectionStatus.Connecting) return
         _connectionState.value = ConnectionStatus.Connecting
-        rePairRetryDone = false
+        attemptCount = 0
         userInitiatedDisconnect = false
         registerBondReceiver()
         startScan()
@@ -321,8 +404,12 @@ class DashKitBleManager(private val context: Context) {
 
     fun disconnect() {
         userInitiatedDisconnect = true
+        // Drops pending timeouts, scheduled retries and the discovery delay.
+        handler.removeCallbacksAndMessages(null)
         stopScan()
         unregisterBondReceiver()
+        pendingGatt?.let { try { it.close() } catch (_: Exception) {} }
+        pendingGatt = null
         gatt?.close()
         gatt = null
         discoveryStarted = false
@@ -362,11 +449,20 @@ class DashKitBleManager(private val context: Context) {
         val settings = ScanSettings.Builder()
             .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
             .build()
+        // Filter on the device name: filtered scans are exempt from most of
+        // Android's unfiltered-scan restrictions (screen-off suspension and
+        // harsher duty-cycle throttling).
+        val filters = listOf(
+            ScanFilter.Builder().setDeviceName(DEVICE_NAME).build()
+        )
         try {
-            scanner.startScan(null, settings, scanCallback)
+            scanner.startScan(filters, settings, scanCallback)
             scanning = true
-            Log.d(TAG, "BLE scan started")
-            crashlytics.log("BLE: scan started")
+            attemptCount++
+            handler.removeCallbacks(scanTimeoutRunnable)
+            handler.postDelayed(scanTimeoutRunnable, SCAN_TIMEOUT_MS)
+            Log.d(TAG, "BLE scan started (attempt $attemptCount/$MAX_ATTEMPTS)")
+            crashlytics.log("BLE: scan started (attempt $attemptCount/$MAX_ATTEMPTS)")
         } catch (e: SecurityException) {
             Log.e(TAG, "BLE scan failed — missing permission: ${e.message}")
             crashlytics.recordException(BleConnectionException("BLE scan failed — missing permission: ${e.message}"))
@@ -379,6 +475,7 @@ class DashKitBleManager(private val context: Context) {
     }
 
     private fun stopScan() {
+        handler.removeCallbacks(scanTimeoutRunnable)
         if (!scanning) return
         try {
             val adapter = (context.getSystemService(Context.BLUETOOTH_SERVICE) as android.bluetooth.BluetoothManager).adapter

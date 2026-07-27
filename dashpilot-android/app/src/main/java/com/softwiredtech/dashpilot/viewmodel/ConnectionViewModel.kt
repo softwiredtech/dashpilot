@@ -421,8 +421,22 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
 
         val type = lastDataSourceType
         if (type != null && (type == DataSourceType.DASHKIT || type == userSelectedType)) {
-            // A DashKit session, or a source the user picked by hand: restore
-            // it directly instead of re-running discovery.
+            if (type == DataSourceType.DASHKIT) {
+                // The BLE link survives backgrounding. If it is still up (or
+                // the manager is already connecting/auto-reconnecting), keep
+                // it: a teardown + rescan here would drop a healthy link, and
+                // rescanning on every foreground burns through Android's
+                // 5-scans-per-30s budget, after which scans silently return
+                // nothing and the app hangs in "Connecting…".
+                val bleState = _bleManager.value?.connectionState?.value
+                if (bleState == ConnectionStatus.Connected ||
+                    bleState == ConnectionStatus.Connecting
+                ) {
+                    return
+                }
+            }
+            // A dead DashKit session, or a source the user picked by hand:
+            // restore it directly instead of re-running discovery.
             reconnect(context, type)
             return
         }
