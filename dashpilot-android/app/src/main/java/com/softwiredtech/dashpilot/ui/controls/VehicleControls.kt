@@ -13,11 +13,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Air
-import androidx.compose.material.icons.rounded.DirectionsCar
 import androidx.compose.material.icons.rounded.EvStation
 import androidx.compose.material.icons.rounded.Flip
 import androidx.compose.material.icons.rounded.Inbox
-import androidx.compose.material.icons.rounded.Inventory2
 import androidx.compose.material.icons.rounded.PushPin
 import androidx.compose.material.icons.rounded.Thermostat
 import androidx.compose.material3.Icon
@@ -93,7 +91,7 @@ val vehicleControls: List<ControlAction> = listOf(
     ),
     ControlAction(
         id = "frunk",
-        icon = Icons.Rounded.DirectionsCar,
+        icon = VehicleIcons.Frunk,
         label = { "Frunk" },
         active = { false },
         gestureValue = 4,
@@ -103,7 +101,7 @@ val vehicleControls: List<ControlAction> = listOf(
     ),
     ControlAction(
         id = "trunk",
-        icon = Icons.Rounded.Inventory2,
+        icon = VehicleIcons.Trunk,
         label = { "Trunk" },
         active = { false },
         gestureValue = 5,
@@ -206,12 +204,22 @@ fun ControlActionButton(
                 .align(Alignment.CenterStart),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = action.icon,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(20.dp)
-            )
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .background(
+                        Color.White.copy(alpha = if (action.active()) 0.18f else 0.08f),
+                        RoundedCornerShape(10.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = action.icon,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
             Spacer(modifier = Modifier.size(12.dp))
             Text(
                 text = action.label(),

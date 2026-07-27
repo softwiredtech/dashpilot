@@ -16,7 +16,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material.icons.rounded.Close
@@ -80,23 +79,7 @@ fun AutomationsScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp, vertical = 24.dp)
         ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = onBack) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                        contentDescription = "Back",
-                        tint = Color.White,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-                Spacer(modifier = Modifier.size(8.dp))
-                Text(
-                    text = "Automations",
-                    color = Color.White,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
+            ScreenHeader(title = "Automations", onBack = onBack)
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -292,13 +275,24 @@ private fun AutomationRow(
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = if (checked) AccentColor else Color.White,
-            modifier = Modifier.size(24.dp)
-        )
-        Spacer(modifier = Modifier.size(16.dp))
+        Box(
+            modifier = Modifier
+                .size(36.dp)
+                .background(
+                    if (checked) AccentColor.copy(alpha = 0.16f)
+                    else Color.White.copy(alpha = 0.08f),
+                    RoundedCornerShape(10.dp)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = if (checked) AccentColor else Color.White,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        Spacer(modifier = Modifier.size(12.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
