@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "920957950532",
+    "project_id": "dashkit-connect",
+    "storage_bucket": "dashkit-connect.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:920957950532:android:5475cb16cba5d2203d7a11",
+        "android_client_info": {
+          "package_name": "com.softwiredtech.dashpilot"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgT-qTM_ewgF6k4VkffAO-cc-2csJoZvg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
