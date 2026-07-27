@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -133,9 +134,13 @@ private fun ConnectedHomeContent(
             .padding(horizontal = 24.dp, vertical = 24.dp)
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
+            // Offset by the IconButton's built-in content inset so the gear
+            // glyph lines up with the tiles' left edge below.
             IconButton(
                 onClick = onSettingsClick,
-                modifier = Modifier.align(Alignment.CenterStart)
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .offset(x = (-12).dp)
             ) {
                 Icon(
                     imageVector = Icons.Rounded.Settings,
@@ -253,12 +258,19 @@ private fun InfoWidget(
             .padding(16.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = AccentColor,
-            modifier = Modifier.size(28.dp)
-        )
+        Box(
+            modifier = Modifier
+                .size(36.dp)
+                .background(AccentColor.copy(alpha = 0.14f), RoundedCornerShape(10.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = AccentColor,
+                modifier = Modifier.size(20.dp)
+            )
+        }
         Column {
             Text(
                 text = value,
