@@ -80,6 +80,12 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     private val _bleManager = MutableStateFlow<DashKitBleManager?>(null)
     val bleManager: StateFlow<DashKitBleManager?> = _bleManager.asStateFlow()
 
+    // Data source the current/most recent session runs on. Drives which home
+    // layout is shown (stat tiles, controls availability). Defaults to DashKit,
+    // the primary source.
+    private val _activeDataSource = MutableStateFlow(DataSourceType.DASHKIT)
+    val activeDataSource = _activeDataSource.asStateFlow()
+
     var blePermissionGate: ((onGranted: () -> Unit) -> Unit)? = null
 
     private val _hasAutoNavigatedToDashboard = MutableStateFlow(false)
@@ -285,6 +291,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         if (userInitiated) userSelectedType = dataSourceType
         lastDataSourceType = dataSourceType
         lastServerAddress = manualServerAddress
+        _activeDataSource.value = dataSourceType
 
         var finalServerAddress = manualServerAddress
         _connectionStatus.value = ConnectionStatus.Connecting

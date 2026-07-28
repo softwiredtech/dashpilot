@@ -21,7 +21,9 @@ import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.BatteryChargingFull
 import androidx.compose.material.icons.rounded.DeviceThermostat
 import androidx.compose.material.icons.rounded.DirectionsCar
+import androidx.compose.material.icons.rounded.Sensors
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.rounded.Signpost
 import androidx.compose.material.icons.rounded.Speed
 import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material3.Button
@@ -32,9 +34,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -56,68 +55,21 @@ import kotlinx.coroutines.flow.flowOf
 import kotlin.math.roundToInt
 
 /**
- * Landing screen. DashKit is the default source and shows the connected home
- * content (vehicle info widgets + primary actions) regardless of connection
- * state. Selecting any other source switches to the data-source setup flow.
+ * Landing screen for every data source. The stat grid adapts to what the
+ * active source can provide: DashKit exposes the vehicle bus (battery, temps,
+ * odometer), while comma/websocket sessions show the openpilot CAN essentials
+ * (speed, gear, speed limit, ADAS state). Controls and Automations act on the
+ * car through DashKit hardware, so they are only enabled on DashKit sessions.
  */
 @Composable
 fun HomeScreen(
     connectionStatus: ConnectionStatus,
+    dataSourceType: String,
     bleManager: DashKitBleManager?,
     dashState: Flow<DashState>?,
     pinnedControlId: String?,
     onConnect: (serverAddress: String, dataSourceType: String) -> Unit,
     onDisconnect: () -> Unit,
-    onNext: () -> Unit,
-    onAutomations: () -> Unit,
-    onControls: () -> Unit,
-    onDrive: () -> Unit,
-    onSettingsClick: () -> Unit
-) {
-    var selectedDataSource by rememberSaveable { mutableStateOf(DataSourceType.DASHKIT) }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(DarkColors.Background)
-            .systemBarsPadding()
-    ) {
-        if (selectedDataSource == DataSourceType.DASHKIT) {
-            ConnectedHomeContent(
-                dashState = dashState,
-                bleManager = bleManager,
-                connectionStatus = connectionStatus,
-                pinnedControlId = pinnedControlId,
-                onConnect = onConnect,
-                onDisconnect = onDisconnect,
-                onSelectDataSource = { selectedDataSource = it },
-                onAutomations = onAutomations,
-                onControls = onControls,
-                onDrive = onDrive,
-                onSettingsClick = onSettingsClick
-            )
-        } else {
-            SetupScreen(
-                connectionStatus = connectionStatus,
-                selectedDataSource = selectedDataSource,
-                onSelectDataSource = { selectedDataSource = it },
-                onConnect = onConnect,
-                onDisconnect = onDisconnect,
-                onNext = onNext,
-                onSettingsClick = onSettingsClick
-            )
-        }
-    }
-}
-
-@Composable
-private fun ConnectedHomeContent(
-    dashState: Flow<DashState>?,
-    bleManager: DashKitBleManager?,
-    connectionStatus: ConnectionStatus,
-    pinnedControlId: String?,
-    onConnect: (serverAddress: String, dataSourceType: String) -> Unit,
-    onDisconnect: () -> Unit,
-    onSelectDataSource: (String) -> Unit,
     onAutomations: () -> Unit,
     onControls: () -> Unit,
     onDrive: () -> Unit,
@@ -127,10 +79,13 @@ private fun ConnectedHomeContent(
     val state by (dashState ?: flowOf(fallback)).collectAsState(initial = fallback)
     val car = state.carState
     val useImperial = state.displaySettings.useImperial
+    val isDashKit = dataSourceType == DataSourceType.DASHKIT
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(DarkColors.Background)
+            .systemBarsPadding()
             .padding(horizontal = 24.dp, vertical = 24.dp)
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
@@ -160,67 +115,39 @@ private fun ConnectedHomeContent(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // 2x2 widget grid
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            InfoWidget(
-                icon = Icons.Rounded.BatteryChargingFull,
-                label = "Battery",
-                value = socText(car),
-                modifier = Modifier.weight(1f)
-            )
-            InfoWidget(
-                icon = Icons.Rounded.DeviceThermostat,
-                label = "Battery Temp",
-                value = batteryTempText(car),
-                modifier = Modifier.weight(1f)
-            )
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            InfoWidget(
-                icon = Icons.Rounded.AcUnit,
-                label = "AC Temp",
-                value = tempText(car.acTemp),
-                modifier = Modifier.weight(1f)
-            )
-            InfoWidget(
-                icon = Icons.Rounded.Speed,
-                label = "Odometer",
-                value = odometerText(car.odometer, useImperial),
-                modifier = Modifier.weight(1f)
-            )
+        if (isDashKit) {
+            DashKitStatGrid(car, useImperial)
+        } else {
+            CommaStatGrid(car)
         }
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        controlById(pinnedControlId)?.let { action ->
-            Text(
-                text = "Pinned",
-                color = DarkColors.TextMuted,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.SemiBold
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            ControlActionButton(
-                action = action,
-                pinned = true,
-                enabled = bleManager != null,
-                onClick = { action.perform(bleManager) },
-                onLongClick = null
-            )
-            Spacer(modifier = Modifier.height(24.dp))
+        if (isDashKit) {
+            controlById(pinnedControlId)?.let { action ->
+                Text(
+                    text = "Pinned",
+                    color = DarkColors.TextMuted,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                ControlActionButton(
+                    action = action,
+                    pinned = true,
+                    enabled = bleManager != null,
+                    onClick = { action.perform(bleManager) },
+                    onLongClick = null
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+            }
         }
 
         ActionButton(
             label = "Automations",
             icon = Icons.Rounded.AutoAwesome,
             accent = false,
+            enabled = isDashKit,
             onClick = onAutomations
         )
         Spacer(modifier = Modifier.height(12.dp))
@@ -228,6 +155,7 @@ private fun ConnectedHomeContent(
             label = "Controls",
             icon = Icons.Rounded.Tune,
             accent = false,
+            enabled = isDashKit,
             onClick = onControls
         )
         Spacer(modifier = Modifier.height(12.dp))
@@ -239,8 +167,86 @@ private fun ConnectedHomeContent(
         )
         Spacer(modifier = Modifier.height(12.dp))
         Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-            DebugDataSourceMenu(connectionStatus, onSelectDataSource, onConnect, onDisconnect)
+            DebugDataSourceMenu(connectionStatus, onConnect, onDisconnect)
         }
+    }
+}
+
+@Composable
+private fun DashKitStatGrid(car: CarState, useImperial: Boolean) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        InfoWidget(
+            icon = Icons.Rounded.BatteryChargingFull,
+            label = "Battery",
+            value = socText(car),
+            modifier = Modifier.weight(1f)
+        )
+        InfoWidget(
+            icon = Icons.Rounded.DeviceThermostat,
+            label = "Battery Temp",
+            value = batteryTempText(car),
+            modifier = Modifier.weight(1f)
+        )
+    }
+    Spacer(modifier = Modifier.height(16.dp))
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        InfoWidget(
+            icon = Icons.Rounded.AcUnit,
+            label = "AC Temp",
+            value = tempText(car.acTemp),
+            modifier = Modifier.weight(1f)
+        )
+        InfoWidget(
+            icon = Icons.Rounded.Speed,
+            label = "Odometer",
+            value = odometerText(car.odometer, useImperial),
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Composable
+private fun CommaStatGrid(car: CarState) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        InfoWidget(
+            icon = Icons.Rounded.Speed,
+            label = "Speed",
+            value = "${car.egoSpeed.roundToInt()}",
+            modifier = Modifier.weight(1f)
+        )
+        InfoWidget(
+            icon = Icons.Rounded.DirectionsCar,
+            label = "Gear",
+            value = gearText(car.gear),
+            modifier = Modifier.weight(1f)
+        )
+    }
+    Spacer(modifier = Modifier.height(16.dp))
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        InfoWidget(
+            icon = Icons.Rounded.Signpost,
+            label = "Speed Limit",
+            value = speedLimitText(car.fusedSpeedLimit),
+            modifier = Modifier.weight(1f)
+        )
+        InfoWidget(
+            icon = Icons.Rounded.Sensors,
+            label = "ADAS",
+            value = if (car.adasOn || car.selfdriveActive) "On" else "Off",
+            modifier = Modifier.weight(1f)
+        )
     }
 }
 
@@ -292,14 +298,18 @@ private fun ActionButton(
     label: String,
     icon: ImageVector,
     accent: Boolean,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ) {
     Button(
         onClick = onClick,
+        enabled = enabled,
         shape = RoundedCornerShape(16.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = if (accent) AccentColor else DarkColors.Surface,
-            contentColor = Color.White
+            contentColor = Color.White,
+            disabledContainerColor = DarkColors.Surface,
+            disabledContentColor = DarkColors.TextSubtle
         ),
         modifier = Modifier
             .fillMaxWidth()
@@ -342,3 +352,15 @@ private fun odometerText(odometer: Float, useImperial: Boolean): String {
     val unit = if (useImperial) "mi" else "km"
     return "${odometer.roundToInt()} $unit"
 }
+
+// Matches the gear encoding the dashboards use (Tesla DI_gear).
+private fun gearText(gear: Float): String = when (gear.roundToInt()) {
+    1 -> "P"
+    2 -> "R"
+    3 -> "N"
+    4 -> "D"
+    else -> "—"
+}
+
+private fun speedLimitText(limit: Float): String =
+    if (limit <= 0f) "—" else "${limit.roundToInt()}"

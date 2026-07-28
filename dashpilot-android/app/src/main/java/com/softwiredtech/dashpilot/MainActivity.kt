@@ -47,7 +47,7 @@ import com.softwiredtech.dashpilot.navigation.ControlsRoute
 import com.softwiredtech.dashpilot.navigation.DashboardRoute
 import com.softwiredtech.dashpilot.navigation.OnboardingRoute
 import com.softwiredtech.dashpilot.navigation.SettingsRoute
-import com.softwiredtech.dashpilot.navigation.SetupRoute
+import com.softwiredtech.dashpilot.navigation.HomeRoute
 import com.softwiredtech.dashpilot.navigation.ThemePickerRoute
 import com.softwiredtech.dashpilot.ui.AutomationsScreen
 import com.softwiredtech.dashpilot.ui.ControlScreen
@@ -179,7 +179,7 @@ class MainActivity : ComponentActivity() {
                                 ?.contains("OnboardingRoute") == true
                             if (!onOnboarding) {
                                 navController.navigate(OnboardingRoute) {
-                                    popUpTo(SetupRoute) { inclusive = true }
+                                    popUpTo(HomeRoute) { inclusive = true }
                                 }
                             }
                         }
@@ -206,7 +206,7 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize()) { _ ->
                     NavHost(
                         navController = navController,
-                        startDestination = SetupRoute,
+                        startDestination = HomeRoute,
                         enterTransition = { EnterTransition.None },
                         exitTransition = { ExitTransition.None },
                         popEnterTransition = { EnterTransition.None },
@@ -217,22 +217,23 @@ class MainActivity : ComponentActivity() {
                                 connectionVM = connectionVM,
                                 onFinish = {
                                     setOnboardingCompleted(context, true)
-                                    navController.navigate(SetupRoute) {
+                                    navController.navigate(HomeRoute) {
                                         popUpTo(OnboardingRoute) { inclusive = true }
                                     }
                                 },
                                 onSkip = {
                                     connectionVM.disconnect()
                                     setOnboardingCompleted(context, true)
-                                    navController.navigate(SetupRoute) {
+                                    navController.navigate(HomeRoute) {
                                         popUpTo(OnboardingRoute) { inclusive = true }
                                     }
                                 }
                             )
                         }
-                        composable<SetupRoute> {
+                        composable<HomeRoute> {
                             val manager by connectionVM.bleManager.collectAsState()
                             val dashStateFlow by connectionVM.dashState.collectAsState()
+                            val activeDataSource by connectionVM.activeDataSource.collectAsState()
                             val toDashboard = {
                                 val dashboard = getSelectedDashboard(context)
                                 navController.navigate(DashboardRoute(
@@ -242,6 +243,7 @@ class MainActivity : ComponentActivity() {
                             }
                             HomeScreen(
                                 connectionStatus = connectionStatus,
+                                dataSourceType = activeDataSource,
                                 bleManager = manager,
                                 dashState = dashStateFlow,
                                 pinnedControlId = pinnedControl,
@@ -254,7 +256,6 @@ class MainActivity : ComponentActivity() {
                                 onDisconnect = {
                                     connectionVM.disconnect()
                                 },
-                                onNext = toDashboard,
                                 onAutomations = {
                                     navController.navigate(AutomationsRoute)
                                 },
@@ -306,7 +307,7 @@ class MainActivity : ComponentActivity() {
                                     connectionVM.disconnect()
                                     setOnboardingCompleted(context, false)
                                     navController.navigate(OnboardingRoute) {
-                                        popUpTo(SetupRoute) { inclusive = false }
+                                        popUpTo(HomeRoute) { inclusive = false }
                                     }
                                 },
                                 onThemeClick = {
