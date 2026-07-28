@@ -30,6 +30,7 @@ struct CarState: Codable {
     var packTMin: Float = 0
     var packTMax: Float = 0
     var odometer: Float = 0
+    var acTemp: Float = 0
 
     // Openpilot state
     var madsActive: Bool = false
@@ -66,6 +67,7 @@ struct CarState: Codable {
         packTMin = Float(bridge.packTMin)
         packTMax = Float(bridge.packTMax)
         odometer = Float(bridge.odometer)
+        acTemp = Float(bridge.acTemp)
         madsActive = bridge.madsActive > 0
         selfdriveActive = bridge.selfdriveActive > 0
         experimentalMode = bridge.experimentalMode > 0
@@ -86,6 +88,7 @@ struct CarState: Codable {
         c.odometer = odometer * Self.kmToMiles
         c.packTMin = packTMin != 0 ? packTMin * 1.8 + 32 : 0
         c.packTMax = packTMax != 0 ? packTMax * 1.8 + 32 : 0
+        c.acTemp = acTemp != 0 ? acTemp * 1.8 + 32 : 0
         if Self.speedLimitSignsInKm() {
             c.fusedSpeedLimit = fusedSpeedLimit * Self.kmToMiles
         }
@@ -120,6 +123,7 @@ struct CarState: Codable {
         packTMin             = try c.decodeIfPresent(Float.self, forKey: .packTMin)             ?? 0
         packTMax             = try c.decodeIfPresent(Float.self, forKey: .packTMax)             ?? 0
         odometer             = try c.decodeIfPresent(Float.self, forKey: .odometer)             ?? 0
+        acTemp               = try c.decodeIfPresent(Float.self, forKey: .acTemp)               ?? 0
         madsActive           = try c.decodeIfPresent(Bool.self,  forKey: .madsActive)           ?? false
         selfdriveActive      = try c.decodeIfPresent(Bool.self,  forKey: .selfdriveActive)      ?? false
         experimentalMode     = try c.decodeIfPresent(Bool.self,  forKey: .experimentalMode)     ?? false

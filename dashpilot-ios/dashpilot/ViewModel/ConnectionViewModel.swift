@@ -5,20 +5,147 @@ import UIKit
 @Observable
 final class ConnectionViewModel {
 
+    /// UserDefaults key for the "onboarding was finished or skipped" flag
+    /// (iOS stand-in for the Android bond-state check — iOS cannot ask
+    /// whether the DashKit is already paired).
+    static let onboardingCompletedKey = "dashkitOnboardingCompleted"
+
+    /// Set when the launch scan finds a DashKit but onboarding has not been
+    /// completed yet (or when the user replays onboarding from Settings).
+    /// The app root observes it to present the onboarding cover; dismissing
+    /// the cover clears it.
+    var onboardingRequested = false
+
     private(set) var connectionStatus: ConnectionStatus = .disconnected
     private(set) var dashMessages: AsyncStream<DashState>?
     private(set) var discoveredAddress: String?
     private(set) var discoveryError: String?
 
+    /// Live BLE manager while a DashKit session is active. Views use it to
+    /// send control commands and the settings screen for firmware/OTA access.
+    private(set) var bleManager: DashKitBleManager?
+
+    /// Source of the current (or last) session; stays set after a DashKit
+    /// error so foregrounding retries the same source, like Android.
+    private(set) var activeSourceType: DataSourceType?
+
+    /// Bumped whenever `dashMessages` is replaced, so views can restart their
+    /// consuming task (`.task(id:)`) on reconnect.
+    private(set) var streamGeneration = 0
+
     private var dataSource: (any IDataSource)?
     private var connectTask: Task<Void, Never>?
+    private var startupDiscoveryStarted = false
 
-    /// Auto-discover a publisher on the local subnet, then connect.
-    func autoConnect() {
+    /// True when a new connection may start (mirrors Android: connect is
+    /// allowed from Disconnected and Error).
+    private var canStartConnection: Bool {
+        switch connectionStatus {
+        case .disconnected, .error: return true
+        case .connecting, .connected: return false
+        }
+    }
+
+    // MARK: - Startup discovery / warm launch
+
+    /// Briefly scan for an advertising DashKit at launch (port of the Android
+    /// startup discovery). If onboarding was already completed the DashKit is
+    /// silently auto-connected; otherwise the onboarding flow is requested and
+    /// its "Pair device" CTA drives the first connection.
+    func startupAutoConnect() {
+        guard !startupDiscoveryStarted else { return }
+        startupDiscoveryStarted = true
         guard connectionStatus == .disconnected else { return }
+
+        Task { @MainActor [weak self] in
+            let found = await DashKitStartupScanner().scan(timeout: 3)
+            guard let self, found, self.canStartConnection, self.dataSource == nil else { return }
+            if UserDefaults.standard.bool(forKey: Self.onboardingCompletedKey) {
+                self.connectDashKit()
+            } else {
+                self.onboardingRequested = true
+            }
+        }
+    }
+
+    /// Called when the app returns to the foreground. Keeps a healthy DashKit
+    /// link (a teardown + rescan would drop it), revives a dead DashKit
+    /// session, and otherwise re-runs startup discovery in case the app was
+    /// opened away from the car before.
+    func onAppForegrounded() {
+        switch activeSourceType {
+        case .dashkit:
+            if let manager = bleManager,
+               manager.connectionState == .connected || manager.connectionState == .connecting {
+                return
+            }
+            disconnect()
+            connectDashKit()
+        case .comma, .websocket:
+            // WiFi sources are user-initiated on iOS; leave them alone.
+            return
+        case nil:
+            guard connectionStatus == .disconnected else { return }
+            startupDiscoveryStarted = false
+            startupAutoConnect()
+        }
+    }
+
+    // MARK: - DashKit
+
+    func connectDashKit() {
+        guard canStartConnection else { return }
+        if case .error = connectionStatus { disconnect() }  // drop failed-session remnants
         connectionStatus = .connecting
         discoveryError = nil
         discoveredAddress = nil
+        activeSourceType = .dashkit
+
+        let manager = DashKitBleManager()
+        bleManager = manager
+        manager.onStateChange = { [weak self] state in
+            guard let self else { return }
+            // Surface BLE failures while we are still waiting for the first
+            // CAN frame so the UI leaves "Connecting…" (mirrors Android).
+            if case .error = state, self.connectionStatus == .connecting {
+                self.connectionStatus = state
+            }
+        }
+
+        let ds = DashKitDataSource(manager: manager)
+        dataSource = ds
+        ds.connect(address: "")
+        startStreaming(ds, resyncDashKit: true)
+    }
+
+    /// Pushes the persisted multi-finger bindings and the wiper-off flag to
+    /// the firmware. The firmware persists them in NVS too, but re-syncing on
+    /// each connect keeps its state matching the app exactly (e.g. after a
+    /// DashKit reboot or an edit made while disconnected).
+    func resyncDashKitAutomations() {
+        guard let manager = bleManager else { return }
+        let raw = UserDefaults.standard.string(forKey: "finger_actions") ?? ""
+        let actions = AutomationsView.parseFingerActions(raw)
+        let byCount = Dictionary(uniqueKeysWithValues: actions.map { ($0.fingerCount, $0.controlId) })
+        for fingers in 3...5 {
+            let actionValue = byCount[fingers].flatMap { controlById($0)?.gestureValue }
+                ?? VehicleControl.gestureActionNone
+            VehicleControl.sendFingerAction(manager, fingers: fingers, actionValue: actionValue)
+        }
+        let wiperOff = UserDefaults.standard.bool(forKey: "wiper_off_automation")
+        VehicleControl.sendWiperOff(manager, enabled: wiperOff)
+    }
+
+    // MARK: - Comma (WiFi)
+
+    /// Auto-discover a publisher on the local subnet, then connect.
+    func autoConnect() {
+        guard canStartConnection else { return }
+        if case .error = connectionStatus { disconnect() }  // drop failed-session remnants
+        connectionStatus = .connecting
+        discoveryError = nil
+        discoveredAddress = nil
+        activeSourceType = .comma
 
         connectTask = Task { @MainActor [weak self] in
             guard let self else { return }
@@ -42,17 +169,19 @@ final class ConnectionViewModel {
             }
 
             self.discoveredAddress = ip
-            self.startDataSource(address: ip)
+            self.startCommaDataSource(address: ip)
         }
     }
 
     /// Connect directly to a known address (manual entry).
     func connect(serverAddress: String) {
-        guard connectionStatus == .disconnected else { return }
+        guard canStartConnection else { return }
+        if case .error = connectionStatus { disconnect() }  // drop failed-session remnants
         connectionStatus = .connecting
         discoveryError = nil
         discoveredAddress = serverAddress
-        startDataSource(address: serverAddress)
+        activeSourceType = .comma
+        startCommaDataSource(address: serverAddress)
     }
 
     func disconnect() {
@@ -60,6 +189,10 @@ final class ConnectionViewModel {
         connectTask = nil
         dataSource?.disconnect()
         dataSource = nil
+        bleManager?.onStateChange = nil
+        bleManager?.disconnect()
+        bleManager = nil
+        activeSourceType = nil
         dashMessages = nil
         discoveredAddress = nil
         discoveryError = nil
@@ -68,7 +201,7 @@ final class ConnectionViewModel {
 
     // MARK: - Private
 
-    private func startDataSource(address: String) {
+    private func startCommaDataSource(address: String) {
         let extraBus = UserDefaults.standard.bool(forKey: DisplaySettings.keyExtraVehicleBus)
         let ds: CommaDataSource
         if extraBus {
@@ -84,11 +217,17 @@ final class ConnectionViewModel {
         }
         dataSource = ds
         ds.connect(address: address)
+        startStreaming(ds, resyncDashKit: false)
+    }
 
+    /// Consumes the data source's `CarState` stream and republishes it as
+    /// `DashState` for the UI; flips to `.connected` on the first message.
+    private func startStreaming(_ ds: any IDataSource, resyncDashKit: Bool) {
         var capturedContinuation: AsyncStream<DashState>.Continuation?
         dashMessages = AsyncStream<DashState>(bufferingPolicy: .bufferingNewest(1)) { continuation in
             capturedContinuation = continuation
         }
+        streamGeneration += 1
 
         connectTask = Task { @MainActor [weak self] in
             guard let self else { return }
@@ -98,6 +237,11 @@ final class ConnectionViewModel {
                 if first {
                     self.connectionStatus = .connected
                     first = false
+                    // The GATT services are discovered by the time the first
+                    // CAN frame arrives.
+                    if resyncDashKit {
+                        self.resyncDashKitAutomations()
+                    }
                 }
                 let settings = DisplaySettingsState.fromUserDefaults()
                 let converted = settings.useImperial ? carState.toImperial() : carState

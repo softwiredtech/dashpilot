@@ -3,9 +3,9 @@ import SwiftUI
 /// Vehicle control screen. Exposes the available DashKit commands as single
 /// toggle/action buttons. Long-pressing a control pins it to the home screen.
 ///
-/// Ported from Android `ControlScreen` (ControlScreen.kt). First round: no
-/// Bluetooth transport — controls flip in-memory `ControlsState` stubs, so
-/// every button stays enabled even without a connection.
+/// Ported from Android `ControlScreen` (ControlScreen.kt). Commands are sent
+/// over the live DashKit BLE link; without one the buttons are dimmed (in
+/// debug builds they stay enabled and simulate, like Android).
 struct ControlsView: View {
 
     @Environment(\.dismiss) var dismiss
@@ -14,7 +14,15 @@ struct ControlsView: View {
     @AppStorage("pinned_control_id") var pinnedControlId: String = ""
 
     private var isConnected: Bool {
-        connectionVM.connectionStatus == .connected
+        connectionVM.bleManager != nil && connectionVM.connectionStatus == .connected
+    }
+
+    private var controlsEnabled: Bool {
+        #if DEBUG
+        return true
+        #else
+        return isConnected
+        #endif
     }
 
     var body: some View {
@@ -41,8 +49,8 @@ struct ControlsView: View {
                             ControlActionButton(
                                 action: control,
                                 pinned: control.id == pinnedControlId,
-                                enabled: true,
-                                onTap: { control.perform() },
+                                enabled: controlsEnabled,
+                                onTap: { control.perform(connectionVM.bleManager) },
                                 onLongPress: { togglePin(control.id) }
                             )
                         }

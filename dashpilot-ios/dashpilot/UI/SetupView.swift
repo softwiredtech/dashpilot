@@ -71,25 +71,33 @@ struct SetupView: View {
 
     // MARK: - Controls
 
+    /// Discovery failure or a terminal connection error (e.g. from a failed
+    /// DashKit session), whichever is present.
+    private var setupError: String? {
+        if let error = connectionVM.discoveryError { return error }
+        if case .error(let message) = connectionVM.connectionStatus { return message }
+        return nil
+    }
+
     private var controlsSection: some View {
         VStack(spacing: 0) {
             switch connectionVM.connectionStatus {
-            case .disconnected:
-                if showManualEntry || connectionVM.discoveryError != nil {
+            case .disconnected, .error:
+                if showManualEntry || setupError != nil {
                     manualIPField
                     Spacer().frame(height: 12)
                 }
 
                 connectButton
 
-                if let error = connectionVM.discoveryError {
+                if let error = setupError {
                     Spacer().frame(height: 8)
                     Text(error)
                         .foregroundColor(Color(red: 1, green: 0.32, blue: 0.32))
                         .font(.system(size: 13))
                 }
 
-                if !showManualEntry && connectionVM.discoveryError == nil {
+                if !showManualEntry && setupError == nil {
                     Spacer().frame(height: 12)
                     manualToggleButton
                 }

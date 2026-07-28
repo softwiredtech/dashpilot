@@ -33,6 +33,7 @@ static void carStateToBridge(const CarState& cs, BridgeCarState* out) {
     out->packTMin = cs.packTMin;
     out->packTMax = cs.packTMax;
     out->odometer = cs.odometer;
+    out->acTemp = cs.acTemp;
     out->madsActive = cs.madsActive;
     out->selfdriveActive = cs.selfdriveActive;
     out->experimentalMode = cs.experimentalMode;
@@ -85,6 +86,13 @@ void* bridge_create_vehicle_decoder(const char** dbcContents, const int* busIndi
 
 void bridge_destroy_vehicle_decoder(void* decoder) {
     bridge::destroyVehicleDecoder(static_cast<VehicleDecoder*>(decoder));
+}
+
+void bridge_decode_can_frame(void* decoderPtr, int bus, uint32_t address, const uint8_t* data, int len, BridgeCarState* out) {
+    auto* decoder = static_cast<VehicleDecoder*>(decoderPtr);
+    decoder->updateFrame(bus, address, data, static_cast<size_t>(len));
+    decoder->updateMapper();
+    carStateToBridge(decoder->state(), out);
 }
 
 void bridge_start_receive_loop(void* groupPtr, void* decoderPtr, void* callbackContext, bridge_car_state_callback_t callback) {
