@@ -23,6 +23,8 @@ struct HomeView: View {
                 Spacer().frame(height: 32)
                 pinnedSection
                 actionButtons
+                Spacer().frame(height: 12)
+                dataSourceMenu
                 Spacer()
             }
             .padding(DashMetrics.screenPadding)
@@ -49,13 +51,13 @@ struct HomeView: View {
                 Button {
                     navigationPath.append(AppRoute.settings)
                 } label: {
-                    Image(systemName: "gearshape")
+                    Image(systemName: "gearshape.fill")
                         .font(.system(size: 22))
                         .foregroundColor(.dashTextMuted)
                         .frame(width: 44, height: 44)
                 }
+                .offset(x: -12)
                 Spacer()
-                connectionChip
             }
             Text("DashPilot")
                 .foregroundColor(.white)
@@ -63,48 +65,55 @@ struct HomeView: View {
         }
     }
 
-    /// Tappable connection-status pill. A failed DashKit session retries the
-    /// BLE connection; otherwise it leads to the WiFi connect/setup flow.
-    private var connectionChip: some View {
-        Button {
-            if case .error = connectionVM.connectionStatus,
-               connectionVM.activeSourceType == .dashkit {
-                connectionVM.disconnect()
-                connectionVM.connectDashKit()
-            } else {
-                navigationPath.append(AppRoute.setup)
+    // MARK: - Data source menu
+
+    /// Centered "Data source" menu below the actions (port of the Android
+    /// `DebugDataSourceMenu`): pick a source while idle, disconnect while a
+    /// session is up. Selecting DashKit retries the BLE link; comma leads to
+    /// the WiFi connect/setup flow.
+    private var dataSourceMenu: some View {
+        VStack(spacing: 4) {
+            Menu {
+                if isIdle {
+                    Button("comma") { navigationPath.append(AppRoute.setup) }
+                    Button("DashKit") { connectionVM.connectDashKit() }
+                } else {
+                    Button("Disconnect") { connectionVM.disconnect() }
+                }
+            } label: {
+                HStack(spacing: 4) {
+                    Text(dataSourceLabel)
+                        .foregroundColor(.dashTextMuted)
+                        .font(.system(size: 13))
+                    Image(systemName: "arrowtriangle.down.fill")
+                        .font(.system(size: 9))
+                        .foregroundColor(.dashTextMuted)
+                }
+                .padding(.horizontal, 12)
+                .frame(height: 36)
             }
-        } label: {
-            HStack(spacing: 6) {
-                Circle()
-                    .fill(connectionColor)
-                    .frame(width: 8, height: 8)
-                Text(connectionLabel)
-                    .foregroundColor(.dashTextMuted)
-                    .font(.system(size: 13, weight: .medium))
+            if case .error(let message) = connectionVM.connectionStatus {
+                Text(message)
+                    .foregroundColor(.dashError)
+                    .font(.system(size: 12))
+                    .multilineTextAlignment(.center)
             }
-            .padding(.horizontal, 12)
-            .frame(height: 32)
-            .background(Color.dashSurface)
-            .clipShape(Capsule())
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var isIdle: Bool {
+        switch connectionVM.connectionStatus {
+        case .disconnected, .error: return true
+        case .connecting, .connected: return false
         }
     }
 
-    private var connectionColor: Color {
+    private var dataSourceLabel: String {
         switch connectionVM.connectionStatus {
-        case .connected: return .dashAccent
-        case .connecting: return .dashContentDisabled
-        case .disconnected: return .dashTextSubtle
-        case .error: return .dashError
-        }
-    }
-
-    private var connectionLabel: String {
-        switch connectionVM.connectionStatus {
-        case .connected: return "Connected"
-        case .connecting: return "Connecting"
-        case .disconnected: return "Connect"
-        case .error: return "Error"
+        case .connected: return "Data source: connected"
+        case .connecting: return "Data source: connecting…"
+        case .disconnected, .error: return "Data source"
         }
     }
 
@@ -224,9 +233,11 @@ private struct InfoWidget: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Image(systemName: icon)
-                .font(.system(size: 28))
-                .foregroundColor(.dashAccent)
+            IconChip(
+                systemName: icon,
+                tint: .dashAccent,
+                background: Color.dashAccent.opacity(0.14)
+            )
             Spacer(minLength: 0)
             VStack(alignment: .leading, spacing: 2) {
                 Text(value)

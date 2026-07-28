@@ -165,10 +165,10 @@ struct ControlActionButton: View {
     var body: some View {
         ZStack {
             HStack(spacing: 12) {
-                Image(systemName: action.icon)
-                    .font(.system(size: 18))
-                    .foregroundColor(.white)
-                    .frame(width: 20)
+                IconChip(
+                    systemName: action.icon,
+                    background: Color.white.opacity(action.active() ? 0.18 : 0.08)
+                )
                 Text(action.label())
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(.white)

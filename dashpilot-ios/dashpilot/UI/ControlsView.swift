@@ -32,14 +32,15 @@ struct ControlsView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-                    headerRow
+                    ScreenHeader(title: "Controls") { dismiss() }
 
                     if !isConnected {
                         Spacer().frame(height: 4)
                         Text("Connect to DashKit to send commands")
                             .foregroundColor(.dashTextMuted)
-                            .font(.system(size: 14))
-                            .padding(.leading, 8)
+                            .font(.system(size: 13))
+                            .frame(maxWidth: .infinity)
+                            .multilineTextAlignment(.center)
                     }
 
                     Spacer().frame(height: 24)
@@ -55,30 +56,18 @@ struct ControlsView: View {
                             )
                         }
                     }
+
+                    Spacer().frame(height: 20)
+                    Text("Tip: long-press a control to pin it to the home screen")
+                        .foregroundColor(.dashTextSubtle)
+                        .font(.system(size: 12))
+                        .frame(maxWidth: .infinity)
+                        .multilineTextAlignment(.center)
                 }
                 .padding(DashMetrics.screenPadding)
             }
         }
         .navigationBarHidden(true)
-    }
-
-    // MARK: - Header
-
-    private var headerRow: some View {
-        HStack(spacing: 8) {
-            Button {
-                dismiss()
-            } label: {
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(.white)
-                    .frame(width: 44, height: 44)
-            }
-            Text("Controls")
-                .foregroundColor(.white)
-                .font(.system(size: 24, weight: .bold))
-            Spacer(minLength: 0)
-        }
     }
 
     // MARK: - Pinning
