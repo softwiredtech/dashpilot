@@ -28,7 +28,7 @@ struct HomeView: View {
             .padding(DashMetrics.screenPadding)
         }
         .navigationBarHidden(true)
-        .task(id: connectionVM.dashMessages != nil) {
+        .task(id: connectionVM.streamGeneration) {
             guard let stream = connectionVM.dashMessages else {
                 dash = nil
                 return
@@ -63,12 +63,17 @@ struct HomeView: View {
         }
     }
 
-    /// Tappable connection-status pill (leads to the connect/setup flow).
-    /// The Android home auto-connects over BLE; on iOS connection is a
-    /// separate WiFi step reached from here.
+    /// Tappable connection-status pill. A failed DashKit session retries the
+    /// BLE connection; otherwise it leads to the WiFi connect/setup flow.
     private var connectionChip: some View {
         Button {
-            navigationPath.append(AppRoute.setup)
+            if case .error = connectionVM.connectionStatus,
+               connectionVM.activeSourceType == .dashkit {
+                connectionVM.disconnect()
+                connectionVM.connectDashKit()
+            } else {
+                navigationPath.append(AppRoute.setup)
+            }
         } label: {
             HStack(spacing: 6) {
                 Circle()
@@ -90,6 +95,7 @@ struct HomeView: View {
         case .connected: return .dashAccent
         case .connecting: return .dashContentDisabled
         case .disconnected: return .dashTextSubtle
+        case .error: return .dashError
         }
     }
 
@@ -98,6 +104,7 @@ struct HomeView: View {
         case .connected: return "Connected"
         case .connecting: return "Connecting"
         case .disconnected: return "Connect"
+        case .error: return "Error"
         }
     }
 
@@ -121,7 +128,7 @@ struct HomeView: View {
                 InfoWidget(
                     icon: "snowflake",
                     label: "AC Temp",
-                    value: "—" // TODO: no acTemp field on iOS CarState yet
+                    value: acTempText
                 )
                 InfoWidget(
                     icon: "gauge.with.dots.needle.bottom.50percent",
@@ -144,8 +151,8 @@ struct HomeView: View {
                 ControlActionButton(
                     action: control,
                     pinned: true,
-                    enabled: true,
-                    onTap: { control.perform() },
+                    enabled: connectionVM.bleManager != nil,
+                    onTap: { control.perform(connectionVM.bleManager) },
                     onLongPress: {}
                 )
             }
@@ -183,6 +190,11 @@ struct HomeView: View {
         guard fullPack > 0, remaining > 0, fullPack - buffer > 0 else { return "—" }
         let soc = Int(((remaining - buffer) / (fullPack - buffer) * 100).rounded())
         return "\(soc)%"
+    }
+
+    private var acTempText: String {
+        guard let car = dash?.carState, car.acTemp != 0 else { return "—" }
+        return "\(Int(car.acTemp.rounded()))°"
     }
 
     private var batteryTempText: String {

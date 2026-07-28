@@ -19,11 +19,13 @@ struct FingerAction: Identifiable, Equatable {
 /// enable the wiper-off automation and bind 3-, 4-, and 5-finger infotainment
 /// taps each to a vehicle control.
 ///
-/// Bluetooth-less first round: state persists to UserDefaults only; nothing is
-/// pushed to the DashKit firmware yet.
+/// Edits persist to UserDefaults and are pushed to the DashKit firmware over
+/// BLE when a link is up; the ConnectionViewModel re-syncs everything on each
+/// connect, so edits made while disconnected are not lost.
 struct AutomationsView: View {
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(ConnectionViewModel.self) private var connectionVM
 
     @AppStorage("wiper_off_automation") private var wiperOff: Bool = false
     @State private var fingerActions: [FingerAction] = []
@@ -79,11 +81,31 @@ struct AutomationsView: View {
         .navigationBarHidden(true)
         .onAppear(perform: loadFingerActions)
         .onChange(of: wiperOff) { _, newValue in
-            // Stub: persisted by @AppStorage; a later round pushes this over BLE.
-            print("[automation] wiper off -> \(newValue ? "on" : "off")")
+            // Persisted by @AppStorage; arm/disarm the firmware immediately.
+            if let manager = connectionVM.bleManager {
+                VehicleControl.sendWiperOff(manager, enabled: newValue)
+            }
         }
-        .onChange(of: fingerActions) { _, _ in
+        .onChange(of: fingerActions) { oldValue, newValue in
             saveFingerActions()
+            pushChangedBindings(from: oldValue, to: newValue)
+        }
+    }
+
+    /// Pushes every finger slot whose binding changed, clearing freed slots
+    /// with GESTURE_ACTION_NONE (covers add, remove, count and control edits —
+    /// the same slots Android's setFingerAction/changeFingerCount push).
+    private func pushChangedBindings(from old: [FingerAction], to new: [FingerAction]) {
+        guard let manager = connectionVM.bleManager else { return }
+        let oldByCount = Dictionary(uniqueKeysWithValues: old.map { ($0.fingerCount, $0.controlId) })
+        let newByCount = Dictionary(uniqueKeysWithValues: new.map { ($0.fingerCount, $0.controlId) })
+        for fingers in fingerCounts {
+            let oldId = oldByCount[fingers]
+            let newId = newByCount[fingers]
+            guard oldId != newId else { continue }
+            let actionValue = newId.flatMap { controlById($0)?.gestureValue }
+                ?? VehicleControl.gestureActionNone
+            VehicleControl.sendFingerAction(manager, fingers: fingers, actionValue: actionValue)
         }
     }
 
@@ -136,12 +158,11 @@ struct AutomationsView: View {
         fingerActions = Self.parseFingerActions(raw)
     }
 
-    /// Persists bindings and logs them (BLE push comes in a later round).
-    /// Called from `.onChange(of: fingerActions)` so every add/remove/edit saves.
+    /// Persists bindings. Called from `.onChange(of: fingerActions)` so every
+    /// add/remove/edit saves; the BLE push happens in `pushChangedBindings`.
     private func saveFingerActions() {
         let raw = Self.serializeFingerActions(fingerActions)
         UserDefaults.standard.set(raw, forKey: fingerActionsKey)
-        print("[automation] finger actions -> \"\(raw)\"")
     }
 
     /// Parses "3=glovebox;4=frunk" into bindings, dropping malformed entries,
@@ -349,4 +370,5 @@ private struct AddTriggerButton: View {
     NavigationStack {
         AutomationsView()
     }
+    .environment(ConnectionViewModel())
 }

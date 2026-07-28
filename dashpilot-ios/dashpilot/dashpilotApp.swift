@@ -10,8 +10,17 @@ import SwiftUI
 @main
 struct dashpilotApp: App {
 
+    @Environment(\.scenePhase) private var scenePhase
+
     @State private var connectionVM = ConnectionViewModel()
     @State private var navigationPath = NavigationPath()
+
+    @AppStorage(ConnectionViewModel.onboardingCompletedKey)
+    private var onboardingCompleted = false
+
+    /// The first `.active` scene phase is the cold launch, which is handled by
+    /// `startupAutoConnect()`; only later activations are "foregrounded".
+    @State private var sawFirstActivation = false
 
     init() {
         let webIds = availableDashboards.filter { $0.type == .web }.map { $0.id }
@@ -42,6 +51,31 @@ struct dashpilotApp: App {
                     }
             }
             .environment(connectionVM)
+            .task { connectionVM.startupAutoConnect() }
+            .fullScreenCover(isPresented: Binding(
+                get: { connectionVM.onboardingRequested },
+                set: { connectionVM.onboardingRequested = $0 }
+            )) {
+                OnboardingView(
+                    onFinish: { completeOnboarding() },
+                    onSkip: { completeOnboarding() }
+                )
+                .environment(connectionVM)
+            }
+            .onChange(of: scenePhase) { _, phase in
+                guard phase == .active else { return }
+                if !sawFirstActivation {
+                    sawFirstActivation = true
+                    return
+                }
+                connectionVM.onAppForegrounded()
+            }
         }
+    }
+
+    /// Both Finish and Skip mark onboarding done so it never auto-triggers again.
+    private func completeOnboarding() {
+        onboardingCompleted = true
+        connectionVM.onboardingRequested = false
     }
 }

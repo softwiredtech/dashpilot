@@ -32,12 +32,13 @@ struct ControlAction: Identifiable {
     let label: () -> String
     let active: () -> Bool
     let gestureValue: Int
-    /// Bluetooth-less stub: flips in-memory `ControlsState` and logs only.
-    let perform: () -> Void
+    /// Sends the command over BLE. Nil manager (e.g. testing without a
+    /// DashKit) simulates: toggle state still flips, momentary actions no-op.
+    let perform: (DashKitBleManager?) -> Void
 }
 
 /// Shared registry of vehicle controls used by both Controls and Home screens.
-/// Ids and gestureValues match the Android app exactly.
+/// Ids, gestureValues and command opcodes match the Android app exactly.
 let vehicleControls: [ControlAction] = [
     ControlAction(
         id: "battery_preheat",
@@ -45,9 +46,12 @@ let vehicleControls: [ControlAction] = [
         label: { ControlsState.shared.preheatOn ? "Battery Preheat: On" : "Battery Preheat: Off" },
         active: { ControlsState.shared.preheatOn },
         gestureValue: 2,
-        perform: {
-            ControlsState.shared.preheatOn.toggle()
-            print("[control] battery preheat -> \(ControlsState.shared.preheatOn ? "on" : "off")")
+        perform: { manager in
+            let next = !ControlsState.shared.preheatOn
+            if manager == nil ||
+                VehicleControl.send(manager!, opcode: VehicleControl.cmdBatteryPreheat, value: next ? 1 : 0) {
+                ControlsState.shared.preheatOn = next
+            }
         }
     ),
     ControlAction(
@@ -56,8 +60,9 @@ let vehicleControls: [ControlAction] = [
         label: { "Frunk" },
         active: { false },
         gestureValue: 4,
-        perform: {
-            print("[control] frunk pressed")
+        perform: { manager in
+            guard let manager else { return }
+            VehicleControl.send(manager, opcode: VehicleControl.cmdClosure, value: VehicleControl.closureFrontTrunk)
         }
     ),
     ControlAction(
@@ -66,8 +71,9 @@ let vehicleControls: [ControlAction] = [
         label: { "Trunk" },
         active: { false },
         gestureValue: 5,
-        perform: {
-            print("[control] trunk pressed")
+        perform: { manager in
+            guard let manager else { return }
+            VehicleControl.send(manager, opcode: VehicleControl.cmdClosure, value: VehicleControl.closureRearTrunk)
         }
     ),
     ControlAction(
@@ -76,9 +82,13 @@ let vehicleControls: [ControlAction] = [
         label: { ControlsState.shared.chargePortOpen ? "Charge Port: Open" : "Charge Port: Closed" },
         active: { ControlsState.shared.chargePortOpen },
         gestureValue: 6,
-        perform: {
-            ControlsState.shared.chargePortOpen.toggle()
-            print("[control] charge port -> \(ControlsState.shared.chargePortOpen ? "open" : "closed")")
+        perform: { manager in
+            let opcode = ControlsState.shared.chargePortOpen
+                ? VehicleControl.cmdChargePortClose
+                : VehicleControl.cmdChargePortOpen
+            if manager == nil || VehicleControl.send(manager!, opcode: opcode, value: 1) {
+                ControlsState.shared.chargePortOpen.toggle()
+            }
         }
     ),
     ControlAction(
@@ -87,9 +97,14 @@ let vehicleControls: [ControlAction] = [
         label: { ControlsState.shared.mirrorsFolded ? "Mirrors: Folded" : "Mirrors: Unfolded" },
         active: { ControlsState.shared.mirrorsFolded },
         gestureValue: 3,
-        perform: {
-            ControlsState.shared.mirrorsFolded.toggle()
-            print("[control] mirrors -> \(ControlsState.shared.mirrorsFolded ? "folded" : "unfolded")")
+        perform: { manager in
+            let value = ControlsState.shared.mirrorsFolded
+                ? VehicleControl.mirrorUnfold
+                : VehicleControl.mirrorFold
+            if manager == nil ||
+                VehicleControl.send(manager!, opcode: VehicleControl.cmdMirrorFold, value: value) {
+                ControlsState.shared.mirrorsFolded.toggle()
+            }
         }
     ),
     ControlAction(
@@ -98,9 +113,10 @@ let vehicleControls: [ControlAction] = [
         label: { ControlsState.shared.rearFanOn ? "Rear Fan: On" : "Rear Fan: Off" },
         active: { ControlsState.shared.rearFanOn },
         gestureValue: 7,
-        perform: {
-            ControlsState.shared.rearFanOn.toggle()
-            print("[control] rear fan -> \(ControlsState.shared.rearFanOn ? "on" : "off")")
+        perform: { manager in
+            if manager == nil || VehicleControl.sendRearFanToggle(manager!) {
+                ControlsState.shared.rearFanOn.toggle()
+            }
         }
     ),
     // Glovebox is an electronic latch release: open only (closed by hand).
@@ -110,8 +126,9 @@ let vehicleControls: [ControlAction] = [
         label: { "Open Glovebox" },
         active: { false },
         gestureValue: 1,
-        perform: {
-            print("[control] glovebox pressed")
+        perform: { manager in
+            guard let manager else { return }
+            VehicleControl.send(manager, opcode: VehicleControl.cmdGlovebox, value: 1)
         }
     )
 ]

@@ -38,6 +38,7 @@ typedef struct {
     double packTMin;
     double packTMax;
     double odometer;
+    double acTemp;
 
     // Openpilot state
     double madsActive;
@@ -57,6 +58,11 @@ void  bridge_delete_sub_sockets(void* group);
 // Vehicle decoder
 void* bridge_create_vehicle_decoder(const char** dbcContents, const int* busIndices, int count, const char* vehicleType);
 void  bridge_destroy_vehicle_decoder(void* decoder);
+
+// Per-frame decode (DashKit BLE path): feed one raw CAN frame into the decoder
+// and read back the updated car state. Not thread-safe against the receive
+// loop — a decoder is used by either this or bridge_start_receive_loop.
+void bridge_decode_can_frame(void* decoder, int bus, uint32_t address, const uint8_t* data, int len, BridgeCarState* out);
 
 // Discovery
 // Returns a malloc'd C string with the discovered IP, or NULL if not found.

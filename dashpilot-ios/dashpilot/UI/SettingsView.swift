@@ -8,6 +8,10 @@ private let borderColor = Color(white: 0.2)
 struct SettingsView: View {
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(ConnectionViewModel.self) private var connectionVM
+
+    /// 0 = General, 1 = DashKit (mirrors the Android settings tabs).
+    @State private var selectedTab = 0
 
     @AppStorage(DisplaySettings.keyExtraVehicleBus)           private var extraVehicleBus = false
     @AppStorage(DisplaySettings.keyShowCarBattery)            private var showCarBattery = true
@@ -18,6 +22,7 @@ struct SettingsView: View {
     @AppStorage(DisplaySettings.keyDarkMode)                  private var darkMode = false
     @AppStorage(DisplaySettings.keyRenderQuality)             private var renderQuality = 3
     @AppStorage(DisplaySettings.keySelectedDashboardId)       private var selectedDashboardId = ""
+    @AppStorage(ConnectionViewModel.onboardingCompletedKey)   private var onboardingCompleted = false
 
     private var currentDashboard: DashboardConfig {
         dashboardById(selectedDashboardId) ?? selectedDashboard()
@@ -53,15 +58,21 @@ struct SettingsView: View {
             VStack(spacing: 0) {
                 header
                 Divider().background(borderColor)
+                tabRow
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
-                        dashboardSection
-                        configurationSection
-                        displaySection
-                        if showVisualizerSettings {
-                            visualizerSection
+                        if selectedTab == 0 {
+                            dashboardSection
+                            configurationSection
+                            displaySection
+                            if showVisualizerSettings {
+                                visualizerSection
+                            }
+                            replayOnboardingRow
+                            versionRow
+                        } else {
+                            dashKitTab
                         }
-                        versionRow
                         Spacer().frame(height: 32)
                     }
                     .padding(.top, 16)
@@ -89,6 +100,45 @@ struct SettingsView: View {
         .padding(.horizontal, 8)
         .frame(height: 56)
         .background(bgColor)
+    }
+
+    // MARK: - Tabs
+
+    private var tabRow: some View {
+        HStack(spacing: 0) {
+            ForEach(Array(["General", "DashKit"].enumerated()), id: \.offset) { index, title in
+                Button {
+                    selectedTab = index
+                } label: {
+                    VStack(spacing: 8) {
+                        Text(title)
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundColor(selectedTab == index ? .white : mutedText)
+                        Rectangle()
+                            .fill(selectedTab == index ? dashGreen : Color.clear)
+                            .frame(height: 2)
+                    }
+                }
+                .frame(maxWidth: .infinity)
+            }
+        }
+        .padding(.top, 12)
+        .background(bgColor)
+    }
+
+    // MARK: - DashKit Tab
+
+    @ViewBuilder
+    private var dashKitTab: some View {
+        if let bleManager = connectionVM.bleManager {
+            DashKitSettingsView(bleManager: bleManager)
+                .padding(.horizontal, 24)
+        } else {
+            Text("Connect to a DashKit device to manage it.")
+                .foregroundColor(mutedText)
+                .font(.system(size: 14))
+                .padding(.horizontal, 24)
+        }
     }
 
     // MARK: - Dashboard Section
@@ -203,6 +253,30 @@ struct SettingsView: View {
             RenderQualityPicker(selected: $renderQuality)
         }
         .padding(.vertical, 4)
+    }
+
+    // MARK: - Replay onboarding
+
+    /// Disconnects, clears the completed flag and re-presents the onboarding
+    /// cover (mirrors the Android "Replay onboarding" settings entry).
+    private var replayOnboardingRow: some View {
+        Button {
+            connectionVM.disconnect()
+            onboardingCompleted = false
+            connectionVM.onboardingRequested = true
+        } label: {
+            HStack {
+                Text("Replay onboarding")
+                    .foregroundColor(.white)
+                    .font(.system(size: 16))
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .foregroundColor(mutedText)
+                    .font(.system(size: 14, weight: .medium))
+            }
+        }
+        .padding(.horizontal, 24)
+        .padding(.vertical, 12)
     }
 
     // MARK: - Version
