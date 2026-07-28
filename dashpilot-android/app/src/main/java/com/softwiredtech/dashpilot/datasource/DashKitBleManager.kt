@@ -52,6 +52,16 @@ class DashKitBleManager(private val context: Context) {
         private const val SCAN_TIMEOUT_MS = 15_000L
         private const val CONNECT_TIMEOUT_MS = 10_000L
         private const val RETRY_DELAY_MS = 2_000L
+
+        // A drop this soon after reaching Connected is treated as a setup
+        // failure rather than a mid-session loss. Encryption is only initiated
+        // when the data source subscribes (service discovery runs unencrypted),
+        // so a stale bond shows up as repeated drops just after Connected.
+        private const val QUICK_DROP_WINDOW_MS = 15_000L
+        private const val MAX_QUICK_DROPS = 3
+
+        // Matches PAIRING_WINDOW_S in the firmware.
+        private const val PAIRING_WINDOW_MS = 120_000L
     }
 
     private val crashlytics = FirebaseCrashlytics.getInstance()
@@ -91,6 +101,33 @@ class DashKitBleManager(private val context: Context) {
     // auto-reconnect after an unexpected drop.
     @Volatile
     private var attemptCount = 0
+
+    // Stale-bond recovery. If DashKit no longer holds the key matching our OS
+    // bond (its bond store was erased, or this phone's entry was evicted), every
+    // reconnect completes service discovery and then dies when the subscription
+    // triggers encryption. After MAX_QUICK_DROPS such cycles we delete the OS
+    // bond and pair freshly — DashKit accepts that whenever its pairing window
+    // is open. One reset per connection intent, so a refused re-pair can't loop.
+    @Volatile
+    private var quickDropCount = 0
+    @Volatile
+    private var bondResetDone = false
+    @Volatile
+    private var connectedAtMs = 0L
+
+    // Set when this phone asks DashKit to open its pairing window. The firmware
+    // drops us to free the single connection slot for the new device; until the
+    // window ends we must not auto-reconnect and steal the slot back.
+    @Volatile
+    private var pairingWindowUntilMs = 0L
+
+    /**
+     * Called after sending the enter-pairing command: the upcoming disconnect
+     * is expected, and auto-reconnect stays paused for the window duration.
+     */
+    fun expectPairingWindowDrop() {
+        pairingWindowUntilMs = android.os.SystemClock.elapsedRealtime() + PAIRING_WINDOW_MS
+    }
 
     // All timeout/retry scheduling (plus the post-bond discovery delay) runs on
     // this handler; disconnect() clears it wholesale.
@@ -261,18 +298,61 @@ class DashKitBleManager(private val context: Context) {
                 gatt = null
                 discoveryStarted = false
                 if (!reachedConnected) {
-                    // Link dropped before the connection was fully up: either
-                    // DashKit rebooted to clear residual pairing state mid-pair
-                    // (it reboots on a failed encryption change), or the
-                    // connect attempt itself failed (e.g. status 133). Retry a
-                    // few times so the freshly-booted DashKit pairs cleanly
-                    // without the user having to tap "pair" again.
+                    // Link dropped before the connection was fully up: DashKit
+                    // refused/tore down a pairing, the previous link was still
+                    // clearing, or the connect attempt itself failed (e.g.
+                    // status 133). Retry a few times before surfacing an error.
                     Log.w(TAG, "Link dropped before setup completed (status=$status)")
                     crashlytics.log("BLE: link dropped before setup completed (status=$status, attempt $attemptCount/$MAX_ATTEMPTS)")
-                    retryOrFail("Could not connect to DashKit")
+                    // An unbonded device at this point means the pairing itself
+                    // did not stick — DashKit only accepts new phones while its
+                    // pairing window is open.
+                    val message =
+                        if (g.device.bondState == BluetoothDevice.BOND_BONDED) {
+                            "Could not connect to DashKit"
+                        } else {
+                            "DashKit did not accept pairing. Open \"Pair a new device\" in DashPilot settings on an already-paired phone, then try again."
+                        }
+                    retryOrFail(message)
                     return
                 }
                 if (!userInitiatedDisconnect) {
+                    if (android.os.SystemClock.elapsedRealtime() < pairingWindowUntilMs) {
+                        // We asked DashKit to open its pairing window and it
+                        // dropped us to free the only connection slot for the
+                        // new device. Don't fight for it — stay disconnected;
+                        // foregrounding the app (or a manual retry) reconnects
+                        // once the window is over.
+                        Log.d(TAG, "Dropped for pairing window; auto-reconnect paused")
+                        crashlytics.log("BLE: dropped for pairing window; auto-reconnect paused")
+                        _connectionState.value = ConnectionStatus.Disconnected
+                        forEachListener { it.onDisconnected() }
+                        return
+                    }
+                    val quickDrop =
+                        android.os.SystemClock.elapsedRealtime() - connectedAtMs < QUICK_DROP_WINDOW_MS
+                    quickDropCount = if (quickDrop) quickDropCount + 1 else 0
+                    if (quickDrop && quickDropCount >= MAX_QUICK_DROPS && !bondResetDone &&
+                        g.device.bondState == BluetoothDevice.BOND_BONDED
+                    ) {
+                        // Stale bond: discovery keeps succeeding but the link
+                        // dies as soon as the subscription forces encryption.
+                        // Delete our side of the bond so the next cycle pairs
+                        // freshly instead of looping forever.
+                        Log.w(TAG, "Repeated drops right after connect on a bonded link; removing stale bond to re-pair")
+                        crashlytics.log("BLE: removing stale bond after $quickDropCount quick drops; re-pairing")
+                        bondResetDone = true
+                        quickDropCount = 0
+                        removeBond(g.device)
+                        // removeBond is asynchronous — reconnect after a pause
+                        // so the next attempt starts from a clean, unbonded
+                        // state and pairs freshly.
+                        _connectionState.value = ConnectionStatus.Connecting
+                        forEachListener { it.onDisconnected() }
+                        attemptCount = 0
+                        handler.postDelayed(retryRunnable, RETRY_DELAY_MS)
+                        return
+                    }
                     // Unexpected drop after a healthy connection (typically a
                     // DashKit reboot). The bond survives the reboot, so restart
                     // the scan: it reconnects, re-discovers services and the
@@ -314,6 +394,7 @@ class DashKitBleManager(private val context: Context) {
             }
             crashlytics.log("BLE: connected (${g.services.size} services, mtu=$mtu)")
             attemptCount = 0
+            connectedAtMs = android.os.SystemClock.elapsedRealtime()
             _connectionState.value = ConnectionStatus.Connected
             forEachListener { it.onServicesReady(g) }
         }
@@ -397,10 +478,24 @@ class DashKitBleManager(private val context: Context) {
             _connectionState.value == ConnectionStatus.Connecting) return
         _connectionState.value = ConnectionStatus.Connecting
         attemptCount = 0
+        quickDropCount = 0
+        bondResetDone = false
         userInitiatedDisconnect = false
         registerBondReceiver()
         startScan()
     }
+
+    // BluetoothDevice.removeBond is a hidden API but stable since API 19 and
+    // widely relied on (e.g. Nordic's BLE library) — there is no public way to
+    // drop a bond programmatically.
+    private fun removeBond(device: BluetoothDevice): Boolean =
+        try {
+            device.javaClass.getMethod("removeBond").invoke(device) as? Boolean ?: false
+        } catch (e: Exception) {
+            Log.w(TAG, "removeBond failed: ${e.message}")
+            crashlytics.log("BLE: removeBond failed: ${e.message}")
+            false
+        }
 
     fun disconnect() {
         userInitiatedDisconnect = true

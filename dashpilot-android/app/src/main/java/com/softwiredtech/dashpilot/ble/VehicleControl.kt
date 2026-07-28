@@ -80,8 +80,14 @@ object VehicleControl {
         send(manager, CMD_WIPER_OFF_ENABLE, if (enabled) 1 else 0)
 
     /** Ask the DashKit to open a pairing window for one new device. */
-    fun sendEnterPairing(manager: DashKitBleManager): Boolean =
-        send(manager, CMD_ENTER_PAIRING, 1)
+    fun sendEnterPairing(manager: DashKitBleManager): Boolean {
+        val ok = send(manager, CMD_ENTER_PAIRING, 1)
+        // DashKit drops this phone to free its single connection slot for the
+        // new device; tell the manager so it doesn't auto-reconnect and steal
+        // the slot back during the window.
+        if (ok) manager.expectPairingWindowDrop()
+        return ok
+    }
 
     /** Toggle the rear AC fan (firmware flips OFF <-> HIGH; value ignored). */
     fun sendRearFanToggle(manager: DashKitBleManager): Boolean =
