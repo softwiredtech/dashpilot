@@ -37,7 +37,7 @@ struct AutomationsView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-                    headerRow
+                    ScreenHeader(title: "Automations") { dismiss() }
 
                     Spacer().frame(height: 24)
 
@@ -106,24 +106,6 @@ struct AutomationsView: View {
             let actionValue = newId.flatMap { controlById($0)?.gestureValue }
                 ?? VehicleControl.gestureActionNone
             VehicleControl.sendFingerAction(manager, fingers: fingers, actionValue: actionValue)
-        }
-    }
-
-    // MARK: - Header
-
-    private var headerRow: some View {
-        HStack(spacing: 8) {
-            Button {
-                dismiss()
-            } label: {
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(.white)
-                    .frame(width: 44, height: 44)
-            }
-            Text("Automations")
-                .foregroundColor(.white)
-                .font(.system(size: 24, weight: .bold))
         }
     }
 
@@ -222,11 +204,12 @@ private struct AutomationRow: View {
     @Binding var isOn: Bool
 
     var body: some View {
-        HStack(spacing: 16) {
-            Image(systemName: icon)
-                .font(.system(size: 20))
-                .foregroundColor(isOn ? .dashAccent : .white)
-                .frame(width: 24)
+        HStack(spacing: 12) {
+            IconChip(
+                systemName: icon,
+                tint: isOn ? .dashAccent : .white,
+                background: isOn ? Color.dashAccent.opacity(0.16) : Color.white.opacity(0.08)
+            )
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
@@ -292,7 +275,7 @@ private struct FingerActionRow: View {
 
             Button(action: onRemove) {
                 Image(systemName: "xmark")
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(.dashTextMuted)
                     .frame(width: 32, height: 32)
             }
@@ -354,7 +337,7 @@ private struct AddTriggerButton: View {
         Button(action: onTap) {
             HStack(spacing: 8) {
                 Image(systemName: "plus")
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.system(size: 18, weight: .semibold))
                     .foregroundColor(.dashAccent)
                 Text("Add trigger")
                     .foregroundColor(.dashAccent)
