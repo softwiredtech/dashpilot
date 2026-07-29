@@ -1,0 +1,8 @@
+{
+  "name": "dashpilot-perf-gate",
+  "private": true,
+  "description": "Performance gate for dash-apps. See dash-apps/README.md.",
+  "engines": { "node": ">=20" },
+  "scripts": { "test": "node --test" },
+  "dependencies": { "jsdom": "^29.1.1" }
+}
