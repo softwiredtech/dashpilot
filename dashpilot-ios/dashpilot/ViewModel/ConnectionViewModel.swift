@@ -17,9 +17,18 @@ final class ConnectionViewModel {
     var onboardingRequested = false
 
     private(set) var connectionStatus: ConnectionStatus = .disconnected
-    private(set) var dashMessages: AsyncStream<DashState>?
     private(set) var discoveredAddress: String?
     private(set) var discoveryError: String?
+
+    /// Most recent state of the session, replayed to new subscribers so a view
+    /// opened mid-session renders immediately.
+    private(set) var latestDashState: DashState?
+
+    /// Live per-view subscriptions. AsyncStream is single-consumer and dies
+    /// with its consuming task, so every view gets its own stream and the pump
+    /// fans out to all of them (the Android equivalent is a shared Flow).
+    @ObservationIgnored
+    private var dashSubscribers: [UUID: AsyncStream<DashState>.Continuation] = [:]
 
     /// Live BLE manager while a DashKit session is active. Views use it to
     /// send control commands and the settings screen for firmware/OTA access.
@@ -29,13 +38,29 @@ final class ConnectionViewModel {
     /// error so foregrounding retries the same source, like Android.
     private(set) var activeSourceType: DataSourceType?
 
-    /// Bumped whenever `dashMessages` is replaced, so views can restart their
-    /// consuming task (`.task(id:)`) on reconnect.
-    private(set) var streamGeneration = 0
-
     private var dataSource: (any IDataSource)?
     private var connectTask: Task<Void, Never>?
     private var startupDiscoveryStarted = false
+
+    /// Returns a stream of `DashState` updates for one view. Each caller gets
+    /// an independent stream, so one view leaving (its task being cancelled)
+    /// tears down only its own subscription — not the pipeline feeding the
+    /// other views. Subscriptions survive reconnects; the stream ends when the
+    /// consuming task is cancelled.
+    func dashStateStream() -> AsyncStream<DashState> {
+        AsyncStream(bufferingPolicy: .bufferingNewest(1)) { continuation in
+            let id = UUID()
+            dashSubscribers[id] = continuation
+            if let latest = latestDashState {
+                continuation.yield(latest)
+            }
+            continuation.onTermination = { [weak self] _ in
+                Task { @MainActor in
+                    self?.dashSubscribers.removeValue(forKey: id)
+                }
+            }
+        }
+    }
 
     /// True when a new connection may start (mirrors Android: connect is
     /// allowed from Disconnected and Error).
@@ -193,7 +218,7 @@ final class ConnectionViewModel {
         bleManager?.disconnect()
         bleManager = nil
         activeSourceType = nil
-        dashMessages = nil
+        latestDashState = nil
         discoveredAddress = nil
         discoveryError = nil
         connectionStatus = .disconnected
@@ -220,15 +245,11 @@ final class ConnectionViewModel {
         startStreaming(ds, resyncDashKit: false)
     }
 
-    /// Consumes the data source's `CarState` stream and republishes it as
-    /// `DashState` for the UI; flips to `.connected` on the first message.
+    /// Consumes the data source's `CarState` stream, republishes it as
+    /// `DashState` to every subscribed view, and flips to `.connected` on the
+    /// first message. Subscribers are not finished when a session ends — a
+    /// reconnect's pump simply resumes feeding them.
     private func startStreaming(_ ds: any IDataSource, resyncDashKit: Bool) {
-        var capturedContinuation: AsyncStream<DashState>.Continuation?
-        dashMessages = AsyncStream<DashState>(bufferingPolicy: .bufferingNewest(1)) { continuation in
-            capturedContinuation = continuation
-        }
-        streamGeneration += 1
-
         connectTask = Task { @MainActor [weak self] in
             guard let self else { return }
             UIDevice.current.isBatteryMonitoringEnabled = true
@@ -252,9 +273,11 @@ final class ConnectionViewModel {
                     phoneBattery: batteryLevel >= 0 ? Int(batteryLevel * 100) : -1,
                     currentTime: Int64(Date().timeIntervalSince1970 * 1000)
                 )
-                capturedContinuation?.yield(state)
+                self.latestDashState = state
+                for continuation in self.dashSubscribers.values {
+                    continuation.yield(state)
+                }
             }
-            capturedContinuation?.finish()
         }
     }
 }

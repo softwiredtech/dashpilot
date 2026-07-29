@@ -30,15 +30,17 @@ struct HomeView: View {
             .padding(DashMetrics.screenPadding)
         }
         .navigationBarHidden(true)
-        .task(id: connectionVM.streamGeneration) {
-            guard let stream = connectionVM.dashMessages else {
-                dash = nil
-                return
-            }
-            // The for-await loop ends cleanly when the task is cancelled
-            // (view disappears) or the stream finishes.
-            for await state in stream {
+        .task {
+            // Each appearance opens its own subscription (with the latest
+            // state replayed), so navigating away cancels only this view's
+            // stream — the pipeline keeps feeding the other views.
+            for await state in connectionVM.dashStateStream() {
                 dash = state
+            }
+        }
+        .onChange(of: connectionVM.connectionStatus) { _, status in
+            if status == .disconnected {
+                dash = nil
             }
         }
     }
