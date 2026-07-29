@@ -8,10 +8,14 @@ struct DashboardView: View {
     @Environment(ConnectionViewModel.self) var connectionVM
     @Environment(\.dismiss) private var dismiss
 
+    /// This view's own subscription, created once per appearance. The web
+    /// view's coordinator consumes it and cancels it when it is torn down.
+    @State private var dashStream: AsyncStream<DashState>?
+
     var body: some View {
         ZStack(alignment: .topLeading) {
             Group {
-                if let dashStream = connectionVM.dashMessages {
+                if let dashStream {
                     switch dashboardType {
                     case DashboardType.web.rawValue:
                         WebDashView(url: dashboardUrl, incomingMessages: dashStream)
@@ -41,7 +45,12 @@ struct DashboardView: View {
         .navigationBarHidden(true)
         .statusBar(hidden: true)
         .persistentSystemOverlays(.hidden)
-        .onAppear { UIApplication.shared.isIdleTimerDisabled = true }
+        .onAppear {
+            UIApplication.shared.isIdleTimerDisabled = true
+            if dashStream == nil {
+                dashStream = connectionVM.dashStateStream()
+            }
+        }
         .onDisappear { UIApplication.shared.isIdleTimerDisabled = false }
     }
 }
