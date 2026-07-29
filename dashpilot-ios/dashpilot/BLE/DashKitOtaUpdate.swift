@@ -34,6 +34,13 @@ final class DashKitOtaUpdate: DashKitGattListener {
     private var dataChar: CBCharacteristic?
     private var statusChar: CBCharacteristic?
 
+    // The CAN stream is paused for the upload — its high-rate notifications
+    // compete with the OTA writes for connection-event bandwidth. Resumed on
+    // error/cancel; after a successful upload the DashKit reboots and the
+    // data source re-subscribes on reconnect.
+    private var canChar: CBCharacteristic?
+    private var canWasNotifying = false
+
     init(manager: DashKitBleManager) {
         self.manager = manager
     }
@@ -54,12 +61,21 @@ final class DashKitOtaUpdate: DashKitGattListener {
 
     func cancel() {
         manager.removeGattListener(self)
+        resumeCanNotifications()
         firmware = nil
         peripheral = nil
         ctrlChar = nil
         dataChar = nil
         statusChar = nil
+        canChar = nil
         setState(.idle)
+    }
+
+    private func resumeCanNotifications() {
+        if canWasNotifying, let peripheral, let canChar {
+            peripheral.setNotifyValue(true, for: canChar)
+        }
+        canWasNotifying = false
     }
 
     private func setState(_ newState: OtaState) {
@@ -81,6 +97,15 @@ final class DashKitOtaUpdate: DashKitGattListener {
             setState(.error("OTA characteristics not found"))
             return
         }
+        canChar = peripheral.services?
+            .first { $0.uuid == DashKitGatt.canService }?
+            .characteristics?
+            .first { $0.uuid == DashKitGatt.canCharacteristic }
+        if let canChar, canChar.isNotifying {
+            canWasNotifying = true
+            peripheral.setNotifyValue(false, for: canChar)
+            print("[DashKitOta] paused CAN notifications for the upload")
+        }
         peripheral.setNotifyValue(true, for: statusChar)
         print("[DashKitOta] OTA service ready, subscribing to status")
     }
@@ -89,6 +114,7 @@ final class DashKitOtaUpdate: DashKitGattListener {
         guard characteristic.uuid == DashKitGatt.otaStatusCharacteristic else { return }
         if error != nil {
             setState(.error("Failed to enable OTA notifications"))
+            resumeCanNotifications()
             return
         }
         sendBeginCommand()
@@ -104,6 +130,7 @@ final class DashKitOtaUpdate: DashKitGattListener {
               characteristic.uuid == DashKitGatt.otaDataCharacteristic else { return }
         if let error {
             setState(.error("Write failed (\(error.localizedDescription))"))
+            resumeCanNotifications()
             return
         }
         sendNextChunk()
@@ -121,6 +148,8 @@ final class DashKitOtaUpdate: DashKitGattListener {
         ctrlChar = nil
         dataChar = nil
         statusChar = nil
+        canChar = nil
+        canWasNotifying = false
     }
 
     // MARK: - Upload
@@ -145,7 +174,9 @@ final class DashKitOtaUpdate: DashKitGattListener {
         guard let fw = firmware, let peripheral, let data = dataChar else { return }
         guard firmwareOffset < fw.count else { return }
 
-        let maxLen = peripheral.maximumWriteValueLength(for: .withResponse)
+        // .withoutResponse reports the true MTU-3 payload; .withResponse
+        // reports 512, which turns each chunk into a slow ATT long write.
+        let maxLen = peripheral.maximumWriteValueLength(for: .withoutResponse)
         let chunkSize = min(maxLen, fw.count - firmwareOffset)
         let chunk = fw.subdata(in: firmwareOffset..<(firmwareOffset + chunkSize))
         firmwareOffset += chunkSize
@@ -175,6 +206,7 @@ final class DashKitOtaUpdate: DashKitGattListener {
             print("[DashKitOta] OTA error from device: 0x\(String(errCode, radix: 16))")
             setState(.error("Device reported error (0x\(String(errCode, radix: 16)))"))
             manager.removeGattListener(self)
+            resumeCanNotifications()
             firmware = nil
         default:
             break
