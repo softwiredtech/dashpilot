@@ -24,7 +24,7 @@ struct HomeView: View {
                 pinnedSection
                 actionButtons
                 Spacer().frame(height: 12)
-                dataSourceMenu
+                DataSourceMenu(navigationPath: $navigationPath)
                 Spacer()
             }
             .padding(DashMetrics.screenPadding)
@@ -64,58 +64,6 @@ struct HomeView: View {
             Text("DashPilot")
                 .foregroundColor(.white)
                 .font(.system(size: 20, weight: .bold))
-        }
-    }
-
-    // MARK: - Data source menu
-
-    /// Centered "Data source" menu below the actions (port of the Android
-    /// `DebugDataSourceMenu`): pick a source while idle, disconnect while a
-    /// session is up. Selecting DashKit retries the BLE link; comma leads to
-    /// the WiFi connect/setup flow.
-    private var dataSourceMenu: some View {
-        VStack(spacing: 4) {
-            Menu {
-                if isIdle {
-                    Button("comma") { navigationPath.append(AppRoute.setup) }
-                    Button("DashKit") { connectionVM.connectDashKit() }
-                } else {
-                    Button("Disconnect") { connectionVM.disconnect() }
-                }
-            } label: {
-                HStack(spacing: 4) {
-                    Text(dataSourceLabel)
-                        .foregroundColor(.dashTextMuted)
-                        .font(.system(size: 13))
-                    Image(systemName: "arrowtriangle.down.fill")
-                        .font(.system(size: 9))
-                        .foregroundColor(.dashTextMuted)
-                }
-                .padding(.horizontal, 12)
-                .frame(height: 36)
-            }
-            if case .error(let message) = connectionVM.connectionStatus {
-                Text(message)
-                    .foregroundColor(.dashError)
-                    .font(.system(size: 12))
-                    .multilineTextAlignment(.center)
-            }
-        }
-        .frame(maxWidth: .infinity)
-    }
-
-    private var isIdle: Bool {
-        switch connectionVM.connectionStatus {
-        case .disconnected, .error: return true
-        case .connecting, .connected: return false
-        }
-    }
-
-    private var dataSourceLabel: String {
-        switch connectionVM.connectionStatus {
-        case .connected: return "Data source: connected"
-        case .connecting: return "Data source: connecting…"
-        case .disconnected, .error: return "Data source"
         }
     }
 
@@ -221,6 +169,70 @@ struct HomeView: View {
         guard let state = dash, state.carState.odometer > 0 else { return "—" }
         let unit = state.displaySettings.useImperial ? "mi" : "km"
         return "\(Int(state.carState.odometer.rounded())) \(unit)"
+    }
+}
+
+// MARK: - Data source menu
+
+/// Centered "Data source" menu below the actions (port of the Android
+/// `DebugDataSourceMenu`): pick a source while idle, disconnect while a
+/// session is up. Selecting DashKit retries the BLE link; comma leads to
+/// the WiFi connect/setup flow.
+///
+/// Kept as its own view on purpose: its body depends only on
+/// `connectionStatus`, not on the live dash state. Inside `HomeView`'s body
+/// the ~25 Hz dash updates rebuilt the presented `Menu` on every tick, which
+/// detached the visible items from their actions — tapping "Disconnect" did
+/// nothing.
+private struct DataSourceMenu: View {
+
+    @Binding var navigationPath: NavigationPath
+    @Environment(ConnectionViewModel.self) var connectionVM
+
+    var body: some View {
+        VStack(spacing: 4) {
+            Menu {
+                if isIdle {
+                    Button("comma") { navigationPath.append(AppRoute.setup) }
+                    Button("DashKit") { connectionVM.connectDashKit() }
+                } else {
+                    Button("Disconnect") { connectionVM.disconnect() }
+                }
+            } label: {
+                HStack(spacing: 4) {
+                    Text(dataSourceLabel)
+                        .foregroundColor(.dashTextMuted)
+                        .font(.system(size: 13))
+                    Image(systemName: "arrowtriangle.down.fill")
+                        .font(.system(size: 9))
+                        .foregroundColor(.dashTextMuted)
+                }
+                .padding(.horizontal, 12)
+                .frame(height: 36)
+            }
+            if case .error(let message) = connectionVM.connectionStatus {
+                Text(message)
+                    .foregroundColor(.dashError)
+                    .font(.system(size: 12))
+                    .multilineTextAlignment(.center)
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var isIdle: Bool {
+        switch connectionVM.connectionStatus {
+        case .disconnected, .error: return true
+        case .connecting, .connected: return false
+        }
+    }
+
+    private var dataSourceLabel: String {
+        switch connectionVM.connectionStatus {
+        case .connected: return "Data source: connected"
+        case .connecting: return "Data source: connecting…"
+        case .disconnected, .error: return "Data source"
+        }
     }
 }
 
