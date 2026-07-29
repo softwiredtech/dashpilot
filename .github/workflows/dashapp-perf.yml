@@ -1,0 +1,32 @@
+name: dashapp-perf
+on:
+  pull_request:
+    paths:
+      - 'dash-apps/**'
+      - '.github/workflows/dashapp-perf.yml'
+permissions:
+  contents: read
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { app: web-retro,   root: '' }
+          - { app: web-analog,  root: '' }
+          - { app: web-ambient, root: '' }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: dash-apps/_perf-gate/package.json
+      - run: npm ci
+        working-directory: dash-apps/_perf-gate
+      - run: node gate.js "../${{ matrix.app }}${{ matrix.root && format('/{0}', matrix.root) || '' }}" --name "${{ matrix.app }}"
+        working-directory: dash-apps/_perf-gate
+        env:
+          GITHUB_STEP_SUMMARY: ${{ github.step_summary }}

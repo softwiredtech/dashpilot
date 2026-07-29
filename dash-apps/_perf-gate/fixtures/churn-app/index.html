@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html><body>
+  <div id="tape"></div>
+  <script>
+    const tape = document.getElementById("tape");
+    const cells = [];
+    for (let i = 0; i < 8; i++) {
+      const c = document.createElement("div");
+      c.className = "cell";
+      tape.appendChild(c);
+      cells.push(c);
+    }
+    window.onCarStateUpdate = function () {
+      const next = "cell " + (window.NativeCarState.getLeftBlinker() ? "on" : "off");
+      cells.forEach((c) => { c.className = next; });
+    };
+  </script>
+</body></html>

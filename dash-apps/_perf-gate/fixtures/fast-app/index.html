@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html><body>
+  <div id="speed" style="font-size:48px">0</div>
+  <div id="blinker"></div>
+  <script>
+    const speedEl = document.getElementById("speed");
+    const blinkerEl = document.getElementById("blinker");
+    window.onCarStateUpdate = function () {
+      speedEl.textContent = Math.round(window.NativeCarState.getEgoSpeed());
+      blinkerEl.textContent = window.NativeCarState.getLeftBlinker() ? "◀" : "";
+    };
+  </script>
+</body></html>
