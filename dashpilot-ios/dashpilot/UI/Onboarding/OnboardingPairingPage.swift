@@ -68,7 +68,7 @@ struct OnboardingPairingPage: View {
     private var subtitle: String {
         switch state {
         case .idle:
-            return "Plug the DashKit into your car's OBD-II port, then tap below to pair over Bluetooth."
+            return "Plug the DashKit into your car's debug port, then tap below to pair over Bluetooth."
         case .searching:
             return "Hold the device close to your phone. This usually takes a few seconds."
         case .paired:

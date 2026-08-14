@@ -98,7 +98,7 @@
     <string name="onboarding_pair_cta">Pair device</string>
     <string name="onboarding_pair_searching_cta">Pairing…</string>
     <string name="onboarding_pair_idle_title">Pair your DashKit</string>
-    <string name="onboarding_pair_idle_subtitle">Plug the DashKit into your car\'s OBD-II port, then tap below to pair over Bluetooth.</string>
+    <string name="onboarding_pair_idle_subtitle">Plug the DashKit into your car\'s debug port, then tap below to pair over Bluetooth.</string>
     <string name="onboarding_pair_searching_title">Looking for DashKit…</string>
     <string name="onboarding_pair_searching_subtitle">Hold the device close to your phone. This usually takes a few seconds.</string>
     <string name="onboarding_pair_success_title">You\'re all set!</string>
