@@ -20,6 +20,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.softwiredtech.dashpilot.ble.VehicleControl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -62,6 +63,10 @@ class DashKitBleManager(private val context: Context) {
 
         // Matches PAIRING_WINDOW_S in the firmware.
         private const val PAIRING_WINDOW_MS = 120_000L
+
+        // Keepalive interval; the firmware drops the link after 60 s without a
+        // ping (KEEPALIVE_TIMEOUT_S), so this allows a few missed writes.
+        private const val PING_INTERVAL_MS = 15_000L
     }
 
     private val crashlytics = FirebaseCrashlytics.getInstance()
@@ -132,6 +137,35 @@ class DashKitBleManager(private val context: Context) {
     // All timeout/retry scheduling (plus the post-bond discovery delay) runs on
     // this handler; disconnect() clears it wholesale.
     private val handler = Handler(Looper.getMainLooper())
+
+    // Keepalive: reschedules itself while Connected and in the foreground.
+    private val pingRunnable = object : Runnable {
+        override fun run() {
+            if (!appInForeground || _connectionState.value != ConnectionStatus.Connected) return
+            VehicleControl.sendPing(this@DashKitBleManager)
+            handler.postDelayed(this, PING_INTERVAL_MS)
+        }
+    }
+
+    // Keepalive is foreground-only by design: a backgrounded app stops pinging
+    // so the firmware frees the connection slot after its timeout — the same
+    // thing iOS suspension does naturally. Unlike iOS, an Android process (and
+    // this handler) keeps running in the background, so the gate is explicit.
+    @Volatile
+    private var appInForeground = true
+
+    fun onAppForegrounded() {
+        appInForeground = true
+        if (_connectionState.value == ConnectionStatus.Connected) {
+            handler.removeCallbacks(pingRunnable)
+            handler.post(pingRunnable)
+        }
+    }
+
+    fun onAppBackgrounded() {
+        appInForeground = false
+        handler.removeCallbacks(pingRunnable)
+    }
 
     private val retryRunnable = Runnable {
         if (!userInitiatedDisconnect && _connectionState.value == ConnectionStatus.Connecting) {
@@ -329,6 +363,19 @@ class DashKitBleManager(private val context: Context) {
                         forEachListener { it.onDisconnected() }
                         return
                     }
+                    if (!appInForeground) {
+                        // We stopped pinging when the app left the foreground,
+                        // so this drop is (usually) the firmware freeing the
+                        // slot. Reconnecting from the background would just
+                        // squat on it again without pinging — stay down;
+                        // ConnectionViewModel.onAppForegrounded restores the
+                        // session when the user returns.
+                        Log.d(TAG, "Dropped while backgrounded; reconnect deferred to foreground")
+                        crashlytics.log("BLE: dropped while backgrounded; reconnect deferred to foreground")
+                        _connectionState.value = ConnectionStatus.Disconnected
+                        forEachListener { it.onDisconnected() }
+                        return
+                    }
                     val quickDrop =
                         android.os.SystemClock.elapsedRealtime() - connectedAtMs < QUICK_DROP_WINDOW_MS
                     quickDropCount = if (quickDrop) quickDropCount + 1 else 0
@@ -397,6 +444,11 @@ class DashKitBleManager(private val context: Context) {
             connectedAtMs = android.os.SystemClock.elapsedRealtime()
             _connectionState.value = ConnectionStatus.Connected
             forEachListener { it.onServicesReady(g) }
+            // Ping immediately, not after one interval: the firmware only arms
+            // its keepalive drop once the first ping arrives, so a client that
+            // dies before pinging would never be evicted.
+            handler.removeCallbacks(pingRunnable)
+            handler.post(pingRunnable)
         }
 
         override fun onDescriptorWrite(g: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {

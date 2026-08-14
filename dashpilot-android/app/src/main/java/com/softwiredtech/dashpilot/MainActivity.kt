@@ -342,6 +342,11 @@ class MainActivity : ComponentActivity() {
         connectionVM.onAppForegrounded(this, hasBluetoothPermission())
     }
 
+    override fun onStop() {
+        super.onStop()
+        connectionVM.onAppBackgrounded()
+    }
+
     private fun hasBluetoothPermission(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) ==

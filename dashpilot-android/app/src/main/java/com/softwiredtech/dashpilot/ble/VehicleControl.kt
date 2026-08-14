@@ -71,6 +71,12 @@ object VehicleControl {
     // Restarts the ESP32 (esp_restart). Value is ignored by the firmware.
     const val CMD_REBOOT: Int = 0x44
 
+    // --- Keepalive ping ---
+    // Written every ~15 s while connected; once the firmware has seen a first
+    // ping it drops the link after 60 s of silence, so a wedged app can't hold
+    // DashKit's only connection slot. Value is ignored by the firmware.
+    const val CMD_PING: Int = 0x45
+
     /** Bind (or clear, with actionValue 0) an N-finger tap to a control action. */
     fun sendFingerAction(manager: DashKitBleManager, fingers: Int, actionValue: Int): Boolean =
         send(manager, CMD_MULTI_FINGER_ACTION, (fingers shl 8) or (actionValue and 0xFF))
@@ -96,6 +102,10 @@ object VehicleControl {
     /** Ask the DashKit to reboot (firmware calls esp_restart; value ignored). */
     fun sendReboot(manager: DashKitBleManager): Boolean =
         send(manager, CMD_REBOOT, 1)
+
+    /** Keepalive ping so the firmware knows this app is still alive. */
+    fun sendPing(manager: DashKitBleManager): Boolean =
+        send(manager, CMD_PING, 1)
 
     /**
      * Write a control command to the DashKit. Returns true if the write was

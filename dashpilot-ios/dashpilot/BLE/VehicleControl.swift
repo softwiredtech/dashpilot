@@ -57,6 +57,12 @@ enum VehicleControl {
     // Restarts the ESP32 (esp_restart). Value is ignored by the firmware.
     static let cmdReboot = 0x44
 
+    // --- Keepalive ping ---
+    // Written every ~15 s while connected; once the firmware has seen a first
+    // ping it drops the link after 60 s of silence, so a wedged app can't hold
+    // DashKit's only connection slot. Value is ignored by the firmware.
+    static let cmdPing = 0x45
+
     /// Bind (or clear, with actionValue 0) an N-finger tap to a control action.
     @discardableResult
     static func sendFingerAction(_ manager: DashKitBleManager, fingers: Int, actionValue: Int) -> Bool {
@@ -90,6 +96,12 @@ enum VehicleControl {
     @discardableResult
     static func sendReboot(_ manager: DashKitBleManager) -> Bool {
         send(manager, opcode: cmdReboot, value: 1)
+    }
+
+    /// Keepalive ping so the firmware knows this app is still alive.
+    @discardableResult
+    static func sendPing(_ manager: DashKitBleManager) -> Bool {
+        send(manager, opcode: cmdPing, value: 1)
     }
 
     /// Write a control command to the DashKit. Returns true if the write was
