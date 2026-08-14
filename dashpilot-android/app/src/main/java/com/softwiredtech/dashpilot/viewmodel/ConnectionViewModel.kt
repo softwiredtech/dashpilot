@@ -415,6 +415,10 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     }
 
     fun onAppForegrounded(context: Context, hasBlePermission: Boolean) {
+        // Restart the keepalive before the firmware's timeout evicts a
+        // surviving link.
+        _bleManager.value?.onAppForegrounded()
+
         // First onStart after a cold launch (or while the permission dialog is
         // up): startup discovery is still deciding the route — let it finish.
         if (_startupTarget.value.route == StartupRoute.LOADING) return
@@ -456,6 +460,10 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         startupDiscoveryStarted = false
         _startupTarget.value = StartupTarget(StartupRoute.LOADING, discoveryGeneration)
         runStartupDiscovery(context, hasBlePermission)
+    }
+
+    fun onAppBackgrounded() {
+        _bleManager.value?.onAppBackgrounded()
     }
 
     private fun reconnect(context: Context, type: String) {

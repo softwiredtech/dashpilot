@@ -1,6 +1,7 @@
 import Foundation
 import CoreBluetooth
 import Observation
+import UIKit
 
 /// Fan-out abstraction for GATT events, mirroring the Android `GattListener`.
 /// The data source, firmware-version reader and OTA updater each register one.
@@ -70,6 +71,10 @@ final class DashKitBleManager: NSObject {
     /// Matches PAIRING_WINDOW_S in the firmware.
     private static let pairingWindow: TimeInterval = 120
 
+    /// Keepalive interval; the firmware drops the link after 60 s without a
+    /// ping (KEEPALIVE_TIMEOUT_S), so this allows a few missed writes.
+    private static let pingInterval: TimeInterval = 15
+
     /// UI-facing state, mirrored from `state` on the main queue.
     private(set) var connectionState: ConnectionStatus = .disconnected
 
@@ -123,6 +128,36 @@ final class DashKitBleManager: NSObject {
     private var scanTimeoutTask: DispatchWorkItem?
     private var connectTimeoutTask: DispatchWorkItem?
     private var retryTask: DispatchWorkItem?
+    private var pingTask: DispatchWorkItem?
+
+    /// Keepalive foreground gate. Suspension alone stops pings too late (and
+    /// never under the debugger), so it's explicit. Accessed on `queue`.
+    private var appInForeground = true
+
+    override init() {
+        super.init()
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.didEnterBackgroundNotification,
+            object: nil, queue: .main
+        ) { [weak self] _ in
+            guard let self else { return }
+            self.queue.async {
+                self.appInForeground = false
+                self.pingTask?.cancel()
+                self.pingTask = nil
+            }
+        }
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.willEnterForegroundNotification,
+            object: nil, queue: .main
+        ) { [weak self] _ in
+            guard let self else { return }
+            self.queue.async {
+                self.appInForeground = true
+                if self.state == .connected { self.schedulePing() }
+            }
+        }
+    }
 
     func addGattListener(_ listener: DashKitGattListener) {
         listenersLock.lock()
@@ -210,9 +245,26 @@ final class DashKitBleManager: NSObject {
         scanTimeoutTask?.cancel()
         connectTimeoutTask?.cancel()
         retryTask?.cancel()
+        pingTask?.cancel()
         scanTimeoutTask = nil
         connectTimeoutTask = nil
         retryTask = nil
+        pingTask = nil
+    }
+
+    // Keepalive: pings now (the firmware only arms its timeout once the first
+    // ping arrives), then reschedules while .connected. The write hops off
+    // `queue` because VehicleControl.send uses queue.sync.
+    private func schedulePing() {
+        pingTask?.cancel()
+        DispatchQueue.global().async { [weak self] in
+            guard let self else { return }
+            VehicleControl.sendPing(self)
+        }
+        pingTask = schedule(after: Self.pingInterval) { [weak self] in
+            guard let self, self.state == .connected else { return }
+            self.schedulePing()
+        }
     }
 
     private func schedule(after delay: TimeInterval, _ block: @escaping () -> Void) -> DispatchWorkItem {
@@ -364,6 +416,15 @@ extension DashKitBleManager: CBCentralManagerDelegate {
             forEachListener { $0.onDisconnected() }
             return
         }
+        if !appInForeground {
+            // Likely our own keepalive eviction; reconnecting from the
+            // background would squat on the slot without pinging.
+            // Foregrounding restores the session.
+            print("[DashKitBleManager] dropped while backgrounded; reconnect deferred to foreground")
+            setState(.disconnected)
+            forEachListener { $0.onDisconnected() }
+            return
+        }
         let quickDrop = ProcessInfo.processInfo.systemUptime - connectedAt < Self.quickDropWindow
         quickDropCount = quickDrop ? quickDropCount + 1 : 0
         if quickDrop && quickDropCount >= Self.maxQuickDrops {
@@ -421,6 +482,7 @@ extension DashKitBleManager: CBPeripheralDelegate {
         connectedAt = ProcessInfo.processInfo.systemUptime
         setState(.connected)
         forEachListener { $0.onServicesReady(peripheral) }
+        schedulePing()
     }
 
     func peripheral(_ peripheral: CBPeripheral,
