@@ -147,10 +147,8 @@ class DashKitBleManager(private val context: Context) {
         }
     }
 
-    // Keepalive is foreground-only by design: a backgrounded app stops pinging
-    // so the firmware frees the connection slot after its timeout — the same
-    // thing iOS suspension does naturally. Unlike iOS, an Android process (and
-    // this handler) keeps running in the background, so the gate is explicit.
+    // Backgrounded apps deliberately stop pinging so the firmware frees the
+    // slot; the process keeps running, so the gate must be explicit.
     @Volatile
     private var appInForeground = true
 
@@ -364,12 +362,9 @@ class DashKitBleManager(private val context: Context) {
                         return
                     }
                     if (!appInForeground) {
-                        // We stopped pinging when the app left the foreground,
-                        // so this drop is (usually) the firmware freeing the
-                        // slot. Reconnecting from the background would just
-                        // squat on it again without pinging — stay down;
-                        // ConnectionViewModel.onAppForegrounded restores the
-                        // session when the user returns.
+                        // Likely our own keepalive eviction; reconnecting from
+                        // the background would squat on the slot without
+                        // pinging. Foregrounding restores the session.
                         Log.d(TAG, "Dropped while backgrounded; reconnect deferred to foreground")
                         crashlytics.log("BLE: dropped while backgrounded; reconnect deferred to foreground")
                         _connectionState.value = ConnectionStatus.Disconnected
@@ -444,9 +439,8 @@ class DashKitBleManager(private val context: Context) {
             connectedAtMs = android.os.SystemClock.elapsedRealtime()
             _connectionState.value = ConnectionStatus.Connected
             forEachListener { it.onServicesReady(g) }
-            // Ping immediately, not after one interval: the firmware only arms
-            // its keepalive drop once the first ping arrives, so a client that
-            // dies before pinging would never be evicted.
+            // Immediate first ping: the firmware only arms its timeout once
+            // one arrives.
             handler.removeCallbacks(pingRunnable)
             handler.post(pingRunnable)
         }

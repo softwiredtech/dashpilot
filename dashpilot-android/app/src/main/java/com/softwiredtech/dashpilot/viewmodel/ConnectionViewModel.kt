@@ -415,8 +415,8 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     }
 
     fun onAppForegrounded(context: Context, hasBlePermission: Boolean) {
-        // Resume the keepalive first: if the BLE link survived backgrounding,
-        // pings must restart before the firmware's timeout evicts us.
+        // Restart the keepalive before the firmware's timeout evicts a
+        // surviving link.
         _bleManager.value?.onAppForegrounded()
 
         // First onStart after a cold launch (or while the permission dialog is
@@ -463,8 +463,6 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     }
 
     fun onAppBackgrounded() {
-        // Stops the keepalive so the firmware frees the connection slot after
-        // its timeout; the manager also defers auto-reconnect until foreground.
         _bleManager.value?.onAppBackgrounded()
     }
 

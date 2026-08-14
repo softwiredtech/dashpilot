@@ -130,11 +130,8 @@ final class DashKitBleManager: NSObject {
     private var retryTask: DispatchWorkItem?
     private var pingTask: DispatchWorkItem?
 
-    /// Foreground gate for the keepalive, mirroring Android. iOS suspension
-    /// stops the ping timer anyway, but not *immediately* (the app gets a few
-    /// seconds of background runtime) and not at all under the Xcode debugger —
-    /// so stop pinging explicitly the moment the app backgrounds, and never
-    /// auto-reconnect from the background. Accessed on `queue`.
+    /// Keepalive foreground gate. Suspension alone stops pings too late (and
+    /// never under the debugger), so it's explicit. Accessed on `queue`.
     private var appInForeground = true
 
     override init() {
@@ -157,8 +154,6 @@ final class DashKitBleManager: NSObject {
             guard let self else { return }
             self.queue.async {
                 self.appInForeground = true
-                // Sends a ping right away — the link may be seconds from the
-                // firmware's keepalive timeout after a short backgrounding.
                 if self.state == .connected { self.schedulePing() }
             }
         }
@@ -257,11 +252,9 @@ final class DashKitBleManager: NSObject {
         pingTask = nil
     }
 
-    // Keepalive: sends one ping now, then reschedules itself while .connected.
-    // The write hops off `queue` because VehicleControl.send uses queue.sync.
-    // Pinging immediately (not after one interval) matters: the firmware only
-    // arms its keepalive drop once the first ping arrives, so an app that
-    // suspends before its first ping would never be evicted.
+    // Keepalive: pings now (the firmware only arms its timeout once the first
+    // ping arrives), then reschedules while .connected. The write hops off
+    // `queue` because VehicleControl.send uses queue.sync.
     private func schedulePing() {
         pingTask?.cancel()
         DispatchQueue.global().async { [weak self] in
@@ -424,10 +417,9 @@ extension DashKitBleManager: CBCentralManagerDelegate {
             return
         }
         if !appInForeground {
-            // We stopped pinging when the app backgrounded, so this drop is
-            // (usually) the firmware freeing the slot. Reconnecting from the
-            // background would squat on it again without pinging — stay down;
-            // ConnectionViewModel.onAppForegrounded restores the session.
+            // Likely our own keepalive eviction; reconnecting from the
+            // background would squat on the slot without pinging.
+            // Foregrounding restores the session.
             print("[DashKitBleManager] dropped while backgrounded; reconnect deferred to foreground")
             setState(.disconnected)
             forEachListener { $0.onDisconnected() }

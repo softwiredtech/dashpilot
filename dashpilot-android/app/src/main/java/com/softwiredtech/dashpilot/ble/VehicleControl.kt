@@ -72,9 +72,8 @@ object VehicleControl {
     const val CMD_REBOOT: Int = 0x44
 
     // --- Keepalive ping ---
-    // Written every ~15 s while connected; once the firmware has seen a first
-    // ping it drops the link after 60 s of silence, so a wedged app can't hold
-    // DashKit's only connection slot. Value is ignored by the firmware.
+    // Sent every ~15 s while connected and foregrounded; after the first ping
+    // the firmware drops the link after 60 s of silence. Value is ignored.
     const val CMD_PING: Int = 0x45
 
     /** Bind (or clear, with actionValue 0) an N-finger tap to a control action. */
