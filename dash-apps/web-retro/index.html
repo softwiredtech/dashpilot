@@ -806,6 +806,13 @@ function flushCarState() {
 }
 
 function receiveMessage(car) {
+  // iOS sends darkMode in the message payload; Android sets data-theme via onCarStateUpdate.
+  if (typeof car.darkMode === 'boolean') {
+    const nextTheme = car.darkMode ? 'dark' : 'light';
+    if (document.documentElement.getAttribute('data-theme') !== nextTheme) {
+      document.documentElement.setAttribute('data-theme', nextTheme);
+    }
+  }
   pendingCarState = car;
   if (renderFrame) return;
   renderFrame = window.requestAnimationFrame(flushCarState);

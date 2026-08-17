@@ -613,6 +613,14 @@
 
     function receiveMessage(car) {
       lastCar = car;
+      // iOS sends darkMode in the message payload; Android sets data-theme via onCarStateUpdate.
+      // Only write on change: the MutationObserver below fires on every setAttribute call.
+      if (typeof car.darkMode === "boolean") {
+        const nextTheme = car.darkMode ? "dark" : "light";
+        if (document.documentElement.getAttribute("data-theme") !== nextTheme) {
+          document.documentElement.setAttribute("data-theme", nextTheme);
+        }
+      }
       const themeKey = activeThemeKey();
       const theme = THEME_STYLES[themeKey];
       const speed = Math.max(0, Math.round(Number(car.egoSpeed) || 0));
