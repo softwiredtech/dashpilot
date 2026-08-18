@@ -72,16 +72,26 @@ struct HomeView: View {
     private var widgetGrid: some View {
         VStack(spacing: DashMetrics.gridGap) {
             HStack(spacing: DashMetrics.gridGap) {
-                InfoWidget(
-                    icon: "battery.100.bolt",
-                    label: "Battery",
-                    value: socText
-                )
-                InfoWidget(
-                    icon: "thermometer.medium",
-                    label: "Battery Temp",
-                    value: batteryTempText
-                )
+                Button {
+                    navigationPath.append(AppRoute.battery)
+                } label: {
+                    InfoWidget(
+                        icon: "battery.100.bolt",
+                        label: "Battery",
+                        value: socText
+                    )
+                }
+                .buttonStyle(.plain)
+                Button {
+                    navigationPath.append(AppRoute.battery)
+                } label: {
+                    InfoWidget(
+                        icon: "thermometer.medium",
+                        label: "Battery Temp",
+                        value: batteryTempText
+                    )
+                }
+                .buttonStyle(.plain)
             }
             HStack(spacing: DashMetrics.gridGap) {
                 InfoWidget(
