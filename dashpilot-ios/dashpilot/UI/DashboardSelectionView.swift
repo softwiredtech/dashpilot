@@ -58,22 +58,17 @@ private struct DashboardCard: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            if dashboard.type == .devRive {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(white: 0.16))
-                    .aspectRatio(16.0 / 9.0, contentMode: .fit)
-            } else if let name = dashboard.screenshotName, let _ = UIImage(named: name) {
-                Image(name)
-                    .resizable()
-                    .scaledToFill()
-                    .aspectRatio(16.0 / 9.0, contentMode: .fit)
-                    .clipped()
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-            } else {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color(white: 0.16))
-                    .aspectRatio(16.0 / 9.0, contentMode: .fit)
-            }
+            Color(white: 0.16)
+                .aspectRatio(16.0 / 9.0, contentMode: .fit)
+                .overlay {
+                    if dashboard.type != .devRive,
+                       let name = dashboard.screenshotName, UIImage(named: name) != nil {
+                        Image(name)
+                            .resizable()
+                            .scaledToFill()
+                    }
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 12))
 
             Spacer().frame(height: 10)
 

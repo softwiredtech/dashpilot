@@ -101,18 +101,16 @@ struct ThemePickerView: View {
         }
     }
 
-    @ViewBuilder
     private func thumbnail(for dashboard: DashboardConfig) -> some View {
-        if let name = dashboard.screenshotName, UIImage(named: name) != nil {
-            Image(name)
-                .resizable()
-                .scaledToFill()
-                .aspectRatio(16.0 / 9.0, contentMode: .fit)
-                .clipped()
-        } else {
-            Rectangle()
-                .fill(Color(white: 0.16))
-                .aspectRatio(16.0 / 9.0, contentMode: .fit)
-        }
+        Color(white: 0.16)
+            .aspectRatio(16.0 / 9.0, contentMode: .fit)
+            .overlay {
+                if let name = dashboard.screenshotName, UIImage(named: name) != nil {
+                    Image(name)
+                        .resizable()
+                        .scaledToFill()
+                }
+            }
+            .clipped()
     }
 }
