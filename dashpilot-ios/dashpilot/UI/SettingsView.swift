@@ -44,7 +44,7 @@ struct SettingsView: View {
     private var showDarkModeToggle: Bool { hasSetting(.darkMode) }
     private var showRenderQualityControl: Bool { hasSetting(.renderQuality) }
     private var showVisualizerSettings: Bool {
-        showRenderQualityControl || showAlwaysOnBlindSpotMonitorToggle || showDarkModeToggle
+        showRenderQualityControl || showAlwaysOnBlindSpotMonitorToggle
     }
     private var showPhoneBatteryToggle: Bool { hasSetting(.showPhoneBattery) }
     private var showUseImperialToggle: Bool { hasSetting(.useImperial) }
@@ -177,19 +177,17 @@ struct SettingsView: View {
         }
     }
 
-    @ViewBuilder
     private func dashboardThumbnail(for dashboard: DashboardConfig) -> some View {
-        if let name = dashboard.screenshotName, UIImage(named: name) != nil {
-            Image(name)
-                .resizable()
-                .scaledToFill()
-                .aspectRatio(16.0 / 9.0, contentMode: .fit)
-                .clipped()
-        } else {
-            Rectangle()
-                .fill(Color(white: 0.16))
-                .aspectRatio(16.0 / 9.0, contentMode: .fit)
-        }
+        Color(white: 0.16)
+            .aspectRatio(16.0 / 9.0, contentMode: .fit)
+            .overlay {
+                if let name = dashboard.screenshotName, UIImage(named: name) != nil {
+                    Image(name)
+                        .resizable()
+                        .scaledToFill()
+                }
+            }
+            .clipped()
     }
 
     // MARK: - Configuration Section
@@ -220,6 +218,9 @@ struct SettingsView: View {
             if showPhoneBatteryToggle {
                 SettingsToggleRow(label: "Show Phone Battery", isOn: $showPhoneBattery)
             }
+            if showDarkModeToggle {
+                SettingsToggleRow(label: "Dark Mode", isOn: $darkMode)
+            }
             Spacer().frame(height: 8)
         }
         .padding(.horizontal, 24)
@@ -232,9 +233,6 @@ struct SettingsView: View {
             sectionTitle("3D Visualizer")
             if showAlwaysOnBlindSpotMonitorToggle {
                 SettingsToggleRow(label: "Always On Blind-Spot Monitor", isOn: $alwaysOnBlindSpotMonitor)
-            }
-            if showDarkModeToggle {
-                SettingsToggleRow(label: "Dark Mode", isOn: $darkMode)
             }
             if showRenderQualityControl {
                 renderQualityRow
