@@ -41,6 +41,8 @@ struct dashpilotApp: App {
                             SettingsView()
                         case .themePicker:
                             ThemePickerView()
+                        case .battery:
+                            BatteryView()
                         case .automations:
                             AutomationsView()
                         case .controls:
