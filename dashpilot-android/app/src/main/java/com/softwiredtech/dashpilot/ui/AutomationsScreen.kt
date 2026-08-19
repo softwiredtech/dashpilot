@@ -1,5 +1,6 @@
 package com.softwiredtech.dashpilot.ui
 
+import android.widget.NumberPicker
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -16,10 +17,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AcUnit
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.WaterDrop
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -27,8 +30,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -41,6 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import com.softwiredtech.dashpilot.ui.controls.controlById
 import com.softwiredtech.dashpilot.ui.controls.vehicleControls
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
@@ -49,6 +55,9 @@ import com.softwiredtech.dashpilot.ui.theme.DarkColors
 // Finger counts that can be bound to an infotainment gesture (matches the
 // firmware's MULTI_FINGER_MIN/MAX_FINGERS).
 private val FINGER_COUNTS = 3..5
+
+// Minutes the keep-climate-on window can run (matches the firmware clamp).
+private val CLIMATE_KEEP_MINUTE_RANGE = 1..60
 
 /**
  * Automations screen. Lets the user enable the wiper-off automation and bind
@@ -61,6 +70,10 @@ private val FINGER_COUNTS = 3..5
 fun AutomationsScreen(
     wiperOffEnabled: Boolean,
     onWiperOffChange: (Boolean) -> Unit,
+    climateKeepEnabled: Boolean,
+    onClimateKeepChange: (Boolean) -> Unit,
+    climateKeepMinutes: Int,
+    onClimateKeepMinutesChange: (Int) -> Unit,
     fingerActions: Map<Int, String>,
     onSetFingerAction: (fingers: Int, id: String?) -> Unit,
     onChangeFingerCount: (from: Int, to: Int) -> Unit,
@@ -91,6 +104,26 @@ fun AutomationsScreen(
                 subtitle = "Keep wipers disabled automatically",
                 checked = wiperOffEnabled,
                 onToggle = { onWiperOffChange(!wiperOffEnabled) }
+            )
+
+            Spacer(modifier = Modifier.height(28.dp))
+
+            SectionLabel("Climate")
+            Spacer(modifier = Modifier.height(8.dp))
+            AutomationRow(
+                icon = Icons.Rounded.AcUnit,
+                title = "Keep climate on",
+                subtitle = "Keep the climate on when you leave the car. The automation stops after the set time, or when you return to the car.",
+                checked = climateKeepEnabled,
+                onToggle = { onClimateKeepChange(!climateKeepEnabled) },
+                extraContent = if (climateKeepEnabled) {
+                    {
+                        ClimateKeepDurationFooter(
+                            minutes = climateKeepMinutes,
+                            onMinutesChange = onClimateKeepMinutesChange
+                        )
+                    }
+                } else null
             )
 
             Spacer(modifier = Modifier.height(28.dp))
@@ -139,6 +172,74 @@ private fun SectionLabel(text: String) {
         fontWeight = FontWeight.SemiBold,
         modifier = Modifier.padding(start = 4.dp)
     )
+}
+
+@Composable
+private fun ClimateKeepDurationFooter(
+    minutes: Int,
+    onMinutesChange: (Int) -> Unit
+) {
+    var showPicker by remember { mutableStateOf(false) }
+
+    Spacer(modifier = Modifier.height(10.dp))
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Stop after",
+            color = DarkColors.TextMuted,
+            fontSize = 14.sp,
+            modifier = Modifier.weight(1f)
+        )
+        Row(
+            modifier = Modifier
+                .clip(RoundedCornerShape(10.dp))
+                .background(DarkColors.Background)
+                .clickable { showPicker = true }
+                .padding(start = 12.dp, end = 6.dp, top = 8.dp, bottom = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = "$minutes min", color = Color.White, fontSize = 15.sp)
+            Icon(
+                imageVector = Icons.Rounded.ArrowDropDown,
+                contentDescription = null,
+                tint = DarkColors.TextMuted,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+    }
+
+    if (showPicker) {
+        var pending by remember { mutableIntStateOf(minutes) }
+        AlertDialog(
+            onDismissRequest = { showPicker = false },
+            title = { Text("Stop after") },
+            text = {
+                AndroidView(
+                    factory = { ctx ->
+                        NumberPicker(ctx).apply {
+                            minValue = CLIMATE_KEEP_MINUTE_RANGE.first
+                            maxValue = CLIMATE_KEEP_MINUTE_RANGE.last
+                            wrapSelectorWheel = false
+                            value = minutes
+                            setOnValueChangedListener { _, _, value -> pending = value }
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showPicker = false
+                    onMinutesChange(pending)
+                }) { Text("OK") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showPicker = false }) { Text("Cancel") }
+            }
+        )
+    }
 }
 
 @Composable
@@ -265,58 +366,65 @@ private fun AutomationRow(
     title: String,
     subtitle: String?,
     checked: Boolean,
-    onToggle: () -> Unit
+    onToggle: () -> Unit,
+    extraContent: (@Composable () -> Unit)? = null
 ) {
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(DarkColors.Surface, RoundedCornerShape(16.dp))
-            .clickable(onClick = onToggle)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
-        Box(
+        Row(
             modifier = Modifier
-                .size(36.dp)
-                .background(
-                    if (checked) AccentColor.copy(alpha = 0.16f)
-                    else Color.White.copy(alpha = 0.08f),
-                    RoundedCornerShape(10.dp)
-                ),
-            contentAlignment = Alignment.Center
+                .fillMaxWidth()
+                .clickable(onClick = onToggle),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = if (checked) AccentColor else Color.White,
-                modifier = Modifier.size(20.dp)
-            )
-        }
-        Spacer(modifier = Modifier.size(12.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = title,
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold
-            )
-            if (subtitle != null) {
-                Text(
-                    text = subtitle,
-                    color = DarkColors.TextMuted,
-                    fontSize = 13.sp
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .background(
+                        if (checked) AccentColor.copy(alpha = 0.16f)
+                        else Color.White.copy(alpha = 0.08f),
+                        RoundedCornerShape(10.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = if (checked) AccentColor else Color.White,
+                    modifier = Modifier.size(20.dp)
                 )
             }
-        }
-        Switch(
-            checked = checked,
-            onCheckedChange = { onToggle() },
-            colors = SwitchDefaults.colors(
-                checkedThumbColor = Color.White,
-                checkedTrackColor = AccentColor,
-                uncheckedThumbColor = Color.White,
-                uncheckedTrackColor = DarkColors.Disabled
+            Spacer(modifier = Modifier.size(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+                if (subtitle != null) {
+                    Text(
+                        text = subtitle,
+                        color = DarkColors.TextMuted,
+                        fontSize = 13.sp
+                    )
+                }
+            }
+            Switch(
+                checked = checked,
+                onCheckedChange = { onToggle() },
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = Color.White,
+                    checkedTrackColor = AccentColor,
+                    uncheckedThumbColor = Color.White,
+                    uncheckedTrackColor = DarkColors.Disabled
+                )
             )
-        )
+        }
+        extraContent?.invoke()
     }
 }

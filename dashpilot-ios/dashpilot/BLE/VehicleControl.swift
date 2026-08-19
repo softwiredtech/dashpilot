@@ -62,6 +62,16 @@ enum VehicleControl {
     // the firmware drops the link after 60 s of silence. Value is ignored.
     static let cmdPing = 0x45
 
+    // --- Keep climate on after leaving the car (UI_hvacRequest 0x2F3) ---
+    // Arms/disarms the firmware's climate-keep automation. 1=enable,
+    // 0=disable. The firmware persists it in NVS (climate_keep module).
+    static let cmdClimateKeepEnable = 0x46
+
+    // --- Climate-keep duration ---
+    // Minutes the climate-keep automation runs after the driver leaves.
+    // The firmware clamps to 1..60 and persists it in NVS.
+    static let cmdClimateKeepDuration = 0x47
+
     /// Bind (or clear, with actionValue 0) an N-finger tap to a control action.
     @discardableResult
     static func sendFingerAction(_ manager: DashKitBleManager, fingers: Int, actionValue: Int) -> Bool {
@@ -101,6 +111,18 @@ enum VehicleControl {
     @discardableResult
     static func sendPing(_ manager: DashKitBleManager) -> Bool {
         send(manager, opcode: cmdPing, value: 1)
+    }
+
+    /// Enable or disable the firmware's keep-climate-on automation.
+    @discardableResult
+    static func sendClimateKeep(_ manager: DashKitBleManager, enabled: Bool) -> Bool {
+        send(manager, opcode: cmdClimateKeepEnable, value: enabled ? 1 : 0)
+    }
+
+    /// Set how many minutes the keep-climate-on automation runs.
+    @discardableResult
+    static func sendClimateKeepDuration(_ manager: DashKitBleManager, minutes: Int) -> Bool {
+        send(manager, opcode: cmdClimateKeepDuration, value: minutes)
     }
 
     /// Write a control command to the DashKit. Returns true if the write was

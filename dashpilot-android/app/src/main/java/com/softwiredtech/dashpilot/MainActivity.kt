@@ -159,6 +159,8 @@ class MainActivity : ComponentActivity() {
                 val connectionStatus by connectionVM.connectionStatus.collectAsState()
                 val pinnedControl by connectionVM.pinnedControl.collectAsState()
                 val wiperOffAutomation by connectionVM.wiperOffAutomation.collectAsState()
+                val climateKeepAutomation by connectionVM.climateKeepAutomation.collectAsState()
+                val climateKeepMinutes by connectionVM.climateKeepMinutes.collectAsState()
                 val fingerActions by connectionVM.fingerActions.collectAsState()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val onDashboard = navBackStackEntry?.destination?.route
@@ -281,6 +283,14 @@ class MainActivity : ComponentActivity() {
                                 wiperOffEnabled = wiperOffAutomation,
                                 onWiperOffChange = {
                                     connectionVM.updateWiperOffAutomation(context, it)
+                                },
+                                climateKeepEnabled = climateKeepAutomation,
+                                onClimateKeepChange = {
+                                    connectionVM.updateClimateKeepAutomation(context, it)
+                                },
+                                climateKeepMinutes = climateKeepMinutes,
+                                onClimateKeepMinutesChange = {
+                                    connectionVM.updateClimateKeepMinutes(context, it)
                                 },
                                 fingerActions = fingerActions,
                                 onSetFingerAction = { fingers, id ->

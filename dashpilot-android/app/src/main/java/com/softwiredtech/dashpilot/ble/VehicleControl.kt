@@ -76,6 +76,16 @@ object VehicleControl {
     // the firmware drops the link after 60 s of silence. Value is ignored.
     const val CMD_PING: Int = 0x45
 
+    // --- Keep climate on after leaving the car (UI_hvacRequest 0x2F3) ---
+    // Arms/disarms the firmware's climate-keep automation. 1=enable, 0=disable.
+    // The firmware persists it in NVS (climate_keep module).
+    const val CMD_CLIMATE_KEEP_ENABLE: Int = 0x46
+
+    // --- Climate-keep duration ---
+    // Minutes the climate-keep automation runs after the driver leaves.
+    // The firmware clamps to 1..60 and persists it in NVS.
+    const val CMD_CLIMATE_KEEP_DURATION: Int = 0x47
+
     /** Bind (or clear, with actionValue 0) an N-finger tap to a control action. */
     fun sendFingerAction(manager: DashKitBleManager, fingers: Int, actionValue: Int): Boolean =
         send(manager, CMD_MULTI_FINGER_ACTION, (fingers shl 8) or (actionValue and 0xFF))
@@ -83,6 +93,14 @@ object VehicleControl {
     /** Enable or disable the firmware's auto wiper-off automation. */
     fun sendWiperOff(manager: DashKitBleManager, enabled: Boolean): Boolean =
         send(manager, CMD_WIPER_OFF_ENABLE, if (enabled) 1 else 0)
+
+    /** Enable or disable the firmware's keep-climate-on automation. */
+    fun sendClimateKeep(manager: DashKitBleManager, enabled: Boolean): Boolean =
+        send(manager, CMD_CLIMATE_KEEP_ENABLE, if (enabled) 1 else 0)
+
+    /** Set how many minutes the keep-climate-on automation runs. */
+    fun sendClimateKeepDuration(manager: DashKitBleManager, minutes: Int): Boolean =
+        send(manager, CMD_CLIMATE_KEEP_DURATION, minutes)
 
     /** Ask the DashKit to open a pairing window for one new device. */
     fun sendEnterPairing(manager: DashKitBleManager): Boolean {
