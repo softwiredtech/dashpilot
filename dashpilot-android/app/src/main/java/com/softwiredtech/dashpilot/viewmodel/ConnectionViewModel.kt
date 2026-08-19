@@ -42,6 +42,11 @@ import com.softwiredtech.dashpilot.datamodel.dash.getFingerActions
 import com.softwiredtech.dashpilot.datamodel.dash.setFingerActions
 import com.softwiredtech.dashpilot.datamodel.dash.getWiperOffAutomation
 import com.softwiredtech.dashpilot.datamodel.dash.setWiperOffAutomation
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_CLIMATE_KEEP_MINUTES
+import com.softwiredtech.dashpilot.datamodel.dash.getClimateKeepAutomation
+import com.softwiredtech.dashpilot.datamodel.dash.setClimateKeepAutomation
+import com.softwiredtech.dashpilot.datamodel.dash.getClimateKeepMinutes
+import com.softwiredtech.dashpilot.datamodel.dash.setClimateKeepMinutes
 import com.softwiredtech.dashpilot.ui.controls.controlById
 import com.softwiredtech.dashpilot.datasource.DataSourceType
 import com.softwiredtech.dashpilot.datasource.CommaDataSource
@@ -105,11 +110,19 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     private val _wiperOffAutomation = MutableStateFlow(false)
     val wiperOffAutomation = _wiperOffAutomation.asStateFlow()
 
+    private val _climateKeepAutomation = MutableStateFlow(false)
+    val climateKeepAutomation = _climateKeepAutomation.asStateFlow()
+
+    private val _climateKeepMinutes = MutableStateFlow(DEFAULT_CLIMATE_KEEP_MINUTES)
+    val climateKeepMinutes = _climateKeepMinutes.asStateFlow()
+
     private val _fingerActions = MutableStateFlow<Map<Int, String>>(emptyMap())
     val fingerActions = _fingerActions.asStateFlow()
 
     fun loadAutomations(context: Context) {
         _wiperOffAutomation.value = getWiperOffAutomation(context)
+        _climateKeepAutomation.value = getClimateKeepAutomation(context)
+        _climateKeepMinutes.value = getClimateKeepMinutes(context)
         _fingerActions.value = getFingerActions(context)
     }
 
@@ -121,6 +134,25 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
 
     private fun pushWiperOff(enabled: Boolean) {
         _bleManager.value?.let { VehicleControl.sendWiperOff(it, enabled) }
+    }
+
+    fun updateClimateKeepAutomation(context: Context, value: Boolean) {
+        setClimateKeepAutomation(context, value)
+        _climateKeepAutomation.value = value
+        _bleManager.value?.let { VehicleControl.sendClimateKeep(it, value) }
+    }
+
+    private var climateKeepMinutesPush: Job? = null
+
+    fun updateClimateKeepMinutes(context: Context, value: Int) {
+        setClimateKeepMinutes(context, value)
+        _climateKeepMinutes.value = value
+        // Debounced: the wheel picker fires once per detent while spinning.
+        climateKeepMinutesPush?.cancel()
+        climateKeepMinutesPush = viewModelScope.launch {
+            delay(400)
+            _bleManager.value?.let { VehicleControl.sendClimateKeepDuration(it, value) }
+        }
     }
 
     fun setFingerAction(context: Context, fingers: Int, id: String?) {
@@ -379,6 +411,14 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
                 val wiperOff = getWiperOffAutomation(context)
                 _wiperOffAutomation.value = wiperOff
                 VehicleControl.sendWiperOff(mgr, wiperOff)
+
+                // Re-sync the climate-keep automation the same way.
+                val climateKeep = getClimateKeepAutomation(context)
+                _climateKeepAutomation.value = climateKeep
+                VehicleControl.sendClimateKeep(mgr, climateKeep)
+                val climateKeepMin = getClimateKeepMinutes(context)
+                _climateKeepMinutes.value = climateKeepMin
+                VehicleControl.sendClimateKeepDuration(mgr, climateKeepMin)
             }
         }
     }

@@ -159,6 +159,10 @@ final class ConnectionViewModel {
         }
         let wiperOff = UserDefaults.standard.bool(forKey: "wiper_off_automation")
         VehicleControl.sendWiperOff(manager, enabled: wiperOff)
+        let climateKeep = UserDefaults.standard.bool(forKey: "climate_keep_automation")
+        VehicleControl.sendClimateKeep(manager, enabled: climateKeep)
+        let climateKeepMinutes = UserDefaults.standard.integer(forKey: "climate_keep_minutes")
+        VehicleControl.sendClimateKeepDuration(manager, minutes: climateKeepMinutes > 0 ? climateKeepMinutes : 5)
     }
 
     // MARK: - Comma (WiFi)
