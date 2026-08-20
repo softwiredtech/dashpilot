@@ -5,6 +5,8 @@ import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import com.softwiredtech.dashpilot.datamodel.dash.CarState
 import kotlinx.coroutines.flow.Flow
@@ -29,7 +31,16 @@ class DashKitDataSource(
         private val CCCD_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
         // The firmware now applies CAN acceptance filtering in hardware (per-bus
         // MCP251xFD filters), so the app no longer pushes a BLE filter list.
+
+        // The app subscribes to two characteristics back-to-back when services
+        // become ready (this one and the Tesla status char). Android's GATT
+        // client allows only one operation in flight, so the second write can be
+        // refused while the first is still pending. Retry a few times.
+        private const val MAX_SUBSCRIBE_ATTEMPTS = 3
+        private const val SUBSCRIBE_RETRY_DELAY_MS = 250L
     }
+
+    private val handler = Handler(Looper.getMainLooper())
 
     private val _incoming = MutableSharedFlow<CarState>(replay = 1)
     @OptIn(FlowPreview::class)
@@ -58,18 +69,35 @@ class DashKitDataSource(
             return
         }
         gatt.setCharacteristicNotification(characteristic, true)
+        subscribeCan(gatt, characteristic, 0)
+    }
+
+    private fun subscribeCan(gatt: BluetoothGatt, characteristic: BluetoothGattCharacteristic, attempt: Int) {
         val descriptor = characteristic.getDescriptor(CCCD_UUID)
-        if (descriptor != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                gatt.writeDescriptor(descriptor, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
-            } else {
-                @Suppress("DEPRECATION")
-                descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                @Suppress("DEPRECATION")
-                gatt.writeDescriptor(descriptor)
-            }
+        if (descriptor == null) {
+            Log.e(TAG, "CAN CCCD (0x2902) not discovered")
+            return
         }
-        Log.d(TAG, "Subscribed to CAN notifications")
+        // API 33+ writeDescriptor() returns Int (0 = queued); older returns Boolean.
+        val queued = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            gatt.writeDescriptor(descriptor, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE) ==
+                BluetoothGatt.GATT_SUCCESS
+        } else {
+            @Suppress("DEPRECATION")
+            descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+            @Suppress("DEPRECATION")
+            gatt.writeDescriptor(descriptor)
+        }
+        if (!queued && attempt < MAX_SUBSCRIBE_ATTEMPTS) {
+            // Android allows one GATT op in flight, so this write can be refused
+            // while the app-channel status subscribe is pending; retry after it
+            // completes. Only fires when the subscription would otherwise drop.
+            Log.d(TAG, "CAN CCCD write not queued (attempt=$attempt); retrying")
+            handler.postDelayed(
+                { subscribeCan(gatt, characteristic, attempt + 1) },
+                SUBSCRIBE_RETRY_DELAY_MS
+            )
+        }
     }
 
     override fun onCharacteristicChanged(
