@@ -3,8 +3,6 @@ package com.softwiredtech.dashpilot.datasource
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
-import android.bluetooth.BluetoothGattDescriptor
-import android.os.Build
 import android.util.Log
 import com.softwiredtech.dashpilot.datamodel.dash.CarState
 import kotlinx.coroutines.flow.Flow
@@ -26,7 +24,6 @@ class DashKitDataSource(
         private const val TAG = "DashKitDataSource"
         private val SERVICE_UUID = UUID.fromString("CADA0000-CA00-B1E0-B0D6-C000AA0100A1")
         private val CHAR_UUID = UUID.fromString("CADA0001-CA00-B1E0-B0D6-C000AA0100A1")
-        private val CCCD_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
         // The firmware now applies CAN acceptance filtering in hardware (per-bus
         // MCP251xFD filters), so the app no longer pushes a BLE filter list.
     }
@@ -58,18 +55,7 @@ class DashKitDataSource(
             return
         }
         gatt.setCharacteristicNotification(characteristic, true)
-        val descriptor = characteristic.getDescriptor(CCCD_UUID)
-        if (descriptor != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                gatt.writeDescriptor(descriptor, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
-            } else {
-                @Suppress("DEPRECATION")
-                descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                @Suppress("DEPRECATION")
-                gatt.writeDescriptor(descriptor)
-            }
-        }
-        Log.d(TAG, "Subscribed to CAN notifications")
+        manager.subscribeWithRetry(gatt, characteristic, TAG, "CAN")
     }
 
     override fun onCharacteristicChanged(

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
-import android.os.Build
 import android.util.Log
 import com.softwiredtech.dashpilot.datasource.DashKitBleManager
 import com.softwiredtech.dashpilot.datasource.GattListener
@@ -58,18 +57,7 @@ class TeslaStatusSource(private val manager: DashKitBleManager) : GattListener {
         }
         statusChar = characteristic
         gatt.setCharacteristicNotification(characteristic, true)
-        val descriptor = characteristic.getDescriptor(TeslaClient.CCCD_UUID)
-        if (descriptor != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                gatt.writeDescriptor(descriptor, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
-            } else {
-                @Suppress("DEPRECATION")
-                descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                @Suppress("DEPRECATION")
-                gatt.writeDescriptor(descriptor)
-            }
-        }
-        Log.d(TAG, "Subscribed to Tesla status notifications")
+        manager.subscribeWithRetry(gatt, characteristic, TAG, "Status")
     }
 
     override fun onDescriptorWrite(
@@ -83,12 +71,8 @@ class TeslaStatusSource(private val manager: DashKitBleManager) : GattListener {
             status == BluetoothGatt.GATT_SUCCESS
         ) {
             val c = statusChar ?: return
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                gatt.readCharacteristic(c)
-            } else {
-                @Suppress("DEPRECATION")
-                gatt.readCharacteristic(c)
-            }
+            @Suppress("DEPRECATION")
+            gatt.readCharacteristic(c)
         }
     }
 
