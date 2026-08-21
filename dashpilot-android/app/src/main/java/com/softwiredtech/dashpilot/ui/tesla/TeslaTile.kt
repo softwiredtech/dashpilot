@@ -20,6 +20,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.softwiredtech.dashpilot.R
@@ -39,16 +41,17 @@ import com.softwiredtech.dashpilot.ui.theme.TeslaCyan
 @Composable
 fun TeslaTile(status: TeslaStatus, onEnroll: () -> Unit) {
     val tapEnabled = status.linkState == TeslaLinkState.Staged ||
-        status.linkState == TeslaLinkState.NeverEnrolled
+        status.linkState == TeslaLinkState.NeverEnrolled ||
+        status.linkState == TeslaLinkState.EnrollmentFault
 
     val text = when (status.linkState) {
         TeslaLinkState.NeverEnrolled -> stringResource(R.string.tesla_tile_key_not_set_up)
         TeslaLinkState.Staged -> stringResource(R.string.tesla_tile_staged)
         TeslaLinkState.EnrolledNotConnected -> stringResource(R.string.tesla_tile_not_connected)
         TeslaLinkState.EnrolledConnected -> teslaTileSummary(status)
-            .ifBlank { stringResource(R.string.tesla_tile_not_connected) }
+            .ifBlank { stringResource(R.string.tesla_tile_connected) }
         TeslaLinkState.PairingWindow -> stringResource(R.string.tesla_enroll_tap_title)
-        TeslaLinkState.EnrollmentFault -> stringResource(R.string.tesla_enroll_error_title)
+        TeslaLinkState.EnrollmentFault -> stringResource(R.string.tesla_tile_fault)
         else -> stringResource(R.string.tesla_tile_not_connected)
     }
 
@@ -81,15 +84,20 @@ fun TeslaTile(status: TeslaStatus, onEnroll: () -> Unit) {
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold,
         )
-        Spacer(Modifier.weight(1f))
+        Spacer(Modifier.width(12.dp))
+        // Status is right-justified toward the chevron (with breathing room) and
+        // single-line so the three statuses never word-wrap; ellipsizes if long.
         Text(
             text = text,
             color = DarkColors.TextMuted,
             fontSize = 14.sp,
-            modifier = Modifier.weight(2f),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            textAlign = TextAlign.End,
+            modifier = Modifier.weight(1f),
         )
         if (tapEnabled) {
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(16.dp))
             Text(text = "›", color = DarkColors.TextMuted, fontSize = 20.sp)
         }
     }

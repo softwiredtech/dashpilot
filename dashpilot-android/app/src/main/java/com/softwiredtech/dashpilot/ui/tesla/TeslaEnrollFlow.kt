@@ -70,7 +70,7 @@ fun TeslaEnrollFlow(
 
     Box(modifier = Modifier.fillMaxSize().background(OnboardingColors.BgBase).systemBarsPadding()) {
         when (status.linkState) {
-            TeslaLinkState.NeverEnrolled, TeslaLinkState.Unknown -> LookingStep()
+            TeslaLinkState.NeverEnrolled, TeslaLinkState.Unknown -> LookingStep(onClose = onClose)
             TeslaLinkState.Staged -> StartStep(onStart = { manager?.let { TeslaClient.sendStart(it) } })
             TeslaLinkState.PairingWindow -> TapCardStep(onCancel = { manager?.let { TeslaClient.sendCancel(it) } })
             TeslaLinkState.EnrollmentFault -> ErrorStep(
@@ -84,12 +84,23 @@ fun TeslaEnrollFlow(
 }
 
 @Composable
-private fun LookingStep() {
+private fun LookingStep(onClose: () -> Unit) {
     InlineScaffold(
         title = stringResource(R.string.tesla_enroll_title),
         subtitle = stringResource(R.string.tesla_enroll_looking),
-        hero = { DevicePuck(state = PairingState.Idle, accent = TeslaCyan) },
-        cta = { Spacer(Modifier.height(8.dp)) },
+        hero = { DevicePuck(state = PairingState.Searching, accent = TeslaCyan) },
+        extra = {
+            Text(
+                text = stringResource(R.string.tesla_enroll_looking_hint),
+                color = OnboardingColors.TextMuted,
+                fontSize = 13.sp,
+            )
+        },
+        cta = {
+            TextButton(onClick = onClose, modifier = Modifier.fillMaxWidth()) {
+                Text(stringResource(R.string.tesla_enroll_cancel), color = OnboardingColors.TextSecondary)
+            }
+        },
     )
 }
 
@@ -217,7 +228,9 @@ private fun RoleChip(text: String) {
     }
 }
 
-/** Builds the one-line Home-tile summary, e.g. "Present · Locked · Asleep". */
+/** Builds the one-line Home-tile summary, e.g. "Present · Unlocked · Awake". Always
+ * shows the presence/lock/sleep state so the driver can see live values — including
+ * the "negative" states (not present / unlocked / awake); unknown (0xFF) is omitted. */
 @Composable
 fun teslaTileSummary(status: TeslaStatus): String {
     if (status.linkState != TeslaLinkState.EnrolledConnected &&
@@ -226,9 +239,27 @@ fun teslaTileSummary(status: TeslaStatus): String {
         return ""
     }
     val parts = buildList {
-        if (status.presence == 1) add(stringResource(R.string.tesla_status_present))
-        if (status.lock == 1) add(stringResource(R.string.tesla_status_locked))
-        if (status.sleep == 1) add(stringResource(R.string.tesla_status_asleep))
-    }
+        add(
+            when (status.presence) {
+                1 -> stringResource(R.string.tesla_status_present)
+                0 -> stringResource(R.string.tesla_status_not_present)
+                else -> null
+            }
+        )
+        add(
+            when (status.lock) {
+                1 -> stringResource(R.string.tesla_status_locked)
+                0 -> stringResource(R.string.tesla_status_unlocked)
+                else -> null
+            }
+        )
+        add(
+            when (status.sleep) {
+                1 -> stringResource(R.string.tesla_status_asleep)
+                0 -> stringResource(R.string.tesla_status_awake)
+                else -> null
+            }
+        )
+    }.filterNotNull()
     return parts.joinToString(" · ")
 }

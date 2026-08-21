@@ -719,36 +719,33 @@ private fun TeslaKeySection(
     val showResetDialog = remember { mutableStateOf(false) }
 
     SectionHeader(stringResource(R.string.settings_section_tesla_key))
+    Text(
+        text = stringResource(R.string.settings_tesla_key_caption),
+        color = DarkColors.TextMuted,
+        fontSize = 12.sp,
+    )
     Spacer(modifier = Modifier.height(12.dp))
     InfoRow(label = stringResource(R.string.settings_tesla_key_status), value = teslaStatusText(status))
     Spacer(modifier = Modifier.height(12.dp))
 
+    // Contextual action: show "Connect" when no connection exists, "Remove" only
+    // once connected (removal erases the link, so it must not persist after).
+    val hasKey = status.linkState.hasKey
     Button(
-        onClick = onEnrollTesla,
+        onClick = if (hasKey) ({ showResetDialog.value = true }) else onEnrollTesla,
         enabled = connected,
         modifier = Modifier.fillMaxWidth(),
         colors = ButtonDefaults.buttonColors(
-            containerColor = AccentColor,
+            containerColor = if (hasKey) DarkColors.SurfaceSelected else AccentColor,
             contentColor = Color.White,
             disabledContainerColor = DarkColors.Border,
             disabledContentColor = DarkColors.TextMuted
         )
     ) {
-        Text(text = stringResource(R.string.settings_tesla_enroll), fontSize = 16.sp)
-    }
-    Spacer(modifier = Modifier.height(12.dp))
-    Button(
-        onClick = { showResetDialog.value = true },
-        enabled = connected,
-        modifier = Modifier.fillMaxWidth(),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = DarkColors.SurfaceSelected,
-            contentColor = Color.White,
-            disabledContainerColor = DarkColors.Border,
-            disabledContentColor = DarkColors.TextMuted
+        Text(
+            text = stringResource(if (hasKey) R.string.settings_tesla_reset else R.string.settings_tesla_enroll),
+            fontSize = 16.sp
         )
-    ) {
-        Text(text = stringResource(R.string.settings_tesla_reset), fontSize = 16.sp)
     }
 
     if (showResetDialog.value) {
@@ -785,9 +782,9 @@ private fun teslaStatusText(status: TeslaStatus): String = when (status.linkStat
     TeslaLinkState.Staged -> stringResource(R.string.tesla_tile_staged)
     TeslaLinkState.EnrolledNotConnected -> stringResource(R.string.tesla_tile_not_connected)
     TeslaLinkState.EnrolledConnected -> teslaTileSummary(status)
-        .ifBlank { stringResource(R.string.tesla_tile_not_connected) }
-    TeslaLinkState.PairingWindow -> stringResource(R.string.tesla_enroll_tap_title)
-    TeslaLinkState.EnrollmentFault -> stringResource(R.string.tesla_enroll_error_title)
+        .ifBlank { stringResource(R.string.tesla_tile_connected) }
+    TeslaLinkState.PairingWindow -> stringResource(R.string.tesla_status_pairing)
+    TeslaLinkState.EnrollmentFault -> stringResource(R.string.tesla_status_fault)
     TeslaLinkState.Unknown -> "—"
 }
 
