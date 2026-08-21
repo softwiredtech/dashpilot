@@ -33,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -42,6 +43,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.softwiredtech.dashpilot.ble.TeslaStatus
 import com.softwiredtech.dashpilot.datamodel.dash.CarState
 import com.softwiredtech.dashpilot.datamodel.dash.DashState
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
@@ -49,9 +51,12 @@ import com.softwiredtech.dashpilot.datasource.DashKitBleManager
 import com.softwiredtech.dashpilot.datasource.DataSourceType
 import com.softwiredtech.dashpilot.ui.controls.ControlActionButton
 import com.softwiredtech.dashpilot.ui.controls.controlById
+import com.softwiredtech.dashpilot.ui.tesla.TeslaTile
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
 import com.softwiredtech.dashpilot.ui.theme.DarkColors
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlin.math.roundToInt
 
@@ -66,6 +71,8 @@ fun HomeScreen(
     bleManager: DashKitBleManager?,
     dashState: Flow<DashState>?,
     pinnedControlId: String?,
+    teslaStatus: StateFlow<TeslaStatus>?,
+    onEnrollTesla: () -> Unit,
     onConnect: (serverAddress: String, dataSourceType: String) -> Unit,
     onDisconnect: () -> Unit,
     onNext: () -> Unit,
@@ -87,6 +94,8 @@ fun HomeScreen(
                 bleManager = bleManager,
                 connectionStatus = connectionStatus,
                 pinnedControlId = pinnedControlId,
+                teslaStatus = teslaStatus,
+                onEnrollTesla = onEnrollTesla,
                 onConnect = onConnect,
                 onDisconnect = onDisconnect,
                 onSelectDataSource = { selectedDataSource = it },
@@ -115,6 +124,8 @@ private fun ConnectedHomeContent(
     bleManager: DashKitBleManager?,
     connectionStatus: ConnectionStatus,
     pinnedControlId: String?,
+    teslaStatus: StateFlow<TeslaStatus>?,
+    onEnrollTesla: () -> Unit,
     onConnect: (serverAddress: String, dataSourceType: String) -> Unit,
     onDisconnect: () -> Unit,
     onSelectDataSource: (String) -> Unit,
@@ -127,6 +138,8 @@ private fun ConnectedHomeContent(
     val state by (dashState ?: flowOf(fallback)).collectAsState(initial = fallback)
     val car = state.carState
     val useImperial = state.displaySettings.useImperial
+    val idleTesla = remember { MutableStateFlow(TeslaStatus.Idle) }
+    val tesla by (teslaStatus ?: idleTesla).collectAsState()
 
     Column(
         modifier = Modifier
@@ -198,6 +211,8 @@ private fun ConnectedHomeContent(
         }
 
         Spacer(modifier = Modifier.height(32.dp))
+
+        TeslaTile(status = tesla, onEnroll = onEnrollTesla)
 
         controlById(pinnedControlId)?.let { action ->
             Text(

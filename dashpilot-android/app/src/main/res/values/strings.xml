@@ -112,4 +112,51 @@
     <string name="onboarding_tips_row_firmware">Check for firmware updates</string>
 
     <string name="settings_replay_onboarding">Replay onboarding</string>
+
+    <!-- ================= Tesla key (Phase 4) ================= -->
+    <string name="tesla_label">Tesla</string>
+    <!-- Home tile -->
+    <string name="tesla_tile_key_not_set_up">Key not set up</string>
+    <string name="tesla_tile_staged">Car found — Start enrollment?</string>
+    <string name="tesla_tile_not_connected">Not connected</string>
+    <string name="tesla_status_present">Present</string>
+    <string name="tesla_status_locked">Locked</string>
+    <string name="tesla_status_asleep">Asleep</string>
+
+    <!-- Enroll flow -->
+    <string name="tesla_enroll_title">Enroll Tesla key</string>
+    <string name="tesla_enroll_explain_body">DashKit adds itself to your Tesla as a Charging Manager — it can read status and control charging, but can\'t unlock or drive the car.</string>
+    <string name="tesla_enroll_role_chip">Charging Manager · Read + charge</string>
+    <string name="tesla_enroll_start">Start enrollment</string>
+    <string name="tesla_enroll_need_card">You\'ll need your Tesla key card.</string>
+    <string name="tesla_enroll_looking">Looking for DashKit / car…</string>
+    <string name="tesla_enroll_tap_title">Tap your key card</string>
+    <string name="tesla_enroll_tap_body">Place your key card on the center console.</string>
+    <string name="tesla_enroll_tap_hint">Tap window: %1$d s · The approval prompt appears only after you tap.</string>
+    <string name="tesla_enroll_success_title">Enrolled</string>
+    <string name="tesla_enroll_success_body">DashKit is now a Charging Manager on your Tesla.</string>
+    <string name="tesla_enroll_success_role">Read + charge enabled</string>
+    <string name="tesla_enroll_done">Done</string>
+    <string name="tesla_enroll_error_title">Enrollment didn\'t finish</string>
+    <string name="tesla_enroll_retry">Try again</string>
+    <string name="tesla_enroll_cancel">Cancel</string>
+    <string name="tesla_fault_tap_timeout">The tap window expired. Try again.</string>
+    <string name="tesla_fault_rejected">The car rejected the enrollment. Make sure it\'s the right car.</string>
+    <string name="tesla_fault_protocol">A protocol error occurred. Try again.</string>
+    <string name="tesla_fault_persist">DashKit couldn\'t save the key. Try again.</string>
+    <string name="tesla_fault_link">The link to DashKit was lost. Reconnect and try again.</string>
+    <string name="tesla_fault_generic">Enrollment didn\'t finish. Try again.</string>
+
+    <!-- Settings: Tesla key section -->
+    <string name="settings_section_tesla_key">Tesla key</string>
+    <string name="settings_tesla_key_status">Status</string>
+    <string name="settings_tesla_enroll">Enroll Tesla key</string>
+    <string name="settings_tesla_reset">Reset Tesla key</string>
+    <string name="settings_tesla_reset_dialog_title">Reset Tesla key?</string>
+    <string name="settings_tesla_reset_dialog_body">Erase DashKit\'s Tesla key. You\'ll need your key card to re-enroll.</string>
+    <string name="settings_tesla_reset_dialog_confirm">Reset</string>
+    <string name="settings_tesla_reset_dialog_cancel">Cancel</string>
+    <string name="settings_tesla_reset_sent">DashKit\'s Tesla key was erased. It will re-enroll when you start from the app.</string>
+    <string name="settings_tesla_reset_failed">Could not send reset command.</string>
+    <string name="settings_pair_caption">Pairs another phone to DashKit — unrelated to your Tesla key.</string>
 </resources>

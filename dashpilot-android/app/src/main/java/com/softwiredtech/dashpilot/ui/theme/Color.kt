@@ -12,6 +12,10 @@ val Pink40 = Color(0xFF7D5260)
 
 val AccentColor = Color(0xFF5CBD68)
 
+// Phase 4 Tesla pair/status cyan (pairing window + staged tile). The in-app motif
+// for a state the physical DashKit LED (buried in the car trim) can't show.
+val TeslaCyan = Color(0xFF4FD1FF)
+
 object DarkColors {
     val Background = Color(0xFF0D0D0D)
     val Surface = Color(0xFF1A1A1A)
