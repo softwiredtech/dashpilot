@@ -52,6 +52,7 @@ import com.softwiredtech.dashpilot.datasource.DataSourceType
 import com.softwiredtech.dashpilot.ui.controls.ControlActionButton
 import com.softwiredtech.dashpilot.ui.controls.controlById
 import com.softwiredtech.dashpilot.ui.tesla.TeslaTile
+import com.softwiredtech.dashpilot.ui.tesla.rememberTeslaCarsDetected
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
 import com.softwiredtech.dashpilot.ui.theme.DarkColors
 import kotlinx.coroutines.flow.Flow
@@ -212,7 +213,8 @@ private fun ConnectedHomeContent(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        TeslaTile(status = tesla, onEnroll = onEnrollTesla)
+        val carsDetected = rememberTeslaCarsDetected(teslaStatus)
+        TeslaTile(status = tesla, onEnroll = onEnrollTesla, carsDetected = carsDetected)
 
         controlById(pinnedControlId)?.let { action ->
             Text(

@@ -70,6 +70,7 @@ import com.softwiredtech.dashpilot.ble.TeslaClient
 import com.softwiredtech.dashpilot.ble.TeslaLinkState
 import com.softwiredtech.dashpilot.ble.TeslaStatus
 import com.softwiredtech.dashpilot.ble.VehicleControl
+import com.softwiredtech.dashpilot.ui.tesla.rememberTeslaCarsDetected
 import com.softwiredtech.dashpilot.ui.tesla.teslaTileSummary
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -716,6 +717,7 @@ private fun TeslaKeySection(
     val connected = connectionState == ConnectionStatus.Connected
     val idleTesla = remember { MutableStateFlow(TeslaStatus.Idle) }
     val status by (teslaStatus ?: idleTesla).collectAsState()
+    val carsDetected = rememberTeslaCarsDetected(teslaStatus)
     val showResetDialog = remember { mutableStateOf(false) }
 
     SectionHeader(stringResource(R.string.settings_section_tesla_key))
@@ -725,7 +727,12 @@ private fun TeslaKeySection(
         fontSize = 12.sp,
     )
     Spacer(modifier = Modifier.height(12.dp))
-    InfoRow(label = stringResource(R.string.settings_tesla_key_status), value = teslaStatusText(status))
+    val statusLabel = if (status.linkState == TeslaLinkState.NeverEnrolled && carsDetected) {
+        stringResource(R.string.tesla_tile_car_found)
+    } else {
+        teslaStatusText(status)
+    }
+    InfoRow(label = stringResource(R.string.settings_tesla_key_status), value = statusLabel)
     Spacer(modifier = Modifier.height(12.dp))
 
     // Contextual action: show "Connect" when no connection exists, "Remove" only
@@ -780,6 +787,7 @@ private fun TeslaKeySection(
 private fun teslaStatusText(status: TeslaStatus): String = when (status.linkState) {
     TeslaLinkState.NeverEnrolled -> stringResource(R.string.tesla_tile_key_not_set_up)
     TeslaLinkState.Staged -> stringResource(R.string.tesla_tile_staged)
+    TeslaLinkState.Connecting -> stringResource(R.string.tesla_enroll_connecting_body)
     TeslaLinkState.EnrolledNotConnected -> stringResource(R.string.tesla_tile_not_connected)
     TeslaLinkState.EnrolledConnected -> teslaTileSummary(status)
         .ifBlank { stringResource(R.string.tesla_tile_connected) }

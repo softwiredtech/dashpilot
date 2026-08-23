@@ -51,6 +51,11 @@ class TeslaStatusTest {
     }
 
     @Test
+    fun `parse rejects unsupported frame versions`() {
+        assertNull(TeslaStatus.parse(byteArrayOf(0x02, 0x02, 0x01, 0x01, 0x01, 0x00, 0xFF.toByte())))
+    }
+
+    @Test
     fun `link state unknown for out of range byte`() {
         val frame = byteArrayOf(0x01, 0x7F, 0xFF.toByte(), 0xFF.toByte(), 0xFF.toByte(), 0x00, 0xFF.toByte())
         val st = TeslaStatus.parse(frame)!!

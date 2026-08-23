@@ -14,6 +14,7 @@ enum class TeslaLinkState(val raw: Int) {
     PairingWindow(0x03),
     EnrollmentFault(0x04),
     Staged(0x05),        // car found, awaiting app start
+    Connecting(0x06),    // app start accepted; contacting the car (pre-tap window)
     Unknown(0xFF);
 
     val hasKey: Boolean
@@ -32,7 +33,6 @@ enum class TeslaFaultDetail(val raw: Int) {
     Rejected(0x01),
     Protocol(0x02),
     Persist(0x03),
-    Link(0x04),
     None(0xFF);
 
     companion object {
@@ -66,6 +66,7 @@ data class TeslaStatus(
         fun parse(payload: ByteArray): TeslaStatus? {
             if (payload.size < 7) return null
             val b = { i: Int -> payload[i].toInt() and 0xFF }
+            if (b(0) != 0x01) return null
             return TeslaStatus(
                 version = b(0),
                 linkState = TeslaLinkState.from(b(1)),

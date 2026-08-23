@@ -117,6 +117,7 @@
     <string name="tesla_label">Tesla</string>
     <!-- Home tile -->
     <string name="tesla_tile_key_not_set_up">Not connected</string>
+    <string name="tesla_tile_car_found">Car seen nearby — tap to connect</string>
     <string name="tesla_tile_staged">Car found — Connect</string>
     <string name="tesla_tile_not_connected">Car not connected</string>
     <string name="tesla_tile_fault">Connection failed — tap to retry</string>
@@ -131,16 +132,33 @@
     <string name="tesla_status_fault">Connection failed</string>
 
     <!-- Enroll flow -->
-    <string name="tesla_enroll_title">Connect to your Tesla</string>
+    <string name="tesla_enroll_title">Connect your Tesla</string>
     <string name="tesla_enroll_explain_body">DashKit adds itself to your Tesla as a Charging Manager — it can read status and control charging, but can\'t unlock or drive the car.</string>
     <string name="tesla_enroll_role_chip">Charging Manager · Read + charge</string>
     <string name="tesla_enroll_start">Connect</string>
     <string name="tesla_enroll_need_card">Have your key card ready.</string>
-    <string name="tesla_enroll_looking">Looking for your Tesla…</string>
-    <string name="tesla_enroll_looking_hint">Keep your phone near the car.</string>
+    <string name="tesla_enroll_connecting_body">Contacting your car… DashKit is reaching out to pair.</string>
+    <string name="tesla_enroll_connecting_hint">Keep your phone and DashKit nearby.</string>
+    <string name="tesla_enroll_vin_help">Enter your VIN to find your car.</string>
+    <string name="tesla_enroll_vin_label">VIN</string>
+    <string name="tesla_enroll_vin_invalid">Enter a valid Tesla VIN.</string>
+    <string name="tesla_enroll_scanning">Searching for your car…</string>
+    <string name="tesla_enroll_found">Car found — connecting to DashKit…</string>
+    <string name="tesla_enroll_provision_failed">DashKit didn\'t confirm the car. Check the connection and try again.</string>
+    <string name="tesla_enroll_cars_found">Nearby</string>
+    <string name="tesla_enroll_car_unknown">Nearby Tesla</string>
+    <string name="tesla_enroll_vin_decoded">VIN decodes to: %1$s</string>
+    <string name="tesla_enroll_vin_tail">VIN ····%1$s</string>
+    <string name="tesla_enroll_match_check">MATCH ✓</string>
+    <string name="tesla_enroll_tail_matches">VIN tail matches ✓</string>
+    <string name="tesla_enroll_check_digit_warning">This VIN fails its ISO 3779 check digit — double-check every character.</string>
+    <string name="tesla_enroll_stage_cta">Stage this car</string>
+    <string name="tesla_enroll_stage_anyway">Stage this car anyway</string>
+    <string name="tesla_enroll_scan_failed">Couldn\'t start Bluetooth scanning. Check Bluetooth is on and permissions are granted.</string>
     <string name="tesla_enroll_tap_title">Tap your key card</string>
     <string name="tesla_enroll_tap_body">Place your key card on the center console, then approve on the car\'s touchscreen.</string>
     <string name="tesla_enroll_tap_hint">%1$d s left</string>
+    <string name="tesla_enroll_tap_ready">Car ready — tap your key card now (%1$d s)</string>
     <string name="tesla_enroll_success_title">Connected</string>
     <string name="tesla_enroll_success_body">DashKit is now a Charging Manager on your Tesla.</string>
     <string name="tesla_enroll_success_role">Read + charge enabled</string>
@@ -152,7 +170,6 @@
     <string name="tesla_fault_rejected">The car rejected the connection. Check you\'re near the right car and using its key card.</string>
     <string name="tesla_fault_protocol">DashKit couldn\'t talk to the car. Try again.</string>
     <string name="tesla_fault_persist">DashKit couldn\'t save the connection. Try again.</string>
-    <string name="tesla_fault_link">The link to DashKit was lost. Reconnect and try again.</string>
     <string name="tesla_fault_generic">Something went wrong. Try again.</string>
 
     <!-- Settings: Tesla Connection section -->
