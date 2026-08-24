@@ -542,6 +542,7 @@
     const ambientLayer = document.getElementById("ambientLayer");
 
     function mapAssist(car) {
+      if (car.dataSourceType !== "comma") return "off";
       if (car.adasOn) return "full";
       if (car.madsActive) return "mads";
       return "off";
@@ -729,6 +730,7 @@
         gear: readNative("getGear", 0),
         adasOn: readNative("isAdasOn", false),
         madsActive: readNative("isMadsActive", false),
+        dataSourceType: readNative("getDataSourceType", ""),
         leftBlindSpot: readNative("getLeftBlindSpot", 0),
         rightBlindSpot: readNative("getRightBlindSpot", 0),
         laneDepartureWarning: readNative("getLaneDepartureWarning", 0),

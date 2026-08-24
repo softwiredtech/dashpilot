@@ -21,6 +21,7 @@ const buildScenario = () => Array.from({ length: TOTAL_FRAMES }, (_, i) => {
     egoSpeed: 60 * (1 - Math.cos(2 * Math.PI * t / 13)),
     leftBlinker: t % 4 < 1 ? 1 : 0, rightBlinker: (t + 2) % 4 < 1 ? 1 : 0,
     gear: 4, adasOn: t >= 4 ? 1 : 0, madsActive: t >= 5 && t < 10 ? 1 : 0,
+    dataSourceType: "comma",
     leftBlindSpot: t % 5 < 1 ? 1 : 0, rightBlindSpot: (t + 2.5) % 5 < 1 ? 1 : 0,
     accSetSpeed: t >= 4 ? (Math.floor((t - 4) / 3) % 2 === 0 ? 90 : 110) : 0,
     fusedSpeedLimit: t < 8 ? 50 : 100, useImperial: 0, darkMode: 1,

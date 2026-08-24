@@ -446,6 +446,10 @@ body.portrait-layout .right-zone {
   gap: calc(12 * var(--u));
 }
 
+.mode-strip-inner.hidden {
+  visibility: hidden;
+}
+
 .mode-text {
   min-width: calc(48 * var(--u));
   font-size: calc(17 * var(--u));
@@ -635,6 +639,7 @@ const UI = {
   iconLim: document.getElementById('icon-lim'),
   modeMads: document.getElementById('mode-mads'),
   modeFull: document.getElementById('mode-full'),
+  modeStripInner: document.querySelector('.mode-strip-inner'),
   stage: document.getElementById('stage'),
   bs: {},
 };
@@ -751,8 +756,9 @@ function renderCarState(car) {
   const limit   = Math.max(0, Math.round(Number(car.fusedSpeedLimit)|| 0));
   const gear    = GEAR_MAP[Math.round(Number(car.gear) || 0)] || GEAR_FALLBACK;
   const isDrive = gear === 'D';
-  const adasOn  = !!car.adasOn;
-  const mads    = !!car.madsActive;
+  const showSunnypilotModes = car.dataSourceType === 'comma';
+  const adasOn  = showSunnypilotModes && !!car.adasOn;
+  const mads    = showSunnypilotModes && !!car.madsActive;
   const imp     = !!car.isImperial;
 
   const leftBlind   = (Number(car.leftBlindSpot)  || 0) > 0;
@@ -776,6 +782,7 @@ function renderCarState(car) {
 
   // Mode strip + set speed — show state below, keep right display numeric only
   setModeState(adasOn ? 'full' : (mads ? 'mads' : ''));
+  UI.modeStripInner.classList.toggle('hidden', !showSunnypilotModes);
   fillDisp14(UI.setDisp, adasOn && setSpd > 0 ? formatDisplayValue(setSpd) : BLANK_DISPLAY, 'md');
 
   // Speed limit
@@ -837,6 +844,7 @@ window.onCarStateUpdate = function() {
     gear:                readNative('getGear',                4),
     adasOn:              readNative('isAdasOn',               false),
     madsActive:          readNative('isMadsActive',           false),
+    dataSourceType:      readNative('getDataSourceType',      ''),
     leftBlindSpot:       readNative('getLeftBlindSpot',       0),
     rightBlindSpot:      readNative('getRightBlindSpot',      0),
     accSetSpeed:         readNative('getAccSetSpeed',         0),

@@ -37,6 +37,7 @@
   }
 
   function normalizeModeState(raw) {
+    if (raw?.dataSourceType !== "comma") return "off";
     const direct = String(raw?.state || raw?.mode || "").toLowerCase();
     if (direct === "off" || direct === "mads" || direct === "full") return direct;
     if (raw?.fullAdas || raw?.adasEnabled || raw?.adasOn) return "full";
