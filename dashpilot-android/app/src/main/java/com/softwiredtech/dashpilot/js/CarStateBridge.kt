@@ -45,6 +45,7 @@ class CarStateBridge {
     @Volatile private var darkModeBackgroundGray: Int = 0
     @Volatile private var changingLane: Boolean = false
     @Volatile private var speedCameraDistance: Int = -1
+    @Volatile private var dataSourceType: String = ""
 
     fun update(state: CarState) {
         egoSteeringAngle = state.egoSteeringAngle
@@ -120,6 +121,12 @@ class CarStateBridge {
     fun updateSpeedCameraDistance(distanceMeters: Int) {
         speedCameraDistance = distanceMeters
     }
+
+    fun updateDataSourceType(type: String) {
+        dataSourceType = type
+    }
+
+    @JavascriptInterface fun getDataSourceType(): String = dataSourceType
 
     fun updatePhoneBattery(level: Int) {
         phoneBattery = level
