@@ -275,7 +275,8 @@ final class ConnectionViewModel {
                     carState: converted,
                     displaySettings: settings,
                     phoneBattery: batteryLevel >= 0 ? Int(batteryLevel * 100) : -1,
-                    currentTime: Int64(Date().timeIntervalSince1970 * 1000)
+                    currentTime: Int64(Date().timeIntervalSince1970 * 1000),
+                    dataSourceType: self.activeSourceType
                 )
                 self.latestDashState = state
                 for continuation in self.dashSubscribers.values {

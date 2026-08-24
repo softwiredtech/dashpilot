@@ -5,4 +5,5 @@ struct DashState {
     var displaySettings: DisplaySettingsState = DisplaySettingsState()
     var phoneBattery: Int = -1
     var currentTime: Int64 = 0
+    var dataSourceType: DataSourceType? = nil
 }
