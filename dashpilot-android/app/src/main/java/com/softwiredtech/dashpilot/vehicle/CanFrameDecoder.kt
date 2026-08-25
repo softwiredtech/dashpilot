@@ -18,6 +18,13 @@ class CanFrameDecoder(
         return arrayToCarState(values)
     }
 
+    // VIN assembled natively during decodeFrame; null until complete.
+    fun getVin(): String? = bridge.nativeGetVin(decoderHandle)
+
+    fun resetVin() {
+        bridge.nativeResetVin(decoderHandle)
+    }
+
     fun destroy() {
         bridge.nativeDestroyVehicleDecoder(decoderHandle)
     }
