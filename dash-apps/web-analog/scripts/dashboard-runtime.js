@@ -74,6 +74,7 @@
       gear: readNative("getGear", 4),
       adasOn: readNative("isAdasOn", false),
       madsActive: readNative("isMadsActive", false),
+      dataSourceType: readNative("getDataSourceType", ""),
       accSetSpeed: readNative("getAccSetSpeed", 0),
       fusedSpeedLimit: readNative("getFusedSpeedLimit", 0),
       isImperial: readNative("isImperial", true),
