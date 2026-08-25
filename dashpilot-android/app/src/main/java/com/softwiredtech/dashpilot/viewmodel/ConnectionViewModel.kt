@@ -60,6 +60,7 @@ import com.softwiredtech.dashpilot.jni.VehicleBridge
 import com.softwiredtech.dashpilot.util.NetworkUtil
 import com.softwiredtech.dashpilot.vehicle.CanFrameDecoder
 import com.softwiredtech.dashpilot.vehicle.VehicleProfileLoader
+import com.softwiredtech.dashpilot.vehicle.VehicleVinState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -278,6 +279,9 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     private val _dashState = MutableStateFlow<Flow<DashState>?>(null)
     val dashState = _dashState.asStateFlow()
 
+    private val _vehicleVin = MutableStateFlow<VehicleVinState>(VehicleVinState.Waiting)
+    val vehicleVin: StateFlow<VehicleVinState> = _vehicleVin.asStateFlow()
+
     private fun phoneBatteryFlow(context: Context): Flow<Int> = flow {
         val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
         while (true) {
@@ -344,7 +348,13 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
                         }
                     }
                     val decoder = CanFrameDecoder(bridge, profile)
-                    DashKitDataSource(manager, decoder)
+                    val ds = DashKitDataSource(manager, decoder)
+                    launch {
+                        ds.vinState.collect {
+                            if (_dataSource.value === ds) _vehicleVin.value = it
+                        }
+                    }
+                    ds
                 }
                 DataSourceType.WEBSOCKET -> WebsocketDataSource()
                 else -> CommaDataSource(bridge, profile)
@@ -442,6 +452,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         _bleManager.value?.disconnect()
         _bleManager.value = null
         _dashState.value = null
+        _vehicleVin.value = VehicleVinState.Waiting
         _hasAutoNavigatedToDashboard.value = false
     }
 
