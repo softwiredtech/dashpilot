@@ -66,7 +66,12 @@ import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.DashKitBleManager
 import com.softwiredtech.dashpilot.ble.FirmwareUpdateManager
 import com.softwiredtech.dashpilot.ble.OtaState
+import com.softwiredtech.dashpilot.ble.TeslaLinkState
+import com.softwiredtech.dashpilot.ble.TeslaStatus
 import com.softwiredtech.dashpilot.ble.VehicleControl
+import com.softwiredtech.dashpilot.ui.tesla.teslaTileSummary
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 import com.softwiredtech.dashpilot.R
@@ -119,6 +124,10 @@ fun SettingsScreen(
     onDisplaySettingsChanged: (DisplaySettings) -> Unit = {},
     bleManager: DashKitBleManager? = null,
     dashkitUpdateManager: FirmwareUpdateManager? = null,
+    teslaStatus: StateFlow<TeslaStatus>? = null,
+    teslaResetPending: StateFlow<Boolean>? = null,
+    onRemoveTesla: () -> Boolean = { false },
+    onEnrollTesla: () -> Unit = {},
     onReplayOnboarding: () -> Unit = {},
     onThemeClick: () -> Unit = {}
 ) {
@@ -454,7 +463,14 @@ fun SettingsScreen(
 
             if (selectedTab.intValue == 1) {
                 if (bleManager != null && dashkitUpdateManager != null) {
-                    DashKitSettingsContent(bleManager, dashkitUpdateManager)
+                    DashKitSettingsContent(
+                        bleManager,
+                        dashkitUpdateManager,
+                        teslaStatus,
+                        teslaResetPending,
+                        onRemoveTesla,
+                        onEnrollTesla,
+                    )
                 } else {
                     Text(
                         text = stringResource(R.string.settings_dashkit_not_connected),
@@ -537,6 +553,13 @@ private fun PairNewDeviceSection(bleManager: DashKitBleManager) {
             Text(text = stringResource(R.string.settings_pair_new_device), fontSize = 16.sp)
         }
 
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = stringResource(R.string.settings_pair_caption),
+            color = DarkColors.TextMuted,
+            fontSize = 12.sp
+        )
+
         if (!connected) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
@@ -578,7 +601,11 @@ private fun PairNewDeviceSection(bleManager: DashKitBleManager) {
 @Composable
 private fun DashKitSettingsContent(
     bleManager: DashKitBleManager,
-    updateManager: FirmwareUpdateManager
+    updateManager: FirmwareUpdateManager,
+    teslaStatus: StateFlow<TeslaStatus>?,
+    teslaResetPending: StateFlow<Boolean>?,
+    onRemoveTesla: () -> Boolean,
+    onEnrollTesla: () -> Unit,
 ) {
     val connectionState by bleManager.connectionState.collectAsState()
     val connected = connectionState == ConnectionStatus.Connected
@@ -598,6 +625,15 @@ private fun DashKitSettingsContent(
     Spacer(modifier = Modifier.height(24.dp))
 
     PairNewDeviceSection(bleManager)
+    Spacer(modifier = Modifier.height(24.dp))
+
+    TeslaKeySection(
+        bleManager,
+        teslaStatus,
+        teslaResetPending,
+        onRemoveTesla,
+        onEnrollTesla,
+    )
     Spacer(modifier = Modifier.height(24.dp))
 
     DashKitMaintenanceSection(bleManager, connected)
@@ -683,6 +719,103 @@ private fun DashKitMaintenanceSection(bleManager: DashKitBleManager, connected: 
             }
         )
     }
+}
+
+@Composable
+private fun TeslaKeySection(
+    bleManager: DashKitBleManager,
+    teslaStatus: StateFlow<TeslaStatus>?,
+    teslaResetPending: StateFlow<Boolean>?,
+    onRemoveTesla: () -> Boolean,
+    onEnrollTesla: () -> Unit,
+) {
+    val context = LocalContext.current
+    val connectionState by bleManager.connectionState.collectAsState()
+    val connected = connectionState == ConnectionStatus.Connected
+    val idleTesla = remember { MutableStateFlow(TeslaStatus.Idle) }
+    val status by (teslaStatus ?: idleTesla).collectAsState()
+    val idleReset = remember { MutableStateFlow(false) }
+    val resetPending by (teslaResetPending ?: idleReset).collectAsState()
+    val showResetDialog = remember { mutableStateOf(false) }
+
+    SectionHeader(stringResource(R.string.settings_section_tesla_key))
+    Text(
+        text = stringResource(R.string.settings_tesla_key_caption),
+        color = DarkColors.TextMuted,
+        fontSize = 12.sp,
+    )
+    Spacer(modifier = Modifier.height(12.dp))
+    val statusLabel = if (resetPending) {
+        stringResource(R.string.tesla_connection_removing)
+    } else {
+        teslaStatusText(status)
+    }
+    InfoRow(label = stringResource(R.string.settings_tesla_key_status), value = statusLabel)
+    Spacer(modifier = Modifier.height(12.dp))
+
+    val hasKey = status.linkState.hasKey
+    Button(
+        onClick = if (hasKey) ({ showResetDialog.value = true }) else onEnrollTesla,
+        enabled = connected && !resetPending,
+        modifier = Modifier.fillMaxWidth(),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (hasKey) DarkColors.SurfaceSelected else AccentColor,
+            contentColor = Color.White,
+            disabledContainerColor = DarkColors.Border,
+            disabledContentColor = DarkColors.TextMuted
+        )
+    ) {
+        Text(
+            text = stringResource(
+                when {
+                    resetPending -> R.string.tesla_connection_removing
+                    hasKey -> R.string.settings_tesla_reset
+                    else -> R.string.settings_tesla_enroll
+                }
+            ),
+            fontSize = 16.sp
+        )
+    }
+
+    if (showResetDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showResetDialog.value = false },
+            title = { Text(stringResource(R.string.settings_tesla_reset_dialog_title)) },
+            text = { Text(stringResource(R.string.settings_tesla_reset_dialog_body)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showResetDialog.value = false
+                    val ok = onRemoveTesla()
+                    val msg = if (ok) {
+                        context.getString(R.string.settings_tesla_reset_sent)
+                    } else {
+                        context.getString(R.string.settings_tesla_reset_failed)
+                    }
+                    android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_LONG).show()
+                }) {
+                    Text(stringResource(R.string.settings_tesla_reset_dialog_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetDialog.value = false }) {
+                    Text(stringResource(R.string.settings_tesla_reset_dialog_cancel))
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun teslaStatusText(status: TeslaStatus): String = when (status.linkState) {
+    TeslaLinkState.NeverEnrolled -> stringResource(R.string.tesla_tile_key_not_set_up)
+    TeslaLinkState.Staged -> stringResource(R.string.tesla_tile_staged)
+    TeslaLinkState.Connecting -> stringResource(R.string.tesla_enroll_connecting_body)
+    TeslaLinkState.EnrolledNotConnected -> stringResource(R.string.tesla_tile_not_connected)
+    TeslaLinkState.EnrolledConnected -> teslaTileSummary(status)
+        .ifBlank { stringResource(R.string.tesla_tile_connected) }
+    TeslaLinkState.PairingWindow -> stringResource(R.string.tesla_status_pairing)
+    TeslaLinkState.EnrollmentFault -> stringResource(R.string.tesla_status_fault)
+    TeslaLinkState.Unknown -> "—"
 }
 
 @Composable
