@@ -112,4 +112,71 @@
     <string name="onboarding_tips_row_firmware">Check for firmware updates</string>
 
     <string name="settings_replay_onboarding">Replay onboarding</string>
+
+    <!-- ================= Tesla Connection (Phase 4) ================= -->
+    <string name="tesla_label">Tesla</string>
+    <!-- Home tile -->
+    <string name="tesla_tile_connect">Connect your Tesla</string>
+    <string name="tesla_tile_key_not_set_up">Not connected</string>
+    <string name="tesla_tile_staged">Car found — Connect</string>
+    <string name="tesla_tile_not_connected">Car not connected</string>
+    <string name="tesla_tile_fault">Connection failed — tap to retry</string>
+    <string name="tesla_tile_connected">Connected</string>
+    <string name="tesla_status_present">Present</string>
+    <string name="tesla_status_not_present">Not present</string>
+    <string name="tesla_status_locked">Locked</string>
+    <string name="tesla_status_unlocked">Unlocked</string>
+    <string name="tesla_status_asleep">Asleep</string>
+    <string name="tesla_status_awake">Awake</string>
+    <string name="tesla_status_pairing">Ready to tap card</string>
+    <string name="tesla_status_fault">Connection failed</string>
+
+    <!-- Enroll flow -->
+    <string name="tesla_enroll_title">Connect your Tesla</string>
+    <string name="tesla_enroll_explain_body">DashKit adds itself to your Tesla as a Charging Manager — it can read status and control charging, but can\'t unlock or drive the car.</string>
+    <string name="tesla_enroll_role_chip">Charging Manager · Read + charge</string>
+    <string name="tesla_enroll_start">Connect</string>
+    <string name="tesla_enroll_need_card">Have your key card ready.</string>
+    <string name="tesla_enroll_connecting_body">Contacting your car… DashKit is reaching out to pair.</string>
+    <string name="tesla_enroll_connecting_hint">Keep your phone and DashKit nearby.</string>
+    <string name="tesla_enroll_checking">Checking DashKit…</string>
+    <string name="tesla_enroll_reading_vin">Reading vehicle identity…</string>
+    <string name="tesla_enroll_finding">Finding your Tesla…</string>
+    <string name="tesla_enroll_masked_vin">Tesla · VIN %1$s</string>
+    <string name="tesla_enroll_found">Car found — connecting to DashKit…</string>
+    <string name="tesla_enroll_provision_failed">DashKit didn\'t confirm the car. Check the connection and try again.</string>
+    <string name="tesla_enroll_firmware_update_needed">Update DashKit firmware to connect your Tesla.</string>
+    <string name="tesla_enroll_vin_timeout">Couldn\'t read the VIN. Wake the vehicle and try again. If this continues, update DashKit firmware.</string>
+    <string name="tesla_enroll_scan_timeout">Make sure Bluetooth is on and stay near the vehicle.</string>
+    <string name="tesla_enroll_tap_title">Tap your key card</string>
+    <string name="tesla_enroll_tap_body">Place your key card on the center console, then approve on the car\'s touchscreen.</string>
+    <string name="tesla_enroll_tap_hint">%1$d s left</string>
+    <string name="tesla_enroll_tap_ready">Car ready — tap your key card now (%1$d s)</string>
+    <string name="tesla_enroll_success_title">Connected</string>
+    <string name="tesla_enroll_success_body">DashKit is now a Charging Manager on your Tesla.</string>
+    <string name="tesla_enroll_success_role">Read + charge enabled</string>
+    <string name="tesla_enroll_done">Done</string>
+    <string name="tesla_enroll_error_title">Connection failed</string>
+    <string name="tesla_enroll_retry">Try again</string>
+    <string name="tesla_enroll_cancel">Cancel</string>
+    <string name="tesla_fault_tap_timeout">You didn\'t tap the card in time. Try again.</string>
+    <string name="tesla_fault_rejected">The car rejected the connection. Check you\'re near the right car and using its key card.</string>
+    <string name="tesla_fault_protocol">DashKit couldn\'t talk to the car. Try again.</string>
+    <string name="tesla_fault_persist">DashKit couldn\'t save the connection. Try again.</string>
+    <string name="tesla_fault_generic">Something went wrong. Try again.</string>
+
+    <!-- Settings: Tesla Connection section -->
+    <string name="settings_section_tesla_key">Tesla Connection</string>
+    <string name="settings_tesla_key_caption">Read status and control charging via BLE.</string>
+    <string name="settings_tesla_key_status">Status</string>
+    <string name="settings_tesla_enroll">Connect Tesla</string>
+    <string name="settings_tesla_reset">Remove Tesla connection</string>
+    <string name="settings_tesla_reset_dialog_title">Remove Tesla connection?</string>
+    <string name="settings_tesla_reset_dialog_body">Remove DashKit from your car\'s Locks screen, then remove the connection here. You\'ll need your key card to reconnect.</string>
+    <string name="settings_tesla_reset_dialog_confirm">Remove</string>
+    <string name="settings_tesla_reset_dialog_cancel">Cancel</string>
+    <string name="settings_tesla_reset_sent">Removing Tesla connection…</string>
+    <string name="settings_tesla_reset_failed">Couldn\'t remove the connection. Try again.</string>
+    <string name="tesla_connection_removing">Removing connection…</string>
+    <string name="settings_pair_caption">Pairs another phone — separate from your Tesla connection.</string>
 </resources>
