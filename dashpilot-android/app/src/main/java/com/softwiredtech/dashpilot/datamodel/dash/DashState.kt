@@ -5,5 +5,6 @@ data class DashState(
     val phoneBattery: Int = -1,
     val currentTime: Long = 0L,
     val displaySettings: DisplaySettings = DisplaySettings(),
-    val speedCameraDistance: Int = -1
+    val speedCameraDistance: Int = -1,
+    val dataSourceType: String = ""
 )

@@ -384,7 +384,8 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
                     phoneBattery = battery,
                     currentTime = System.currentTimeMillis(),
                     displaySettings = settings,
-                    speedCameraDistance = camDist
+                    speedCameraDistance = camDist,
+                    dataSourceType = dataSourceType
                 )
             }
             _dashState.value = combined

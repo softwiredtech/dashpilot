@@ -117,6 +117,7 @@ fun WebDashView(
                 carStateBridge.updateCurrentTime(dashState.currentTime)
                 carStateBridge.updateDisplaySettings(dashState.displaySettings)
                 carStateBridge.updateSpeedCameraDistance(dashState.speedCameraDistance)
+                carStateBridge.updateDataSourceType(dashState.dataSourceType)
                 webView.post {
                     webView.evaluateJavascript("window.onCarStateUpdate && window.onCarStateUpdate()", null)
                 }
