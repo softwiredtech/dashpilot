@@ -39,7 +39,6 @@ import com.softwiredtech.dashpilot.ui.onboarding.PairingState
 import com.softwiredtech.dashpilot.ui.onboarding.PrimaryCta
 import com.softwiredtech.dashpilot.ui.theme.OnboardingColors
 import com.softwiredtech.dashpilot.ui.theme.TeslaCyan
-import com.softwiredtech.dashpilot.vehicle.VehicleVinState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -50,7 +49,7 @@ private const val TAP_WINDOW_S = 60
 fun TeslaEnrollFlow(
     manager: DashKitBleManager?,
     statusFlow: StateFlow<TeslaStatus>?,
-    vinState: StateFlow<VehicleVinState>,
+    vinState: StateFlow<String?>,
     onClose: () -> Unit,
 ) {
     val idleStatus = remember { MutableStateFlow(TeslaStatus.Idle) }
@@ -83,7 +82,7 @@ fun TeslaEnrollFlow(
 @Composable
 fun TeslaEnrollmentContent(
     state: TeslaEnrollmentState,
-    vinState: StateFlow<VehicleVinState>,
+    vinState: StateFlow<String?>,
     onConnect: () -> Unit,
     onRetry: () -> Unit,
     onCancelPairing: () -> Unit,
@@ -162,7 +161,7 @@ private fun ProgressStep(
 @Composable
 private fun ReadyStep(
     maskedVin: String?,
-    vinState: StateFlow<VehicleVinState>,
+    vinState: StateFlow<String?>,
     onConnect: () -> Unit,
 ) {
     InlineScaffold(
@@ -190,7 +189,7 @@ private fun ReadyStep(
 }
 
 @Composable
-private fun ConnectingStep(maskedVin: String?, vinState: StateFlow<VehicleVinState>, onCancel: () -> Unit) {
+private fun ConnectingStep(maskedVin: String?, vinState: StateFlow<String?>, onCancel: () -> Unit) {
     InlineScaffold(
         title = stringResource(R.string.tesla_enroll_title),
         subtitle = stringResource(R.string.tesla_enroll_connecting_body),
@@ -213,7 +212,7 @@ private fun ConnectingStep(maskedVin: String?, vinState: StateFlow<VehicleVinSta
 private fun TapCardStep(
     carReady: Boolean,
     maskedVin: String?,
-    vinState: StateFlow<VehicleVinState>,
+    vinState: StateFlow<String?>,
     onCancel: () -> Unit,
 ) {
     var remaining by remember { mutableIntStateOf(TAP_WINDOW_S) }
@@ -255,7 +254,7 @@ private fun TapCardStep(
 }
 
 @Composable
-private fun SuccessStep(vinState: StateFlow<VehicleVinState>, onDone: () -> Unit) {
+private fun SuccessStep(vinState: StateFlow<String?>, onDone: () -> Unit) {
     InlineScaffold(
         title = stringResource(R.string.tesla_enroll_success_title),
         subtitle = stringResource(R.string.tesla_enroll_success_body),
@@ -273,7 +272,7 @@ private fun SuccessStep(vinState: StateFlow<VehicleVinState>, onDone: () -> Unit
 @Composable
 private fun ErrorStep(
     reason: TeslaEnrollmentErrorReason,
-    vinState: StateFlow<VehicleVinState>,
+    vinState: StateFlow<String?>,
     onRetry: () -> Unit,
     onCancel: () -> Unit,
 ) {
@@ -309,9 +308,9 @@ private fun ErrorStep(
 }
 
 @Composable
-private fun MaskedVinLine(vinState: StateFlow<VehicleVinState>) {
-    val vs by vinState.collectAsState()
-    MaskedTextLine(maskVinTail((vs as? VehicleVinState.Available)?.vin))
+private fun MaskedVinLine(vinState: StateFlow<String?>) {
+    val vin by vinState.collectAsState()
+    MaskedTextLine(maskVinTail(vin))
 }
 
 @Composable

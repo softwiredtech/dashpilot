@@ -8,7 +8,6 @@ import com.softwiredtech.dashpilot.ble.TeslaLinkState
 import com.softwiredtech.dashpilot.ble.TeslaStatus
 import com.softwiredtech.dashpilot.ble.TeslaVehicleScanner
 import com.softwiredtech.dashpilot.datasource.DashKitBleManager
-import com.softwiredtech.dashpilot.vehicle.VehicleVinState
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -66,7 +65,7 @@ sealed interface TeslaEnrollmentState {
 
 class TeslaEnrollmentController(
     private val scope: CoroutineScope,
-    private val vinState: StateFlow<VehicleVinState>,
+    private val vinState: StateFlow<String?>,
     private val status: StateFlow<TeslaStatus>,
     private val matchScanner: TeslaMatchScanner,
     private val hasTeslaService: () -> Boolean,
@@ -87,7 +86,7 @@ class TeslaEnrollmentController(
             scope: CoroutineScope,
             context: Context,
             manager: DashKitBleManager?,
-            vinState: StateFlow<VehicleVinState>,
+            vinState: StateFlow<String?>,
             status: StateFlow<TeslaStatus>,
         ): TeslaEnrollmentController {
             @Suppress("MissingPermission") // BLUETOOTH_SCAN requested with the other BLE permissions
@@ -125,7 +124,7 @@ class TeslaEnrollmentController(
     private var pipeline: Job? = null
     private var observer: Job? = null
 
-    private fun vin(): String? = (vinState.value as? VehicleVinState.Available)?.vin
+    private fun vin(): String? = vinState.value
 
     fun begin() {
         if (observer?.isActive == true) return
@@ -215,8 +214,8 @@ class TeslaEnrollmentController(
 
             set(TeslaEnrollmentState.WaitingForVin)
             val vin = withTimeoutOrNull(VIN_TIMEOUT_MS) {
-                vinState.first { it is VehicleVinState.Available }
-            }?.let { (it as VehicleVinState.Available).vin }
+                vinState.first { !it.isNullOrEmpty() }
+            }
 
             terminalStateFor(status.value)?.let { route ->
                 set(route)

@@ -2,7 +2,6 @@ package com.softwiredtech.dashpilot.ui.tesla
 
 import com.softwiredtech.dashpilot.ble.TeslaLinkState
 import com.softwiredtech.dashpilot.ble.TeslaStatus
-import com.softwiredtech.dashpilot.vehicle.VehicleVinState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +20,7 @@ class TeslaEnrollmentControllerTest {
 
     @Test
     fun stages_vehicle_before_explicit_connect() = runTest {
-        val vinState = MutableStateFlow<VehicleVinState>(VehicleVinState.Available(vin))
+        val vinState = MutableStateFlow<String?>(vin)
         val status = MutableStateFlow(TeslaStatus.Idle)
         val provisions = mutableListOf<Pair<String, String>>()
         var starts = 0
@@ -51,7 +50,7 @@ class TeslaEnrollmentControllerTest {
 
     @Test
     fun gatt_dispatch_is_not_staging_acknowledgement() = runTest {
-        val vinState = MutableStateFlow<VehicleVinState>(VehicleVinState.Available(vin))
+        val vinState = MutableStateFlow<String?>(vin)
         val status = MutableStateFlow(TeslaStatus.Idle)
         val controller = controller(
             vinState = vinState,
@@ -67,7 +66,7 @@ class TeslaEnrollmentControllerTest {
 
     @Test
     fun missing_vin_never_provisions() = runTest {
-        val vinState = MutableStateFlow<VehicleVinState>(VehicleVinState.Waiting)
+        val vinState = MutableStateFlow<String?>(null)
         val status = MutableStateFlow(TeslaStatus.Idle)
         var provisions = 0
         val controller = controller(
@@ -87,7 +86,7 @@ class TeslaEnrollmentControllerTest {
     }
 
     private fun kotlinx.coroutines.test.TestScope.controller(
-        vinState: MutableStateFlow<VehicleVinState>,
+        vinState: MutableStateFlow<String?>,
         status: MutableStateFlow<TeslaStatus>,
         provision: (String, String) -> Boolean,
         startEnrollment: () -> Boolean = { true },
