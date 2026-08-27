@@ -20,6 +20,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import java.util.UUID
 import com.softwiredtech.dashpilot.ble.VehicleControl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -67,6 +68,12 @@ class DashKitBleManager(private val context: Context) {
         // Keepalive interval; the firmware drops the link after 60 s without a
         // ping (KEEPALIVE_TIMEOUT_S), so this allows a few missed writes.
         private const val PING_INTERVAL_MS = 15_000L
+
+        // Android's GATT client allows only one operation in flight, so a CCCD
+        // write racing another subscribe can be refused; retry a few times.
+        private val CCCD_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
+        private const val MAX_SUBSCRIBE_ATTEMPTS = 3
+        private const val SUBSCRIBE_RETRY_DELAY_MS = 250L
     }
 
     private val crashlytics = FirebaseCrashlytics.getInstance()
@@ -623,5 +630,39 @@ class DashKitBleManager(private val context: Context) {
             adapter?.bluetoothLeScanner?.stopScan(scanCallback)
         } catch (_: Exception) {}
         scanning = false
+    }
+
+    /** Subscribes to a characteristic's notifications, retrying if the CCCD
+     * write races another GATT operation. Shared by the CAN and Tesla status
+     * sources. */
+    fun subscribeWithRetry(
+        gatt: BluetoothGatt,
+        characteristic: BluetoothGattCharacteristic,
+        logTag: String,
+        label: String
+    ) {
+        val descriptor = characteristic.getDescriptor(CCCD_UUID)
+        if (descriptor == null) {
+            Log.e(logTag, "$label CCCD (0x2902) not discovered")
+            return
+        }
+        var attempt = 0
+        fun writeCccd() {
+            val queued = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                gatt.writeDescriptor(descriptor, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE) ==
+                    BluetoothGatt.GATT_SUCCESS
+            } else {
+                @Suppress("DEPRECATION")
+                descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                @Suppress("DEPRECATION")
+                gatt.writeDescriptor(descriptor)
+            }
+            if (!queued && attempt < MAX_SUBSCRIBE_ATTEMPTS) {
+                attempt++
+                Log.d(logTag, "$label CCCD write not queued (attempt=$attempt); retrying")
+                handler.postDelayed({ writeCccd() }, SUBSCRIBE_RETRY_DELAY_MS)
+            }
+        }
+        writeCccd()
     }
 }
