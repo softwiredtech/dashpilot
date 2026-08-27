@@ -68,8 +68,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
@@ -278,6 +281,10 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     private val _dashState = MutableStateFlow<Flow<DashState>?>(null)
     val dashState = _dashState.asStateFlow()
 
+    // Vehicle VIN from CarState (assembled by the native mapper); null until known.
+    private val _vehicleVin = MutableStateFlow<String?>(null)
+    val vehicleVin: StateFlow<String?> = _vehicleVin.asStateFlow()
+
     private fun phoneBatteryFlow(context: Context): Flow<Int> = flow {
         val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
         while (true) {
@@ -361,6 +368,14 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
 
             _dataSource.value = ds
 
+            launch {
+                ds.incomingMessages
+                    .map { it.vin }
+                    .filter { it.isNotEmpty() }
+                    .distinctUntilChanged()
+                    .collect { if (_dataSource.value === ds) _vehicleVin.value = it }
+            }
+
             _displaySettings.value = DisplaySettings(
                 showPhoneBattery = prefs.getBoolean(PREF_SHOW_PHONE_BATTERY, DEFAULT_SHOW_PHONE_BATTERY),
                 showCarBattery = prefs.getBoolean(PREF_SHOW_CAR_BATTERY, DEFAULT_SHOW_CAR_BATTERY),
@@ -442,6 +457,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         _bleManager.value?.disconnect()
         _bleManager.value = null
         _dashState.value = null
+        _vehicleVin.value = null
         _hasAutoNavigatedToDashboard.value = false
     }
 

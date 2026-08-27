@@ -34,6 +34,7 @@ import androidx.navigation.toRoute
 import androidx.startup.AppInitializer
 import app.rive.runtime.kotlin.RiveInitializer
 import com.softwiredtech.dashpilot.ble.FirmwareUpdateManager
+import com.softwiredtech.dashpilot.ble.TeslaStatusSource
 import com.softwiredtech.dashpilot.datamodel.dash.DashboardType
 import com.softwiredtech.dashpilot.datamodel.dash.ManifestLoader
 import com.softwiredtech.dashpilot.datamodel.dash.availableDashboards
@@ -48,6 +49,7 @@ import com.softwiredtech.dashpilot.navigation.DashboardRoute
 import com.softwiredtech.dashpilot.navigation.OnboardingRoute
 import com.softwiredtech.dashpilot.navigation.SettingsRoute
 import com.softwiredtech.dashpilot.navigation.SetupRoute
+import com.softwiredtech.dashpilot.navigation.TeslaEnrollRoute
 import com.softwiredtech.dashpilot.navigation.ThemePickerRoute
 import com.softwiredtech.dashpilot.ui.AutomationsScreen
 import com.softwiredtech.dashpilot.ui.ControlScreen
@@ -57,6 +59,7 @@ import com.softwiredtech.dashpilot.ui.LOCAL_ASSET_BASE_URL
 import com.softwiredtech.dashpilot.ui.SettingsScreen
 import com.softwiredtech.dashpilot.ui.ThemePickerScreen
 import com.softwiredtech.dashpilot.ui.onboarding.OnboardingScreen
+import com.softwiredtech.dashpilot.ui.tesla.TeslaEnrollFlow
 import com.softwiredtech.dashpilot.ui.theme.DashPilotTheme
 import com.softwiredtech.dashpilot.util.NetworkUtil
 import com.softwiredtech.dashpilot.viewmodel.ConnectionViewModel
@@ -174,6 +177,13 @@ class MainActivity : ComponentActivity() {
                     onDispose { dashkitUpdateManager?.dispose() }
                 }
 
+                // Phase 4: Tesla status/command channel rides the same bond.
+                val teslaSource = remember(bleManager) { bleManager?.let { TeslaStatusSource(it) } }
+                val teslaStatus = teslaSource?.status
+                val teslaResetPending = teslaSource?.resetPending
+                LaunchedEffect(teslaSource) { teslaSource?.start() }
+                DisposableEffect(teslaSource) { onDispose { teslaSource?.stop() } }
+
                 LaunchedEffect(startupTarget) {
                     when (startupTarget.route) {
                         ConnectionViewModel.StartupRoute.ONBOARDING_DASHKIT -> {
@@ -247,6 +257,9 @@ class MainActivity : ComponentActivity() {
                                 bleManager = manager,
                                 dashState = dashStateFlow,
                                 pinnedControlId = pinnedControl,
+                                teslaStatus = teslaStatus,
+                                teslaResetPending = teslaResetPending,
+                                onEnrollTesla = { navController.navigate(TeslaEnrollRoute) },
                                 onConnect = { serverAddress, dataSourceType ->
                                     connectionVM.connect(
                                         context, serverAddress, dataSourceType,
@@ -312,6 +325,10 @@ class MainActivity : ComponentActivity() {
                                 onDisplaySettingsChanged = { connectionVM.updateDisplaySettings(it) },
                                 bleManager = manager,
                                 dashkitUpdateManager = dashkitUpdateManager,
+                                teslaStatus = teslaStatus,
+                                teslaResetPending = teslaResetPending,
+                                onRemoveTesla = { teslaSource?.requestReset() == true },
+                                onEnrollTesla = { navController.navigate(TeslaEnrollRoute) },
                                 onReplayOnboarding = {
                                     connectionVM.disconnect()
                                     setOnboardingCompleted(context, false)
@@ -322,6 +339,15 @@ class MainActivity : ComponentActivity() {
                                 onThemeClick = {
                                     navController.navigate(ThemePickerRoute)
                                 }
+                            )
+                        }
+                        composable<TeslaEnrollRoute> {
+                            val manager by connectionVM.bleManager.collectAsState()
+                            TeslaEnrollFlow(
+                                manager = manager,
+                                statusFlow = teslaStatus,
+                                vinState = connectionVM.vehicleVin,
+                                onClose = { navController.popBackStack() },
                             )
                         }
                         composable<ThemePickerRoute> {

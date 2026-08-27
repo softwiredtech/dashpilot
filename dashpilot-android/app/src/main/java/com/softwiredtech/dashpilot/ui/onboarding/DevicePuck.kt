@@ -39,7 +39,8 @@ enum class PairingState { Idle, Searching, Paired }
 @Composable
 fun DevicePuck(
     state: PairingState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    accent: Color = OnboardingColors.Accent
 ) {
     val infinite = rememberInfiniteTransition(label = "puck")
 
@@ -94,7 +95,7 @@ fun DevicePuck(
             if (state == PairingState.Searching) {
                 ringAnims.forEach { (scaleAnim, alphaAnim) ->
                     drawCircle(
-                        color = OnboardingColors.Accent.copy(alpha = alphaAnim.value),
+                        color = accent.copy(alpha = alphaAnim.value),
                         radius = puckRadius * scaleAnim.value,
                         center = center,
                         style = Stroke(width = 1.dp.toPx())

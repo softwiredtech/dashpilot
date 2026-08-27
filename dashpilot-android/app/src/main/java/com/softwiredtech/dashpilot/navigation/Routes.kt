@@ -12,6 +12,9 @@ object SetupRoute
 object SettingsRoute
 
 @Serializable
+object TeslaEnrollRoute
+
+@Serializable
 object ThemePickerRoute
 
 @Serializable
