@@ -4,4 +4,5 @@ enum DataSourceType: String {
     case comma
     case dashkit
     case websocket
+    case demo
 }
