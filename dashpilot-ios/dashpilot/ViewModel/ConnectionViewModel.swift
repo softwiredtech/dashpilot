@@ -106,8 +106,8 @@ final class ConnectionViewModel {
             }
             disconnect()
             connectDashKit()
-        case .comma, .websocket:
-            // WiFi sources are user-initiated on iOS; leave them alone.
+        case .comma, .websocket, .demo:
+            // WiFi sources (and demo mode) are user-initiated on iOS; leave them alone.
             return
         case nil:
             guard connectionStatus == .disconnected else { return }
@@ -211,6 +211,25 @@ final class ConnectionViewModel {
         discoveredAddress = serverAddress
         activeSourceType = .comma
         startCommaDataSource(address: serverAddress)
+    }
+
+    // MARK: - Demo mode
+
+    /// Starts a local, hardware-free session with mocked `CarState` values
+    /// (Settings > Start Demo Mode). Leaves `bleManager` nil, same as a comma
+    /// session, so control buttons stay in their existing no-op/simulate mode.
+    func connectDemo() {
+        guard canStartConnection else { return }
+        if case .error = connectionStatus { disconnect() }  // drop failed-session remnants
+        connectionStatus = .connecting
+        discoveryError = nil
+        discoveredAddress = nil
+        activeSourceType = .demo
+
+        let ds = DemoDataSource()
+        dataSource = ds
+        ds.connect(address: "")
+        startStreaming(ds, resyncDashKit: false)
     }
 
     func disconnect() {

@@ -69,6 +69,7 @@ struct SettingsView: View {
                                 visualizerSection
                             }
                             replayOnboardingRow
+                            demoModeRow
                             versionRow
                         } else {
                             dashKitTab
@@ -265,6 +266,29 @@ struct SettingsView: View {
         } label: {
             HStack {
                 Text("Replay onboarding")
+                    .foregroundColor(.white)
+                    .font(.system(size: 16))
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .foregroundColor(mutedText)
+                    .font(.system(size: 14, weight: .medium))
+            }
+        }
+        .padding(.horizontal, 24)
+        .padding(.vertical, 12)
+    }
+
+    // MARK: - Demo mode
+
+    /// Starts a hardware-free session with mocked car data, so the
+    /// dashboards can be demoed without a DashKit or comma nearby.
+    private var demoModeRow: some View {
+        Button {
+            connectionVM.connectDemo()
+            dismiss()
+        } label: {
+            HStack {
+                Text("Start Demo Mode")
                     .foregroundColor(.white)
                     .font(.system(size: 16))
                 Spacer()
