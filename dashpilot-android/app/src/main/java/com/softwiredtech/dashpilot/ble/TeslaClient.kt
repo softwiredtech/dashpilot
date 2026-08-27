@@ -1,9 +1,5 @@
 package com.softwiredtech.dashpilot.ble
 
-import android.annotation.SuppressLint
-import android.bluetooth.BluetoothGatt
-import android.bluetooth.BluetoothGattCharacteristic
-import android.os.Build
 import android.util.Log
 import com.softwiredtech.dashpilot.datasource.DashKitBleManager
 import java.util.UUID
@@ -23,7 +19,6 @@ import java.util.UUID
  * Enrollment is app-triggered only: the firmware never starts pairing on its
  * own, because the DashKit sits in the car trim and its LEDs aren't visible.
  */
-@SuppressLint("MissingPermission")
 object TeslaClient {
 
     private const val TAG = "TeslaClient"
@@ -42,6 +37,8 @@ object TeslaClient {
 
     const val VIN_LEN: Int = 17
 
+    private val MAC_REGEX = Regex("([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}")
+
     /** Ask the firmware to begin enrollment for the staged car. */
     fun sendStart(manager: DashKitBleManager): Boolean = sendTesla(manager, CMD_START)
 
@@ -57,24 +54,13 @@ object TeslaClient {
             Log.w(TAG, "provision: rejecting invalid vehicle identity or address")
             return false
         }
-        return writePayload(manager, payload)
+        return manager.writeCommand(SERVICE_UUID, COMMAND_CHAR_UUID, payload, TAG)
     }
 
     internal fun isValidVin(vin: String): Boolean =
         vin.length == VIN_LEN && vin.all { it in '0'..'9' || (it in 'A'..'Z' && it !in "IOQ") }
 
-    internal fun isValidMac(mac: String): Boolean {
-        if (mac.length != 17) return false
-        for (i in mac.indices) {
-            val c = mac[i]
-            if (i % 3 == 2) {
-                if (c != ':') return false
-            } else if (!(c in '0'..'9' || c in 'a'..'f' || c in 'A'..'F')) {
-                return false
-            }
-        }
-        return true
-    }
+    internal fun isValidMac(mac: String): Boolean = MAC_REGEX.matches(mac)
 
     internal fun buildProvisionPayload(vin: String, mac: String): ByteArray? {
         val v = vin.trim().uppercase()
@@ -86,15 +72,16 @@ object TeslaClient {
         v.toByteArray(Charsets.US_ASCII).copyInto(payload, destinationOffset = 1)
         payload[18] = 0x00 // BLE_ADDR_PUBLIC
         // NimBLE stores the MAC octets in reverse display order.
-        for (i in 0..5) {
-            val pairIndex = 5 - i
-            payload[19 + i] = m.substring(pairIndex * 3, pairIndex * 3 + 2).toInt(16).toByte()
-        }
+        m.split(":")
+            .map { it.toInt(16).toByte() }
+            .reversed()
+            .toByteArray()
+            .copyInto(payload, destinationOffset = 19)
         return payload
     }
 
     /** Write an app-channel command to the DashKit (same [opcode][value_lo][value_hi]
-     * framing and TIRAMISU branch as [VehicleControl.send], but on the new UUIDs).
+     * framing as [VehicleControl.send], but on the app-channel UUIDs).
      * Returns true if dispatched (not acknowledged).
      */
     fun sendTesla(manager: DashKitBleManager, opcode: Int): Boolean {
@@ -104,35 +91,6 @@ object TeslaClient {
             0
         )
         Log.d(TAG, "Sending app-channel 0x%02X".format(opcode))
-        return writePayload(manager, payload)
-    }
-
-    private fun writePayload(manager: DashKitBleManager, payload: ByteArray): Boolean {
-        val gatt = manager.gatt ?: run {
-            Log.w(TAG, "No GATT connection; cannot send app-channel write")
-            return false
-        }
-        val service = gatt.getService(SERVICE_UUID) ?: run {
-            Log.w(TAG, "App-channel service not found; firmware may be older")
-            return false
-        }
-        val commandChar = service.getCharacteristic(COMMAND_CHAR_UUID) ?: run {
-            Log.w(TAG, "App-channel command characteristic not found")
-            return false
-        }
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            gatt.writeCharacteristic(
-                commandChar,
-                payload,
-                BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
-            ) == BluetoothGatt.GATT_SUCCESS
-        } else {
-            @Suppress("DEPRECATION")
-            commandChar.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
-            @Suppress("DEPRECATION")
-            commandChar.value = payload
-            @Suppress("DEPRECATION")
-            gatt.writeCharacteristic(commandChar)
-        }
+        return manager.writeCommand(SERVICE_UUID, COMMAND_CHAR_UUID, payload, TAG)
     }
 }

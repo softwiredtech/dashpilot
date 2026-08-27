@@ -33,8 +33,6 @@ class TeslaStatusSource(private val manager: DashKitBleManager) : GattListener {
     private val _resetPending = MutableStateFlow(false)
     val resetPending: StateFlow<Boolean> = _resetPending.asStateFlow()
 
-    private var statusChar: BluetoothGattCharacteristic? = null
-
     /** Register with the manager so we receive onServicesReady + notifications. */
     fun start() {
         manager.addGattListener(this)
@@ -65,7 +63,6 @@ class TeslaStatusSource(private val manager: DashKitBleManager) : GattListener {
             Log.e(TAG, "App-channel/status characteristic not found; firmware may be older")
             return
         }
-        statusChar = characteristic
         gatt.setCharacteristicNotification(characteristic, true)
         manager.subscribeWithRetry(gatt, characteristic, TAG, "Status")
     }
@@ -77,12 +74,11 @@ class TeslaStatusSource(private val manager: DashKitBleManager) : GattListener {
     ) {
         // After subscribing, read the current value so we don't wait for the
         // next change notification (e.g. during a long reconnect backoff).
-        if (descriptor.characteristic?.uuid == TeslaClient.STATUS_CHAR_UUID &&
+        val characteristic = descriptor.characteristic ?: return
+        if (characteristic.uuid == TeslaClient.STATUS_CHAR_UUID &&
             status == BluetoothGatt.GATT_SUCCESS
         ) {
-            val c = statusChar ?: return
-            @Suppress("DEPRECATION")
-            gatt.readCharacteristic(c)
+            gatt.readCharacteristic(characteristic)
         }
     }
 
