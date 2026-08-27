@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <cstring>
 
 struct CarState {
     // Party bus
@@ -40,7 +41,12 @@ struct CarState {
     double experimentalMode = 0;
     double changingLane = 0;
 
-    static constexpr size_t FIELD_COUNT = 31;
+    // Vehicle VIN, empty until fully assembled by the mapper.
+    static constexpr size_t VIN_LENGTH = 17;
+    char vin[VIN_LENGTH + 1] = {};
+
+    static constexpr size_t VIN_DOUBLE_COUNT = 3;
+    static constexpr size_t FIELD_COUNT = 31 + VIN_DOUBLE_COUNT;
 
     void toArray(double* out) const {
         // Party bus
@@ -80,5 +86,11 @@ struct CarState {
         out[29] = changingLane;
 
         out[30] = acTemp;
+
+        // VIN chars ride the double array as raw bit patterns, 8 bytes per
+        // double; decoded by CanFrameDecoder.arrayToCarState.
+        char padded[VIN_DOUBLE_COUNT * sizeof(double)] = {};
+        std::memcpy(padded, vin, VIN_LENGTH);
+        std::memcpy(out + 31, padded, sizeof(padded));
     }
 };

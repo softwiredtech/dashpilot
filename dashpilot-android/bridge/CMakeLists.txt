@@ -4,6 +4,8 @@ project(dashpilot-android LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 
 set(MSGQ_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../bridge")
+
+if(ANDROID)
 set(ZMQ_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/zmq")
 set(CAPNP_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../third_party/capnp")
 set(GENERATED_CEREAL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/../../bridge/cereal/gen")
@@ -71,3 +73,16 @@ target_link_libraries(bridge
         android
         log
 )
+else()
+# Host-side unit tests for the native decode logic (not built for Android).
+# Build & run: cmake -B build-host -S . && cmake --build build-host && ctest --test-dir build-host
+enable_testing()
+add_executable(tesla_vin_mapper_test
+        tests/tesla_vin_mapper_test.cpp
+        ${MSGQ_ROOT}/dbc/dbc.cc
+        ${MSGQ_ROOT}/dbc/dbcfile.cc
+)
+target_include_directories(tesla_vin_mapper_test PRIVATE ${MSGQ_ROOT})
+target_compile_options(tesla_vin_mapper_test PRIVATE -Wall -Wextra)
+add_test(NAME tesla_vin_mapper COMMAND tesla_vin_mapper_test)
+endif()
