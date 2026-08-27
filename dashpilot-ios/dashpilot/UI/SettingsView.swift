@@ -68,7 +68,9 @@ struct SettingsView: View {
                             if showVisualizerSettings {
                                 visualizerSection
                             }
+                            #if DEBUG
                             replayOnboardingRow
+                            #endif
                             demoModeRow
                             versionRow
                         } else {

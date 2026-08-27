@@ -69,6 +69,7 @@ import com.softwiredtech.dashpilot.ble.OtaState
 import com.softwiredtech.dashpilot.ble.VehicleControl
 import kotlinx.coroutines.launch
 
+import com.softwiredtech.dashpilot.BuildConfig
 import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.datamodel.dash.DASH_PREFS_NAME
 import com.softwiredtech.dashpilot.datamodel.dash.DisplaySettings
@@ -424,19 +425,21 @@ fun SettingsScreen(
                 Spacer(modifier = Modifier.height(24.dp))
             }
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onReplayOnboarding() }
-                    .padding(vertical = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = stringResource(R.string.settings_replay_onboarding), color = Color.White, fontSize = 16.sp)
-                Text(text = "›", color = DarkColors.TextMuted, fontSize = 20.sp)
-            }
+            if (BuildConfig.DEBUG) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onReplayOnboarding() }
+                        .padding(vertical = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(text = stringResource(R.string.settings_replay_onboarding), color = Color.White, fontSize = 16.sp)
+                    Text(text = "›", color = DarkColors.TextMuted, fontSize = 20.sp)
+                }
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+            }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
