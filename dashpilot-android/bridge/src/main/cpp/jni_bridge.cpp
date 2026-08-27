@@ -223,23 +223,6 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDestroyVehicleDecoder(
     bridge::destroyVehicleDecoder(reinterpret_cast<VehicleDecoder*>(decoderHandle));
 }
 
-JNIEXPORT jstring JNICALL
-Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeGetVin(
-        JNIEnv* env, jobject thiz,
-        jlong decoderHandle) {
-    auto* decoder = reinterpret_cast<VehicleDecoder*>(decoderHandle);
-    if (!decoder || !decoder->vinReady()) return nullptr;
-    return env->NewStringUTF(decoder->vin().c_str());
-}
-
-JNIEXPORT void JNICALL
-Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeResetVin(
-        JNIEnv* env, jobject thiz,
-        jlong decoderHandle) {
-    auto* decoder = reinterpret_cast<VehicleDecoder*>(decoderHandle);
-    if (decoder) decoder->resetVin();
-}
-
 // === Receive loop ===
 JNIEXPORT void JNICALL
 Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStartReceiveLoop(

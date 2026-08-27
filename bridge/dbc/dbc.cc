@@ -138,6 +138,14 @@ bool cabana::Signal::getValue(const uint8_t *data, size_t data_size, double *val
   return true;
 }
 
+bool cabana::Signal::getRawBits(const uint8_t *data, size_t data_size, uint64_t *val) const {
+  if (multiplexor && get_raw_value(data, data_size, *multiplexor) != multiplex_value) {
+    return false;
+  }
+  *val = get_raw_bits(data, data_size, *this);
+  return true;
+}
+
 bool cabana::Signal::operator==(const cabana::Signal &other) const {
   return name == other.name && size == other.size &&
          start_bit == other.start_bit &&
@@ -150,7 +158,7 @@ bool cabana::Signal::operator==(const cabana::Signal &other) const {
 
 // helper functions
 
-double get_raw_value(const uint8_t *data, size_t data_size, const cabana::Signal &sig) {
+uint64_t get_raw_bits(const uint8_t *data, size_t data_size, const cabana::Signal &sig) {
   const int msb_byte = sig.msb / 8;
   if (msb_byte >= (int)data_size) return 0;
 
@@ -174,6 +182,12 @@ double get_raw_value(const uint8_t *data, size_t data_size, const cabana::Signal
       i += step;
     }
   }
+
+  return val;
+}
+
+double get_raw_value(const uint8_t *data, size_t data_size, const cabana::Signal &sig) {
+  uint64_t val = get_raw_bits(data, data_size, sig);
 
   // Sign extension (if needed)
   if (sig.is_signed && (val & (1ULL << (sig.size - 1)))) {

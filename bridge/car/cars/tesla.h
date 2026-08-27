@@ -1,8 +1,67 @@
 #pragma once
 
+#include <array>
 #include <chrono>
+#include <cstdint>
+#include <cstring>
 
 #include "car/car_state_mapper.h"
+
+// Assembles CarState::vin from VIN_info (0x405) on the vehicle bus. The VIN
+// arrives as three muxed segments in any order; each is read as unscaled bits
+// because the 56-bit VIN signals are wider than double's 53-bit mantissa, so
+// the normal cp.get() path would silently corrupt the top byte(s).
+class TeslaVinUpdater {
+public:
+    void update(const CANParsers& cp, CarState& cs) {
+        if (seen_ == kAllSegments) return;
+        for (size_t i = 0; i < kSegments.size(); i++) {
+            if (seen_ & (1u << i)) continue;
+            const Segment& seg = kSegments[i];
+
+            uint64_t raw;
+            if (!cp.getRaw(1, "VIN_info", seg.signal, &raw)) continue;
+
+            char chars[7];
+            for (int b = 0; b < 7; b++) chars[b] = static_cast<char>(raw >> (8 * b));
+
+            bool valid = true;
+            for (int b = 0; b < seg.textStart; b++) valid &= chars[b] == '\0';
+            for (int b = seg.textStart; b < 7; b++) valid &= isVinChar(chars[b]);
+            if (!valid) continue;
+
+            std::memcpy(pending_ + seg.vinOffset, chars + seg.textStart, 7 - seg.textStart);
+            seen_ |= 1u << i;
+        }
+        if (seen_ == kAllSegments) {
+            std::memcpy(cs.vin, pending_, CarState::VIN_LENGTH);
+        }
+    }
+
+private:
+    struct Segment {
+        const char* signal;
+        int textStart;   // first payload byte; earlier bytes must be zero
+        int vinOffset;
+    };
+
+    static constexpr std::array<Segment, 3> kSegments{{
+        {"VIN_A405", 4, 0},
+        {"VIN_B405", 0, 3},
+        {"VIN_C405", 0, 10},
+    }};
+    static constexpr uint8_t kAllSegments = 0b111;
+
+    // ISO 3779: digits and letters except I, O, Q.
+    static bool isVinChar(char c) {
+        if (c >= '0' && c <= '9') return true;
+        if (c >= 'A' && c <= 'Z') return c != 'I' && c != 'O' && c != 'Q';
+        return false;
+    }
+
+    uint8_t seen_ = 0;
+    char pending_[CarState::VIN_LENGTH] = {};
+};
 
 static inline void updatePartyBus(const CANParsers& cp, CarState& cs) {
     cs.egoSteeringAngle = cp.get(2, "SCCM_steeringAngleSensor", "SCCM_steeringAngle");
@@ -59,7 +118,11 @@ public:
     void update(const CANParsers& cp, CarState& cs) override {
         updatePartyBus(cp, cs);
         updateVehicleBus(cp, cs);
+        vin_.update(cp, cs);
     }
+
+private:
+    TeslaVinUpdater vin_;
 };
 
 class TeslaDashKitMapper : public CarStateMapper {
@@ -101,6 +164,7 @@ public:
         cs.acTemp = cp.get(1, "UI_hvacRequest", "UI_hvacReqTempSetpointLeft");
 
         updateVehicleBus(cp, cs);
+        vin_.update(cp, cs);
     }
 
 private:
@@ -127,4 +191,5 @@ private:
 
     BlinkerHold leftBlinkerHold_;
     BlinkerHold rightBlinkerHold_;
+    TeslaVinUpdater vin_;
 };

@@ -6,13 +6,9 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.util.Log
 import com.softwiredtech.dashpilot.datamodel.dash.CarState
 import com.softwiredtech.dashpilot.vehicle.CanFrameDecoder
-import com.softwiredtech.dashpilot.vehicle.VehicleVinState
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.sample
 import java.util.UUID
 
@@ -32,9 +28,6 @@ class DashKitDataSource(
     @OptIn(FlowPreview::class)
     override val incomingMessages: Flow<CarState> = _incoming.sample(40)
 
-    private val _vinState = MutableStateFlow<VehicleVinState>(VehicleVinState.Waiting)
-    val vinState: StateFlow<VehicleVinState> = _vinState.asStateFlow()
-
     private var currentState = CarState()
 
     override fun connect(address: String) {
@@ -43,13 +36,10 @@ class DashKitDataSource(
     }
 
     override fun disconnect() {
-        resetVin()
         manager.removeGattListener(this)
     }
 
     override fun onServicesReady(gatt: BluetoothGatt) {
-        resetVin()
-
         val service = gatt.getService(SERVICE_UUID)
         if (service == null) {
             Log.e(TAG, "CAN BLE service not found")
@@ -73,21 +63,11 @@ class DashKitDataSource(
         parseAndEmit(value)
     }
 
-    override fun onDisconnected() = resetVin()
-
     private fun parseAndEmit(payload: ByteArray) {
         if (payload.isEmpty()) return
         for (frame in parseCanPacket(payload)) {
             currentState = decoder.decodeFrame(frame.bus, frame.address, frame.data)
         }
-        // decodeFrame drives the native VIN assembler
-        _vinState.value = decoder.getVin()?.let { VehicleVinState.Available(it) }
-            ?: VehicleVinState.Waiting
         _incoming.tryEmit(currentState)
-    }
-
-    private fun resetVin() {
-        decoder.resetVin()
-        _vinState.value = VehicleVinState.Waiting
     }
 }

@@ -3,7 +3,6 @@
 #include "car/can_parsers.h"
 #include "car/car_state.h"
 #include "car/car_state_mapper.h"
-#include "car/vin_assembler.h"
 #include "car/cars/tesla.h"
 #include "msgq/ipc.h"
 #include <vector>
@@ -35,7 +34,6 @@ public:
 
     void updateFrame(int bus, uint32_t address, const uint8_t* data, size_t len) {
         parsers_.updateFrame(bus, address, data, len);
-        vin_.onFrame(bus, address, data, len);
     }
 
     void updateMapper() {
@@ -44,14 +42,8 @@ public:
 
     CarState& state() { return state_; }
 
-    // Vehicle VIN assembled from the CAN stream (empty until complete).
-    bool vinReady() const { return vin_.ready(); }
-    const std::string& vin() const { return vin_.vin(); }
-    void resetVin() { vin_.reset(); }
-
 private:
     CANParsers parsers_;
     std::unique_ptr<CarStateMapper> mapper_;
     CarState state_;
-    VinAssembler vin_;
 };

@@ -75,6 +75,8 @@ public:
   Signal(const Signal &other) = default;
   void update();
   bool getValue(const uint8_t *data, size_t data_size, double *val) const;
+  // Unscaled signal bits, for signals wider than double's 53-bit mantissa.
+  bool getRawBits(const uint8_t *data, size_t data_size, uint64_t *val) const;
   bool operator==(const cabana::Signal &other) const;
   inline bool operator!=(const cabana::Signal &other) const { return !(*this == other); }
 
@@ -132,5 +134,6 @@ public:
 
 // Helper functions
 double get_raw_value(const uint8_t *data, size_t data_size, const cabana::Signal &sig);
+uint64_t get_raw_bits(const uint8_t *data, size_t data_size, const cabana::Signal &sig);
 void updateMsbLsb(cabana::Signal &s);
 inline int flipBitPos(int start_bit) { return 8 * (start_bit / 8) + 7 - start_bit % 8; }

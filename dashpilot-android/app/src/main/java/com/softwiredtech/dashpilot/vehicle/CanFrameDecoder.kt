@@ -18,13 +18,6 @@ class CanFrameDecoder(
         return arrayToCarState(values)
     }
 
-    // VIN assembled natively during decodeFrame; null until complete.
-    fun getVin(): String? = bridge.nativeGetVin(decoderHandle)
-
-    fun resetVin() {
-        bridge.nativeResetVin(decoderHandle)
-    }
-
     fun destroy() {
         bridge.nativeDestroyVehicleDecoder(decoderHandle)
     }
@@ -64,8 +57,25 @@ class CanFrameDecoder(
                 experimentalMode = values[27] > 0,
                 madsActive = values[28] > 0,
                 changingLane = values[29] > 0,
-                acTemp = values[30].toFloat()
+                acTemp = values[30].toFloat(),
+                vin = decodeVin(values, offset = 31)
             )
         }
+
+        // VIN chars arrive bit-cast into doubles, 8 ASCII bytes per double,
+        // little-endian; see CarState::toArray in bridge/car/car_state.h.
+        private fun decodeVin(values: DoubleArray, offset: Int): String {
+            val bytes = ByteArray(VIN_DOUBLE_COUNT * 8)
+            for (chunk in 0 until VIN_DOUBLE_COUNT) {
+                val bits = values[offset + chunk].toRawBits()
+                for (b in 0 until 8) {
+                    bytes[chunk * 8 + b] = (bits ushr (8 * b)).toByte()
+                }
+            }
+            val length = bytes.indexOf(0).let { if (it < 0) bytes.size else it }
+            return String(bytes, 0, length, Charsets.US_ASCII)
+        }
+
+        private const val VIN_DOUBLE_COUNT = 3
     }
 }
