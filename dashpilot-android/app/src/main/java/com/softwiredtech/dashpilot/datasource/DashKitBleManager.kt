@@ -665,4 +665,37 @@ class DashKitBleManager(private val context: Context) {
         }
         writeCccd()
     }
+
+    /** Write-with-response to a characteristic on the current connection.
+     * Returns true if the write was dispatched (not acknowledged). Shared by
+     * the CAN control and Tesla app-channel commands. */
+    fun writeCommand(
+        serviceUuid: UUID,
+        charUuid: UUID,
+        payload: ByteArray,
+        logTag: String
+    ): Boolean {
+        val gatt = gatt ?: run {
+            Log.w(logTag, "No GATT connection; cannot write command")
+            return false
+        }
+        val characteristic = gatt.getService(serviceUuid)?.getCharacteristic(charUuid) ?: run {
+            Log.w(logTag, "Characteristic $charUuid not found; firmware may be older")
+            return false
+        }
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            gatt.writeCharacteristic(
+                characteristic,
+                payload,
+                BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+            ) == BluetoothGatt.GATT_SUCCESS
+        } else {
+            @Suppress("DEPRECATION")
+            characteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+            @Suppress("DEPRECATION")
+            characteristic.value = payload
+            @Suppress("DEPRECATION")
+            gatt.writeCharacteristic(characteristic)
+        }
+    }
 }

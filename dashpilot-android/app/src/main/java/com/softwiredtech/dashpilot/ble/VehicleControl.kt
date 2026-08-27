@@ -1,9 +1,5 @@
 package com.softwiredtech.dashpilot.ble
 
-import android.annotation.SuppressLint
-import android.bluetooth.BluetoothGatt
-import android.bluetooth.BluetoothGattCharacteristic
-import android.os.Build
 import android.util.Log
 import com.softwiredtech.dashpilot.datasource.DashKitBleManager
 import java.util.UUID
@@ -15,7 +11,6 @@ import java.util.UUID
  * [opcode][value_lo][value_hi] packet and bit-packs the matching Tesla DBC
  * signal into a CAN frame. Opcodes mirror `vehicle_control.h` in the firmware.
  */
-@SuppressLint("MissingPermission")
 object VehicleControl {
 
     private const val TAG = "VehicleControl"
@@ -130,43 +125,13 @@ object VehicleControl {
      * link is down or the control characteristic is unavailable.
      */
     fun send(manager: DashKitBleManager, opcode: Int, value: Int): Boolean {
-        val gatt = manager.gatt
-        if (gatt == null) {
-            Log.w(TAG, "No GATT connection; cannot send command 0x%02X".format(opcode))
-            return false
-        }
-        val service = gatt.getService(SERVICE_UUID)
-        if (service == null) {
-            Log.w(TAG, "Control service not found")
-            return false
-        }
-        val controlChar = service.getCharacteristic(CONTROL_CHAR_UUID)
-        if (controlChar == null) {
-            Log.w(TAG, "Control characteristic not found; firmware may be older")
-            return false
-        }
-
         val v = value and 0xFFFF
         val payload = byteArrayOf(
             (opcode and 0xFF).toByte(),
             (v and 0xFF).toByte(),
             ((v shr 8) and 0xFF).toByte()
         )
-
         Log.d(TAG, "Sending control 0x%02X value=%d".format(opcode, v))
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            gatt.writeCharacteristic(
-                controlChar,
-                payload,
-                BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
-            ) == BluetoothGatt.GATT_SUCCESS
-        } else {
-            @Suppress("DEPRECATION")
-            controlChar.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
-            @Suppress("DEPRECATION")
-            controlChar.value = payload
-            @Suppress("DEPRECATION")
-            gatt.writeCharacteristic(controlChar)
-        }
+        return manager.writeCommand(SERVICE_UUID, CONTROL_CHAR_UUID, payload, TAG)
     }
 }
