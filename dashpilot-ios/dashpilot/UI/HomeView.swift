@@ -16,18 +16,19 @@ struct HomeView: View {
             Color.dashBackground
                 .ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                header
-                Spacer().frame(height: 8)
-                widgetGrid
-                Spacer().frame(height: 32)
-                pinnedSection
-                actionButtons
-                Spacer().frame(height: 12)
-                DataSourceMenu(navigationPath: $navigationPath)
-                Spacer()
+            ScrollView {
+                VStack(spacing: 0) {
+                    header
+                    Spacer().frame(height: 8)
+                    widgetGrid
+                    Spacer().frame(height: 32)
+                    pinnedSection
+                    actionButtons
+                    Spacer().frame(height: 12)
+                    DataSourceMenu(navigationPath: $navigationPath)
+                }
+                .padding(DashMetrics.screenPadding)
             }
-            .padding(DashMetrics.screenPadding)
         }
         .navigationBarHidden(true)
         .task {
