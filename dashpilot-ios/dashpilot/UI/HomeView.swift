@@ -16,18 +16,22 @@ struct HomeView: View {
             Color.dashBackground
                 .ignoresSafeArea()
 
-            ScrollView {
-                VStack(spacing: 0) {
-                    header
-                    Spacer().frame(height: 8)
-                    widgetGrid
-                    Spacer().frame(height: 32)
-                    pinnedSection
-                    actionButtons
-                    Spacer().frame(height: 12)
-                    DataSourceMenu(navigationPath: $navigationPath)
+            GeometryReader { geo in
+                let landscape = geo.size.width > geo.size.height
+                ScrollView {
+                    VStack(spacing: 0) {
+                        header(showDataSource: landscape)
+                        Spacer().frame(height: 8)
+                        if landscape {
+                            landscapeContent(
+                                minHeight: geo.size.height - 2 * DashMetrics.screenPadding - 52
+                            )
+                        } else {
+                            portraitContent
+                        }
+                    }
+                    .padding(DashMetrics.screenPadding)
                 }
-                .padding(DashMetrics.screenPadding)
             }
         }
         .navigationBarHidden(true)
@@ -46,9 +50,51 @@ struct HomeView: View {
         }
     }
 
+    // MARK: - Layouts
+
+    private var portraitContent: some View {
+        VStack(spacing: 0) {
+            widgetGrid(fillHeight: false)
+            Spacer().frame(height: 32)
+            if hasPinnedControl {
+                pinnedSection
+                Spacer().frame(height: 24)
+            }
+            actionButtons
+            Spacer().frame(height: 12)
+            DataSourceMenu(navigationPath: $navigationPath)
+        }
+    }
+
+    private func landscapeContent(minHeight: CGFloat) -> some View {
+        HStack(alignment: .top, spacing: DashMetrics.screenPadding) {
+            widgetGrid(fillHeight: true)
+            VStack(spacing: DashMetrics.gridGap) {
+                HStack(spacing: DashMetrics.gridGap) {
+                    ActionTile(label: "Automations", icon: "sparkles") {
+                        navigationPath.append(AppRoute.automations)
+                    }
+                    ActionTile(label: "Controls", icon: "slider.horizontal.3") {
+                        navigationPath.append(AppRoute.controls)
+                    }
+                }
+                .frame(maxHeight: .infinity)
+                VStack(spacing: 12) {
+                    Spacer(minLength: 0)
+                    if let control = pinnedControl {
+                        pinnedButton(control)
+                    }
+                    driveButton
+                }
+                .frame(maxHeight: .infinity)
+            }
+        }
+        .frame(minHeight: minHeight)
+    }
+
     // MARK: - Header
 
-    private var header: some View {
+    private func header(showDataSource: Bool) -> some View {
         ZStack {
             HStack {
                 Button {
@@ -61,6 +107,10 @@ struct HomeView: View {
                 }
                 .offset(x: -12)
                 Spacer()
+                if showDataSource {
+                    DataSourceMenu(navigationPath: $navigationPath, alignment: .trailing)
+                        .offset(x: 12)
+                }
             }
             Text("DashPilot")
                 .foregroundColor(.white)
@@ -70,7 +120,7 @@ struct HomeView: View {
 
     // MARK: - Widget grid
 
-    private var widgetGrid: some View {
+    private func widgetGrid(fillHeight: Bool) -> some View {
         VStack(spacing: DashMetrics.gridGap) {
             HStack(spacing: DashMetrics.gridGap) {
                 Button {
@@ -79,7 +129,8 @@ struct HomeView: View {
                     InfoWidget(
                         icon: "battery.100.bolt",
                         label: "Battery",
-                        value: socText
+                        value: socText,
+                        fillHeight: fillHeight
                     )
                 }
                 .buttonStyle(.plain)
@@ -89,7 +140,8 @@ struct HomeView: View {
                     InfoWidget(
                         icon: "thermometer.medium",
                         label: "Battery Temp",
-                        value: batteryTempText
+                        value: batteryTempText,
+                        fillHeight: fillHeight
                     )
                 }
                 .buttonStyle(.plain)
@@ -98,12 +150,14 @@ struct HomeView: View {
                 InfoWidget(
                     icon: "snowflake",
                     label: "AC Temp",
-                    value: acTempText
+                    value: acTempText,
+                    fillHeight: fillHeight
                 )
                 InfoWidget(
                     icon: "gauge.with.dots.needle.bottom.50percent",
                     label: "Odometer",
-                    value: odometerText
+                    value: odometerText,
+                    fillHeight: fillHeight
                 )
             }
         }
@@ -111,24 +165,33 @@ struct HomeView: View {
 
     // MARK: - Pinned control
 
+    private var pinnedControl: ControlAction? {
+        pinnedControlId.isEmpty ? nil : controlById(pinnedControlId)
+    }
+
+    private var hasPinnedControl: Bool { pinnedControl != nil }
+
     @ViewBuilder
     private var pinnedSection: some View {
-        if !pinnedControlId.isEmpty, let control = controlById(pinnedControlId) {
+        if let control = pinnedControl {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Pinned")
                     .foregroundColor(.dashTextMuted)
                     .font(.system(size: 13, weight: .semibold))
-                ControlActionButton(
-                    action: control,
-                    pinned: true,
-                    enabled: connectionVM.bleManager != nil,
-                    onTap: { control.perform(connectionVM.bleManager) },
-                    onLongPress: {}
-                )
+                pinnedButton(control)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            Spacer().frame(height: 24)
         }
+    }
+
+    private func pinnedButton(_ control: ControlAction) -> some View {
+        ControlActionButton(
+            action: control,
+            pinned: true,
+            enabled: connectionVM.bleManager != nil,
+            onTap: { control.perform(connectionVM.bleManager) },
+            onLongPress: {}
+        )
     }
 
     // MARK: - Actions
@@ -141,12 +204,16 @@ struct HomeView: View {
             ActionButton(label: "Controls", icon: "slider.horizontal.3") {
                 navigationPath.append(AppRoute.controls)
             }
-            ActionButton(label: "Drive", icon: "car.fill", accent: true) {
-                let dashboard = selectedDashboard()
-                navigationPath.append(
-                    AppRoute.dashboard(type: dashboard.type.rawValue, url: dashboard.url)
-                )
-            }
+            driveButton
+        }
+    }
+
+    private var driveButton: some View {
+        ActionButton(label: "Drive", icon: "car.fill", accent: true) {
+            let dashboard = selectedDashboard()
+            navigationPath.append(
+                AppRoute.dashboard(type: dashboard.type.rawValue, url: dashboard.url)
+            )
         }
     }
 
@@ -198,6 +265,7 @@ struct HomeView: View {
 private struct DataSourceMenu: View {
 
     @Binding var navigationPath: NavigationPath
+    var alignment: Alignment = .center
     @Environment(ConnectionViewModel.self) var connectionVM
 
     var body: some View {
@@ -228,7 +296,7 @@ private struct DataSourceMenu: View {
                     .multilineTextAlignment(.center)
             }
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, alignment: alignment)
     }
 
     private var isIdle: Bool {
@@ -255,8 +323,17 @@ private struct InfoWidget: View {
     let icon: String
     let label: String
     let value: String
+    var fillHeight: Bool = false
 
     var body: some View {
+        if fillHeight {
+            card
+        } else {
+            card.aspectRatio(1.4, contentMode: .fit)
+        }
+    }
+
+    private var card: some View {
         VStack(alignment: .leading, spacing: 0) {
             IconChip(
                 systemName: icon,
@@ -279,7 +356,36 @@ private struct InfoWidget: View {
         .padding(16)
         .background(Color.dashSurface)
         .clipShape(RoundedRectangle(cornerRadius: DashMetrics.corner))
-        .aspectRatio(1.4, contentMode: .fit)
+    }
+}
+
+// MARK: - Action tile
+
+/// Landscape counterpart of `ActionButton`: a card with the icon at the top
+/// and the label at the bottom, sized to match the stat tiles beside it.
+private struct ActionTile: View {
+
+    let label: String
+    let icon: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 0) {
+                IconChip(systemName: icon)
+                Spacer(minLength: 0)
+                Text(label)
+                    .foregroundColor(.white)
+                    .font(.system(size: 16, weight: .semibold))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+            .padding(16)
+            .background(Color.dashSurface)
+            .clipShape(RoundedRectangle(cornerRadius: DashMetrics.corner))
+        }
+        .buttonStyle(.plain)
     }
 }
 
