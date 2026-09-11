@@ -72,6 +72,11 @@ enum VehicleControl {
     // The firmware clamps to 1..60 and persists it in NVS.
     static let cmdClimateKeepDuration = 0x47
 
+    // --- Mirror auto-dip on reverse toggle (UI_vehicleControl 0x273) ---
+    // The firmware flips the live UI_mirrorDipOnReverse bit. Only acts while the
+    // car is in reverse; the override drops when it leaves reverse. Value ignored.
+    static let cmdMirrorDipToggle = 0x48
+
     /// Bind (or clear, with actionValue 0) an N-finger tap to a control action.
     @discardableResult
     static func sendFingerAction(_ manager: DashKitBleManager, fingers: Int, actionValue: Int) -> Bool {
@@ -99,6 +104,12 @@ enum VehicleControl {
     @discardableResult
     static func sendRearFanToggle(_ manager: DashKitBleManager) -> Bool {
         send(manager, opcode: cmdRearFanToggle, value: 1)
+    }
+
+    /// Toggle mirror auto-dip while in reverse (no-op outside reverse; value ignored).
+    @discardableResult
+    static func sendMirrorDipToggle(_ manager: DashKitBleManager) -> Bool {
+        send(manager, opcode: cmdMirrorDipToggle, value: 1)
     }
 
     /// Ask the DashKit to reboot (firmware calls esp_restart; value ignored).
