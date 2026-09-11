@@ -81,6 +81,11 @@ object VehicleControl {
     // The firmware clamps to 1..60 and persists it in NVS.
     const val CMD_CLIMATE_KEEP_DURATION: Int = 0x47
 
+    // --- Mirror auto-dip on reverse toggle (UI_vehicleControl 0x273) ---
+    // The firmware flips the live UI_mirrorDipOnReverse bit. Only acts while the
+    // car is in reverse; the override drops when it leaves reverse. Value ignored.
+    const val CMD_MIRROR_DIP_TOGGLE: Int = 0x48
+
     /** Bind (or clear, with actionValue 0) an N-finger tap to a control action. */
     fun sendFingerAction(manager: DashKitBleManager, fingers: Int, actionValue: Int): Boolean =
         send(manager, CMD_MULTI_FINGER_ACTION, (fingers shl 8) or (actionValue and 0xFF))
@@ -110,6 +115,10 @@ object VehicleControl {
     /** Toggle the rear AC fan (firmware flips OFF <-> HIGH; value ignored). */
     fun sendRearFanToggle(manager: DashKitBleManager): Boolean =
         send(manager, CMD_REAR_FAN_TOGGLE, 1)
+
+    /** Toggle mirror auto-dip while in reverse (no-op outside reverse; value ignored). */
+    fun sendMirrorDipToggle(manager: DashKitBleManager): Boolean =
+        send(manager, CMD_MIRROR_DIP_TOGGLE, 1)
 
     /** Ask the DashKit to reboot (firmware calls esp_restart; value ignored). */
     fun sendReboot(manager: DashKitBleManager): Boolean =

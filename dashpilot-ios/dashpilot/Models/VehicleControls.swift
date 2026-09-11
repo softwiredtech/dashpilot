@@ -119,6 +119,19 @@ let vehicleControls: [ControlAction] = [
             }
         }
     ),
+    // Momentary: the firmware only acts in reverse and drops the override when
+    // the car leaves reverse, so there is no stable on/off state to show.
+    ControlAction(
+        id: "mirror_dip",
+        icon: "arrow.down.right",
+        label: { "Toggle Mirror Dip" },
+        active: { false },
+        gestureValue: 8,
+        perform: { manager in
+            guard let manager else { return }
+            VehicleControl.sendMirrorDipToggle(manager)
+        }
+    ),
     // Glovebox is an electronic latch release: open only (closed by hand).
     ControlAction(
         id: "glovebox",

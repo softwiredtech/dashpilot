@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Air
+import androidx.compose.material.icons.rounded.SouthEast
 import androidx.compose.material.icons.rounded.EvStation
 import androidx.compose.material.icons.rounded.Flip
 import androidx.compose.material.icons.rounded.Inbox
@@ -147,6 +148,18 @@ val vehicleControls: List<ControlAction> = listOf(
             if (manager == null || VehicleControl.sendRearFanToggle(manager)) {
                 ControlsState.rearFanOn = !ControlsState.rearFanOn
             }
+        }
+    ),
+    // Momentary: the firmware only acts in reverse and drops the override when
+    // the car leaves reverse, so there is no stable on/off state to show.
+    ControlAction(
+        id = "mirror_dip",
+        icon = Icons.Rounded.SouthEast,
+        label = { "Toggle Mirror Dip" },
+        active = { false },
+        gestureValue = 8,
+        perform = { manager ->
+            manager?.let { VehicleControl.sendMirrorDipToggle(it) }
         }
     ),
     // Glovebox is an electronic latch release: open only (closed by hand).
