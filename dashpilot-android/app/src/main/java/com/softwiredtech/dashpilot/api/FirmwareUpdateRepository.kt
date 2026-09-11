@@ -40,7 +40,7 @@ object FirmwareUpdateRepository {
     private const val TAG = "FirmwareUpdateRepo"
 
     const val MANIFEST_URL =
-        "https://firebasestorage.googleapis.com/v0/b/xreport-f792c.appspot.com/o/dashkit%2Fmanifest.json?alt=media&token=68bcc03a-3951-454d-8f35-f5ab06c0ed0a"
+        "https://firebasestorage.googleapis.com/v0/b/dashkit-connect.firebasestorage.app/o/dashkit%2Fmanifest.json?alt=media&token=68bcc03a-3951-454d-8f35-f5ab06c0ed0a"
 
     private val client: OkHttpClient by lazy {
         OkHttpClient.Builder()
