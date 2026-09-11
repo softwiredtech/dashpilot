@@ -145,11 +145,18 @@ class DashKitBleManager(private val context: Context) {
     // this handler; disconnect() clears it wholesale.
     private val handler = Handler(Looper.getMainLooper())
 
+    // Set by the OTA uploader for the duration of a transfer: a ping racing a
+    // chunk write steals the single in-flight GATT slot, and the firmware
+    // exempts the updating phone from its keepalive cull anyway. The loop
+    // keeps rescheduling so pings resume as soon as the flag clears.
+    @Volatile
+    var suppressPings = false
+
     // Keepalive: reschedules itself while Connected and in the foreground.
     private val pingRunnable = object : Runnable {
         override fun run() {
             if (!appInForeground || _connectionState.value != ConnectionStatus.Connected) return
-            VehicleControl.sendPing(this@DashKitBleManager)
+            if (!suppressPings) VehicleControl.sendPing(this@DashKitBleManager)
             handler.postDelayed(this, PING_INTERVAL_MS)
         }
     }

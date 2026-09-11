@@ -52,6 +52,7 @@ class DashKitOtaUpdate(
         firmware = fw
         firmwareOffset = 0
 
+        manager.suppressPings = true
         manager.addGattListener(this)
 
         // If already connected, use existing GATT directly
@@ -66,6 +67,7 @@ class DashKitOtaUpdate(
 
     fun cancel() {
         manager.removeGattListener(this)
+        manager.suppressPings = false
         firmware = null
         ctrlChar = null
         dataChar = null
@@ -145,6 +147,7 @@ class DashKitOtaUpdate(
         if (currentState !is OtaState.Rebooting && currentState !is OtaState.Idle) {
             _state.value = OtaState.Error("Disconnected unexpectedly")
         }
+        manager.suppressPings = false
         firmware = null
         ctrlChar = null
         dataChar = null
@@ -216,6 +219,7 @@ class DashKitOtaUpdate(
                 Log.d(TAG, "OTA complete, device rebooting")
                 _state.value = OtaState.Rebooting
                 manager.removeGattListener(this)
+                manager.suppressPings = false
                 firmware = null
             }
             0xFF -> {
@@ -223,6 +227,7 @@ class DashKitOtaUpdate(
                 Log.e(TAG, "OTA error from device: 0x${errCode.toString(16)}")
                 _state.value = OtaState.Error("Device reported error (0x${errCode.toString(16)})")
                 manager.removeGattListener(this)
+                manager.suppressPings = false
                 firmware = null
             }
         }
