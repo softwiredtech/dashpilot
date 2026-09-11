@@ -17,7 +17,7 @@ struct FirmwareManifest: Codable, Equatable {
 enum FirmwareUpdateRepository {
 
     static let manifestURL =
-        "https://firebasestorage.googleapis.com/v0/b/xreport-f792c.appspot.com/o/dashkit%2Fmanifest.json?alt=media&token=68bcc03a-3951-454d-8f35-f5ab06c0ed0a"
+        "https://firebasestorage.googleapis.com/v0/b/dashkit-connect.firebasestorage.app/o/dashkit%2Fmanifest.json?alt=media&token=68bcc03a-3951-454d-8f35-f5ab06c0ed0a"
 
     /// Download and parse the update manifest. Returns nil on any failure.
     static func fetchManifest() async -> FirmwareManifest? {

@@ -299,6 +299,15 @@ class DashKitBleManager(private val context: Context) {
                 gatt = g
                 discoveryStarted = false
                 g.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH)
+                // Pin the link to 1M PHY (firmware 0.1.4+ requests 1M too; older
+                // firmware asks for 2M, and the central's preference wins). On 2M
+                // the phone dropped the encrypted stream every ~10 min with a MIC
+                // failure (status 61); the CAN stream needs a fraction of 1M's rate.
+                g.setPreferredPhy(
+                    BluetoothDevice.PHY_LE_1M_MASK,
+                    BluetoothDevice.PHY_LE_1M_MASK,
+                    BluetoothDevice.PHY_OPTION_NO_PREFERRED
+                )
                 // DashKit's characteristics require an encrypted (paired) link.
                 // Ensure we are bonded before discovering services.
                 when (g.device.bondState) {
@@ -417,6 +426,11 @@ class DashKitBleManager(private val context: Context) {
                 _connectionState.value = ConnectionStatus.Disconnected
                 forEachListener { it.onDisconnected() }
             }
+        }
+
+        override fun onPhyUpdate(g: BluetoothGatt, txPhy: Int, rxPhy: Int, status: Int) {
+            Log.d(TAG, "PHY updated tx=$txPhy rx=$rxPhy status=$status")
+            crashlytics.log("BLE: PHY updated tx=$txPhy rx=$rxPhy status=$status")
         }
 
         override fun onMtuChanged(g: BluetoothGatt, newMtu: Int, status: Int) {
