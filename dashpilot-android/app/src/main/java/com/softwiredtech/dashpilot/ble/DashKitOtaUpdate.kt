@@ -76,6 +76,12 @@ class DashKitOtaUpdate(
     }
 
     override fun onServicesReady(gatt: BluetoothGatt) {
+        if (_state.value is OtaState.Rebooting) {
+            // The DashKit came back on the new firmware: the update is done.
+            manager.removeGattListener(this)
+            _state.value = OtaState.Idle
+            return
+        }
         setupOtaService(gatt)
     }
 
@@ -144,6 +150,8 @@ class DashKitOtaUpdate(
 
     override fun onDisconnected() {
         val currentState = _state.value
+        // Rebooting expects this drop; the listener stays registered so the
+        // reconnect's onServicesReady can clear the completed state.
         if (currentState !is OtaState.Rebooting && currentState !is OtaState.Idle) {
             _state.value = OtaState.Error("Disconnected unexpectedly")
         }
@@ -218,7 +226,6 @@ class DashKitOtaUpdate(
             0x02 -> {
                 Log.d(TAG, "OTA complete, device rebooting")
                 _state.value = OtaState.Rebooting
-                manager.removeGattListener(this)
                 manager.suppressPings = false
                 firmware = null
             }
