@@ -1,20 +1,27 @@
 package com.softwiredtech.dashpilot.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AcUnit
 import androidx.compose.material.icons.rounded.AutoAwesome
@@ -41,14 +48,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.softwiredtech.dashpilot.BuildConfig
 import com.softwiredtech.dashpilot.ble.TeslaStatus
 import com.softwiredtech.dashpilot.datamodel.dash.CarState
 import com.softwiredtech.dashpilot.datamodel.dash.DashState
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.DashKitBleManager
 import com.softwiredtech.dashpilot.datasource.DataSourceType
+import com.softwiredtech.dashpilot.ui.controls.ControlAction
 import com.softwiredtech.dashpilot.ui.controls.ControlActionButton
 import com.softwiredtech.dashpilot.ui.controls.controlById
 import com.softwiredtech.dashpilot.ui.tesla.TeslaTile
@@ -120,6 +130,10 @@ fun HomeScreen(
     }
 }
 
+private val ScreenPadding = 24.dp
+private val GridGap = 16.dp
+private val HeaderHeight = 48.dp
+
 @Composable
 private fun ConnectedHomeContent(
     dashState: Flow<DashState>?,
@@ -145,81 +159,140 @@ private fun ConnectedHomeContent(
     val tesla by (teslaStatus ?: idleTesla).collectAsState()
     val idleReset = remember { MutableStateFlow(false) }
     val resetPending by (teslaResetPending ?: idleReset).collectAsState()
+    val pinned = controlById(pinnedControlId)
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 24.dp, vertical = 24.dp)
-    ) {
-        Box(modifier = Modifier.fillMaxWidth()) {
-            // Offset by the IconButton's built-in content inset so the gear
-            // glyph lines up with the tiles' left edge below.
-            IconButton(
-                onClick = onSettingsClick,
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .offset(x = (-12).dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Rounded.Settings,
-                    contentDescription = "Settings",
-                    tint = DarkColors.TextMuted,
-                    modifier = Modifier.size(24.dp)
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val landscape = maxWidth > maxHeight
+        val contentMinHeight = maxHeight - ScreenPadding * 2 - HeaderHeight - 8.dp
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(ScreenPadding)
+        ) {
+            Header(
+                showDataSource = landscape,
+                connectionStatus = connectionStatus,
+                onSelectDataSource = onSelectDataSource,
+                onConnect = onConnect,
+                onDisconnect = onDisconnect,
+                onSettingsClick = onSettingsClick
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            if (landscape) {
+                LandscapeContent(
+                    minHeight = contentMinHeight,
+                    car = car,
+                    useImperial = useImperial,
+                    bleManager = bleManager,
+                    pinned = pinned,
+                    tesla = tesla,
+                    resetPending = resetPending,
+                    onEnrollTesla = onEnrollTesla,
+                    onAutomations = onAutomations,
+                    onControls = onControls,
+                    onDrive = onDrive
+                )
+            } else {
+                PortraitContent(
+                    car = car,
+                    useImperial = useImperial,
+                    bleManager = bleManager,
+                    pinned = pinned,
+                    tesla = tesla,
+                    resetPending = resetPending,
+                    connectionStatus = connectionStatus,
+                    onEnrollTesla = onEnrollTesla,
+                    onConnect = onConnect,
+                    onDisconnect = onDisconnect,
+                    onSelectDataSource = onSelectDataSource,
+                    onAutomations = onAutomations,
+                    onControls = onControls,
+                    onDrive = onDrive
                 )
             }
-            Text(
-                text = "DashPilot",
-                color = Color.White,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.align(Alignment.Center)
-            )
         }
+    }
+}
 
-        Spacer(modifier = Modifier.height(8.dp))
+@Composable
+private fun Header(
+    showDataSource: Boolean,
+    connectionStatus: ConnectionStatus,
+    onSelectDataSource: (String) -> Unit,
+    onConnect: (serverAddress: String, dataSourceType: String) -> Unit,
+    onDisconnect: () -> Unit,
+    onSettingsClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(HeaderHeight)
+    ) {
+        // Offset by the IconButton's built-in content inset so the gear
+        // glyph lines up with the tiles' left edge below.
+        IconButton(
+            onClick = onSettingsClick,
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .offset(x = (-12).dp)
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.Settings,
+                contentDescription = "Settings",
+                tint = DarkColors.TextMuted,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+        Text(
+            text = "DashPilot",
+            color = Color.White,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.align(Alignment.Center)
+        )
+        if (showDataSource) {
+            Box(
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .offset(x = 12.dp)
+            ) {
+                DebugDataSourceMenu(connectionStatus, onSelectDataSource, onConnect, onDisconnect)
+            }
+        }
+    }
+}
 
-        // 2x2 widget grid
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            InfoWidget(
-                icon = Icons.Rounded.BatteryChargingFull,
-                label = "Battery",
-                value = socText(car),
-                modifier = Modifier.weight(1f)
-            )
-            InfoWidget(
-                icon = Icons.Rounded.DeviceThermostat,
-                label = "Battery Temp",
-                value = batteryTempText(car),
-                modifier = Modifier.weight(1f)
-            )
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            InfoWidget(
-                icon = Icons.Rounded.AcUnit,
-                label = "AC Temp",
-                value = tempText(car.acTemp),
-                modifier = Modifier.weight(1f)
-            )
-            InfoWidget(
-                icon = Icons.Rounded.Speed,
-                label = "Odometer",
-                value = odometerText(car.odometer, useImperial),
-                modifier = Modifier.weight(1f)
-            )
-        }
+@Composable
+private fun PortraitContent(
+    car: CarState,
+    useImperial: Boolean,
+    bleManager: DashKitBleManager?,
+    pinned: ControlAction?,
+    tesla: TeslaStatus,
+    resetPending: Boolean,
+    connectionStatus: ConnectionStatus,
+    onEnrollTesla: () -> Unit,
+    onConnect: (serverAddress: String, dataSourceType: String) -> Unit,
+    onDisconnect: () -> Unit,
+    onSelectDataSource: (String) -> Unit,
+    onAutomations: () -> Unit,
+    onControls: () -> Unit,
+    onDrive: () -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        WidgetGrid(car = car, useImperial = useImperial, fillHeight = false)
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        TeslaTile(status = tesla, resetPending = resetPending, onEnroll = onEnrollTesla)
+        if (BuildConfig.DEBUG) {
+            TeslaTile(status = tesla, resetPending = resetPending, onEnroll = onEnrollTesla)
+        }
 
-        controlById(pinnedControlId)?.let { action ->
+        pinned?.let { action ->
             Text(
                 text = "Pinned",
                 color = DarkColors.TextMuted,
@@ -227,13 +300,7 @@ private fun ConnectedHomeContent(
                 fontWeight = FontWeight.SemiBold
             )
             Spacer(modifier = Modifier.height(8.dp))
-            ControlActionButton(
-                action = action,
-                pinned = true,
-                enabled = bleManager != null,
-                onClick = { action.perform(bleManager) },
-                onLongClick = null
-            )
+            PinnedButton(action = action, bleManager = bleManager)
             Spacer(modifier = Modifier.height(24.dp))
         }
 
@@ -251,12 +318,7 @@ private fun ConnectedHomeContent(
             onClick = onControls
         )
         Spacer(modifier = Modifier.height(12.dp))
-        ActionButton(
-            label = "Drive",
-            icon = Icons.Rounded.DirectionsCar,
-            accent = true,
-            onClick = onDrive
-        )
+        DriveButton(onDrive)
         Spacer(modifier = Modifier.height(12.dp))
         Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
             DebugDataSourceMenu(connectionStatus, onSelectDataSource, onConnect, onDisconnect)
@@ -264,39 +326,183 @@ private fun ConnectedHomeContent(
     }
 }
 
+// Mirrors HomeView.swift: widget grid on the left, action tiles and the
+// primary buttons on the right, both stretched to the viewport height so the
+// screen fills without scrolling unless the content is genuinely taller.
+@Composable
+private fun LandscapeContent(
+    minHeight: Dp,
+    car: CarState,
+    useImperial: Boolean,
+    bleManager: DashKitBleManager?,
+    pinned: ControlAction?,
+    tesla: TeslaStatus,
+    resetPending: Boolean,
+    onEnrollTesla: () -> Unit,
+    onAutomations: () -> Unit,
+    onControls: () -> Unit,
+    onDrive: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = minHeight)
+            .height(IntrinsicSize.Min),
+        horizontalArrangement = Arrangement.spacedBy(ScreenPadding)
+    ) {
+        WidgetGrid(
+            car = car,
+            useImperial = useImperial,
+            fillHeight = true,
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+        )
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
+            verticalArrangement = Arrangement.spacedBy(GridGap)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                horizontalArrangement = Arrangement.spacedBy(GridGap)
+            ) {
+                ActionTile(
+                    label = "Automations",
+                    icon = Icons.Rounded.AutoAwesome,
+                    onClick = onAutomations,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                )
+                ActionTile(
+                    label = "Controls",
+                    icon = Icons.Rounded.Tune,
+                    onClick = onControls,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                )
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            ) {
+                Spacer(modifier = Modifier.weight(1f))
+                if (BuildConfig.DEBUG) {
+                    TeslaTile(status = tesla, resetPending = resetPending, onEnroll = onEnrollTesla)
+                }
+                pinned?.let { action ->
+                    PinnedButton(action = action, bleManager = bleManager)
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+                DriveButton(onDrive)
+            }
+        }
+    }
+}
+
+@Composable
+private fun WidgetGrid(
+    car: CarState,
+    useImperial: Boolean,
+    fillHeight: Boolean,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(GridGap)
+    ) {
+        val rowModifier = if (fillHeight) Modifier.fillMaxWidth().weight(1f) else Modifier.fillMaxWidth()
+        Row(
+            modifier = rowModifier,
+            horizontalArrangement = Arrangement.spacedBy(GridGap)
+        ) {
+            InfoWidget(
+                icon = Icons.Rounded.BatteryChargingFull,
+                label = "Battery",
+                value = socText(car),
+                fillHeight = fillHeight,
+                modifier = Modifier.weight(1f)
+            )
+            InfoWidget(
+                icon = Icons.Rounded.DeviceThermostat,
+                label = "Battery Temp",
+                value = batteryTempText(car),
+                fillHeight = fillHeight,
+                modifier = Modifier.weight(1f)
+            )
+        }
+        Row(
+            modifier = rowModifier,
+            horizontalArrangement = Arrangement.spacedBy(GridGap)
+        ) {
+            InfoWidget(
+                icon = Icons.Rounded.AcUnit,
+                label = "AC Temp",
+                value = tempText(car.acTemp),
+                fillHeight = fillHeight,
+                modifier = Modifier.weight(1f)
+            )
+            InfoWidget(
+                icon = Icons.Rounded.Speed,
+                label = "Odometer",
+                value = odometerText(car.odometer, useImperial),
+                fillHeight = fillHeight,
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+@Composable
+private fun PinnedButton(action: ControlAction, bleManager: DashKitBleManager?) {
+    ControlActionButton(
+        action = action,
+        pinned = true,
+        enabled = bleManager != null,
+        onClick = { action.perform(bleManager) },
+        onLongClick = null
+    )
+}
+
+@Composable
+private fun DriveButton(onDrive: () -> Unit) {
+    ActionButton(
+        label = "Drive",
+        icon = Icons.Rounded.DirectionsCar,
+        accent = true,
+        onClick = onDrive
+    )
+}
+
 @Composable
 private fun InfoWidget(
     icon: ImageVector,
     label: String,
     value: String,
+    fillHeight: Boolean,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
-            .aspectRatio(1.4f)
+            .then(if (fillHeight) Modifier.fillMaxHeight() else Modifier.aspectRatio(1.4f))
             .background(DarkColors.Surface, RoundedCornerShape(16.dp))
             .padding(16.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Box(
-            modifier = Modifier
-                .size(36.dp)
-                .background(AccentColor.copy(alpha = 0.14f), RoundedCornerShape(10.dp)),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = AccentColor,
-                modifier = Modifier.size(20.dp)
-            )
-        }
+        IconChip(icon = icon, tint = AccentColor, background = AccentColor.copy(alpha = 0.14f))
         Column {
             Text(
                 text = value,
                 color = Color.White,
                 fontSize = 26.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                maxLines = 1
             )
             Text(
                 text = label,
@@ -304,6 +510,50 @@ private fun InfoWidget(
                 fontSize = 13.sp
             )
         }
+    }
+}
+
+// Landscape counterpart of ActionButton: icon at the top, label at the
+// bottom, sized to match the stat tiles beside it.
+@Composable
+private fun ActionTile(
+    label: String,
+    icon: ImageVector,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .background(DarkColors.Surface, RoundedCornerShape(16.dp))
+            .clickable(onClick = onClick)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        IconChip(icon = icon, tint = Color.White, background = Color.White.copy(alpha = 0.08f))
+        Text(
+            text = label,
+            color = Color.White,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.SemiBold,
+            maxLines = 1
+        )
+    }
+}
+
+@Composable
+private fun IconChip(icon: ImageVector, tint: Color, background: Color) {
+    Box(
+        modifier = Modifier
+            .size(36.dp)
+            .background(background, RoundedCornerShape(10.dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = tint,
+            modifier = Modifier.size(20.dp)
+        )
     }
 }
 
