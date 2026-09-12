@@ -17,7 +17,8 @@ object VehicleProfileLoader {
 
         for ((i, bus) in config.buses.withIndex()) {
             busIndices[i] = bus.index
-            dbcContents[i] = context.assets.open("$basePath/${bus.dbc}")
+            val dbcPath = if (bus.dbc.startsWith("/")) bus.dbc.substring(1) else "$basePath/${bus.dbc}"
+            dbcContents[i] = context.assets.open(dbcPath)
                 .bufferedReader().use { it.readText() }
         }
 

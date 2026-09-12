@@ -12,7 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.softwiredtech.dashpilot.R
-import com.softwiredtech.dashpilot.datasource.ConnectionStatus
+import com.softwiredtech.dashkitconnect.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.DataSourceType
 import com.softwiredtech.dashpilot.viewmodel.ConnectionViewModel
 

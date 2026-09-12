@@ -1,7 +1,7 @@
 package com.softwiredtech.dashpilot.js
 
 import android.webkit.JavascriptInterface
-import com.softwiredtech.dashpilot.datamodel.dash.CarState
+import com.softwiredtech.dashkitconnect.CarState
 import com.softwiredtech.dashpilot.datamodel.dash.DisplaySettings
 
 class CarStateBridge {

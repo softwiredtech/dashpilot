@@ -30,8 +30,9 @@ These are the example apps running in the [dashpilot-android](./dashpilot-androi
 `/dashpilot-android`:  
 
 The android app that handles the connection to the vehicle, and running the `/dash-apps`.
-It has two main parts: the `bridge` and the `app` module.  
+It has three main parts: the `bridge`, `dashkit-connect` and `app` modules.  
 The `bridge` module contains the code that establishes connection to the car, and handles CAN message, signal decoding.
+The [`dashkit-connect`](./dashpilot-android/dashkit-connect/) module is a standalone Android library for DashKit BLE communication (connection, decoded `CarState` stream, vehicle control, Tesla key enrollment, OTA) that third-party apps can integrate.
 The `app` module contains the code for the various data sources, rive / web dash views, navigation, UI, settings, etc. 
 
 `/simulator`:  

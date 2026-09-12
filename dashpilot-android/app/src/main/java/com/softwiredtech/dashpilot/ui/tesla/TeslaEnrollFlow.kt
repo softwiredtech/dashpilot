@@ -30,9 +30,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.softwiredtech.dashpilot.R
-import com.softwiredtech.dashpilot.ble.TeslaLinkState
-import com.softwiredtech.dashpilot.ble.TeslaStatus
-import com.softwiredtech.dashpilot.datasource.DashKitBleManager
+import com.softwiredtech.dashkitconnect.tesla.TeslaLinkState
+import com.softwiredtech.dashkitconnect.tesla.TeslaStatus
+import com.softwiredtech.dashkitconnect.DashKitBleManager
 import com.softwiredtech.dashpilot.ui.onboarding.DevicePuck
 import com.softwiredtech.dashpilot.ui.onboarding.OnboardingPageScaffold
 import com.softwiredtech.dashpilot.ui.onboarding.PairingState

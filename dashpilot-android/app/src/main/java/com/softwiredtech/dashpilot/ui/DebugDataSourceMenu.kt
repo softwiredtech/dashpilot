@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.edit
 import com.softwiredtech.dashpilot.BuildConfig
 import com.softwiredtech.dashpilot.datamodel.dash.DASH_PREFS_NAME
-import com.softwiredtech.dashpilot.datasource.ConnectionStatus
+import com.softwiredtech.dashkitconnect.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.DataSourceType
 import com.softwiredtech.dashpilot.ui.theme.DarkColors
 

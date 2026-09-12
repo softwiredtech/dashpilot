@@ -34,8 +34,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.softwiredtech.dashpilot.ble.VehicleControl
-import com.softwiredtech.dashpilot.datasource.DashKitBleManager
+import com.softwiredtech.dashkitconnect.VehicleControl
+import com.softwiredtech.dashkitconnect.DashKitBleManager
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
 import com.softwiredtech.dashpilot.ui.theme.DarkColors
 

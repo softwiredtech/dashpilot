@@ -1,7 +1,7 @@
 package com.softwiredtech.dashpilot.ui.tesla
 
-import com.softwiredtech.dashpilot.ble.TeslaLinkState
-import com.softwiredtech.dashpilot.ble.TeslaStatus
+import com.softwiredtech.dashkitconnect.tesla.TeslaLinkState
+import com.softwiredtech.dashkitconnect.tesla.TeslaStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow

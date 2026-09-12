@@ -1,8 +1,8 @@
 package com.softwiredtech.dashpilot.ui.tesla
 
 import com.softwiredtech.dashpilot.R
-import com.softwiredtech.dashpilot.ble.TeslaLinkState
-import com.softwiredtech.dashpilot.ble.TeslaStatus
+import com.softwiredtech.dashkitconnect.tesla.TeslaLinkState
+import com.softwiredtech.dashkitconnect.tesla.TeslaStatus
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

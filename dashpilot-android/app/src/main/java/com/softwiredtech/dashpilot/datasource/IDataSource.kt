@@ -1,6 +1,6 @@
 package com.softwiredtech.dashpilot.datasource
 
-import com.softwiredtech.dashpilot.datamodel.dash.CarState
+import com.softwiredtech.dashkitconnect.CarState
 import kotlinx.coroutines.flow.Flow
 
 interface IDataSource {

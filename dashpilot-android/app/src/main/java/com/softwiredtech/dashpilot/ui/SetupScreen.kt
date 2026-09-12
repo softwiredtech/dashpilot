@@ -61,7 +61,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.softwiredtech.dashpilot.BuildConfig
 import com.softwiredtech.dashpilot.R
-import com.softwiredtech.dashpilot.datasource.ConnectionStatus
+import com.softwiredtech.dashkitconnect.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.DataSourceType
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
 import com.softwiredtech.dashpilot.ui.theme.DarkColors

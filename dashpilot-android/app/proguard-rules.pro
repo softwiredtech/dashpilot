@@ -11,7 +11,7 @@
 }
 
 # --- CarState data class (used by JS bridge and Gson) ---
--keep class com.softwiredtech.dashpilot.datamodel.dash.CarState { *; }
+-keep class com.softwiredtech.dashkitconnect.CarState { *; }
 -keep class com.softwiredtech.dashpilot.datamodel.dash.DashboardConfig { *; }
 -keep class com.softwiredtech.dashpilot.datamodel.dash.DashboardConfig$* { *; }
 
@@ -39,9 +39,6 @@
 -keep class com.google.gson.reflect.TypeToken { *; }
 -keep class * extends com.google.gson.reflect.TypeToken
 -keep class com.softwiredtech.dashpilot.datamodel.api.** { *; }
-
-# --- Firmware OTA update manifest (parsed by Gson via reflection) ---
--keep class com.softwiredtech.dashpilot.api.FirmwareManifest { *; }
 
 # --- OkHttp ---
 -dontwarn okhttp3.internal.platform.**

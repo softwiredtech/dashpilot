@@ -25,8 +25,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.softwiredtech.dashpilot.R
-import com.softwiredtech.dashpilot.ble.TeslaLinkState
-import com.softwiredtech.dashpilot.ble.TeslaStatus
+import com.softwiredtech.dashkitconnect.tesla.TeslaLinkState
+import com.softwiredtech.dashkitconnect.tesla.TeslaStatus
 import com.softwiredtech.dashpilot.ui.theme.DarkColors
 import com.softwiredtech.dashpilot.ui.theme.OnboardingColors
 import com.softwiredtech.dashpilot.ui.theme.TeslaCyan

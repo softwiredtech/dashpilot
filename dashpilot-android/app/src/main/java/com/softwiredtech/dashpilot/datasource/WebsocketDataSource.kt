@@ -1,7 +1,7 @@
 package com.softwiredtech.dashpilot.datasource
 
 import com.google.gson.Gson
-import com.softwiredtech.dashpilot.datamodel.dash.CarState
+import com.softwiredtech.dashkitconnect.CarState
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow

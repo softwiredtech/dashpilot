@@ -1,17 +1,10 @@
 package com.softwiredtech.dashpilot.viewmodel
 
 import android.Manifest
-import android.annotation.SuppressLint
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothManager
-import android.bluetooth.le.ScanCallback
-import android.bluetooth.le.ScanResult
-import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.BatteryManager
 import android.os.Build
-import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -47,18 +40,20 @@ import com.softwiredtech.dashpilot.datamodel.dash.getClimateKeepAutomation
 import com.softwiredtech.dashpilot.datamodel.dash.setClimateKeepAutomation
 import com.softwiredtech.dashpilot.datamodel.dash.getClimateKeepMinutes
 import com.softwiredtech.dashpilot.datamodel.dash.setClimateKeepMinutes
+import com.softwiredtech.dashpilot.datamodel.dash.toImperial
 import com.softwiredtech.dashpilot.ui.controls.controlById
 import com.softwiredtech.dashpilot.datasource.DataSourceType
 import com.softwiredtech.dashpilot.datasource.CommaDataSource
-import com.softwiredtech.dashpilot.datasource.ConnectionStatus
+import com.softwiredtech.dashpilot.datasource.CrashlyticsTelemetry
+import com.softwiredtech.dashkitconnect.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.IDataSource
-import com.softwiredtech.dashpilot.datasource.DashKitBleManager
+import com.softwiredtech.dashkitconnect.DashKitBleManager
+import com.softwiredtech.dashkitconnect.DashKitDiscovery
 import com.softwiredtech.dashpilot.datasource.DashKitDataSource
 import com.softwiredtech.dashpilot.datasource.WebsocketDataSource
-import com.softwiredtech.dashpilot.ble.VehicleControl
+import com.softwiredtech.dashkitconnect.VehicleControl
 import com.softwiredtech.dashpilot.jni.VehicleBridge
 import com.softwiredtech.dashpilot.util.NetworkUtil
-import com.softwiredtech.dashpilot.vehicle.CanFrameDecoder
 import com.softwiredtech.dashpilot.vehicle.VehicleProfileLoader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -74,9 +69,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withTimeoutOrNull
-import kotlin.coroutines.resume
 
 class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     private val _dataSource = MutableStateFlow<IDataSource?>(null)
@@ -221,59 +213,15 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         }
 
         viewModelScope.launch {
-            val route = withTimeoutOrNull(STARTUP_SCAN_TIMEOUT_MS) {
-                scanForDashKit(context)
-            } ?: StartupRoute.DEFAULT
+            val found = DashKitDiscovery.find(context, STARTUP_SCAN_TIMEOUT_MS)
+            val route = when {
+                found == null -> StartupRoute.DEFAULT
+                found.bonded -> StartupRoute.AUTOCONNECT_DASHKIT
+                else -> StartupRoute.ONBOARDING_DASHKIT
+            }
             _startupTarget.value = StartupTarget(route, generation)
         }
     }
-
-    @SuppressLint("MissingPermission")
-    private suspend fun scanForDashKit(context: Context): StartupRoute =
-        suspendCancellableCoroutine { cont ->
-            val adapter = (context.getSystemService(Context.BLUETOOTH_SERVICE) as? BluetoothManager)
-                ?.adapter
-            val scanner = adapter?.bluetoothLeScanner
-            if (scanner == null) {
-                if (cont.isActive) cont.resume(StartupRoute.DEFAULT)
-                return@suspendCancellableCoroutine
-            }
-
-            val callback = object : ScanCallback() {
-                override fun onScanResult(callbackType: Int, result: ScanResult) {
-                    val name = result.device.name ?: result.scanRecord?.deviceName
-                    if (name != DASHKIT_DEVICE_NAME) return
-                    val bonded = result.device.bondState == BluetoothDevice.BOND_BONDED
-                    try { scanner.stopScan(this) } catch (_: Exception) {}
-                    if (cont.isActive) {
-                        cont.resume(
-                            if (bonded) StartupRoute.AUTOCONNECT_DASHKIT
-                            else StartupRoute.ONBOARDING_DASHKIT
-                        )
-                    }
-                }
-
-                override fun onScanFailed(errorCode: Int) {
-                    Log.e("ConnectionViewModel", "Startup scan failed: $errorCode")
-                    if (cont.isActive) cont.resume(StartupRoute.DEFAULT)
-                }
-            }
-
-            val settings = ScanSettings.Builder()
-                .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-                .build()
-            try {
-                scanner.startScan(null, settings, callback)
-            } catch (e: Exception) {
-                Log.e("ConnectionViewModel", "Startup scan could not start: ${e.message}")
-                if (cont.isActive) cont.resume(StartupRoute.DEFAULT)
-                return@suspendCancellableCoroutine
-            }
-
-            cont.invokeOnCancellation {
-                try { scanner.stopScan(callback) } catch (_: Exception) {}
-            }
-        }
 
     private val _displaySettings = MutableStateFlow(DisplaySettings())
     private val _speedCameraDistance = MutableStateFlow(-1)
@@ -331,15 +279,9 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
             val vehicleName = "tesla" // TODO: make configurable via UI
             val prefs = context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
             val extraBus = prefs.getBoolean(PREF_EXTRA_VEHICLE_BUS, DEFAULT_EXTRA_VEHICLE_BUS)
-            val configFile = when (dataSourceType) {
-                DataSourceType.DASHKIT -> "config_dashkit.json"
-                else -> if (extraBus) "config_comma_extra_bus.json" else "config_comma_normal.json"
-            }
-            val profile = VehicleProfileLoader.loadProfile(context, vehicleName, configFile)
-            val bridge = VehicleBridge()
             val ds = when (dataSourceType) {
                 DataSourceType.DASHKIT -> {
-                    val manager = DashKitBleManager(context)
+                    val manager = DashKitBleManager(context, CrashlyticsTelemetry)
                     _bleManager.value = manager
                     launch {
                         manager.connectionState.collect { st ->
@@ -350,11 +292,15 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
                             }
                         }
                     }
-                    val decoder = CanFrameDecoder(bridge, profile)
-                    DashKitDataSource(manager, decoder)
+                    DashKitDataSource(context, manager)
                 }
                 DataSourceType.WEBSOCKET -> WebsocketDataSource()
-                else -> CommaDataSource(bridge, profile)
+                else -> {
+                    val configFile =
+                        if (extraBus) "config_comma_extra_bus.json" else "config_comma_normal.json"
+                    val profile = VehicleProfileLoader.loadProfile(context, vehicleName, configFile)
+                    CommaDataSource(VehicleBridge(), profile)
+                }
             }
 
             if (finalServerAddress.isEmpty() && dataSourceType == DataSourceType.COMMA) {
@@ -531,7 +477,6 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     }
 
     companion object {
-        private const val DASHKIT_DEVICE_NAME = "DashKit"
         private const val STARTUP_SCAN_TIMEOUT_MS = 3000L
     }
 }

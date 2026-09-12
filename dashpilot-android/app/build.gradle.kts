@@ -79,6 +79,7 @@ tasks.named("preBuild") {
 
 dependencies {
     implementation(project(":bridge"))
+    implementation(project(":dashkit-connect"))
     implementation("app.rive:rive-android:11.7.0")
     implementation("androidx.startup:startup-runtime:1.1.1")
     implementation("androidx.webkit:webkit:1.12.1")

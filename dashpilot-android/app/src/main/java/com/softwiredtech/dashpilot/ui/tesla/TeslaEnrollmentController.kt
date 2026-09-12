@@ -2,12 +2,12 @@ package com.softwiredtech.dashpilot.ui.tesla
 
 import android.bluetooth.BluetoothManager
 import android.content.Context
-import com.softwiredtech.dashpilot.ble.TeslaClient
-import com.softwiredtech.dashpilot.ble.TeslaFaultDetail
-import com.softwiredtech.dashpilot.ble.TeslaLinkState
-import com.softwiredtech.dashpilot.ble.TeslaStatus
-import com.softwiredtech.dashpilot.ble.TeslaVehicleScanner
-import com.softwiredtech.dashpilot.datasource.DashKitBleManager
+import com.softwiredtech.dashkitconnect.tesla.TeslaClient
+import com.softwiredtech.dashkitconnect.tesla.TeslaFaultDetail
+import com.softwiredtech.dashkitconnect.tesla.TeslaLinkState
+import com.softwiredtech.dashkitconnect.tesla.TeslaStatus
+import com.softwiredtech.dashkitconnect.tesla.TeslaVehicleScanner
+import com.softwiredtech.dashkitconnect.DashKitBleManager
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job

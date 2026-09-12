@@ -1,8 +1,7 @@
 package com.softwiredtech.dashpilot.datasource
 
-import com.softwiredtech.dashpilot.datamodel.dash.CarState
+import com.softwiredtech.dashkitconnect.CarState
 import com.softwiredtech.dashpilot.jni.VehicleBridge
-import com.softwiredtech.dashpilot.vehicle.CanFrameDecoder
 import com.softwiredtech.dashpilot.vehicle.VehicleProfile
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
@@ -36,7 +35,7 @@ class CommaDataSource(
         bridge.nativeStartReceiveLoop(
             decoderHandle, groupHandle, reusableBuffer
         ) { values ->
-            _incoming.tryEmit(CanFrameDecoder.arrayToCarState(values))
+            _incoming.tryEmit(CarState.fromArray(values))
         }
     }
 

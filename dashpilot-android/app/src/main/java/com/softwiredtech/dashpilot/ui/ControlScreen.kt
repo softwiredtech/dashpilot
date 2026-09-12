@@ -18,7 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.softwiredtech.dashpilot.BuildConfig
-import com.softwiredtech.dashpilot.datasource.DashKitBleManager
+import com.softwiredtech.dashkitconnect.DashKitBleManager
 import com.softwiredtech.dashpilot.ui.controls.ControlActionButton
 import com.softwiredtech.dashpilot.ui.controls.vehicleControls
 import com.softwiredtech.dashpilot.ui.theme.DarkColors

@@ -43,11 +43,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.softwiredtech.dashpilot.ble.TeslaStatus
-import com.softwiredtech.dashpilot.datamodel.dash.CarState
+import com.softwiredtech.dashkitconnect.tesla.TeslaStatus
+import com.softwiredtech.dashkitconnect.CarState
 import com.softwiredtech.dashpilot.datamodel.dash.DashState
-import com.softwiredtech.dashpilot.datasource.ConnectionStatus
-import com.softwiredtech.dashpilot.datasource.DashKitBleManager
+import com.softwiredtech.dashkitconnect.ConnectionStatus
+import com.softwiredtech.dashkitconnect.DashKitBleManager
 import com.softwiredtech.dashpilot.datasource.DataSourceType
 import com.softwiredtech.dashpilot.ui.controls.ControlActionButton
 import com.softwiredtech.dashpilot.ui.controls.controlById

@@ -1,5 +1,7 @@
 package com.softwiredtech.dashpilot.datamodel.dash
 
+import com.softwiredtech.dashkitconnect.CarState
+
 data class DashState(
     val carState: CarState = CarState(),
     val phoneBattery: Int = -1,

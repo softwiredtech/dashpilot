@@ -1,6 +1,7 @@
 #pragma once
 
 #include "common/vehicle_decoder.h"
+#include "msgq/ipc.h"
 #include <capnp/message.h>
 #include <capnp/serialize.h>
 // log.capnp.h uses ANDROID as an enum value, but the Android NDK defines it
@@ -30,6 +31,10 @@
 #else
 #define BRIDGE_LOG(fmt, ...) printf(fmt "\n", ##__VA_ARGS__)
 #endif
+
+struct SubSocketGroup {
+    std::vector<SubSocket*> sockets;
+};
 
 namespace bridge {
 

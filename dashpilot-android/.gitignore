@@ -14,3 +14,4 @@ bridge/build-host
 .externalNativeBuild
 .cxx
 local.properties
+.kotlin
