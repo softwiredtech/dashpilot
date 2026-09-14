@@ -58,7 +58,7 @@ import com.softwiredtech.dashpilot.ui.theme.DarkColors
 private val FINGER_COUNTS = 3..5
 
 // Minutes the keep-climate-on window can run (matches the firmware clamp).
-private val CLIMATE_KEEP_MINUTE_RANGE = 1..60
+internal val CLIMATE_KEEP_MINUTE_RANGE = 1..60
 
 // Matches the firmware clamp.
 private val SPORT_KICKDOWN_PERCENT_RANGE = 10..95
@@ -144,8 +144,8 @@ fun AutomationsScreen(
             Spacer(modifier = Modifier.height(8.dp))
             AutomationRow(
                 icon = Icons.Rounded.Speed,
-                title = "Sport kick-down",
-                subtitle = "Switch from Chill to Sport pedal response while the accelerator is pressed past the threshold. Reverts when you ease off.",
+                title = "Kick-down",
+                subtitle = "Switch from Chill to Standard while the accelerator is pressed past the threshold. Reverts when you ease off.",
                 checked = sportKickdownEnabled,
                 onToggle = { onSportKickdownChange(!sportKickdownEnabled) },
                 extraContent = if (sportKickdownEnabled) {
@@ -211,7 +211,7 @@ private fun SectionLabel(text: String) {
 }
 
 @Composable
-private fun NumberPickerFooter(
+internal fun NumberPickerFooter(
     label: String,
     value: Int,
     unit: String,
@@ -403,7 +403,7 @@ private fun AddTriggerButton(onClick: () -> Unit) {
 }
 
 @Composable
-private fun AutomationRow(
+internal fun AutomationRow(
     icon: ImageVector,
     title: String,
     subtitle: String?,

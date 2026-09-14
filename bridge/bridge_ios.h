@@ -39,6 +39,12 @@ typedef struct {
     double packTMax;
     double odometer;
     double acTemp;
+    double acTempRight;
+    double hvacFanLevel;
+    double hvacPowerState;
+    double hvacAcMode;
+    double hvacRecirc;
+    double hvacKeepClimateOn;
 
     // Openpilot state
     double madsActive;

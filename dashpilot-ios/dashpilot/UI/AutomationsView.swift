@@ -8,7 +8,7 @@ private let fingerCounts = 3...5
 private let fingerActionsKey = "finger_actions"
 
 /// Minutes the keep-climate-on window can run (matches the firmware clamp).
-private let climateKeepMinuteRange = 1...60
+let climateKeepMinuteRange = 1...60
 
 // Matches the firmware clamp.
 private let sportKickdownPercentOptions = Array(stride(from: 10, through: 95, by: 5))
@@ -91,8 +91,8 @@ struct AutomationsView: View {
                     Spacer().frame(height: 8)
                     AutomationRow(
                         icon: "gauge.with.needle",
-                        title: "Sport kick-down",
-                        subtitle: "Switch from Chill to Sport pedal response while the accelerator is pressed past the threshold. Reverts when you ease off.",
+                        title: "Kick-down",
+                        subtitle: "Switch from Chill to Standard while the accelerator is pressed past the threshold. Reverts when you ease off.",
                         isOn: $sportKickdown
                     ) {
                         if sportKickdown {
@@ -299,7 +299,7 @@ private struct SectionLabel: View {
 
 /// A `.dashSurface` card with an icon, title/subtitle, a trailing toggle, and
 /// an optional footer rendered inside the same card (Android `AutomationRow`).
-private struct AutomationRow<Footer: View>: View {
+struct AutomationRow<Footer: View>: View {
     let icon: String
     let title: String
     let subtitle: String?
@@ -369,7 +369,7 @@ extension AutomationRow where Footer == EmptyView {
 
 /// "Label  N unit" line inside an automation card; tapping the value expands a
 /// wheel over `options` (Android `NumberPickerFooter`).
-private struct ValuePickerFooter: View {
+struct ValuePickerFooter: View {
     let label: String
     let unit: String
     let options: [Int]

@@ -132,7 +132,7 @@ void vin_round_trips_through_the_double_array() {
     double out[CarState::FIELD_COUNT];
     h.cs.toArray(out);
     char decoded[CarState::VIN_DOUBLE_COUNT * sizeof(double) + 1] = {};
-    std::memcpy(decoded, out + 31, CarState::VIN_DOUBLE_COUNT * sizeof(double));
+    std::memcpy(decoded, out + CarState::VIN_OFFSET, CarState::VIN_DOUBLE_COUNT * sizeof(double));
     CHECK(std::string(decoded) == kVin);
 }
 
@@ -140,7 +140,7 @@ void empty_vin_encodes_as_zero_doubles() {
     CarState cs;
     double out[CarState::FIELD_COUNT];
     cs.toArray(out);
-    for (size_t i = 31; i < CarState::FIELD_COUNT; i++) {
+    for (size_t i = CarState::VIN_OFFSET; i < CarState::FIELD_COUNT; i++) {
         CHECK(out[i] == 0.0);
     }
 }

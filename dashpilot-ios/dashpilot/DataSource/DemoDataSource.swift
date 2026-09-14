@@ -157,6 +157,9 @@ final class DemoDataSource: IDataSource {
         s.packTMin = 22
         s.packTMax = 28
         s.acTemp = 22
+        s.acTempRight = 21
+        s.hvacFanLevel = 11
+        s.hvacPowerState = 1
         s.odometer = Float(42000 + t * 0.01)
 
         return s
