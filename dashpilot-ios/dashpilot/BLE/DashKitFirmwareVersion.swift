@@ -11,15 +11,24 @@ final class DashKitFirmwareVersion: DashKitGattListener {
     private(set) var version: String?
 
     private let manager: DashKitBleManager
+    private var registered = false
 
     init(manager: DashKitBleManager) {
         self.manager = manager
     }
 
     /// Register for callbacks; if already connected the manager immediately
-    /// replays onServicesReady, which triggers the read.
+    /// replays onServicesReady, which triggers the read. The listener stays
+    /// registered so every reconnect (e.g. the reboot after an OTA) re-reads.
     func read() {
+        guard !registered else { return }
+        registered = true
         manager.addGattListener(self)
+    }
+
+    // The link is gone, so the last value no longer describes what is running.
+    func onDisconnected() {
+        DispatchQueue.main.async { self.version = nil }
     }
 
     func onServicesReady(_ peripheral: CBPeripheral) {
@@ -59,5 +68,6 @@ final class DashKitFirmwareVersion: DashKitGattListener {
 
     func dispose() {
         manager.removeGattListener(self)
+        registered = false
     }
 }

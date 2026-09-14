@@ -10,6 +10,9 @@ private let fingerActionsKey = "finger_actions"
 /// Minutes the keep-climate-on window can run (matches the firmware clamp).
 private let climateKeepMinuteRange = 1...60
 
+// Matches the firmware clamp.
+private let sportKickdownPercentOptions = Array(stride(from: 10, through: 95, by: 5))
+
 /// A single multi-finger tap binding: `fingerCount` fingers -> vehicle
 /// control `controlId`.
 struct FingerAction: Identifiable, Equatable {
@@ -33,9 +36,13 @@ struct AutomationsView: View {
     @AppStorage("wiper_off_automation") private var wiperOff: Bool = false
     @AppStorage("climate_keep_automation") private var climateKeep: Bool = false
     @AppStorage("climate_keep_minutes") private var climateKeepMinutes: Int = 5
+    @AppStorage("sport_kickdown_automation") private var sportKickdown: Bool = false
+    @AppStorage("sport_kickdown_percent") private var sportKickdownPercent: Int = 80
     @State private var fingerActions: [FingerAction] = []
     @State private var minutesPushTask: Task<Void, Never>?
     @State private var minutesWheelExpanded = false
+    @State private var percentPushTask: Task<Void, Never>?
+    @State private var percentWheelExpanded = false
 
     var body: some View {
         ZStack {
@@ -68,9 +75,33 @@ struct AutomationsView: View {
                         isOn: $climateKeep
                     ) {
                         if climateKeep {
-                            ClimateKeepDurationFooter(
-                                minutes: $climateKeepMinutes,
+                            ValuePickerFooter(
+                                label: "Stop after",
+                                unit: "min",
+                                options: Array(climateKeepMinuteRange),
+                                value: $climateKeepMinutes,
                                 expanded: $minutesWheelExpanded
+                            )
+                        }
+                    }
+
+                    Spacer().frame(height: 28)
+
+                    SectionLabel("Driving")
+                    Spacer().frame(height: 8)
+                    AutomationRow(
+                        icon: "gauge.with.needle",
+                        title: "Sport kick-down",
+                        subtitle: "Switch from Chill to Sport pedal response while the accelerator is pressed past the threshold. Reverts when you ease off.",
+                        isOn: $sportKickdown
+                    ) {
+                        if sportKickdown {
+                            ValuePickerFooter(
+                                label: "Pedal threshold",
+                                unit: "%",
+                                options: sportKickdownPercentOptions,
+                                value: $sportKickdownPercent,
+                                expanded: $percentWheelExpanded
                             )
                         }
                     }
@@ -107,7 +138,10 @@ struct AutomationsView: View {
         // empty space: tapping outside the minutes wheel collapses it.
         .contentShape(Rectangle())
         .onTapGesture {
-            withAnimation { minutesWheelExpanded = false }
+            withAnimation {
+                minutesWheelExpanded = false
+                percentWheelExpanded = false
+            }
         }
         .navigationBarHidden(true)
         .onAppear(perform: loadFingerActions)
@@ -133,6 +167,24 @@ struct AutomationsView: View {
                 guard !Task.isCancelled else { return }
                 if let manager = connectionVM.bleManager {
                     VehicleControl.sendClimateKeepDuration(manager, minutes: newValue)
+                }
+            }
+        }
+        .onChange(of: sportKickdown) { _, newValue in
+            if !newValue {
+                percentWheelExpanded = false
+            }
+            if let manager = connectionVM.bleManager {
+                VehicleControl.sendSportKickdown(manager, enabled: newValue)
+            }
+        }
+        .onChange(of: sportKickdownPercent) { _, newValue in
+            percentPushTask?.cancel()
+            percentPushTask = Task {
+                try? await Task.sleep(for: .milliseconds(400))
+                guard !Task.isCancelled else { return }
+                if let manager = connectionVM.bleManager {
+                    VehicleControl.sendSportKickdownThreshold(manager, percent: newValue)
                 }
             }
         }
@@ -313,18 +365,21 @@ extension AutomationRow where Footer == EmptyView {
     }
 }
 
-// MARK: - Climate keep duration footer
+// MARK: - Value picker footer
 
-/// "Stop after N min" line inside the keep-climate-on card; tapping the value
-/// expands a minutes wheel (Android `ClimateKeepDurationFooter`).
-private struct ClimateKeepDurationFooter: View {
-    @Binding var minutes: Int
+/// "Label  N unit" line inside an automation card; tapping the value expands a
+/// wheel over `options` (Android `NumberPickerFooter`).
+private struct ValuePickerFooter: View {
+    let label: String
+    let unit: String
+    let options: [Int]
+    @Binding var value: Int
     @Binding var expanded: Bool
 
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                Text("Stop after")
+                Text(label)
                     .foregroundColor(.dashTextMuted)
                     .font(.system(size: 14))
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -333,7 +388,7 @@ private struct ClimateKeepDurationFooter: View {
                     withAnimation { expanded.toggle() }
                 } label: {
                     HStack(spacing: 2) {
-                        Text("\(minutes) min")
+                        Text("\(value) \(unit)")
                             .foregroundColor(.white)
                             .font(.system(size: 15))
                         Image(systemName: "chevron.down")
@@ -351,9 +406,9 @@ private struct ClimateKeepDurationFooter: View {
             .padding(.top, 10)
 
             if expanded {
-                Picker("", selection: $minutes) {
-                    ForEach(climateKeepMinuteRange, id: \.self) { value in
-                        Text("\(value) min").tag(value)
+                Picker("", selection: $value) {
+                    ForEach(options, id: \.self) { option in
+                        Text("\(option) \(unit)").tag(option)
                     }
                 }
                 .pickerStyle(.wheel)

@@ -163,6 +163,10 @@ final class ConnectionViewModel {
         VehicleControl.sendClimateKeep(manager, enabled: climateKeep)
         let climateKeepMinutes = UserDefaults.standard.integer(forKey: "climate_keep_minutes")
         VehicleControl.sendClimateKeepDuration(manager, minutes: climateKeepMinutes > 0 ? climateKeepMinutes : 5)
+        let sportKickdown = UserDefaults.standard.bool(forKey: "sport_kickdown_automation")
+        VehicleControl.sendSportKickdown(manager, enabled: sportKickdown)
+        let sportKickdownPercent = UserDefaults.standard.integer(forKey: "sport_kickdown_percent")
+        VehicleControl.sendSportKickdownThreshold(manager, percent: sportKickdownPercent > 0 ? sportKickdownPercent : 80)
     }
 
     // MARK: - Comma (WiFi)
