@@ -91,8 +91,8 @@ struct AutomationsView: View {
                     Spacer().frame(height: 8)
                     AutomationRow(
                         icon: "gauge.with.needle",
-                        title: "Sport kick-down",
-                        subtitle: "Switch from Chill to Sport pedal response while the accelerator is pressed past the threshold. Reverts when you ease off.",
+                        title: "Kick-down",
+                        subtitle: "Switch from Chill to Standard while the accelerator is pressed past the threshold. Reverts when you ease off.",
                         isOn: $sportKickdown
                     ) {
                         if sportKickdown {
