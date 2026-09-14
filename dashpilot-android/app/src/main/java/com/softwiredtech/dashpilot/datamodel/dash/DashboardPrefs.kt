@@ -24,6 +24,8 @@ const val PREF_PINNED_CONTROL = "pinned_control"
 const val PREF_WIPER_OFF_AUTOMATION = "wiper_off_automation"
 const val PREF_CLIMATE_KEEP_AUTOMATION = "climate_keep_automation"
 const val PREF_CLIMATE_KEEP_MINUTES = "climate_keep_minutes"
+const val PREF_SPORT_KICKDOWN_AUTOMATION = "sport_kickdown_automation"
+const val PREF_SPORT_KICKDOWN_PERCENT = "sport_kickdown_percent"
 // Map of finger count (3..5) -> control id, serialized as "3=glovebox;4=frunk".
 const val PREF_FINGER_ACTIONS = "finger_actions"
 // Legacy single three-finger binding, migrated into PREF_FINGER_ACTIONS.
@@ -31,6 +33,8 @@ const val PREF_THREE_FINGER_ACTION = "three_finger_action"
 const val DEFAULT_WIPER_OFF_AUTOMATION = false
 const val DEFAULT_CLIMATE_KEEP_AUTOMATION = false
 const val DEFAULT_CLIMATE_KEEP_MINUTES = 5
+const val DEFAULT_SPORT_KICKDOWN_AUTOMATION = false
+const val DEFAULT_SPORT_KICKDOWN_PERCENT = 80
 
 // Display settings defaults
 const val DEFAULT_SHOW_PHONE_BATTERY = true
@@ -131,6 +135,24 @@ fun getClimateKeepMinutes(context: Context): Int =
 fun setClimateKeepMinutes(context: Context, value: Int) {
     context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
         .edit { putInt(PREF_CLIMATE_KEEP_MINUTES, value) }
+}
+
+fun getSportKickdownAutomation(context: Context): Boolean =
+    context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
+        .getBoolean(PREF_SPORT_KICKDOWN_AUTOMATION, DEFAULT_SPORT_KICKDOWN_AUTOMATION)
+
+fun setSportKickdownAutomation(context: Context, value: Boolean) {
+    context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
+        .edit { putBoolean(PREF_SPORT_KICKDOWN_AUTOMATION, value) }
+}
+
+fun getSportKickdownPercent(context: Context): Int =
+    context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
+        .getInt(PREF_SPORT_KICKDOWN_PERCENT, DEFAULT_SPORT_KICKDOWN_PERCENT)
+
+fun setSportKickdownPercent(context: Context, value: Int) {
+    context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
+        .edit { putInt(PREF_SPORT_KICKDOWN_PERCENT, value) }
 }
 
 /**

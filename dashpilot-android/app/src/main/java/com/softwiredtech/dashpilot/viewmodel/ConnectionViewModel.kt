@@ -47,6 +47,11 @@ import com.softwiredtech.dashpilot.datamodel.dash.getClimateKeepAutomation
 import com.softwiredtech.dashpilot.datamodel.dash.setClimateKeepAutomation
 import com.softwiredtech.dashpilot.datamodel.dash.getClimateKeepMinutes
 import com.softwiredtech.dashpilot.datamodel.dash.setClimateKeepMinutes
+import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SPORT_KICKDOWN_PERCENT
+import com.softwiredtech.dashpilot.datamodel.dash.getSportKickdownAutomation
+import com.softwiredtech.dashpilot.datamodel.dash.setSportKickdownAutomation
+import com.softwiredtech.dashpilot.datamodel.dash.getSportKickdownPercent
+import com.softwiredtech.dashpilot.datamodel.dash.setSportKickdownPercent
 import com.softwiredtech.dashpilot.ui.controls.controlById
 import com.softwiredtech.dashpilot.datasource.DataSourceType
 import com.softwiredtech.dashpilot.datasource.CommaDataSource
@@ -119,6 +124,12 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     private val _climateKeepMinutes = MutableStateFlow(DEFAULT_CLIMATE_KEEP_MINUTES)
     val climateKeepMinutes = _climateKeepMinutes.asStateFlow()
 
+    private val _sportKickdownAutomation = MutableStateFlow(false)
+    val sportKickdownAutomation = _sportKickdownAutomation.asStateFlow()
+
+    private val _sportKickdownPercent = MutableStateFlow(DEFAULT_SPORT_KICKDOWN_PERCENT)
+    val sportKickdownPercent = _sportKickdownPercent.asStateFlow()
+
     private val _fingerActions = MutableStateFlow<Map<Int, String>>(emptyMap())
     val fingerActions = _fingerActions.asStateFlow()
 
@@ -126,6 +137,8 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         _wiperOffAutomation.value = getWiperOffAutomation(context)
         _climateKeepAutomation.value = getClimateKeepAutomation(context)
         _climateKeepMinutes.value = getClimateKeepMinutes(context)
+        _sportKickdownAutomation.value = getSportKickdownAutomation(context)
+        _sportKickdownPercent.value = getSportKickdownPercent(context)
         _fingerActions.value = getFingerActions(context)
     }
 
@@ -155,6 +168,24 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         climateKeepMinutesPush = viewModelScope.launch {
             delay(400)
             _bleManager.value?.let { VehicleControl.sendClimateKeepDuration(it, value) }
+        }
+    }
+
+    fun updateSportKickdownAutomation(context: Context, value: Boolean) {
+        setSportKickdownAutomation(context, value)
+        _sportKickdownAutomation.value = value
+        _bleManager.value?.let { VehicleControl.sendSportKickdown(it, value) }
+    }
+
+    private var sportKickdownPercentPush: Job? = null
+
+    fun updateSportKickdownPercent(context: Context, value: Int) {
+        setSportKickdownPercent(context, value)
+        _sportKickdownPercent.value = value
+        sportKickdownPercentPush?.cancel()
+        sportKickdownPercentPush = viewModelScope.launch {
+            delay(400)
+            _bleManager.value?.let { VehicleControl.sendSportKickdownThreshold(it, value) }
         }
     }
 
@@ -435,6 +466,13 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
                 val climateKeepMin = getClimateKeepMinutes(context)
                 _climateKeepMinutes.value = climateKeepMin
                 VehicleControl.sendClimateKeepDuration(mgr, climateKeepMin)
+
+                val sportKickdown = getSportKickdownAutomation(context)
+                _sportKickdownAutomation.value = sportKickdown
+                VehicleControl.sendSportKickdown(mgr, sportKickdown)
+                val sportKickdownPct = getSportKickdownPercent(context)
+                _sportKickdownPercent.value = sportKickdownPct
+                VehicleControl.sendSportKickdownThreshold(mgr, sportKickdownPct)
             }
         }
     }

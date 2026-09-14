@@ -21,6 +21,7 @@ import androidx.compose.material.icons.rounded.AcUnit
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.Speed
 import androidx.compose.material.icons.rounded.WaterDrop
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
@@ -59,6 +60,10 @@ private val FINGER_COUNTS = 3..5
 // Minutes the keep-climate-on window can run (matches the firmware clamp).
 private val CLIMATE_KEEP_MINUTE_RANGE = 1..60
 
+// Matches the firmware clamp.
+private val SPORT_KICKDOWN_PERCENT_RANGE = 10..95
+private const val SPORT_KICKDOWN_PERCENT_STEP = 5
+
 /**
  * Automations screen. Lets the user enable the wiper-off automation and bind
  * 3-, 4-, and 5-finger infotainment taps each to a vehicle control. Bindings are
@@ -74,6 +79,10 @@ fun AutomationsScreen(
     onClimateKeepChange: (Boolean) -> Unit,
     climateKeepMinutes: Int,
     onClimateKeepMinutesChange: (Int) -> Unit,
+    sportKickdownEnabled: Boolean,
+    onSportKickdownChange: (Boolean) -> Unit,
+    sportKickdownPercent: Int,
+    onSportKickdownPercentChange: (Int) -> Unit,
     fingerActions: Map<Int, String>,
     onSetFingerAction: (fingers: Int, id: String?) -> Unit,
     onChangeFingerCount: (from: Int, to: Int) -> Unit,
@@ -118,9 +127,36 @@ fun AutomationsScreen(
                 onToggle = { onClimateKeepChange(!climateKeepEnabled) },
                 extraContent = if (climateKeepEnabled) {
                     {
-                        ClimateKeepDurationFooter(
-                            minutes = climateKeepMinutes,
-                            onMinutesChange = onClimateKeepMinutesChange
+                        NumberPickerFooter(
+                            label = "Stop after",
+                            value = climateKeepMinutes,
+                            unit = "min",
+                            range = CLIMATE_KEEP_MINUTE_RANGE,
+                            onValueChange = onClimateKeepMinutesChange
+                        )
+                    }
+                } else null
+            )
+
+            Spacer(modifier = Modifier.height(28.dp))
+
+            SectionLabel("Driving")
+            Spacer(modifier = Modifier.height(8.dp))
+            AutomationRow(
+                icon = Icons.Rounded.Speed,
+                title = "Sport kick-down",
+                subtitle = "Switch from Chill to Sport pedal response while the accelerator is pressed past the threshold. Reverts when you ease off.",
+                checked = sportKickdownEnabled,
+                onToggle = { onSportKickdownChange(!sportKickdownEnabled) },
+                extraContent = if (sportKickdownEnabled) {
+                    {
+                        NumberPickerFooter(
+                            label = "Pedal threshold",
+                            value = sportKickdownPercent,
+                            unit = "%",
+                            range = SPORT_KICKDOWN_PERCENT_RANGE,
+                            step = SPORT_KICKDOWN_PERCENT_STEP,
+                            onValueChange = onSportKickdownPercentChange
                         )
                     }
                 } else null
@@ -175,11 +211,16 @@ private fun SectionLabel(text: String) {
 }
 
 @Composable
-private fun ClimateKeepDurationFooter(
-    minutes: Int,
-    onMinutesChange: (Int) -> Unit
+private fun NumberPickerFooter(
+    label: String,
+    value: Int,
+    unit: String,
+    range: IntRange,
+    onValueChange: (Int) -> Unit,
+    step: Int = 1
 ) {
     var showPicker by remember { mutableStateOf(false) }
+    val choices = remember(range, step) { (range step step).toList() }
 
     Spacer(modifier = Modifier.height(10.dp))
     Row(
@@ -187,7 +228,7 @@ private fun ClimateKeepDurationFooter(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Stop after",
+            text = label,
             color = DarkColors.TextMuted,
             fontSize = 14.sp,
             modifier = Modifier.weight(1f)
@@ -200,7 +241,7 @@ private fun ClimateKeepDurationFooter(
                 .padding(start = 12.dp, end = 6.dp, top = 8.dp, bottom = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "$minutes min", color = Color.White, fontSize = 15.sp)
+            Text(text = "$value $unit", color = Color.White, fontSize = 15.sp)
             Icon(
                 imageVector = Icons.Rounded.ArrowDropDown,
                 contentDescription = null,
@@ -211,19 +252,20 @@ private fun ClimateKeepDurationFooter(
     }
 
     if (showPicker) {
-        var pending by remember { mutableIntStateOf(minutes) }
+        var pending by remember { mutableIntStateOf(value) }
         AlertDialog(
             onDismissRequest = { showPicker = false },
-            title = { Text("Stop after") },
+            title = { Text(label) },
             text = {
                 AndroidView(
                     factory = { ctx ->
                         NumberPicker(ctx).apply {
-                            minValue = CLIMATE_KEEP_MINUTE_RANGE.first
-                            maxValue = CLIMATE_KEEP_MINUTE_RANGE.last
+                            minValue = 0
+                            maxValue = choices.lastIndex
+                            displayedValues = choices.map { "$it $unit" }.toTypedArray()
                             wrapSelectorWheel = false
-                            value = minutes
-                            setOnValueChangedListener { _, _, value -> pending = value }
+                            this.value = choices.indexOf(value).coerceAtLeast(0)
+                            setOnValueChangedListener { _, _, idx -> pending = choices[idx] }
                         }
                     },
                     modifier = Modifier.fillMaxWidth()
@@ -232,7 +274,7 @@ private fun ClimateKeepDurationFooter(
             confirmButton = {
                 TextButton(onClick = {
                     showPicker = false
-                    onMinutesChange(pending)
+                    onValueChange(pending)
                 }) { Text("OK") }
             },
             dismissButton = {
