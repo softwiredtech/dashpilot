@@ -37,11 +37,12 @@
   }
 
   function normalizeModeState(raw) {
-    if (raw?.dataSourceType !== "comma") return "off";
+    const sunnypilot = raw?.dataSourceType === "comma";
     const direct = String(raw?.state || raw?.mode || "").toLowerCase();
-    if (direct === "off" || direct === "mads" || direct === "full") return direct;
+    if (direct === "off" || direct === "full") return direct;
+    if (direct === "mads") return sunnypilot ? "mads" : "off";
     if (raw?.fullAdas || raw?.adasEnabled || raw?.adasOn) return "full";
-    if (raw?.madsEnabled || raw?.madsActive) return "mads";
+    if (raw?.madsEnabled || raw?.madsActive) return sunnypilot ? "mads" : "off";
     return "off";
   }
 
