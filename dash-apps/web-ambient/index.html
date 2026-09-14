@@ -542,9 +542,8 @@
     const ambientLayer = document.getElementById("ambientLayer");
 
     function mapAssist(car) {
-      if (car.dataSourceType !== "comma") return "off";
       if (car.adasOn) return "full";
-      if (car.madsActive) return "mads";
+      if (car.madsActive && car.dataSourceType === "comma") return "mads";
       return "off";
     }
 

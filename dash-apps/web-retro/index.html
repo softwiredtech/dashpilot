@@ -446,7 +446,7 @@ body.portrait-layout .right-zone {
   gap: calc(12 * var(--u));
 }
 
-.mode-strip-inner.hidden {
+.mode-text.hidden {
   visibility: hidden;
 }
 
@@ -639,7 +639,6 @@ const UI = {
   iconLim: document.getElementById('icon-lim'),
   modeMads: document.getElementById('mode-mads'),
   modeFull: document.getElementById('mode-full'),
-  modeStripInner: document.querySelector('.mode-strip-inner'),
   stage: document.getElementById('stage'),
   bs: {},
 };
@@ -757,7 +756,7 @@ function renderCarState(car) {
   const gear    = GEAR_MAP[Math.round(Number(car.gear) || 0)] || GEAR_FALLBACK;
   const isDrive = gear === 'D';
   const showSunnypilotModes = car.dataSourceType === 'comma';
-  const adasOn  = showSunnypilotModes && !!car.adasOn;
+  const adasOn  = !!car.adasOn;
   const mads    = showSunnypilotModes && !!car.madsActive;
   const imp     = !!car.isImperial;
 
@@ -782,7 +781,7 @@ function renderCarState(car) {
 
   // Mode strip + set speed — show state below, keep right display numeric only
   setModeState(adasOn ? 'full' : (mads ? 'mads' : ''));
-  UI.modeStripInner.classList.toggle('hidden', !showSunnypilotModes);
+  UI.modeMads.classList.toggle('hidden', !showSunnypilotModes);
   fillDisp14(UI.setDisp, adasOn && setSpd > 0 ? formatDisplayValue(setSpd) : BLANK_DISPLAY, 'md');
 
   // Speed limit
