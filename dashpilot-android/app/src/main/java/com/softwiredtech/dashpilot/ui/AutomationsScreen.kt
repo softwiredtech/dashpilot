@@ -144,8 +144,8 @@ fun AutomationsScreen(
             Spacer(modifier = Modifier.height(8.dp))
             AutomationRow(
                 icon = Icons.Rounded.Speed,
-                title = "Sport kick-down",
-                subtitle = "Switch from Chill to Sport pedal response while the accelerator is pressed past the threshold. Reverts when you ease off.",
+                title = "Kick-down",
+                subtitle = "Switch from Chill to Standard while the accelerator is pressed past the threshold. Reverts when you ease off.",
                 checked = sportKickdownEnabled,
                 onToggle = { onSportKickdownChange(!sportKickdownEnabled) },
                 extraContent = if (sportKickdownEnabled) {
