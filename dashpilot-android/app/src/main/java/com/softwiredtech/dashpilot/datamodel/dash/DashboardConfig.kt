@@ -56,6 +56,16 @@ val availableDashboards = buildList {
         )
     )
 
+    add(
+        DashboardConfig(
+            id = "rive",
+            nameRes = R.string.dashboard_name_rive,
+            url = "dashboard_main",
+            type = DashboardType.RIVE,
+            screenshotRes = R.drawable.preview_rive
+        )
+    )
+
     if (BuildConfig.DEBUG) {
         add(
             DashboardConfig(

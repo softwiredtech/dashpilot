@@ -36,6 +36,7 @@ private val debugSources = buildList {
     add(DataSourceType.DASHKIT to "DashKit")
     if (BuildConfig.DEBUG) {
         add(DataSourceType.WEBSOCKET to "WebSocket")
+        add(DataSourceType.DEMO to "Demo")
     }
 }
 
@@ -79,6 +80,8 @@ fun DebugDataSourceMenu(
                             expanded = false
                             if (key == DataSourceType.WEBSOCKET) {
                                 showIpDialog = true
+                            } else if (key == DataSourceType.DEMO) {
+                                onConnect("", key)
                             } else {
                                 onSelectDataSource(key)
                                 onConnect("", key)
