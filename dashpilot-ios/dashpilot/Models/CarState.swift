@@ -31,6 +31,12 @@ struct CarState: Codable {
     var packTMax: Float = 0
     var odometer: Float = 0
     var acTemp: Float = 0
+    var acTempRight: Float = 0
+    var hvacFanLevel: Float = 0
+    var hvacPowerState: Float = 0
+    var hvacAcMode: Float = 0
+    var hvacRecirc: Float = 0
+    var hvacKeepClimateOn: Float = 0
 
     // Openpilot state
     var madsActive: Bool = false
@@ -68,6 +74,12 @@ struct CarState: Codable {
         packTMax = Float(bridge.packTMax)
         odometer = Float(bridge.odometer)
         acTemp = Float(bridge.acTemp)
+        acTempRight = Float(bridge.acTempRight)
+        hvacFanLevel = Float(bridge.hvacFanLevel)
+        hvacPowerState = Float(bridge.hvacPowerState)
+        hvacAcMode = Float(bridge.hvacAcMode)
+        hvacRecirc = Float(bridge.hvacRecirc)
+        hvacKeepClimateOn = Float(bridge.hvacKeepClimateOn)
         madsActive = bridge.madsActive > 0
         selfdriveActive = bridge.selfdriveActive > 0
         experimentalMode = bridge.experimentalMode > 0
@@ -89,6 +101,7 @@ struct CarState: Codable {
         c.packTMin = packTMin != 0 ? packTMin * 1.8 + 32 : 0
         c.packTMax = packTMax != 0 ? packTMax * 1.8 + 32 : 0
         c.acTemp = acTemp != 0 ? acTemp * 1.8 + 32 : 0
+        c.acTempRight = acTempRight != 0 ? acTempRight * 1.8 + 32 : 0
         if Self.speedLimitSignsInKm() {
             c.fusedSpeedLimit = fusedSpeedLimit * Self.kmToMiles
         }
@@ -124,6 +137,12 @@ struct CarState: Codable {
         packTMax             = try c.decodeIfPresent(Float.self, forKey: .packTMax)             ?? 0
         odometer             = try c.decodeIfPresent(Float.self, forKey: .odometer)             ?? 0
         acTemp               = try c.decodeIfPresent(Float.self, forKey: .acTemp)               ?? 0
+        acTempRight          = try c.decodeIfPresent(Float.self, forKey: .acTempRight)          ?? 0
+        hvacFanLevel         = try c.decodeIfPresent(Float.self, forKey: .hvacFanLevel)         ?? 0
+        hvacPowerState       = try c.decodeIfPresent(Float.self, forKey: .hvacPowerState)       ?? 0
+        hvacAcMode           = try c.decodeIfPresent(Float.self, forKey: .hvacAcMode)           ?? 0
+        hvacRecirc           = try c.decodeIfPresent(Float.self, forKey: .hvacRecirc)           ?? 0
+        hvacKeepClimateOn    = try c.decodeIfPresent(Float.self, forKey: .hvacKeepClimateOn)    ?? 0
         madsActive           = try c.decodeIfPresent(Bool.self,  forKey: .madsActive)           ?? false
         selfdriveActive      = try c.decodeIfPresent(Bool.self,  forKey: .selfdriveActive)      ?? false
         experimentalMode     = try c.decodeIfPresent(Bool.self,  forKey: .experimentalMode)     ?? false

@@ -21,6 +21,19 @@ struct BatteryView: View {
                     Spacer().frame(height: 24)
 
                     socCard
+                    if let preheat = controlById("battery_preheat") {
+                        Spacer().frame(height: 28)
+                        Text("Preheat")
+                            .foregroundColor(.dashTextMuted)
+                            .font(.system(size: 13, weight: .semibold))
+                        Spacer().frame(height: 8)
+                        ControlActionButton(
+                            action: preheat,
+                            enabled: connectionVM.bleManager != nil,
+                            onTap: { preheat.perform(connectionVM.bleManager) },
+                            onLongPress: {}
+                        )
+                    }
 
                     Spacer().frame(height: 28)
 
@@ -47,6 +60,7 @@ struct BatteryView: View {
                         ("Temp Min", tempText(car?.packTMin)),
                         ("Temp Max", tempText(car?.packTMax))
                     ])
+
 
                     Spacer().frame(height: 32)
                 }

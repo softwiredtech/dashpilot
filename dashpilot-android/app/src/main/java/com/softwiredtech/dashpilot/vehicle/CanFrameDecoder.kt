@@ -58,7 +58,13 @@ class CanFrameDecoder(
                 madsActive = values[28] > 0,
                 changingLane = values[29] > 0,
                 acTemp = values[30].toFloat(),
-                vin = decodeVin(values, offset = 31)
+                acTempRight = values[31].toFloat(),
+                hvacFanLevel = values[32].toFloat(),
+                hvacPowerState = values[33].toFloat(),
+                hvacAcMode = values[34].toFloat(),
+                hvacRecirc = values[35].toFloat(),
+                hvacKeepClimateOn = values[36].toFloat(),
+                vin = decodeVin(values, offset = 37)
             )
         }
 
