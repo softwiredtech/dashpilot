@@ -86,6 +86,12 @@ object VehicleControl {
     // car is in reverse; the override drops when it leaves reverse. Value ignored.
     const val CMD_MIRROR_DIP_TOGGLE: Int = 0x48
 
+    // --- Sport kick-down (UI_powertrainControl 0x334) ---
+    // 1=enable, 0=disable. Persisted in NVS by the firmware.
+    const val CMD_SPORT_KICKDOWN_ENABLE: Int = 0x49
+    // Trigger pedal percent, clamped to 10..95. Persisted in NVS by the firmware.
+    const val CMD_SPORT_KICKDOWN_THRESHOLD: Int = 0x4A
+
     /** Bind (or clear, with actionValue 0) an N-finger tap to a control action. */
     fun sendFingerAction(manager: DashKitBleManager, fingers: Int, actionValue: Int): Boolean =
         send(manager, CMD_MULTI_FINGER_ACTION, (fingers shl 8) or (actionValue and 0xFF))
@@ -101,6 +107,12 @@ object VehicleControl {
     /** Set how many minutes the keep-climate-on automation runs. */
     fun sendClimateKeepDuration(manager: DashKitBleManager, minutes: Int): Boolean =
         send(manager, CMD_CLIMATE_KEEP_DURATION, minutes)
+
+    fun sendSportKickdown(manager: DashKitBleManager, enabled: Boolean): Boolean =
+        send(manager, CMD_SPORT_KICKDOWN_ENABLE, if (enabled) 1 else 0)
+
+    fun sendSportKickdownThreshold(manager: DashKitBleManager, percent: Int): Boolean =
+        send(manager, CMD_SPORT_KICKDOWN_THRESHOLD, percent)
 
     /** Ask the DashKit to open a pairing window for one new device. */
     fun sendEnterPairing(manager: DashKitBleManager): Boolean {
