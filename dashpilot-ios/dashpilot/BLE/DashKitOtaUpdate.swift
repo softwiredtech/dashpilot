@@ -41,6 +41,10 @@ final class DashKitOtaUpdate: DashKitGattListener {
     private var canChar: CBCharacteristic?
     private var canWasNotifying = false
 
+    // Set synchronously on the BLE queue when the device reports completion;
+    // `state` is published on main so it can lag the disconnect that follows.
+    private var rebooting = false
+
     init(manager: DashKitBleManager) {
         self.manager = manager
     }
@@ -52,6 +56,8 @@ final class DashKitOtaUpdate: DashKitGattListener {
         }
         firmware = fw
         firmwareOffset = 0
+        rebooting = false
+        manager.suppressPings = true
         setState(.connecting)
         // If already connected the manager replays onServicesReady right away;
         // otherwise kick off a connection.
@@ -61,6 +67,8 @@ final class DashKitOtaUpdate: DashKitGattListener {
 
     func cancel() {
         manager.removeGattListener(self)
+        manager.suppressPings = false
+        rebooting = false
         resumeCanNotifications()
         firmware = nil
         peripheral = nil
@@ -85,6 +93,13 @@ final class DashKitOtaUpdate: DashKitGattListener {
     // MARK: - DashKitGattListener (called on the manager's BLE queue)
 
     func onServicesReady(_ peripheral: CBPeripheral) {
+        if rebooting {
+            // The DashKit came back on the new firmware: the update is done.
+            rebooting = false
+            manager.removeGattListener(self)
+            setState(.idle)
+            return
+        }
         guard let service = peripheral.services?.first(where: { $0.uuid == DashKitGatt.otaService }) else {
             setState(.error("OTA service not found on device"))
             return
@@ -137,12 +152,12 @@ final class DashKitOtaUpdate: DashKitGattListener {
     }
 
     func onDisconnected() {
-        switch state {
-        case .rebooting, .idle:
-            break
-        default:
+        // Rebooting expects this drop; the listener stays registered so the
+        // reconnect's onServicesReady can clear the completed state.
+        if !rebooting, state != .idle {
             setState(.error("Disconnected unexpectedly"))
         }
+        manager.suppressPings = false
         firmware = nil
         peripheral = nil
         ctrlChar = nil
@@ -198,14 +213,16 @@ final class DashKitOtaUpdate: DashKitGattListener {
             }
         case 0x02:
             print("[DashKitOta] OTA complete, device rebooting")
+            rebooting = true
             setState(.rebooting)
-            manager.removeGattListener(self)
+            manager.suppressPings = false
             firmware = nil
         case 0xFF:
             let errCode = value.count > 1 ? value[1] : 0
             print("[DashKitOta] OTA error from device: 0x\(String(errCode, radix: 16))")
             setState(.error("Device reported error (0x\(String(errCode, radix: 16)))"))
             manager.removeGattListener(self)
+            manager.suppressPings = false
             resumeCanNotifications()
             firmware = nil
         default:

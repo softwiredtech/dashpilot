@@ -77,6 +77,12 @@ enum VehicleControl {
     // car is in reverse; the override drops when it leaves reverse. Value ignored.
     static let cmdMirrorDipToggle = 0x48
 
+    // --- Sport kick-down (UI_powertrainControl 0x334) ---
+    // 1=enable, 0=disable. Persisted in NVS by the firmware.
+    static let cmdSportKickdownEnable = 0x49
+    // Trigger pedal percent, clamped to 10..95. Persisted in NVS by the firmware.
+    static let cmdSportKickdownThreshold = 0x4A
+
     /// Bind (or clear, with actionValue 0) an N-finger tap to a control action.
     @discardableResult
     static func sendFingerAction(_ manager: DashKitBleManager, fingers: Int, actionValue: Int) -> Bool {
@@ -134,6 +140,16 @@ enum VehicleControl {
     @discardableResult
     static func sendClimateKeepDuration(_ manager: DashKitBleManager, minutes: Int) -> Bool {
         send(manager, opcode: cmdClimateKeepDuration, value: minutes)
+    }
+
+    @discardableResult
+    static func sendSportKickdown(_ manager: DashKitBleManager, enabled: Bool) -> Bool {
+        send(manager, opcode: cmdSportKickdownEnable, value: enabled ? 1 : 0)
+    }
+
+    @discardableResult
+    static func sendSportKickdownThreshold(_ manager: DashKitBleManager, percent: Int) -> Bool {
+        send(manager, opcode: cmdSportKickdownThreshold, value: percent)
     }
 
     /// Write a control command to the DashKit. Returns true if the write was

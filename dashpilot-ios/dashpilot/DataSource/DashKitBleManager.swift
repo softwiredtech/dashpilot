@@ -130,6 +130,11 @@ final class DashKitBleManager: NSObject {
     private var retryTask: DispatchWorkItem?
     private var pingTask: DispatchWorkItem?
 
+    // Set by the OTA uploader for the duration of a transfer; the firmware
+    // exempts the updating phone from its keepalive cull. The loop keeps
+    // rescheduling so pings resume as soon as the flag clears.
+    var suppressPings = false
+
     /// Keepalive foreground gate. Suspension alone stops pings too late (and
     /// never under the debugger), so it's explicit. Accessed on `queue`.
     private var appInForeground = true
@@ -257,9 +262,11 @@ final class DashKitBleManager: NSObject {
     // `queue` because VehicleControl.send uses queue.sync.
     private func schedulePing() {
         pingTask?.cancel()
-        DispatchQueue.global().async { [weak self] in
-            guard let self else { return }
-            VehicleControl.sendPing(self)
+        if !suppressPings {
+            DispatchQueue.global().async { [weak self] in
+                guard let self else { return }
+                VehicleControl.sendPing(self)
+            }
         }
         pingTask = schedule(after: Self.pingInterval) { [weak self] in
             guard let self, self.state == .connected else { return }
