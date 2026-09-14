@@ -87,6 +87,8 @@ fun HomeScreen(
     onConnect: (serverAddress: String, dataSourceType: String) -> Unit,
     onDisconnect: () -> Unit,
     onNext: () -> Unit,
+    onBattery: () -> Unit,
+    onClimate: () -> Unit,
     onAutomations: () -> Unit,
     onControls: () -> Unit,
     onDrive: () -> Unit,
@@ -111,6 +113,8 @@ fun HomeScreen(
                 onConnect = onConnect,
                 onDisconnect = onDisconnect,
                 onSelectDataSource = { selectedDataSource = it },
+                onBattery = onBattery,
+                onClimate = onClimate,
                 onAutomations = onAutomations,
                 onControls = onControls,
                 onDrive = onDrive,
@@ -146,6 +150,8 @@ private fun ConnectedHomeContent(
     onConnect: (serverAddress: String, dataSourceType: String) -> Unit,
     onDisconnect: () -> Unit,
     onSelectDataSource: (String) -> Unit,
+    onBattery: () -> Unit,
+    onClimate: () -> Unit,
     onAutomations: () -> Unit,
     onControls: () -> Unit,
     onDrive: () -> Unit,
@@ -192,6 +198,8 @@ private fun ConnectedHomeContent(
                     tesla = tesla,
                     resetPending = resetPending,
                     onEnrollTesla = onEnrollTesla,
+                    onBattery = onBattery,
+                    onClimate = onClimate,
                     onAutomations = onAutomations,
                     onControls = onControls,
                     onDrive = onDrive
@@ -209,6 +217,8 @@ private fun ConnectedHomeContent(
                     onConnect = onConnect,
                     onDisconnect = onDisconnect,
                     onSelectDataSource = onSelectDataSource,
+                    onBattery = onBattery,
+                    onClimate = onClimate,
                     onAutomations = onAutomations,
                     onControls = onControls,
                     onDrive = onDrive
@@ -279,12 +289,14 @@ private fun PortraitContent(
     onConnect: (serverAddress: String, dataSourceType: String) -> Unit,
     onDisconnect: () -> Unit,
     onSelectDataSource: (String) -> Unit,
+    onBattery: () -> Unit,
+    onClimate: () -> Unit,
     onAutomations: () -> Unit,
     onControls: () -> Unit,
     onDrive: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        WidgetGrid(car = car, useImperial = useImperial, fillHeight = false)
+        WidgetGrid(car = car, useImperial = useImperial, fillHeight = false, onBattery = onBattery, onClimate = onClimate)
 
         Spacer(modifier = Modifier.height(32.dp))
 
@@ -339,6 +351,8 @@ private fun LandscapeContent(
     tesla: TeslaStatus,
     resetPending: Boolean,
     onEnrollTesla: () -> Unit,
+    onBattery: () -> Unit,
+    onClimate: () -> Unit,
     onAutomations: () -> Unit,
     onControls: () -> Unit,
     onDrive: () -> Unit
@@ -354,6 +368,8 @@ private fun LandscapeContent(
             car = car,
             useImperial = useImperial,
             fillHeight = true,
+            onBattery = onBattery,
+            onClimate = onClimate,
             modifier = Modifier
                 .weight(1f)
                 .fillMaxHeight()
@@ -411,6 +427,8 @@ private fun WidgetGrid(
     car: CarState,
     useImperial: Boolean,
     fillHeight: Boolean,
+    onBattery: () -> Unit,
+    onClimate: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -427,14 +445,16 @@ private fun WidgetGrid(
                 label = "Battery",
                 value = socText(car),
                 fillHeight = fillHeight,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                onClick = onBattery
             )
             InfoWidget(
                 icon = Icons.Rounded.DeviceThermostat,
                 label = "Battery Temp",
                 value = batteryTempText(car),
                 fillHeight = fillHeight,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                onClick = onBattery
             )
         }
         Row(
@@ -446,7 +466,8 @@ private fun WidgetGrid(
                 label = "AC Temp",
                 value = tempText(car.acTemp),
                 fillHeight = fillHeight,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                onClick = onClimate
             )
             InfoWidget(
                 icon = Icons.Rounded.Speed,
@@ -486,12 +507,14 @@ private fun InfoWidget(
     label: String,
     value: String,
     fillHeight: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null
 ) {
     Column(
         modifier = modifier
             .then(if (fillHeight) Modifier.fillMaxHeight() else Modifier.aspectRatio(1.4f))
             .background(DarkColors.Surface, RoundedCornerShape(16.dp))
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
             .padding(16.dp),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
@@ -541,7 +564,7 @@ private fun ActionTile(
 }
 
 @Composable
-private fun IconChip(icon: ImageVector, tint: Color, background: Color) {
+internal fun IconChip(icon: ImageVector, tint: Color, background: Color) {
     Box(
         modifier = Modifier
             .size(36.dp)

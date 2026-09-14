@@ -21,6 +21,12 @@ object ThemePickerRoute
 object AutomationsRoute
 
 @Serializable
+object BatteryRoute
+
+@Serializable
+object ClimateRoute
+
+@Serializable
 object ControlsRoute
 
 @Serializable

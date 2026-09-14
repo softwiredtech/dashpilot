@@ -147,12 +147,17 @@ struct HomeView: View {
                 .buttonStyle(.plain)
             }
             HStack(spacing: DashMetrics.gridGap) {
-                InfoWidget(
-                    icon: "snowflake",
-                    label: "AC Temp",
-                    value: acTempText,
-                    fillHeight: fillHeight
-                )
+                Button {
+                    navigationPath.append(AppRoute.climate)
+                } label: {
+                    InfoWidget(
+                        icon: "snowflake",
+                        label: "AC Temp",
+                        value: acTempText,
+                        fillHeight: fillHeight
+                    )
+                }
+                .buttonStyle(.plain)
                 InfoWidget(
                     icon: "gauge.with.dots.needle.bottom.50percent",
                     label: "Odometer",

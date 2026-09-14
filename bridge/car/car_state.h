@@ -34,6 +34,12 @@ struct CarState {
     double packTMax = 0;
     double odometer = 0;
     double acTemp = 0;
+    double acTempRight = 0;
+    double hvacFanLevel = 0;
+    double hvacPowerState = 0;
+    double hvacAcMode = 0;
+    double hvacRecirc = 0;
+    double hvacKeepClimateOn = 0;
 
     // Openpilot state
     double madsActive = 0;
@@ -46,7 +52,8 @@ struct CarState {
     char vin[VIN_LENGTH + 1] = {};
 
     static constexpr size_t VIN_DOUBLE_COUNT = 3;
-    static constexpr size_t FIELD_COUNT = 31 + VIN_DOUBLE_COUNT;
+    static constexpr size_t VIN_OFFSET = 37;
+    static constexpr size_t FIELD_COUNT = VIN_OFFSET + VIN_DOUBLE_COUNT;
 
     void toArray(double* out) const {
         // Party bus
@@ -86,11 +93,17 @@ struct CarState {
         out[29] = changingLane;
 
         out[30] = acTemp;
+        out[31] = acTempRight;
+        out[32] = hvacFanLevel;
+        out[33] = hvacPowerState;
+        out[34] = hvacAcMode;
+        out[35] = hvacRecirc;
+        out[36] = hvacKeepClimateOn;
 
         // VIN chars ride the double array as raw bit patterns, 8 bytes per
         // double; decoded by CanFrameDecoder.arrayToCarState.
         char padded[VIN_DOUBLE_COUNT * sizeof(double)] = {};
         std::memcpy(padded, vin, VIN_LENGTH);
-        std::memcpy(out + 31, padded, sizeof(padded));
+        std::memcpy(out + VIN_OFFSET, padded, sizeof(padded));
     }
 };

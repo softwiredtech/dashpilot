@@ -4,6 +4,7 @@ enum AppRoute: Hashable {
     case settings
     case themePicker
     case battery
+    case climate
     case automations
     case controls
     case setup

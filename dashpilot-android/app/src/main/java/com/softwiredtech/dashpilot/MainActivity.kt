@@ -44,6 +44,8 @@ import com.softwiredtech.dashpilot.datamodel.dash.setLoadedManifests
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.DataSourceType
 import com.softwiredtech.dashpilot.navigation.AutomationsRoute
+import com.softwiredtech.dashpilot.navigation.BatteryRoute
+import com.softwiredtech.dashpilot.navigation.ClimateRoute
 import com.softwiredtech.dashpilot.navigation.ControlsRoute
 import com.softwiredtech.dashpilot.navigation.DashboardRoute
 import com.softwiredtech.dashpilot.navigation.OnboardingRoute
@@ -52,6 +54,8 @@ import com.softwiredtech.dashpilot.navigation.SetupRoute
 import com.softwiredtech.dashpilot.navigation.TeslaEnrollRoute
 import com.softwiredtech.dashpilot.navigation.ThemePickerRoute
 import com.softwiredtech.dashpilot.ui.AutomationsScreen
+import com.softwiredtech.dashpilot.ui.BatteryScreen
+import com.softwiredtech.dashpilot.ui.ClimateScreen
 import com.softwiredtech.dashpilot.ui.ControlScreen
 import com.softwiredtech.dashpilot.ui.DashboardScreen
 import com.softwiredtech.dashpilot.ui.HomeScreen
@@ -272,6 +276,12 @@ class MainActivity : ComponentActivity() {
                                     connectionVM.disconnect()
                                 },
                                 onNext = toDashboard,
+                                onBattery = {
+                                    navController.navigate(BatteryRoute)
+                                },
+                                onClimate = {
+                                    navController.navigate(ClimateRoute)
+                                },
                                 onAutomations = {
                                     navController.navigate(AutomationsRoute)
                                 },
@@ -282,6 +292,30 @@ class MainActivity : ComponentActivity() {
                                 onSettingsClick = {
                                     navController.navigate(SettingsRoute)
                                 }
+                            )
+                        }
+                        composable<BatteryRoute> {
+                            val manager by connectionVM.bleManager.collectAsState()
+                            val dashStateFlow by connectionVM.dashState.collectAsState()
+                            BatteryScreen(
+                                dashState = dashStateFlow,
+                                bleManager = manager,
+                                onBack = { navController.popBackStack() }
+                            )
+                        }
+                        composable<ClimateRoute> {
+                            val dashStateFlow by connectionVM.dashState.collectAsState()
+                            ClimateScreen(
+                                dashState = dashStateFlow,
+                                climateKeepEnabled = climateKeepAutomation,
+                                onClimateKeepChange = {
+                                    connectionVM.updateClimateKeepAutomation(context, it)
+                                },
+                                climateKeepMinutes = climateKeepMinutes,
+                                onClimateKeepMinutesChange = {
+                                    connectionVM.updateClimateKeepMinutes(context, it)
+                                },
+                                onBack = { navController.popBackStack() }
                             )
                         }
                         composable<ControlsRoute> {
