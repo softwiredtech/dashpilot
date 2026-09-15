@@ -101,7 +101,7 @@ fun HomeScreen(
             .background(DarkColors.Background)
             .systemBarsPadding()
     ) {
-        if (selectedDataSource == DataSourceType.DASHKIT) {
+        if (selectedDataSource == DataSourceType.DASHKIT || selectedDataSource == DataSourceType.DEMO) {
             ConnectedHomeContent(
                 dashState = dashState,
                 bleManager = bleManager,

@@ -1,0 +1,486 @@
+<Rive version="1" kind="fragment">
+    <FontAsset file="inter-400.ttf" name="Inter" id="2:900"/>
+    <FontAsset file="inter-500.ttf" name="Inter Medium" id="2:901"/>
+    <FontAsset file="inter-600.ttf" name="Inter SemiBold" id="2:902"/>
+
+    <ViewModel defaultInstanceId="2:2" name="MainViewModel" id="2:1">
+        <ViewModelPropertyNumber name="speed" id="2:10"/>
+        <ViewModelPropertyNumber name="speedLimit" id="2:11"/>
+        <ViewModelPropertyNumber name="gear" id="2:12"/>
+        <ViewModelPropertyNumber name="steeringAngle" id="2:13"/>
+        <ViewModelPropertyNumber name="blinkerLeft" id="2:14"/>
+        <ViewModelPropertyNumber name="blinkerRight" id="2:15"/>
+        <ViewModelPropertyNumber name="leftBlindspot" id="2:16"/>
+        <ViewModelPropertyNumber name="rightBlindspot" id="2:17"/>
+        <ViewModelPropertyNumber name="stopDist" id="2:18"/>
+        <ViewModelPropertyNumber name="trafficLightColor" id="2:19"/>
+        <ViewModelPropertyNumber name="accSetSpeed" id="2:20"/>
+        <ViewModelPropertyNumber name="laneDeparture" id="2:21"/>
+        <ViewModelPropertyNumber name="sideCollision" id="2:22"/>
+        <ViewModelPropertyNumber name="anyDoorOpen" id="2:23"/>
+        <ViewModelPropertyNumber name="buckleStatus" id="2:24"/>
+        <ViewModelPropertyNumber name="adasOn" id="2:25"/>
+        <ViewModelPropertyNumber name="selfdriveActive" id="2:26"/>
+        <ViewModelPropertyNumber name="experimentalMode" id="2:27"/>
+        <ViewModelPropertyNumber name="madsActive" id="2:28"/>
+        <ViewModelPropertyNumber name="changingLane" id="2:29"/>
+        <ViewModelPropertyNumber name="fullPackEnergy" id="2:30"/>
+        <ViewModelPropertyNumber name="nominalEnergyRemaining" id="2:31"/>
+        <ViewModelPropertyNumber name="energyBuffer" id="2:32"/>
+        <ViewModelPropertyNumber name="maxRegenPower" id="2:33"/>
+        <ViewModelPropertyNumber name="maxDischargePower" id="2:34"/>
+        <ViewModelPropertyNumber name="packVoltage" id="2:35"/>
+        <ViewModelPropertyNumber name="packCurrent" id="2:36"/>
+        <ViewModelPropertyNumber name="packTMin" id="2:37"/>
+        <ViewModelPropertyNumber name="packTMax" id="2:38"/>
+        <ViewModelPropertyNumber name="odometer" id="2:39"/>
+        <ViewModelPropertyNumber name="acTemp" id="2:40"/>
+        <ViewModelPropertyNumber name="acTempRight" id="2:41"/>
+        <ViewModelPropertyNumber name="hvacFanLevel" id="2:42"/>
+        <ViewModelPropertyNumber name="hvacPowerState" id="2:43"/>
+        <ViewModelPropertyNumber name="hvacAcMode" id="2:44"/>
+        <ViewModelPropertyNumber name="phoneBattery" id="2:45"/>
+        <ViewModelPropertyNumber name="rangeFactor" id="2:46"/>
+        <ViewModelPropertyString name="speedUnit" id="2:50"/>
+        <ViewModelPropertyString name="distUnit" id="2:51"/>
+        <ViewModelPropertyString name="tempUnit" id="2:52"/>
+        <ViewModelPropertyString name="clock" id="2:53"/>
+        <ViewModelPropertyNumber name="slot1" id="2:60"/>
+        <ViewModelPropertyNumber name="slot2" id="2:61"/>
+        <ViewModelPropertyNumber name="slot3" id="2:62"/>
+        <ViewModelPropertyNumber name="slot4" id="2:63"/>
+        <ViewModelPropertyNumber name="slot5" id="2:64"/>
+
+        <ViewModelInstance exports="true" name="Default" id="2:2">
+            <ViewModelInstanceNumber propertyValue="42" viewModelPropertyId="2:10"/>
+            <ViewModelInstanceNumber propertyValue="50" viewModelPropertyId="2:11"/>
+            <ViewModelInstanceNumber propertyValue="4" viewModelPropertyId="2:12"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="2:13"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="2:14"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="2:15"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="2:16"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="2:17"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="2:18"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="2:19"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="2:20"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="2:21"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="2:22"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="2:23"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="2:24"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="2:25"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="2:26"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="2:27"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="2:28"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="2:29"/>
+            <ViewModelInstanceNumber propertyValue="78" viewModelPropertyId="2:30"/>
+            <ViewModelInstanceNumber propertyValue="52" viewModelPropertyId="2:31"/>
+            <ViewModelInstanceNumber propertyValue="3" viewModelPropertyId="2:32"/>
+            <ViewModelInstanceNumber propertyValue="60" viewModelPropertyId="2:33"/>
+            <ViewModelInstanceNumber propertyValue="250" viewModelPropertyId="2:34"/>
+            <ViewModelInstanceNumber propertyValue="380" viewModelPropertyId="2:35"/>
+            <ViewModelInstanceNumber propertyValue="40" viewModelPropertyId="2:36"/>
+            <ViewModelInstanceNumber propertyValue="22" viewModelPropertyId="2:37"/>
+            <ViewModelInstanceNumber propertyValue="25" viewModelPropertyId="2:38"/>
+            <ViewModelInstanceNumber propertyValue="48213" viewModelPropertyId="2:39"/>
+            <ViewModelInstanceNumber propertyValue="21" viewModelPropertyId="2:40"/>
+            <ViewModelInstanceNumber propertyValue="21" viewModelPropertyId="2:41"/>
+            <ViewModelInstanceNumber propertyValue="3" viewModelPropertyId="2:42"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="2:43"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="2:44"/>
+            <ViewModelInstanceNumber propertyValue="80" viewModelPropertyId="2:45"/>
+            <ViewModelInstanceNumber propertyValue="6.5" viewModelPropertyId="2:46"/>
+            <ViewModelInstanceString propertyValue="km/h" viewModelPropertyId="2:50"/>
+            <ViewModelInstanceString propertyValue="km" viewModelPropertyId="2:51"/>
+            <ViewModelInstanceString propertyValue="°C" viewModelPropertyId="2:52"/>
+            <ViewModelInstanceString propertyValue="15:46" viewModelPropertyId="2:53"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="2:60"/>
+            <ViewModelInstanceNumber propertyValue="2" viewModelPropertyId="2:61"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="2:62"/>
+            <ViewModelInstanceNumber propertyValue="3" viewModelPropertyId="2:63"/>
+            <ViewModelInstanceNumber propertyValue="5" viewModelPropertyId="2:64"/>
+        </ViewModelInstance>
+    </ViewModel>
+
+    <!-- number formatting -->
+    <DataConverterToString decimals="0" round="true" name="Int" id="2:100"/>
+    <DataConverterToString decimals="1" round="true" name="OneDecimal" id="2:101"/>
+
+    <!-- state of charge in percent: (remaining - buffer) / max(1, full - buffer) * 100 -->
+    <DataConverterFormula name="SocRaw" id="2:110">
+        <FormulaTokenParenthesisOpen/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue><DataBindContext sourcePathIds="2:1-2:32" propertyKey="777"/></FormulaTokenValue>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenOperation operationType="3"/>
+        <FormulaTokenFunction functionType="1"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenValue><DataBindContext sourcePathIds="2:1-2:30" propertyKey="777"/></FormulaTokenValue>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue><DataBindContext sourcePathIds="2:1-2:32" propertyKey="777"/></FormulaTokenValue>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenOperation operationType="2"/>
+        <FormulaTokenValue operationValue="100"/>
+    </DataConverterFormula>
+    <DataConverterRangeMapper minInput="0" maxInput="100" minOutput="0" maxOutput="100" clampLower="true" clampUpper="true" name="Clamp0to100" id="2:111"/>
+    <DataConverterGroup name="Soc" id="2:112">
+        <DataConverterGroupItem converterId="2:110"/>
+        <DataConverterGroupItem converterId="2:111"/>
+    </DataConverterGroup>
+    <DataConverterGroup name="SocText" id="2:113">
+        <DataConverterGroupItem converterId="2:110"/>
+        <DataConverterGroupItem converterId="2:111"/>
+        <DataConverterGroupItem converterId="2:100"/>
+    </DataConverterGroup>
+    <DataConverterRangeMapper minInput="0" maxInput="100" minOutput="100" maxOutput="0" clampLower="true" clampUpper="true" name="Invert100" id="2:114"/>
+    <DataConverterGroup name="SocRest" id="2:115">
+        <DataConverterGroupItem converterId="2:110"/>
+        <DataConverterGroupItem converterId="2:114"/>
+    </DataConverterGroup>
+
+    <!-- usable energy: remaining - buffer -->
+    <DataConverterFormula name="UsableKwh" id="2:116">
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue><DataBindContext sourcePathIds="2:1-2:32" propertyKey="777"/></FormulaTokenValue>
+    </DataConverterFormula>
+    <DataConverterGroup name="UsableKwhText" id="2:117">
+        <DataConverterGroupItem converterId="2:116"/>
+        <DataConverterGroupItem converterId="2:101"/>
+    </DataConverterGroup>
+
+    <!-- range estimate: (remaining - buffer) * rangeFactor (km or mi per kWh, set by the host) -->
+    <DataConverterFormula name="RangeRaw" id="2:120">
+        <FormulaTokenParenthesisOpen/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue><DataBindContext sourcePathIds="2:1-2:32" propertyKey="777"/></FormulaTokenValue>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenOperation operationType="2"/>
+        <FormulaTokenValue><DataBindContext sourcePathIds="2:1-2:46" propertyKey="777"/></FormulaTokenValue>
+    </DataConverterFormula>
+    <DataConverterRangeMapper minInput="0" maxInput="100000" minOutput="0" maxOutput="100000" clampLower="true" name="ClampMin0" id="2:122"/>
+    <DataConverterGroup name="RangeText" id="2:121">
+        <DataConverterGroupItem converterId="2:120"/>
+        <DataConverterGroupItem converterId="2:122"/>
+        <DataConverterGroupItem converterId="2:100"/>
+    </DataConverterGroup>
+
+    <!-- pack power in kW: voltage * current / 1000; positive = discharge, negative = regen -->
+    <DataConverterFormula name="PowerKw" id="2:130">
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="2"/>
+        <FormulaTokenValue><DataBindContext sourcePathIds="2:1-2:36" propertyKey="777"/></FormulaTokenValue>
+        <FormulaTokenOperation operationType="3"/>
+        <FormulaTokenValue operationValue="1000"/>
+    </DataConverterFormula>
+    <DataConverterGroup name="PowerText" id="2:131">
+        <DataConverterGroupItem converterId="2:130"/>
+        <DataConverterGroupItem converterId="2:101"/>
+    </DataConverterGroup>
+    <DataConverterFormula name="RegenPctRaw" id="2:132">
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="2"/>
+        <FormulaTokenValue><DataBindContext sourcePathIds="2:1-2:36" propertyKey="777"/></FormulaTokenValue>
+        <FormulaTokenOperation operationType="3"/>
+        <FormulaTokenValue operationValue="-1000"/>
+        <FormulaTokenOperation operationType="3"/>
+        <FormulaTokenFunction functionType="1"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenValue><DataBindContext sourcePathIds="2:1-2:33" propertyKey="777"/></FormulaTokenValue>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenOperation operationType="2"/>
+        <FormulaTokenValue operationValue="100"/>
+    </DataConverterFormula>
+    <DataConverterGroup name="RegenPct" id="2:133">
+        <DataConverterGroupItem converterId="2:132"/>
+        <DataConverterGroupItem converterId="2:111"/>
+    </DataConverterGroup>
+    <DataConverterGroup name="RegenRest" id="2:134">
+        <DataConverterGroupItem converterId="2:132"/>
+        <DataConverterGroupItem converterId="2:114"/>
+    </DataConverterGroup>
+    <DataConverterFormula name="DischargePctRaw" id="2:135">
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="2"/>
+        <FormulaTokenValue><DataBindContext sourcePathIds="2:1-2:36" propertyKey="777"/></FormulaTokenValue>
+        <FormulaTokenOperation operationType="3"/>
+        <FormulaTokenValue operationValue="1000"/>
+        <FormulaTokenOperation operationType="3"/>
+        <FormulaTokenFunction functionType="1"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenValue><DataBindContext sourcePathIds="2:1-2:34" propertyKey="777"/></FormulaTokenValue>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenOperation operationType="2"/>
+        <FormulaTokenValue operationValue="100"/>
+    </DataConverterFormula>
+    <DataConverterGroup name="DischargePct" id="2:136">
+        <DataConverterGroupItem converterId="2:135"/>
+        <DataConverterGroupItem converterId="2:111"/>
+    </DataConverterGroup>
+    <DataConverterGroup name="DischargeRest" id="2:137">
+        <DataConverterGroupItem converterId="2:135"/>
+        <DataConverterGroupItem converterId="2:114"/>
+    </DataConverterGroup>
+
+    <!-- flags and opacities -->
+    <DataConverterRangeMapper minInput="0" maxInput="1" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Clamp01" id="2:140"/>
+    <DataConverterRangeMapper minInput="0" maxInput="1" minOutput="1" maxOutput="0" clampLower="true" clampUpper="true" name="Invert01" id="2:141"/>
+    <DataConverterRangeMapper minInput="0" maxInput="1" minOutput="0.35" maxOutput="1" clampLower="true" clampUpper="true" name="Dim" id="2:142"/>
+
+    <!-- speed ring: 0..200 maps onto three quarters of the circle -->
+    <DataConverterRangeMapper minInput="0" maxInput="200" minOutput="0" maxOutput="0.75" clampLower="true" clampUpper="true" name="SpeedArc" id="2:150"/>
+
+    <!-- IsEqK: 1 when the input equals K, else 0 (drives opacity) -->
+    <DataConverterFormula name="IsEq0" id="2:160">
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenFunction functionType="0"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenFunction functionType="5"/>
+        <FormulaTokenFunction functionType="6"/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue operationValue="0"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenValue operationValue="2"/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+    <DataConverterFormula name="IsEq1" id="2:161">
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenFunction functionType="0"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenFunction functionType="5"/>
+        <FormulaTokenFunction functionType="6"/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenValue operationValue="2"/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+    <DataConverterFormula name="IsEq2" id="2:162">
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenFunction functionType="0"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenFunction functionType="5"/>
+        <FormulaTokenFunction functionType="6"/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue operationValue="2"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenValue operationValue="2"/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+    <DataConverterFormula name="IsEq3" id="2:163">
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenFunction functionType="0"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenFunction functionType="5"/>
+        <FormulaTokenFunction functionType="6"/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue operationValue="3"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenValue operationValue="2"/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+    <DataConverterFormula name="IsEq4" id="2:164">
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenFunction functionType="0"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenFunction functionType="5"/>
+        <FormulaTokenFunction functionType="6"/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue operationValue="4"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenValue operationValue="2"/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+
+    <!-- next widget kind on tap: (slot + 1) % 10 -->
+    <DataConverterFormula name="NextKind" id="2:190">
+        <FormulaTokenParenthesisOpen/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="0"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenOperation operationType="4"/>
+        <FormulaTokenValue operationValue="10"/>
+    </DataConverterFormula>
+
+    <!-- NotEqK: 0 when the input equals K (display flex), else 1 (display none) -->
+    <DataConverterFormula name="NotEq0" id="2:200">
+        <FormulaTokenFunction functionType="0"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenFunction functionType="5"/>
+        <FormulaTokenFunction functionType="6"/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue operationValue="0"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenValue operationValue="2"/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+    <DataConverterFormula name="NotEq1" id="2:201">
+        <FormulaTokenFunction functionType="0"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenFunction functionType="5"/>
+        <FormulaTokenFunction functionType="6"/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenValue operationValue="2"/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+    <DataConverterFormula name="NotEq2" id="2:202">
+        <FormulaTokenFunction functionType="0"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenFunction functionType="5"/>
+        <FormulaTokenFunction functionType="6"/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue operationValue="2"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenValue operationValue="2"/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+    <DataConverterFormula name="NotEq3" id="2:203">
+        <FormulaTokenFunction functionType="0"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenFunction functionType="5"/>
+        <FormulaTokenFunction functionType="6"/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue operationValue="3"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenValue operationValue="2"/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+    <DataConverterFormula name="NotEq4" id="2:204">
+        <FormulaTokenFunction functionType="0"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenFunction functionType="5"/>
+        <FormulaTokenFunction functionType="6"/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue operationValue="4"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenValue operationValue="2"/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+    <DataConverterFormula name="NotEq5" id="2:205">
+        <FormulaTokenFunction functionType="0"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenFunction functionType="5"/>
+        <FormulaTokenFunction functionType="6"/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue operationValue="5"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenValue operationValue="2"/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+    <DataConverterFormula name="NotEq6" id="2:206">
+        <FormulaTokenFunction functionType="0"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenFunction functionType="5"/>
+        <FormulaTokenFunction functionType="6"/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue operationValue="6"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenValue operationValue="2"/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+    <DataConverterFormula name="NotEq7" id="2:207">
+        <FormulaTokenFunction functionType="0"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenFunction functionType="5"/>
+        <FormulaTokenFunction functionType="6"/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue operationValue="7"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenValue operationValue="2"/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+    <DataConverterFormula name="NotEq8" id="2:208">
+        <FormulaTokenFunction functionType="0"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenFunction functionType="5"/>
+        <FormulaTokenFunction functionType="6"/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue operationValue="8"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenValue operationValue="2"/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+    <DataConverterFormula name="NotEq9" id="2:209">
+        <FormulaTokenFunction functionType="0"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenFunction functionType="5"/>
+        <FormulaTokenFunction functionType="6"/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue operationValue="9"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenValue operationValue="2"/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+</Rive>

@@ -54,6 +54,7 @@ import com.softwiredtech.dashpilot.datamodel.dash.getSportKickdownPercent
 import com.softwiredtech.dashpilot.datamodel.dash.setSportKickdownPercent
 import com.softwiredtech.dashpilot.ui.controls.controlById
 import com.softwiredtech.dashpilot.datasource.DataSourceType
+import com.softwiredtech.dashpilot.datasource.DemoDataSource
 import com.softwiredtech.dashpilot.datasource.CommaDataSource
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.IDataSource
@@ -385,6 +386,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
                     DashKitDataSource(manager, decoder)
                 }
                 DataSourceType.WEBSOCKET -> WebsocketDataSource()
+                DataSourceType.DEMO -> DemoDataSource()
                 else -> CommaDataSource(bridge, profile)
             }
 

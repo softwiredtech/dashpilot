@@ -34,6 +34,7 @@ private const val PREF_LAST_WEBSOCKET_ADDRESS = "last_websocket_address"
 private val debugSources = buildList {
     add(DataSourceType.COMMA to "comma")
     add(DataSourceType.DASHKIT to "DashKit")
+    add(DataSourceType.DEMO to "Demo")
     if (BuildConfig.DEBUG) {
         add(DataSourceType.WEBSOCKET to "WebSocket")
     }

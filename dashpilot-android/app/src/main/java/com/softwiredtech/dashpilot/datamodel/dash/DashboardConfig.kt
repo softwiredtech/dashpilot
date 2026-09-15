@@ -55,6 +55,15 @@ val availableDashboards = buildList {
             screenshotRes = R.drawable.preview_retro
         )
     )
+    add(
+        DashboardConfig(
+            id = "modular",
+            nameRes = R.string.dashboard_name_modular,
+            url = "dashboard_modular",
+            type = DashboardType.RIVE,
+            screenshotRes = R.drawable.preview_modular
+        )
+    )
 
     if (BuildConfig.DEBUG) {
         add(

@@ -1,0 +1,9 @@
+name: dashboard_modular
+main: Dash
+artboard:
+  background: "#000000"
+output:
+  dir: dist
+logs:
+  file: build/rive.log
+  problems: build/problems.log

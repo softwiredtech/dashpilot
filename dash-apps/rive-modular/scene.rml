@@ -1,0 +1,659 @@
+<Rive version="1" kind="fragment">
+    <Artboard defaultStateMachineId="1:900" viewModelId="2:1" viewModelInstanceId="2:2" styleId="1:3" clip="true" width="1600" height="720" name="Dash" id="1:2">
+        <LayoutComponentStyle name="Dash Style" id="1:3"/>
+        <Fill name="Background"><SolidColor colorValue="FF000000" name="C"/></Fill>
+
+        <!-- blind spot glows on the artboard edges; declared first so they draw on top -->
+        <LayoutComponent width="28" height="720" styleId="1:301" name="GlowL" id="1:300">
+            <DataBindContext sourcePathIds="2:1-2:16" propertyKey="18" converterId="2:140"/>
+            <LayoutComponentStyle positionTypeValue="absolute" layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                  positionLeft="0" positionLeftUnitsValue="points"
+                                  positionTop="0" positionTopUnitsValue="points"
+                                  positionBottom="0" positionBottomUnitsValue="points"
+                                  name="S" id="1:301"/>
+            <Fill name="F">
+                <LinearGradient startX="0" startY="0" endX="28" endY="0" name="G">
+                    <GradientStop colorValue="FFF59E0B" position="0"/>
+                    <GradientStop colorValue="00F59E0B" position="1"/>
+                </LinearGradient>
+            </Fill>
+        </LayoutComponent>
+        <LayoutComponent width="28" height="720" styleId="1:303" name="GlowR" id="1:302">
+            <DataBindContext sourcePathIds="2:1-2:17" propertyKey="18" converterId="2:140"/>
+            <LayoutComponentStyle positionTypeValue="absolute" layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                  positionRight="0" positionRightUnitsValue="points"
+                                  positionTop="0" positionTopUnitsValue="points"
+                                  positionBottom="0" positionBottomUnitsValue="points"
+                                  name="S" id="1:303"/>
+            <Fill name="F">
+                <LinearGradient startX="0" startY="0" endX="28" endY="0" name="G">
+                    <GradientStop colorValue="00F59E0B" position="0"/>
+                    <GradientStop colorValue="FFF59E0B" position="1"/>
+                </LinearGradient>
+            </Fill>
+        </LayoutComponent>
+
+        <LayoutComponent width="1600" height="720" styleId="1:11" name="Root" id="1:10">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill"
+                                  flexDirectionValue="row"
+                                  gapHorizontal="16" gapHorizontalUnitsValue="points"
+                                  paddingLeft="28" paddingLeftUnitsValue="points"
+                                  paddingRight="28" paddingRightUnitsValue="points"
+                                  paddingTop="24" paddingTopUnitsValue="points"
+                                  paddingBottom="24" paddingBottomUnitsValue="points"
+                                  name="Root Style" id="1:11"/>
+
+            <LayoutComponent fractionalWidth="1.05" styleId="1:21" name="Left" id="1:20">
+                <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill"
+                                      flexBasis="0" flexBasisUnitsValue="points"
+                                      flexDirectionValue="column"
+                                      gapVertical="16" gapVerticalUnitsValue="points"
+                                      name="Left Style" id="1:21"/>
+
+                <LayoutComponent clip="true" styleId="1:101" name="Slot1" id="1:100">
+                    <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill"
+                                          flexBasis="0" flexBasisUnitsValue="points"
+                                          layoutTypeValue="stack" cornerRadiusTL="22" name="Slot1 Style" id="1:101"/>
+                    <Fill name="Fill"><SolidColor colorValue="FF1B1C20" name="C"/></Fill>
+                    <LayoutComponent styleId="1:1101" name="S1V0" id="1:1100">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1101">
+                            <DataBindContext sourcePathIds="2:1-2:60" propertyKey="596" converterId="2:200"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:120" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Battery"/>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="1:1103" name="S1V1" id="1:1102">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1103">
+                            <DataBindContext sourcePathIds="2:1-2:60" propertyKey="596" converterId="2:201"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:219" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Range"/>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="1:1105" name="S1V2" id="1:1104">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1105">
+                            <DataBindContext sourcePathIds="2:1-2:60" propertyKey="596" converterId="2:202"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:330" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Power"/>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="1:1107" name="S1V3" id="1:1106">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1107">
+                            <DataBindContext sourcePathIds="2:1-2:60" propertyKey="596" converterId="2:203"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:418" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Temp"/>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="1:1109" name="S1V4" id="1:1108">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1109">
+                            <DataBindContext sourcePathIds="2:1-2:60" propertyKey="596" converterId="2:204"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:515" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Odometer"/>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="1:1111" name="S1V5" id="1:1110">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1111">
+                            <DataBindContext sourcePathIds="2:1-2:60" propertyKey="596" converterId="2:205"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:611" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="SpeedLimit"/>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="1:1113" name="S1V6" id="1:1112">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1113">
+                            <DataBindContext sourcePathIds="2:1-2:60" propertyKey="596" converterId="2:206"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:719" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Cruise"/>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="1:1115" name="S1V7" id="1:1114">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1115">
+                            <DataBindContext sourcePathIds="2:1-2:60" propertyKey="596" converterId="2:207"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:818" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Climate"/>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="1:1117" name="S1V8" id="1:1116">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1117">
+                            <DataBindContext sourcePathIds="2:1-2:60" propertyKey="596" converterId="2:208"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:915" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Clock"/>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="1:1119" name="S1V9" id="1:1118">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1119">
+                            <DataBindContext sourcePathIds="2:1-2:60" propertyKey="596" converterId="2:209"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:1033" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="TrafficLight"/>
+                    </LayoutComponent>
+                </LayoutComponent>
+
+                <LayoutComponent clip="true" styleId="1:111" name="Slot2" id="1:110">
+                    <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill"
+                                          flexBasis="0" flexBasisUnitsValue="points"
+                                          layoutTypeValue="stack" cornerRadiusTL="22" name="Slot2 Style" id="1:111"/>
+                    <Fill name="Fill"><SolidColor colorValue="FF1B1C20" name="C"/></Fill>
+                    <LayoutComponent styleId="1:1201" name="S2V0" id="1:1200">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1201">
+                            <DataBindContext sourcePathIds="2:1-2:61" propertyKey="596" converterId="2:200"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:120" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Battery"/>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="1:1203" name="S2V1" id="1:1202">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1203">
+                            <DataBindContext sourcePathIds="2:1-2:61" propertyKey="596" converterId="2:201"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:219" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Range"/>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="1:1205" name="S2V2" id="1:1204">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1205">
+                            <DataBindContext sourcePathIds="2:1-2:61" propertyKey="596" converterId="2:202"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:330" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Power"/>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="1:1207" name="S2V3" id="1:1206">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1207">
+                            <DataBindContext sourcePathIds="2:1-2:61" propertyKey="596" converterId="2:203"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:418" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Temp"/>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="1:1209" name="S2V4" id="1:1208">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1209">
+                            <DataBindContext sourcePathIds="2:1-2:61" propertyKey="596" converterId="2:204"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:515" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Odometer"/>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="1:1211" name="S2V5" id="1:1210">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1211">
+                            <DataBindContext sourcePathIds="2:1-2:61" propertyKey="596" converterId="2:205"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:611" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="SpeedLimit"/>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="1:1213" name="S2V6" id="1:1212">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1213">
+                            <DataBindContext sourcePathIds="2:1-2:61" propertyKey="596" converterId="2:206"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:719" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Cruise"/>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="1:1215" name="S2V7" id="1:1214">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1215">
+                            <DataBindContext sourcePathIds="2:1-2:61" propertyKey="596" converterId="2:207"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:818" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Climate"/>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="1:1217" name="S2V8" id="1:1216">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1217">
+                            <DataBindContext sourcePathIds="2:1-2:61" propertyKey="596" converterId="2:208"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:915" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Clock"/>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="1:1219" name="S2V9" id="1:1218">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1219">
+                            <DataBindContext sourcePathIds="2:1-2:61" propertyKey="596" converterId="2:209"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:1033" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="TrafficLight"/>
+                    </LayoutComponent>
+                </LayoutComponent>
+            </LayoutComponent>
+
+            <LayoutComponent fractionalWidth="1.25" clip="true" styleId="1:31" name="Center" id="1:30">
+                <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill"
+                                      flexBasis="0" flexBasisUnitsValue="points"
+                                      flexDirectionValue="column" layoutAlignmentType="center"
+                                      cornerRadiusTL="22" name="Center Style" id="1:31"/>
+                <Fill name="Fill"><SolidColor colorValue="FF1B1C20" name="C"/></Fill>
+
+                <!-- speed cluster -->
+                <LayoutComponent styleId="1:203" name="GaugeHolder" id="1:202">
+                <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill"
+                                      flexDirectionValue="column" layoutAlignmentType="center" name="S" id="1:203"/>
+                <LayoutComponent width="480" height="480" styleId="1:201" name="Gauge" id="1:200">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="Gauge Style" id="1:201"/>
+                    <Node x="240" y="240" name="Cluster" id="1:210">
+                        <GroupEffect name="ArcTrim" id="1:211">
+                            <TrimPath start="0" end="0.16" name="Trim" id="1:212">
+                                <DataBindContext sourcePathIds="2:1-2:10" propertyKey="115" converterId="2:150"/>
+                            </TrimPath>
+                        </GroupEffect>
+
+                        <Text x="0" y="-122" originX="0.5" originY="0.5" name="Engaged" id="1:220">
+                            <DataBindContext sourcePathIds="2:1-2:25" propertyKey="18" converterId="2:161"/>
+                            <TextStylePaint fontSize="26" fontAssetId="2:902" letterSpacing="2" name="S" id="1:221">
+                                <Fill name="F"><SolidColor colorValue="FF3B82F6" name="C"/></Fill>
+                            </TextStylePaint>
+                            <TextValueRun styleId="1:221" text="ENGAGED" name="Run"/>
+                        </Text>
+                        <Text x="0" y="-122" originX="0.5" originY="0.5" name="Manual" id="1:222">
+                            <DataBindContext sourcePathIds="2:1-2:25" propertyKey="18" converterId="2:160"/>
+                            <TextStylePaint fontSize="26" fontAssetId="2:902" letterSpacing="2" name="S" id="1:223">
+                                <Fill name="F"><SolidColor colorValue="FF6B6F78" name="C"/></Fill>
+                            </TextStylePaint>
+                            <TextValueRun styleId="1:223" text="MANUAL" name="Run"/>
+                        </Text>
+
+                        <Text x="0" y="-8" originX="0.5" originY="0.5" name="Speed" id="1:224">
+                            <TextStylePaint fontSize="150" fontAssetId="2:902" name="S" id="1:225">
+                                <Fill name="F"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                            </TextStylePaint>
+                            <TextValueRun styleId="1:225" text="42" name="Run">
+                                <DataBindContext sourcePathIds="2:1-2:10" propertyKey="268" converterId="2:100"/>
+                            </TextValueRun>
+                        </Text>
+                        <Text x="0" y="86" originX="0.5" originY="0.5" name="Unit" id="1:226">
+                            <TextStylePaint fontSize="30" fontAssetId="2:901" name="S" id="1:227">
+                                <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                            </TextStylePaint>
+                            <TextValueRun styleId="1:227" text="km/h" name="Run">
+                                <DataBindContext sourcePathIds="2:1-2:50" propertyKey="268"/>
+                            </TextValueRun>
+                        </Text>
+
+                        <Text x="0" y="148" originX="0.5" originY="0.5" name="GearP" id="1:230">
+                            <DataBindContext sourcePathIds="2:1-2:12" propertyKey="18" converterId="2:161"/>
+                            <TextStylePaint fontSize="40" fontAssetId="2:902" name="S" id="1:231">
+                                <Fill name="F"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                            </TextStylePaint>
+                            <TextValueRun styleId="1:231" text="P" name="Run"/>
+                        </Text>
+                        <Text x="0" y="148" originX="0.5" originY="0.5" name="GearR" id="1:232">
+                            <DataBindContext sourcePathIds="2:1-2:12" propertyKey="18" converterId="2:162"/>
+                            <TextStylePaint fontSize="40" fontAssetId="2:902" name="S" id="1:233">
+                                <Fill name="F"><SolidColor colorValue="FFE0332B" name="C"/></Fill>
+                            </TextStylePaint>
+                            <TextValueRun styleId="1:233" text="R" name="Run"/>
+                        </Text>
+                        <Text x="0" y="148" originX="0.5" originY="0.5" name="GearN" id="1:234">
+                            <DataBindContext sourcePathIds="2:1-2:12" propertyKey="18" converterId="2:163"/>
+                            <TextStylePaint fontSize="40" fontAssetId="2:902" name="S" id="1:235">
+                                <Fill name="F"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                            </TextStylePaint>
+                            <TextValueRun styleId="1:235" text="N" name="Run"/>
+                        </Text>
+                        <Text x="0" y="148" originX="0.5" originY="0.5" name="GearD" id="1:236">
+                            <DataBindContext sourcePathIds="2:1-2:12" propertyKey="18" converterId="2:164"/>
+                            <TextStylePaint fontSize="40" fontAssetId="2:902" name="S" id="1:237">
+                                <Fill name="F"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                            </TextStylePaint>
+                            <TextValueRun styleId="1:237" text="D" name="Run"/>
+                        </Text>
+
+                        <Shape rotation="-0.7853982" name="Arc" id="1:240">
+                            <Ellipse width="400" height="400" originX="0.5" originY="0.5" name="Path"/>
+                            <Stroke thickness="26" cap="round" name="Glow">
+                                <SolidColor colorValue="FF3B82F6" name="C"/>
+                                <Feather strength="20" name="Feather"/>
+                                <TargetEffect targetId="1:211" name="Trim"/>
+                            </Stroke>
+                            <Stroke thickness="18" cap="round" name="Crisp">
+                                <SolidColor colorValue="FF3B82F6" name="C"/>
+                                <TargetEffect targetId="1:211" name="Trim"/>
+                            </Stroke>
+                        </Shape>
+                        <Shape rotation="-0.7853982" name="Track" id="1:242">
+                            <Ellipse width="400" height="400" originX="0.5" originY="0.5" name="Path"/>
+                            <Stroke thickness="18" cap="round" name="Stroke">
+                                <SolidColor colorValue="FF2C2E36" name="C"/>
+                                <TrimPath start="0" end="0.75" name="Trim"/>
+                            </Stroke>
+                        </Shape>
+                    </Node>
+                </LayoutComponent>
+                </LayoutComponent>
+
+                <!-- blinkers -->
+                <LayoutComponent width="64" height="44" styleId="1:251" name="BlinkL" id="1:250">
+                    <DataBindContext sourcePathIds="2:1-2:14" propertyKey="18" converterId="2:140"/>
+                    <LayoutComponentStyle positionTypeValue="absolute" layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                          positionTop="22" positionTopUnitsValue="points"
+                                          positionLeft="26" positionLeftUnitsValue="points" name="S" id="1:251"/>
+                    <Node name="Art">
+                        <Shape x="32" y="22" name="Arrow">
+                            <PointsPath isClosed="true" name="Path">
+                                <StraightVertex x="-30" y="0"/>
+                                <StraightVertex x="-6" y="-20"/>
+                                <StraightVertex x="-6" y="-9"/>
+                                <StraightVertex x="30" y="-9" radius="3"/>
+                                <StraightVertex x="30" y="9" radius="3"/>
+                                <StraightVertex x="-6" y="9"/>
+                                <StraightVertex x="-6" y="20"/>
+                            </PointsPath>
+                            <Fill name="F"><SolidColor colorValue="FF34C759" name="C"/></Fill>
+                        </Shape>
+                    </Node>
+                </LayoutComponent>
+                <LayoutComponent width="64" height="44" styleId="1:253" name="BlinkR" id="1:252">
+                    <DataBindContext sourcePathIds="2:1-2:15" propertyKey="18" converterId="2:140"/>
+                    <LayoutComponentStyle positionTypeValue="absolute" layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                          positionTop="22" positionTopUnitsValue="points"
+                                          positionRight="26" positionRightUnitsValue="points" name="S" id="1:253"/>
+                    <Node name="Art">
+                        <Shape x="32" y="22" rotation="3.1415927" name="Arrow">
+                            <PointsPath isClosed="true" name="Path">
+                                <StraightVertex x="-30" y="0"/>
+                                <StraightVertex x="-6" y="-20"/>
+                                <StraightVertex x="-6" y="-9"/>
+                                <StraightVertex x="30" y="-9" radius="3"/>
+                                <StraightVertex x="30" y="9" radius="3"/>
+                                <StraightVertex x="-6" y="9"/>
+                                <StraightVertex x="-6" y="20"/>
+                            </PointsPath>
+                            <Fill name="F"><SolidColor colorValue="FF34C759" name="C"/></Fill>
+                        </Shape>
+                    </Node>
+                </LayoutComponent>
+
+                <!-- warning chips, hidden unless the condition is active -->
+                <LayoutComponent styleId="1:261" name="Warnings" id="1:260">
+                    <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="hug"
+                                          paddingBottom="20" paddingBottomUnitsValue="points"
+                                          flexDirectionValue="row" layoutAlignmentType="center"
+                                          gapHorizontal="10" gapHorizontalUnitsValue="points" name="S" id="1:261"/>
+                    <LayoutComponent width="160" height="40" styleId="1:1271" name="Chip" id="1:1270">
+                        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" cornerRadiusTL="20" name="S" id="1:1271">
+                            <DataBindContext sourcePathIds="2:1-2:23" propertyKey="596" converterId="2:160"/>
+                        </LayoutComponentStyle>
+                        <Fill name="F"><SolidColor colorValue="FFD93025" name="C"/></Fill>
+                        <Text sizingValue="fixed" alignValue="center" verticalAlignValue="middle" wrapValue="noWrap" name="T" id="1:1272">
+                            <TextStylePaint fontSize="20" fontAssetId="2:902" letterSpacing="1" name="S" id="1:1273">
+                                <Fill name="F"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                            </TextStylePaint>
+                            <TextValueRun styleId="1:1273" text="DOOR OPEN" name="Run"/>
+                        </Text>
+                    </LayoutComponent>
+                    <LayoutComponent width="160" height="40" styleId="1:1275" name="Chip" id="1:1274">
+                        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" cornerRadiusTL="20" name="S" id="1:1275">
+                            <DataBindContext sourcePathIds="2:1-2:24" propertyKey="596" converterId="2:161"/>
+                        </LayoutComponentStyle>
+                        <Fill name="F"><SolidColor colorValue="FFD93025" name="C"/></Fill>
+                        <Text sizingValue="fixed" alignValue="center" verticalAlignValue="middle" wrapValue="noWrap" name="T" id="1:1276">
+                            <TextStylePaint fontSize="20" fontAssetId="2:902" letterSpacing="1" name="S" id="1:1277">
+                                <Fill name="F"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                            </TextStylePaint>
+                            <TextValueRun styleId="1:1277" text="BUCKLE UP" name="Run"/>
+                        </Text>
+                    </LayoutComponent>
+                    <LayoutComponent width="220" height="40" styleId="1:1279" name="Chip" id="1:1278">
+                        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" cornerRadiusTL="20" name="S" id="1:1279">
+                            <DataBindContext sourcePathIds="2:1-2:21" propertyKey="596" converterId="2:160"/>
+                        </LayoutComponentStyle>
+                        <Fill name="F"><SolidColor colorValue="FFD93025" name="C"/></Fill>
+                        <Text sizingValue="fixed" alignValue="center" verticalAlignValue="middle" wrapValue="noWrap" name="T" id="1:1280">
+                            <TextStylePaint fontSize="20" fontAssetId="2:902" letterSpacing="1" name="S" id="1:1281">
+                                <Fill name="F"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                            </TextStylePaint>
+                            <TextValueRun styleId="1:1281" text="LANE DEPARTURE" name="Run"/>
+                        </Text>
+                    </LayoutComponent>
+                    <LayoutComponent width="210" height="40" styleId="1:1283" name="Chip" id="1:1282">
+                        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" cornerRadiusTL="20" name="S" id="1:1283">
+                            <DataBindContext sourcePathIds="2:1-2:22" propertyKey="596" converterId="2:160"/>
+                        </LayoutComponentStyle>
+                        <Fill name="F"><SolidColor colorValue="FFD93025" name="C"/></Fill>
+                        <Text sizingValue="fixed" alignValue="center" verticalAlignValue="middle" wrapValue="noWrap" name="T" id="1:1284">
+                            <TextStylePaint fontSize="20" fontAssetId="2:902" letterSpacing="1" name="S" id="1:1285">
+                                <Fill name="F"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                            </TextStylePaint>
+                            <TextValueRun styleId="1:1285" text="SIDE COLLISION" name="Run"/>
+                        </Text>
+                    </LayoutComponent>
+                </LayoutComponent>
+            </LayoutComponent>
+
+            <LayoutComponent fractionalWidth="1.1" styleId="1:41" name="Right" id="1:40">
+                <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill"
+                                      flexBasis="0" flexBasisUnitsValue="points"
+                                      flexDirectionValue="row"
+                                      gapHorizontal="16" gapHorizontalUnitsValue="points"
+                                      name="Right Style" id="1:41"/>
+
+                <LayoutComponent clip="true" styleId="1:121" name="Slot3" id="1:120">
+                    <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill"
+                                          flexBasis="0" flexBasisUnitsValue="points"
+                                          layoutTypeValue="stack" cornerRadiusTL="22" name="Slot3 Style" id="1:121"/>
+                    <Fill name="Fill"><SolidColor colorValue="FF1B1C20" name="C"/></Fill>
+                    <LayoutComponent styleId="1:1301" name="S3V0" id="1:1300">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1301">
+                            <DataBindContext sourcePathIds="2:1-2:62" propertyKey="596" converterId="2:200"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:120" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Battery"/>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="1:1303" name="S3V1" id="1:1302">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1303">
+                            <DataBindContext sourcePathIds="2:1-2:62" propertyKey="596" converterId="2:201"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:219" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Range"/>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="1:1305" name="S3V2" id="1:1304">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1305">
+                            <DataBindContext sourcePathIds="2:1-2:62" propertyKey="596" converterId="2:202"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:330" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Power"/>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="1:1307" name="S3V3" id="1:1306">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1307">
+                            <DataBindContext sourcePathIds="2:1-2:62" propertyKey="596" converterId="2:203"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:418" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Temp"/>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="1:1309" name="S3V4" id="1:1308">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1309">
+                            <DataBindContext sourcePathIds="2:1-2:62" propertyKey="596" converterId="2:204"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:515" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Odometer"/>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="1:1311" name="S3V5" id="1:1310">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1311">
+                            <DataBindContext sourcePathIds="2:1-2:62" propertyKey="596" converterId="2:205"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:611" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="SpeedLimit"/>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="1:1313" name="S3V6" id="1:1312">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1313">
+                            <DataBindContext sourcePathIds="2:1-2:62" propertyKey="596" converterId="2:206"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:719" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Cruise"/>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="1:1315" name="S3V7" id="1:1314">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1315">
+                            <DataBindContext sourcePathIds="2:1-2:62" propertyKey="596" converterId="2:207"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:818" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Climate"/>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="1:1317" name="S3V8" id="1:1316">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1317">
+                            <DataBindContext sourcePathIds="2:1-2:62" propertyKey="596" converterId="2:208"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:915" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Clock"/>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="1:1319" name="S3V9" id="1:1318">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1319">
+                            <DataBindContext sourcePathIds="2:1-2:62" propertyKey="596" converterId="2:209"/>
+                        </LayoutComponentStyle>
+                        <NestedArtboardLayout artboardId="3:1033" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="TrafficLight"/>
+                    </LayoutComponent>
+                </LayoutComponent>
+
+                <LayoutComponent styleId="1:51" name="RightCol" id="1:50">
+                    <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill"
+                                          flexBasis="0" flexBasisUnitsValue="points"
+                                          flexDirectionValue="column"
+                                          gapVertical="16" gapVerticalUnitsValue="points"
+                                          name="RightCol Style" id="1:51"/>
+
+                    <LayoutComponent clip="true" styleId="1:131" name="Slot4" id="1:130">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill"
+                                              flexBasis="0" flexBasisUnitsValue="points"
+                                              layoutTypeValue="stack" cornerRadiusTL="22" name="Slot4 Style" id="1:131"/>
+                        <Fill name="Fill"><SolidColor colorValue="FF1B1C20" name="C"/></Fill>
+                        <LayoutComponent styleId="1:1401" name="S4V0" id="1:1400">
+                            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1401">
+                                <DataBindContext sourcePathIds="2:1-2:63" propertyKey="596" converterId="2:200"/>
+                            </LayoutComponentStyle>
+                            <NestedArtboardLayout artboardId="3:120" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Battery"/>
+                        </LayoutComponent>
+                        <LayoutComponent styleId="1:1403" name="S4V1" id="1:1402">
+                            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1403">
+                                <DataBindContext sourcePathIds="2:1-2:63" propertyKey="596" converterId="2:201"/>
+                            </LayoutComponentStyle>
+                            <NestedArtboardLayout artboardId="3:219" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Range"/>
+                        </LayoutComponent>
+                        <LayoutComponent styleId="1:1405" name="S4V2" id="1:1404">
+                            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1405">
+                                <DataBindContext sourcePathIds="2:1-2:63" propertyKey="596" converterId="2:202"/>
+                            </LayoutComponentStyle>
+                            <NestedArtboardLayout artboardId="3:330" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Power"/>
+                        </LayoutComponent>
+                        <LayoutComponent styleId="1:1407" name="S4V3" id="1:1406">
+                            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1407">
+                                <DataBindContext sourcePathIds="2:1-2:63" propertyKey="596" converterId="2:203"/>
+                            </LayoutComponentStyle>
+                            <NestedArtboardLayout artboardId="3:418" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Temp"/>
+                        </LayoutComponent>
+                        <LayoutComponent styleId="1:1409" name="S4V4" id="1:1408">
+                            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1409">
+                                <DataBindContext sourcePathIds="2:1-2:63" propertyKey="596" converterId="2:204"/>
+                            </LayoutComponentStyle>
+                            <NestedArtboardLayout artboardId="3:515" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Odometer"/>
+                        </LayoutComponent>
+                        <LayoutComponent styleId="1:1411" name="S4V5" id="1:1410">
+                            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1411">
+                                <DataBindContext sourcePathIds="2:1-2:63" propertyKey="596" converterId="2:205"/>
+                            </LayoutComponentStyle>
+                            <NestedArtboardLayout artboardId="3:611" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="SpeedLimit"/>
+                        </LayoutComponent>
+                        <LayoutComponent styleId="1:1413" name="S4V6" id="1:1412">
+                            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1413">
+                                <DataBindContext sourcePathIds="2:1-2:63" propertyKey="596" converterId="2:206"/>
+                            </LayoutComponentStyle>
+                            <NestedArtboardLayout artboardId="3:719" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Cruise"/>
+                        </LayoutComponent>
+                        <LayoutComponent styleId="1:1415" name="S4V7" id="1:1414">
+                            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1415">
+                                <DataBindContext sourcePathIds="2:1-2:63" propertyKey="596" converterId="2:207"/>
+                            </LayoutComponentStyle>
+                            <NestedArtboardLayout artboardId="3:818" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Climate"/>
+                        </LayoutComponent>
+                        <LayoutComponent styleId="1:1417" name="S4V8" id="1:1416">
+                            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1417">
+                                <DataBindContext sourcePathIds="2:1-2:63" propertyKey="596" converterId="2:208"/>
+                            </LayoutComponentStyle>
+                            <NestedArtboardLayout artboardId="3:915" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Clock"/>
+                        </LayoutComponent>
+                        <LayoutComponent styleId="1:1419" name="S4V9" id="1:1418">
+                            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1419">
+                                <DataBindContext sourcePathIds="2:1-2:63" propertyKey="596" converterId="2:209"/>
+                            </LayoutComponentStyle>
+                            <NestedArtboardLayout artboardId="3:1033" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="TrafficLight"/>
+                        </LayoutComponent>
+                    </LayoutComponent>
+
+                    <LayoutComponent clip="true" styleId="1:141" name="Slot5" id="1:140">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill"
+                                              flexBasis="0" flexBasisUnitsValue="points"
+                                              layoutTypeValue="stack" cornerRadiusTL="22" name="Slot5 Style" id="1:141"/>
+                        <Fill name="Fill"><SolidColor colorValue="FF1B1C20" name="C"/></Fill>
+                        <LayoutComponent styleId="1:1501" name="S5V0" id="1:1500">
+                            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1501">
+                                <DataBindContext sourcePathIds="2:1-2:64" propertyKey="596" converterId="2:200"/>
+                            </LayoutComponentStyle>
+                            <NestedArtboardLayout artboardId="3:120" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Battery"/>
+                        </LayoutComponent>
+                        <LayoutComponent styleId="1:1503" name="S5V1" id="1:1502">
+                            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1503">
+                                <DataBindContext sourcePathIds="2:1-2:64" propertyKey="596" converterId="2:201"/>
+                            </LayoutComponentStyle>
+                            <NestedArtboardLayout artboardId="3:219" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Range"/>
+                        </LayoutComponent>
+                        <LayoutComponent styleId="1:1505" name="S5V2" id="1:1504">
+                            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1505">
+                                <DataBindContext sourcePathIds="2:1-2:64" propertyKey="596" converterId="2:202"/>
+                            </LayoutComponentStyle>
+                            <NestedArtboardLayout artboardId="3:330" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Power"/>
+                        </LayoutComponent>
+                        <LayoutComponent styleId="1:1507" name="S5V3" id="1:1506">
+                            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1507">
+                                <DataBindContext sourcePathIds="2:1-2:64" propertyKey="596" converterId="2:203"/>
+                            </LayoutComponentStyle>
+                            <NestedArtboardLayout artboardId="3:418" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Temp"/>
+                        </LayoutComponent>
+                        <LayoutComponent styleId="1:1509" name="S5V4" id="1:1508">
+                            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1509">
+                                <DataBindContext sourcePathIds="2:1-2:64" propertyKey="596" converterId="2:204"/>
+                            </LayoutComponentStyle>
+                            <NestedArtboardLayout artboardId="3:515" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Odometer"/>
+                        </LayoutComponent>
+                        <LayoutComponent styleId="1:1511" name="S5V5" id="1:1510">
+                            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1511">
+                                <DataBindContext sourcePathIds="2:1-2:64" propertyKey="596" converterId="2:205"/>
+                            </LayoutComponentStyle>
+                            <NestedArtboardLayout artboardId="3:611" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="SpeedLimit"/>
+                        </LayoutComponent>
+                        <LayoutComponent styleId="1:1513" name="S5V6" id="1:1512">
+                            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1513">
+                                <DataBindContext sourcePathIds="2:1-2:64" propertyKey="596" converterId="2:206"/>
+                            </LayoutComponentStyle>
+                            <NestedArtboardLayout artboardId="3:719" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Cruise"/>
+                        </LayoutComponent>
+                        <LayoutComponent styleId="1:1515" name="S5V7" id="1:1514">
+                            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1515">
+                                <DataBindContext sourcePathIds="2:1-2:64" propertyKey="596" converterId="2:207"/>
+                            </LayoutComponentStyle>
+                            <NestedArtboardLayout artboardId="3:818" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Climate"/>
+                        </LayoutComponent>
+                        <LayoutComponent styleId="1:1517" name="S5V8" id="1:1516">
+                            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1517">
+                                <DataBindContext sourcePathIds="2:1-2:64" propertyKey="596" converterId="2:208"/>
+                            </LayoutComponentStyle>
+                            <NestedArtboardLayout artboardId="3:915" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="Clock"/>
+                        </LayoutComponent>
+                        <LayoutComponent styleId="1:1519" name="S5V9" id="1:1518">
+                            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="S" id="1:1519">
+                                <DataBindContext sourcePathIds="2:1-2:64" propertyKey="596" converterId="2:209"/>
+                            </LayoutComponentStyle>
+                            <NestedArtboardLayout artboardId="3:1033" instanceWidthScaleType="fill" instanceHeightScaleType="fill" name="TrafficLight"/>
+                        </LayoutComponent>
+                    </LayoutComponent>
+                </LayoutComponent>
+            </LayoutComponent>
+        </LayoutComponent>
+
+        <StateMachine name="Main" id="1:900">
+            <StateMachineListenerSingle targetId="1:100" listenerTypeValue="click" name="Tap Slot1" id="1:1922">
+                <ListenerViewModelChange fromViewModelProperty="true" fromDataBindId="1:1923">
+                    <BindablePropertyNumber>
+                        <DataBindContext sourcePathIds="2:1-2:60" propertyKey="636" id="1:1923" converterId="2:190"/>
+                        <DataBindContext sourcePathIds="2:1-2:60" propertyKey="636" direction="true"/>
+                    </BindablePropertyNumber>
+                </ListenerViewModelChange>
+            </StateMachineListenerSingle>
+            <StateMachineListenerSingle targetId="1:110" listenerTypeValue="click" name="Tap Slot2" id="1:1924">
+                <ListenerViewModelChange fromViewModelProperty="true" fromDataBindId="1:1925">
+                    <BindablePropertyNumber>
+                        <DataBindContext sourcePathIds="2:1-2:61" propertyKey="636" id="1:1925" converterId="2:190"/>
+                        <DataBindContext sourcePathIds="2:1-2:61" propertyKey="636" direction="true"/>
+                    </BindablePropertyNumber>
+                </ListenerViewModelChange>
+            </StateMachineListenerSingle>
+            <StateMachineListenerSingle targetId="1:120" listenerTypeValue="click" name="Tap Slot3" id="1:1926">
+                <ListenerViewModelChange fromViewModelProperty="true" fromDataBindId="1:1927">
+                    <BindablePropertyNumber>
+                        <DataBindContext sourcePathIds="2:1-2:62" propertyKey="636" id="1:1927" converterId="2:190"/>
+                        <DataBindContext sourcePathIds="2:1-2:62" propertyKey="636" direction="true"/>
+                    </BindablePropertyNumber>
+                </ListenerViewModelChange>
+            </StateMachineListenerSingle>
+            <StateMachineListenerSingle targetId="1:130" listenerTypeValue="click" name="Tap Slot4" id="1:1928">
+                <ListenerViewModelChange fromViewModelProperty="true" fromDataBindId="1:1929">
+                    <BindablePropertyNumber>
+                        <DataBindContext sourcePathIds="2:1-2:63" propertyKey="636" id="1:1929" converterId="2:190"/>
+                        <DataBindContext sourcePathIds="2:1-2:63" propertyKey="636" direction="true"/>
+                    </BindablePropertyNumber>
+                </ListenerViewModelChange>
+            </StateMachineListenerSingle>
+            <StateMachineListenerSingle targetId="1:140" listenerTypeValue="click" name="Tap Slot5" id="1:1930">
+                <ListenerViewModelChange fromViewModelProperty="true" fromDataBindId="1:1931">
+                    <BindablePropertyNumber>
+                        <DataBindContext sourcePathIds="2:1-2:64" propertyKey="636" id="1:1931" converterId="2:190"/>
+                        <DataBindContext sourcePathIds="2:1-2:64" propertyKey="636" direction="true"/>
+                    </BindablePropertyNumber>
+                </ListenerViewModelChange>
+            </StateMachineListenerSingle>
+            <StateMachineLayer name="Idle" id="1:910">
+                <AnyState x="400" y="0"/>
+                <ExitState x="480" y="0"/>
+                <EntryState x="0" y="16"><StateTransition stateToId="1:912"/></EntryState>
+                <AnimationState x="160" y="0" animationId="1:901" id="1:912"/>
+            </StateMachineLayer>
+        </StateMachine>
+        <LinearAnimation loopValue="loop" duration="60" name="Idle" id="1:901"/>
+    </Artboard>
+</Rive>

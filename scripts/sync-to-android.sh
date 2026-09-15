@@ -10,10 +10,11 @@ REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 APPS_DIR="$REPO_ROOT/dash-apps"
 ASSETS_DIR="$REPO_ROOT/dashpilot-android/app/src/main/assets"
 DRAWABLES_DIR="$REPO_ROOT/dashpilot-android/app/src/main/res/drawable"
+RAW_DIR="$REPO_ROOT/dashpilot-android/app/src/main/res/raw"
 
 # Default folders to sync (override by passing arguments)
 DEFAULT_FOLDERS=(web-vanilla web-retro web-ambient web-analog)
-PREVIEW_FOLDERS=("${DEFAULT_FOLDERS[@]}" web-expo rive)
+PREVIEW_FOLDERS=("${DEFAULT_FOLDERS[@]}" web-expo rive rive-modular)
 
 if [ $# -gt 0 ]; then
   FOLDERS=("$@")
@@ -24,9 +25,15 @@ fi
 ADASVIZ_DIR="$REPO_ROOT/adasviz"
 
 for folder in "${PREVIEW_FOLDERS[@]}"; do
-  cp -f "$APPS_DIR/$folder/preview.jpg" "$DRAWABLES_DIR/preview_${folder#web-}.jpg"
-  echo "Copied preview $folder -> $DRAWABLES_DIR/preview_${folder#web-}.jpg"
+  name="${folder#web-}"
+  name="${name#rive-}"
+  cp -f "$APPS_DIR/$folder/preview.jpg" "$DRAWABLES_DIR/preview_${name}.jpg"
+  echo "Copied preview $folder -> $DRAWABLES_DIR/preview_${name}.jpg"
 done
+
+# Rive dash-apps ship as a built .riv in their dist/ folder (see dash-apps/rive-modular/README.md)
+cp -f "$APPS_DIR/rive-modular/dist/dashboard_modular.riv" "$RAW_DIR/dashboard_modular.riv"
+echo "Copied rive-modular -> $RAW_DIR/dashboard_modular.riv"
 
 for name in "${FOLDERS[@]}"; do
   src="$APPS_DIR/$name"

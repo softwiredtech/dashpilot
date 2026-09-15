@@ -28,6 +28,7 @@ import androidx.compose.material.icons.rounded.Bluetooth
 import androidx.compose.material.icons.rounded.DirectionsCar
 import androidx.compose.material.icons.rounded.Lan
 import androidx.compose.material.icons.rounded.PhoneAndroid
+import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -75,6 +76,7 @@ private data class DataSource(
 private val dataSources = buildList {
     add(DataSource(DataSourceType.COMMA, "comma", null))
     add(DataSource(DataSourceType.DASHKIT, "DashKit", Icons.Rounded.Bluetooth))
+    add(DataSource(DataSourceType.DEMO, "Demo", Icons.Rounded.PlayArrow))
     if (BuildConfig.DEBUG) {
         add(DataSource(DataSourceType.WEBSOCKET, "WebSocket", Icons.Rounded.Lan))
     }

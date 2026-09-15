@@ -3,6 +3,10 @@
 Dash apps are the sandboxed applications running inside the Dashpilot android app.
 They can be either web apps running in the `WebDashView` Composable, or Rive apps running in `RiveDashView`.
 
+Rive apps come in two flavours: `rive/` holds an editor-exported `.riv`, and
+[`rive-modular/`](./rive-modular/README.md) is authored as RML text and built with the Rive
+CLI (`rive . --once`), with the resulting `.riv` committed under its `dist/` folder.
+
 ## Performance requirements
 
 Dash-apps render live driving data - even one second of stale speed is unacceptable. Web

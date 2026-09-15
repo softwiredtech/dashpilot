@@ -1,0 +1,646 @@
+<Rive version="1" kind="fragment">
+
+    <!-- ===== 0: W_Battery ===== -->
+    <Artboard isComponent="true" defaultStateMachineId="3:122" viewModelId="2:1" viewModelInstanceId="2:2" x="0" y="900" styleId="3:121" clip="true" width="400" height="300" name="W_Battery" id="3:120">
+        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" flexDirectionValue="column" layoutAlignmentType="spaceBetweenStart" paddingLeft="26" paddingLeftUnitsValue="points" paddingRight="26" paddingRightUnitsValue="points" paddingTop="22" paddingTopUnitsValue="points" paddingBottom="24" paddingBottomUnitsValue="points" name="Style" id="3:121"/>
+        <LayoutComponent height="30" styleId="3:102" name="TextRow" id="3:101">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="S" id="3:102"/>
+            <Text sizingValue="fixed" alignValue="left" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:103">
+                <TextStylePaint fontSize="22" fontAssetId="2:901" name="S" id="3:104">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:104" text="Battery" name="Run"/>
+            </Text>
+            <Text sizingValue="fixed" alignValue="right" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:105">
+                <TextStylePaint fontSize="20" fontAssetId="2:901" name="S" id="3:106">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextStylePaint fontSize="20" fontAssetId="2:901" name="S" id="3:107">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:106" text="49" name="Run">
+                    <DataBindContext sourcePathIds="2:1-2:31" propertyKey="268" converterId="2:117"/>
+                </TextValueRun>
+                <TextValueRun styleId="3:107" text=" kWh" name="Run"/>
+            </Text>
+        </LayoutComponent>
+        <LayoutComponent height="76" styleId="3:109" name="TextRow" id="3:108">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="S" id="3:109"/>
+            <Text sizingValue="fixed" alignValue="left" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:110">
+                <TextStylePaint fontSize="64" fontAssetId="2:902" name="S" id="3:111">
+                    <Fill name="F"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                </TextStylePaint>
+                <TextStylePaint fontSize="26" fontAssetId="2:901" name="S" id="3:112">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextStylePaint fontSize="26" fontAssetId="2:901" name="S" id="3:113">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:111" text="65" name="Run">
+                    <DataBindContext sourcePathIds="2:1-2:31" propertyKey="268" converterId="2:113"/>
+                </TextValueRun>
+                <TextValueRun styleId="3:112" text=" " name="Run"/>
+                <TextValueRun styleId="3:113" text="%" name="Run"/>
+            </Text>
+        </LayoutComponent>
+        <LayoutComponent clip="true" height="14" styleId="3:119" name="Track" id="3:118">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" flexDirectionValue="row" cornerRadiusTL="7" name="Style" id="3:119"/>
+            <Fill name="F"><SolidColor colorValue="FF2C2E36" name="C"/></Fill>
+            <LayoutComponent fractionalWidth="50" styleId="3:115" name="Bar" id="3:114">
+                <DataBindContext sourcePathIds="2:1-2:31" propertyKey="706" converterId="2:112"/>
+                <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" cornerRadiusTL="7" name="Style" id="3:115"/>
+                <Fill name="F"><SolidColor colorValue="FF3B82F6" name="C"/></Fill>
+            </LayoutComponent>
+            <LayoutComponent fractionalWidth="50" styleId="3:117" name="Rest" id="3:116">
+                <DataBindContext sourcePathIds="2:1-2:31" propertyKey="706" converterId="2:115"/>
+                <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="Style" id="3:117"/>
+            </LayoutComponent>
+        </LayoutComponent>
+        <StateMachine name="SM" id="3:122">
+            <StateMachineLayer name="L" id="3:123">
+                <AnyState x="400" y="0"/><ExitState x="480" y="0"/>
+                <EntryState x="0" y="16"><StateTransition stateToId="3:124"/></EntryState>
+                <AnimationState x="160" y="0" animationId="3:125" id="3:124"/>
+            </StateMachineLayer>
+        </StateMachine>
+        <LinearAnimation loopValue="loop" duration="60" name="Idle" id="3:125"/>
+    </Artboard>
+    <ComponentAsset artboardId="3:120" name="W_Battery"/>
+
+    <!-- ===== 1: W_Range ===== -->
+    <Artboard isComponent="true" defaultStateMachineId="3:221" viewModelId="2:1" viewModelInstanceId="2:2" x="500" y="900" styleId="3:220" clip="true" width="400" height="300" name="W_Range" id="3:219">
+        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" flexDirectionValue="column" layoutAlignmentType="spaceBetweenStart" paddingLeft="26" paddingLeftUnitsValue="points" paddingRight="26" paddingRightUnitsValue="points" paddingTop="22" paddingTopUnitsValue="points" paddingBottom="24" paddingBottomUnitsValue="points" name="Style" id="3:220"/>
+        <LayoutComponent height="30" styleId="3:210" name="TextRow" id="3:209">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="S" id="3:210"/>
+            <Text sizingValue="fixed" alignValue="left" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:211">
+                <TextStylePaint fontSize="22" fontAssetId="2:901" name="S" id="3:212">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:212" text="Range" name="Run"/>
+            </Text>
+        </LayoutComponent>
+        <LayoutComponent height="76" styleId="3:214" name="TextRow" id="3:213">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="S" id="3:214"/>
+            <Text sizingValue="fixed" alignValue="left" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:215">
+                <TextStylePaint fontSize="64" fontAssetId="2:902" name="S" id="3:216">
+                    <Fill name="F"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                </TextStylePaint>
+                <TextStylePaint fontSize="26" fontAssetId="2:901" name="S" id="3:217">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextStylePaint fontSize="26" fontAssetId="2:901" name="S" id="3:218">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:216" text="320" name="Run">
+                    <DataBindContext sourcePathIds="2:1-2:31" propertyKey="268" converterId="2:121"/>
+                </TextValueRun>
+                <TextValueRun styleId="3:217" text=" " name="Run"/>
+                <TextValueRun styleId="3:218" text="km" name="Run">
+                    <DataBindContext sourcePathIds="2:1-2:51" propertyKey="268"/>
+                </TextValueRun>
+            </Text>
+        </LayoutComponent>
+        <LayoutComponent styleId="3:208" name="Holder" id="3:207">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" flexDirectionValue="row" layoutAlignmentType="center" paddingTop="16" paddingTopUnitsValue="points" name="Style" id="3:208"/>
+            <LayoutComponent clip="true" width="56" styleId="3:206" name="Tube" id="3:205">
+                <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fill" flexDirectionValue="column" cornerRadiusTL="22" name="Style" id="3:206"/>
+                <Fill name="F"><SolidColor colorValue="FF2C2E36" name="C"/></Fill>
+                <LayoutComponent fractionalWidth="50" styleId="3:202" name="Rest" id="3:201">
+                    <DataBindContext sourcePathIds="2:1-2:31" propertyKey="706" converterId="2:115"/>
+                    <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="Style" id="3:202"/>
+                </LayoutComponent>
+                <LayoutComponent fractionalWidth="50" styleId="3:204" name="Bar" id="3:203">
+                    <DataBindContext sourcePathIds="2:1-2:31" propertyKey="706" converterId="2:112"/>
+                    <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" cornerRadiusTL="22" name="Style" id="3:204"/>
+                    <Fill name="F"><SolidColor colorValue="FF3B82F6" name="C"/></Fill>
+                </LayoutComponent>
+            </LayoutComponent>
+        </LayoutComponent>
+        <StateMachine name="SM" id="3:221">
+            <StateMachineLayer name="L" id="3:222">
+                <AnyState x="400" y="0"/><ExitState x="480" y="0"/>
+                <EntryState x="0" y="16"><StateTransition stateToId="3:223"/></EntryState>
+                <AnimationState x="160" y="0" animationId="3:224" id="3:223"/>
+            </StateMachineLayer>
+        </StateMachine>
+        <LinearAnimation loopValue="loop" duration="60" name="Idle" id="3:224"/>
+    </Artboard>
+    <ComponentAsset artboardId="3:219" name="W_Range"/>
+
+    <!-- ===== 2: W_Power ===== -->
+    <Artboard isComponent="true" defaultStateMachineId="3:332" viewModelId="2:1" viewModelInstanceId="2:2" x="1000" y="900" styleId="3:331" clip="true" width="400" height="300" name="W_Power" id="3:330">
+        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" flexDirectionValue="column" layoutAlignmentType="spaceBetweenStart" paddingLeft="26" paddingLeftUnitsValue="points" paddingRight="26" paddingRightUnitsValue="points" paddingTop="22" paddingTopUnitsValue="points" paddingBottom="24" paddingBottomUnitsValue="points" name="Style" id="3:331"/>
+        <LayoutComponent height="30" styleId="3:318" name="TextRow" id="3:317">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="S" id="3:318"/>
+            <Text sizingValue="fixed" alignValue="left" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:319">
+                <TextStylePaint fontSize="22" fontAssetId="2:901" name="S" id="3:320">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:320" text="Power" name="Run"/>
+            </Text>
+            <Text sizingValue="fixed" alignValue="right" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:321">
+                <TextStylePaint fontSize="20" fontAssetId="2:901" name="S" id="3:322">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextStylePaint fontSize="20" fontAssetId="2:901" name="S" id="3:323">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:322" text="380" name="Run">
+                    <DataBindContext sourcePathIds="2:1-2:35" propertyKey="268" converterId="2:100"/>
+                </TextValueRun>
+                <TextValueRun styleId="3:323" text=" V" name="Run"/>
+            </Text>
+        </LayoutComponent>
+        <LayoutComponent height="67" styleId="3:325" name="TextRow" id="3:324">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="S" id="3:325"/>
+            <Text sizingValue="fixed" alignValue="left" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:326">
+                <TextStylePaint fontSize="56" fontAssetId="2:902" name="S" id="3:327">
+                    <Fill name="F"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                </TextStylePaint>
+                <TextStylePaint fontSize="26" fontAssetId="2:901" name="S" id="3:328">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextStylePaint fontSize="26" fontAssetId="2:901" name="S" id="3:329">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:327" text="15.2" name="Run">
+                    <DataBindContext sourcePathIds="2:1-2:35" propertyKey="268" converterId="2:131"/>
+                </TextValueRun>
+                <TextValueRun styleId="3:328" text=" " name="Run"/>
+                <TextValueRun styleId="3:329" text="kW" name="Run"/>
+            </Text>
+        </LayoutComponent>
+        <LayoutComponent clip="true" height="14" styleId="3:316" name="Track" id="3:315">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" flexDirectionValue="row" cornerRadiusTL="7" name="Style" id="3:316"/>
+            <Fill name="F"><SolidColor colorValue="FF2C2E36" name="C"/></Fill>
+            <LayoutComponent styleId="3:306" name="Left" id="3:305">
+                <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" flexDirectionValue="row" name="Style" id="3:306"/>
+                <LayoutComponent fractionalWidth="50" styleId="3:302" name="Rest" id="3:301">
+                    <DataBindContext sourcePathIds="2:1-2:35" propertyKey="706" converterId="2:134"/>
+                    <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="Style" id="3:302"/>
+                </LayoutComponent>
+                <LayoutComponent fractionalWidth="50" styleId="3:304" name="Regen" id="3:303">
+                    <DataBindContext sourcePathIds="2:1-2:35" propertyKey="706" converterId="2:133"/>
+                    <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" cornerRadiusTL="7" name="Style" id="3:304"/>
+                    <Fill name="F"><SolidColor colorValue="FF34C759" name="C"/></Fill>
+                </LayoutComponent>
+            </LayoutComponent>
+            <LayoutComponent width="3" styleId="3:314" name="Tick" id="3:313">
+                <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fill" name="Style" id="3:314"/>
+                <Fill name="F"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+            </LayoutComponent>
+            <LayoutComponent styleId="3:312" name="Right" id="3:311">
+                <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" flexDirectionValue="row" name="Style" id="3:312"/>
+                <LayoutComponent fractionalWidth="50" styleId="3:308" name="Discharge" id="3:307">
+                    <DataBindContext sourcePathIds="2:1-2:35" propertyKey="706" converterId="2:136"/>
+                    <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" cornerRadiusTL="7" name="Style" id="3:308"/>
+                    <Fill name="F"><SolidColor colorValue="FFF59E0B" name="C"/></Fill>
+                </LayoutComponent>
+                <LayoutComponent fractionalWidth="50" styleId="3:310" name="Rest" id="3:309">
+                    <DataBindContext sourcePathIds="2:1-2:35" propertyKey="706" converterId="2:137"/>
+                    <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" name="Style" id="3:310"/>
+                </LayoutComponent>
+            </LayoutComponent>
+        </LayoutComponent>
+        <StateMachine name="SM" id="3:332">
+            <StateMachineLayer name="L" id="3:333">
+                <AnyState x="400" y="0"/><ExitState x="480" y="0"/>
+                <EntryState x="0" y="16"><StateTransition stateToId="3:334"/></EntryState>
+                <AnimationState x="160" y="0" animationId="3:335" id="3:334"/>
+            </StateMachineLayer>
+        </StateMachine>
+        <LinearAnimation loopValue="loop" duration="60" name="Idle" id="3:335"/>
+    </Artboard>
+    <ComponentAsset artboardId="3:330" name="W_Power"/>
+
+    <!-- ===== 3: W_Temp ===== -->
+    <Artboard isComponent="true" defaultStateMachineId="3:420" viewModelId="2:1" viewModelInstanceId="2:2" x="1500" y="900" styleId="3:419" clip="true" width="400" height="300" name="W_Temp" id="3:418">
+        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" flexDirectionValue="column" layoutAlignmentType="spaceBetweenStart" paddingLeft="26" paddingLeftUnitsValue="points" paddingRight="26" paddingRightUnitsValue="points" paddingTop="22" paddingTopUnitsValue="points" paddingBottom="24" paddingBottomUnitsValue="points" name="Style" id="3:419"/>
+        <LayoutComponent height="30" styleId="3:402" name="TextRow" id="3:401">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="S" id="3:402"/>
+            <Text sizingValue="fixed" alignValue="left" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:403">
+                <TextStylePaint fontSize="22" fontAssetId="2:901" name="S" id="3:404">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:404" text="Pack temp" name="Run"/>
+            </Text>
+        </LayoutComponent>
+        <LayoutComponent height="76" styleId="3:406" name="TextRow" id="3:405">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="S" id="3:406"/>
+            <Text sizingValue="fixed" alignValue="left" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:407">
+                <TextStylePaint fontSize="64" fontAssetId="2:902" name="S" id="3:408">
+                    <Fill name="F"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                </TextStylePaint>
+                <TextStylePaint fontSize="26" fontAssetId="2:901" name="S" id="3:409">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextStylePaint fontSize="26" fontAssetId="2:901" name="S" id="3:410">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:408" text="25" name="Run">
+                    <DataBindContext sourcePathIds="2:1-2:38" propertyKey="268" converterId="2:100"/>
+                </TextValueRun>
+                <TextValueRun styleId="3:409" text=" " name="Run"/>
+                <TextValueRun styleId="3:410" text="°C" name="Run">
+                    <DataBindContext sourcePathIds="2:1-2:52" propertyKey="268"/>
+                </TextValueRun>
+            </Text>
+        </LayoutComponent>
+        <LayoutComponent height="30" styleId="3:412" name="TextRow" id="3:411">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="S" id="3:412"/>
+            <Text sizingValue="fixed" alignValue="left" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:413">
+                <TextStylePaint fontSize="22" fontAssetId="2:900" name="S" id="3:414">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextStylePaint fontSize="22" fontAssetId="2:900" name="S" id="3:415">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextStylePaint fontSize="22" fontAssetId="2:900" name="S" id="3:416">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextStylePaint fontSize="22" fontAssetId="2:900" name="S" id="3:417">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:414" text="min " name="Run"/>
+                <TextValueRun styleId="3:415" text="22" name="Run">
+                    <DataBindContext sourcePathIds="2:1-2:37" propertyKey="268" converterId="2:100"/>
+                </TextValueRun>
+                <TextValueRun styleId="3:416" text=" " name="Run"/>
+                <TextValueRun styleId="3:417" text="°C" name="Run">
+                    <DataBindContext sourcePathIds="2:1-2:52" propertyKey="268"/>
+                </TextValueRun>
+            </Text>
+        </LayoutComponent>
+        <StateMachine name="SM" id="3:420">
+            <StateMachineLayer name="L" id="3:421">
+                <AnyState x="400" y="0"/><ExitState x="480" y="0"/>
+                <EntryState x="0" y="16"><StateTransition stateToId="3:422"/></EntryState>
+                <AnimationState x="160" y="0" animationId="3:423" id="3:422"/>
+            </StateMachineLayer>
+        </StateMachine>
+        <LinearAnimation loopValue="loop" duration="60" name="Idle" id="3:423"/>
+    </Artboard>
+    <ComponentAsset artboardId="3:418" name="W_Temp"/>
+
+    <!-- ===== 4: W_Odometer ===== -->
+    <Artboard isComponent="true" defaultStateMachineId="3:517" viewModelId="2:1" viewModelInstanceId="2:2" x="2000" y="900" styleId="3:516" clip="true" width="400" height="300" name="W_Odometer" id="3:515">
+        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" flexDirectionValue="column" layoutAlignmentType="spaceBetweenStart" paddingLeft="26" paddingLeftUnitsValue="points" paddingRight="26" paddingRightUnitsValue="points" paddingTop="22" paddingTopUnitsValue="points" paddingBottom="24" paddingBottomUnitsValue="points" name="Style" id="3:516"/>
+        <LayoutComponent height="30" styleId="3:502" name="TextRow" id="3:501">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="S" id="3:502"/>
+            <Text sizingValue="fixed" alignValue="left" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:503">
+                <TextStylePaint fontSize="22" fontAssetId="2:901" name="S" id="3:504">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:504" text="Odometer" name="Run"/>
+            </Text>
+        </LayoutComponent>
+        <LayoutComponent height="57" styleId="3:506" name="TextRow" id="3:505">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="S" id="3:506"/>
+            <Text sizingValue="fixed" alignValue="left" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:507">
+                <TextStylePaint fontSize="48" fontAssetId="2:902" name="S" id="3:508">
+                    <Fill name="F"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                </TextStylePaint>
+                <TextStylePaint fontSize="26" fontAssetId="2:901" name="S" id="3:509">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextStylePaint fontSize="26" fontAssetId="2:901" name="S" id="3:510">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:508" text="48213" name="Run">
+                    <DataBindContext sourcePathIds="2:1-2:39" propertyKey="268" converterId="2:100"/>
+                </TextValueRun>
+                <TextValueRun styleId="3:509" text=" " name="Run"/>
+                <TextValueRun styleId="3:510" text="km" name="Run">
+                    <DataBindContext sourcePathIds="2:1-2:51" propertyKey="268"/>
+                </TextValueRun>
+            </Text>
+        </LayoutComponent>
+        <LayoutComponent height="30" styleId="3:512" name="TextRow" id="3:511">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="S" id="3:512"/>
+            <Text sizingValue="fixed" alignValue="left" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:513">
+                <TextStylePaint fontSize="22" fontAssetId="2:900" name="S" id="3:514">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:514" text="total" name="Run"/>
+            </Text>
+        </LayoutComponent>
+        <StateMachine name="SM" id="3:517">
+            <StateMachineLayer name="L" id="3:518">
+                <AnyState x="400" y="0"/><ExitState x="480" y="0"/>
+                <EntryState x="0" y="16"><StateTransition stateToId="3:519"/></EntryState>
+                <AnimationState x="160" y="0" animationId="3:520" id="3:519"/>
+            </StateMachineLayer>
+        </StateMachine>
+        <LinearAnimation loopValue="loop" duration="60" name="Idle" id="3:520"/>
+    </Artboard>
+    <ComponentAsset artboardId="3:515" name="W_Odometer"/>
+
+    <!-- ===== 5: W_SpeedLimit ===== -->
+    <Artboard isComponent="true" defaultStateMachineId="3:613" viewModelId="2:1" viewModelInstanceId="2:2" x="2500" y="900" styleId="3:612" clip="true" width="400" height="300" name="W_SpeedLimit" id="3:611">
+        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" flexDirectionValue="column" layoutAlignmentType="spaceBetweenStart" paddingLeft="26" paddingLeftUnitsValue="points" paddingRight="26" paddingRightUnitsValue="points" paddingTop="22" paddingTopUnitsValue="points" paddingBottom="24" paddingBottomUnitsValue="points" name="Style" id="3:612"/>
+        <LayoutComponent height="30" styleId="3:608" name="TextRow" id="3:607">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="S" id="3:608"/>
+            <Text sizingValue="fixed" alignValue="left" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:609">
+                <TextStylePaint fontSize="22" fontAssetId="2:901" name="S" id="3:610">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:610" text="Speed limit" name="Run"/>
+            </Text>
+        </LayoutComponent>
+        <LayoutComponent styleId="3:606" name="Holder" id="3:605">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" flexDirectionValue="row" layoutAlignmentType="center" name="Style" id="3:606"/>
+            <LayoutComponent width="132" height="132" styleId="3:604" name="Sign" id="3:603">
+                <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" cornerRadiusTL="66" name="Style" id="3:604"/>
+                <Fill name="F"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                <Stroke thickness="12" name="St"><SolidColor colorValue="FFE0332B" name="C"/></Stroke>
+                <Text sizingValue="fixed" alignValue="center" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:601">
+                    <TextStylePaint fontSize="54" fontAssetId="2:902" name="S" id="3:602">
+                        <Fill name="F"><SolidColor colorValue="FF111111" name="C"/></Fill>
+                    </TextStylePaint>
+                    <TextValueRun styleId="3:602" text="50" name="Run">
+                        <DataBindContext sourcePathIds="2:1-2:11" propertyKey="268" converterId="2:100"/>
+                    </TextValueRun>
+                </Text>
+            </LayoutComponent>
+        </LayoutComponent>
+        <StateMachine name="SM" id="3:613">
+            <StateMachineLayer name="L" id="3:614">
+                <AnyState x="400" y="0"/><ExitState x="480" y="0"/>
+                <EntryState x="0" y="16"><StateTransition stateToId="3:615"/></EntryState>
+                <AnimationState x="160" y="0" animationId="3:616" id="3:615"/>
+            </StateMachineLayer>
+        </StateMachine>
+        <LinearAnimation loopValue="loop" duration="60" name="Idle" id="3:616"/>
+    </Artboard>
+    <ComponentAsset artboardId="3:611" name="W_SpeedLimit"/>
+
+    <!-- ===== 6: W_Cruise ===== -->
+    <Artboard isComponent="true" defaultStateMachineId="3:721" viewModelId="2:1" viewModelInstanceId="2:2" x="3000" y="900" styleId="3:720" clip="true" width="400" height="300" name="W_Cruise" id="3:719">
+        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" flexDirectionValue="column" layoutAlignmentType="spaceBetweenStart" paddingLeft="26" paddingLeftUnitsValue="points" paddingRight="26" paddingRightUnitsValue="points" paddingTop="22" paddingTopUnitsValue="points" paddingBottom="24" paddingBottomUnitsValue="points" name="Style" id="3:720"/>
+        <LayoutComponent height="30" styleId="3:702" name="TextRow" id="3:701">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="S" id="3:702"/>
+            <Text sizingValue="fixed" alignValue="left" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:703">
+                <TextStylePaint fontSize="22" fontAssetId="2:901" name="S" id="3:704">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:704" text="Cruise" name="Run"/>
+            </Text>
+            <Text sizingValue="fixed" alignValue="right" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:705">
+                <DataBindContext sourcePathIds="2:1-2:25" propertyKey="18" converterId="2:161"/>
+                <TextStylePaint fontSize="22" fontAssetId="2:902" name="S" id="3:706">
+                    <Fill name="F"><SolidColor colorValue="FF3B82F6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:706" text="ON" name="Run"/>
+            </Text>
+            <Text sizingValue="fixed" alignValue="right" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:707">
+                <DataBindContext sourcePathIds="2:1-2:25" propertyKey="18" converterId="2:160"/>
+                <TextStylePaint fontSize="22" fontAssetId="2:902" name="S" id="3:708">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:708" text="OFF" name="Run"/>
+            </Text>
+        </LayoutComponent>
+        <LayoutComponent height="76" styleId="3:710" name="TextRow" id="3:709">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="S" id="3:710"/>
+            <Text sizingValue="fixed" alignValue="left" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:711">
+                <DataBindContext sourcePathIds="2:1-2:25" propertyKey="18" converterId="2:142"/>
+                <TextStylePaint fontSize="64" fontAssetId="2:902" name="S" id="3:712">
+                    <Fill name="F"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                </TextStylePaint>
+                <TextStylePaint fontSize="26" fontAssetId="2:901" name="S" id="3:713">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextStylePaint fontSize="26" fontAssetId="2:901" name="S" id="3:714">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:712" text="0" name="Run">
+                    <DataBindContext sourcePathIds="2:1-2:20" propertyKey="268" converterId="2:100"/>
+                </TextValueRun>
+                <TextValueRun styleId="3:713" text=" " name="Run"/>
+                <TextValueRun styleId="3:714" text="km/h" name="Run">
+                    <DataBindContext sourcePathIds="2:1-2:50" propertyKey="268"/>
+                </TextValueRun>
+            </Text>
+        </LayoutComponent>
+        <LayoutComponent height="30" styleId="3:716" name="TextRow" id="3:715">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="S" id="3:716"/>
+            <Text sizingValue="fixed" alignValue="left" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:717">
+                <TextStylePaint fontSize="22" fontAssetId="2:900" name="S" id="3:718">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:718" text="set speed" name="Run"/>
+            </Text>
+        </LayoutComponent>
+        <StateMachine name="SM" id="3:721">
+            <StateMachineLayer name="L" id="3:722">
+                <AnyState x="400" y="0"/><ExitState x="480" y="0"/>
+                <EntryState x="0" y="16"><StateTransition stateToId="3:723"/></EntryState>
+                <AnimationState x="160" y="0" animationId="3:724" id="3:723"/>
+            </StateMachineLayer>
+        </StateMachine>
+        <LinearAnimation loopValue="loop" duration="60" name="Idle" id="3:724"/>
+    </Artboard>
+    <ComponentAsset artboardId="3:719" name="W_Cruise"/>
+
+    <!-- ===== 7: W_Climate ===== -->
+    <Artboard isComponent="true" defaultStateMachineId="3:820" viewModelId="2:1" viewModelInstanceId="2:2" x="3500" y="900" styleId="3:819" clip="true" width="400" height="300" name="W_Climate" id="3:818">
+        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" flexDirectionValue="column" layoutAlignmentType="spaceBetweenStart" paddingLeft="26" paddingLeftUnitsValue="points" paddingRight="26" paddingRightUnitsValue="points" paddingTop="22" paddingTopUnitsValue="points" paddingBottom="24" paddingBottomUnitsValue="points" name="Style" id="3:819"/>
+        <LayoutComponent height="30" styleId="3:802" name="TextRow" id="3:801">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="S" id="3:802"/>
+            <Text sizingValue="fixed" alignValue="left" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:803">
+                <TextStylePaint fontSize="22" fontAssetId="2:901" name="S" id="3:804">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:804" text="Climate" name="Run"/>
+            </Text>
+            <Text sizingValue="fixed" alignValue="right" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:805">
+                <TextStylePaint fontSize="20" fontAssetId="2:901" name="S" id="3:806">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextStylePaint fontSize="20" fontAssetId="2:901" name="S" id="3:807">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:806" text="Fan " name="Run"/>
+                <TextValueRun styleId="3:807" text="3" name="Run">
+                    <DataBindContext sourcePathIds="2:1-2:42" propertyKey="268" converterId="2:100"/>
+                </TextValueRun>
+            </Text>
+        </LayoutComponent>
+        <LayoutComponent height="76" styleId="3:809" name="TextRow" id="3:808">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="S" id="3:809"/>
+            <Text sizingValue="fixed" alignValue="left" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:810">
+                <TextStylePaint fontSize="64" fontAssetId="2:902" name="S" id="3:811">
+                    <Fill name="F"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                </TextStylePaint>
+                <TextStylePaint fontSize="26" fontAssetId="2:901" name="S" id="3:812">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextStylePaint fontSize="26" fontAssetId="2:901" name="S" id="3:813">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:811" text="21.0" name="Run">
+                    <DataBindContext sourcePathIds="2:1-2:40" propertyKey="268" converterId="2:101"/>
+                </TextValueRun>
+                <TextValueRun styleId="3:812" text=" " name="Run"/>
+                <TextValueRun styleId="3:813" text="°C" name="Run">
+                    <DataBindContext sourcePathIds="2:1-2:52" propertyKey="268"/>
+                </TextValueRun>
+            </Text>
+        </LayoutComponent>
+        <LayoutComponent height="30" styleId="3:815" name="TextRow" id="3:814">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="S" id="3:815"/>
+            <Text sizingValue="fixed" alignValue="left" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:816">
+                <TextStylePaint fontSize="22" fontAssetId="2:900" name="S" id="3:817">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:817" text="driver" name="Run"/>
+            </Text>
+        </LayoutComponent>
+        <StateMachine name="SM" id="3:820">
+            <StateMachineLayer name="L" id="3:821">
+                <AnyState x="400" y="0"/><ExitState x="480" y="0"/>
+                <EntryState x="0" y="16"><StateTransition stateToId="3:822"/></EntryState>
+                <AnimationState x="160" y="0" animationId="3:823" id="3:822"/>
+            </StateMachineLayer>
+        </StateMachine>
+        <LinearAnimation loopValue="loop" duration="60" name="Idle" id="3:823"/>
+    </Artboard>
+    <ComponentAsset artboardId="3:818" name="W_Climate"/>
+
+    <!-- ===== 8: W_Clock ===== -->
+    <Artboard isComponent="true" defaultStateMachineId="3:917" viewModelId="2:1" viewModelInstanceId="2:2" x="4000" y="900" styleId="3:916" clip="true" width="400" height="300" name="W_Clock" id="3:915">
+        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" flexDirectionValue="column" layoutAlignmentType="spaceBetweenStart" paddingLeft="26" paddingLeftUnitsValue="points" paddingRight="26" paddingRightUnitsValue="points" paddingTop="22" paddingTopUnitsValue="points" paddingBottom="24" paddingBottomUnitsValue="points" name="Style" id="3:916"/>
+        <LayoutComponent height="30" styleId="3:902" name="TextRow" id="3:901">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="S" id="3:902"/>
+            <Text sizingValue="fixed" alignValue="left" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:903">
+                <TextStylePaint fontSize="22" fontAssetId="2:901" name="S" id="3:904">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:904" text="Clock" name="Run"/>
+            </Text>
+        </LayoutComponent>
+        <LayoutComponent height="76" styleId="3:906" name="TextRow" id="3:905">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="S" id="3:906"/>
+            <Text sizingValue="fixed" alignValue="left" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:907">
+                <TextStylePaint fontSize="64" fontAssetId="2:902" name="S" id="3:908">
+                    <Fill name="F"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:908" text="15:46" name="Run">
+                    <DataBindContext sourcePathIds="2:1-2:53" propertyKey="268"/>
+                </TextValueRun>
+            </Text>
+        </LayoutComponent>
+        <LayoutComponent height="30" styleId="3:910" name="TextRow" id="3:909">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="S" id="3:910"/>
+            <Text sizingValue="fixed" alignValue="left" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:911">
+                <TextStylePaint fontSize="22" fontAssetId="2:900" name="S" id="3:912">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextStylePaint fontSize="22" fontAssetId="2:900" name="S" id="3:913">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextStylePaint fontSize="22" fontAssetId="2:900" name="S" id="3:914">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:912" text="phone " name="Run"/>
+                <TextValueRun styleId="3:913" text="80" name="Run">
+                    <DataBindContext sourcePathIds="2:1-2:45" propertyKey="268" converterId="2:100"/>
+                </TextValueRun>
+                <TextValueRun styleId="3:914" text=" %" name="Run"/>
+            </Text>
+        </LayoutComponent>
+        <StateMachine name="SM" id="3:917">
+            <StateMachineLayer name="L" id="3:918">
+                <AnyState x="400" y="0"/><ExitState x="480" y="0"/>
+                <EntryState x="0" y="16"><StateTransition stateToId="3:919"/></EntryState>
+                <AnimationState x="160" y="0" animationId="3:920" id="3:919"/>
+            </StateMachineLayer>
+        </StateMachine>
+        <LinearAnimation loopValue="loop" duration="60" name="Idle" id="3:920"/>
+    </Artboard>
+    <ComponentAsset artboardId="3:915" name="W_Clock"/>
+
+    <!-- ===== 9: W_TrafficLight ===== -->
+    <Artboard isComponent="true" defaultStateMachineId="3:1035" viewModelId="2:1" viewModelInstanceId="2:2" x="4500" y="900" styleId="3:1034" clip="true" width="400" height="300" name="W_TrafficLight" id="3:1033">
+        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" flexDirectionValue="column" layoutAlignmentType="spaceBetweenStart" paddingLeft="26" paddingLeftUnitsValue="points" paddingRight="26" paddingRightUnitsValue="points" paddingTop="22" paddingTopUnitsValue="points" paddingBottom="24" paddingBottomUnitsValue="points" name="Style" id="3:1034"/>
+        <LayoutComponent height="30" styleId="3:1024" name="TextRow" id="3:1023">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="S" id="3:1024"/>
+            <Text sizingValue="fixed" alignValue="left" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:1025">
+                <TextStylePaint fontSize="22" fontAssetId="2:901" name="S" id="3:1026">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:1026" text="Traffic light" name="Run"/>
+            </Text>
+        </LayoutComponent>
+        <LayoutComponent styleId="3:1022" name="Holder" id="3:1021">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" flexDirectionValue="row" layoutAlignmentType="center" name="Style" id="3:1022"/>
+            <LayoutComponent styleId="3:1020" name="Lamps" id="3:1019">
+                <LayoutComponentStyle layoutWidthScaleType="hug" layoutHeightScaleType="hug" flexDirectionValue="row" gapHorizontal="16" gapHorizontalUnitsValue="points" name="Style" id="3:1020"/>
+                <LayoutComponent width="60" height="60" styleId="3:1006" name="Lamp" id="3:1005">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" layoutTypeValue="stack" name="Style" id="3:1006"/>
+                    <LayoutComponent styleId="3:1004" name="Lit" id="3:1003">
+                        <DataBindContext sourcePathIds="2:1-2:19" propertyKey="18" converterId="2:161"/>
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" cornerRadiusTL="30" name="Style" id="3:1004"/>
+                        <Fill name="F"><SolidColor colorValue="FFE0332B" name="C"/></Fill>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="3:1002" name="Dim" id="3:1001">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" cornerRadiusTL="30" name="Style" id="3:1002"/>
+                        <Fill name="F"><SolidColor colorValue="FF3A1D1D" name="C"/></Fill>
+                    </LayoutComponent>
+                </LayoutComponent>
+                <LayoutComponent width="60" height="60" styleId="3:1012" name="Lamp" id="3:1011">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" layoutTypeValue="stack" name="Style" id="3:1012"/>
+                    <LayoutComponent styleId="3:1010" name="Lit" id="3:1009">
+                        <DataBindContext sourcePathIds="2:1-2:19" propertyKey="18" converterId="2:163"/>
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" cornerRadiusTL="30" name="Style" id="3:1010"/>
+                        <Fill name="F"><SolidColor colorValue="FFF59E0B" name="C"/></Fill>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="3:1008" name="Dim" id="3:1007">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" cornerRadiusTL="30" name="Style" id="3:1008"/>
+                        <Fill name="F"><SolidColor colorValue="FF3A321D" name="C"/></Fill>
+                    </LayoutComponent>
+                </LayoutComponent>
+                <LayoutComponent width="60" height="60" styleId="3:1018" name="Lamp" id="3:1017">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" layoutTypeValue="stack" name="Style" id="3:1018"/>
+                    <LayoutComponent styleId="3:1016" name="Lit" id="3:1015">
+                        <DataBindContext sourcePathIds="2:1-2:19" propertyKey="18" converterId="2:162"/>
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" cornerRadiusTL="30" name="Style" id="3:1016"/>
+                        <Fill name="F"><SolidColor colorValue="FF34C759" name="C"/></Fill>
+                    </LayoutComponent>
+                    <LayoutComponent styleId="3:1014" name="Dim" id="3:1013">
+                        <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill" cornerRadiusTL="30" name="Style" id="3:1014"/>
+                        <Fill name="F"><SolidColor colorValue="FF1D3A24" name="C"/></Fill>
+                    </LayoutComponent>
+                </LayoutComponent>
+            </LayoutComponent>
+        </LayoutComponent>
+        <LayoutComponent height="30" styleId="3:1028" name="TextRow" id="3:1027">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed" name="S" id="3:1028"/>
+            <Text sizingValue="fixed" alignValue="left" verticalAlignValue="middle" wrapValue="noWrap" overflowValue="visible" name="Text" id="3:1029">
+                <TextStylePaint fontSize="22" fontAssetId="2:900" name="S" id="3:1030">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextStylePaint fontSize="22" fontAssetId="2:900" name="S" id="3:1031">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextStylePaint fontSize="22" fontAssetId="2:900" name="S" id="3:1032">
+                    <Fill name="F"><SolidColor colorValue="FF9A9DA6" name="C"/></Fill>
+                </TextStylePaint>
+                <TextValueRun styleId="3:1030" text="stop line " name="Run"/>
+                <TextValueRun styleId="3:1031" text="0" name="Run">
+                    <DataBindContext sourcePathIds="2:1-2:18" propertyKey="268" converterId="2:100"/>
+                </TextValueRun>
+                <TextValueRun styleId="3:1032" text=" m" name="Run"/>
+            </Text>
+        </LayoutComponent>
+        <StateMachine name="SM" id="3:1035">
+            <StateMachineLayer name="L" id="3:1036">
+                <AnyState x="400" y="0"/><ExitState x="480" y="0"/>
+                <EntryState x="0" y="16"><StateTransition stateToId="3:1037"/></EntryState>
+                <AnimationState x="160" y="0" animationId="3:1038" id="3:1037"/>
+            </StateMachineLayer>
+        </StateMachine>
+        <LinearAnimation loopValue="loop" duration="60" name="Idle" id="3:1038"/>
+    </Artboard>
+    <ComponentAsset artboardId="3:1033" name="W_TrafficLight"/>
+</Rive>
