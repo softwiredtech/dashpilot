@@ -130,9 +130,6 @@ final class DashKitBleManager: NSObject {
     private var retryTask: DispatchWorkItem?
     private var pingTask: DispatchWorkItem?
 
-    // Set by the OTA uploader for the duration of a transfer; the firmware
-    // exempts the updating phone from its keepalive cull. The loop keeps
-    // rescheduling so pings resume as soon as the flag clears.
     var suppressPings = false
 
     /// Keepalive foreground gate. Suspension alone stops pings too late (and

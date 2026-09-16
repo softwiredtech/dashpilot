@@ -15,8 +15,8 @@ object VehicleControl {
 
     private const val TAG = "VehicleControl"
 
-    private val SERVICE_UUID = UUID.fromString("CADA0000-CA00-B1E0-B0D6-C000AA0100A1")
-    private val CONTROL_CHAR_UUID = UUID.fromString("CADA0004-CA00-B1E0-B0D6-C000AA0100A1")
+    val SERVICE_UUID: UUID = UUID.fromString("CADA0000-CA00-B1E0-B0D6-C000AA0100A1")
+    val CONTROL_CHAR_UUID: UUID = UUID.fromString("CADA0004-CA00-B1E0-B0D6-C000AA0100A1")
 
     // --- UI_vehicleControl (0x273) ---
     const val CMD_CLOSURE: Int = 0x02  // UI_remoteClosureRequest: 1=REAR_TRUNK 2=FRONT_TRUNK
@@ -146,13 +146,16 @@ object VehicleControl {
      * link is down or the control characteristic is unavailable.
      */
     fun send(manager: DashKitBleManager, opcode: Int, value: Int): Boolean {
+        Log.d(TAG, "Sending control 0x%02X value=%d".format(opcode, value and 0xFFFF))
+        return manager.writeCommand(SERVICE_UUID, CONTROL_CHAR_UUID, payload(opcode, value), TAG)
+    }
+
+    fun payload(opcode: Int, value: Int): ByteArray {
         val v = value and 0xFFFF
-        val payload = byteArrayOf(
+        return byteArrayOf(
             (opcode and 0xFF).toByte(),
             (v and 0xFF).toByte(),
             ((v shr 8) and 0xFF).toByte()
         )
-        Log.d(TAG, "Sending control 0x%02X value=%d".format(opcode, v))
-        return manager.writeCommand(SERVICE_UUID, CONTROL_CHAR_UUID, payload, TAG)
     }
 }

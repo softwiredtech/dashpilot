@@ -23,6 +23,9 @@ final class DashKitOtaUpdate: DashKitGattListener {
 
     private(set) var state: OtaState = .idle
 
+    @ObservationIgnored
+    var onCompleted: (() -> Void)?
+
     private let manager: DashKitBleManager
 
     // Mutated only on the manager's BLE queue (listener callbacks) once the
@@ -41,9 +44,15 @@ final class DashKitOtaUpdate: DashKitGattListener {
     private var canChar: CBCharacteristic?
     private var canWasNotifying = false
 
+    private static let pingInterval: TimeInterval = 15
+    private var controlChar: CBCharacteristic?
+    private var lastPingAt = Date.distantPast
+    private var pingInFlight = false
+
     // Set synchronously on the BLE queue when the device reports completion;
     // `state` is published on main so it can lag the disconnect that follows.
     private var rebooting = false
+    private var uploadFinished = false
 
     init(manager: DashKitBleManager) {
         self.manager = manager
@@ -57,6 +66,7 @@ final class DashKitOtaUpdate: DashKitGattListener {
         firmware = fw
         firmwareOffset = 0
         rebooting = false
+        uploadFinished = false
         manager.suppressPings = true
         setState(.connecting)
         // If already connected the manager replays onServicesReady right away;
@@ -69,6 +79,7 @@ final class DashKitOtaUpdate: DashKitGattListener {
         manager.removeGattListener(self)
         manager.suppressPings = false
         rebooting = false
+        uploadFinished = false
         resumeCanNotifications()
         firmware = nil
         peripheral = nil
@@ -76,6 +87,8 @@ final class DashKitOtaUpdate: DashKitGattListener {
         dataChar = nil
         statusChar = nil
         canChar = nil
+        controlChar = nil
+        pingInFlight = false
         setState(.idle)
     }
 
@@ -98,6 +111,7 @@ final class DashKitOtaUpdate: DashKitGattListener {
             rebooting = false
             manager.removeGattListener(self)
             setState(.idle)
+            onCompleted?()
             return
         }
         guard let service = peripheral.services?.first(where: { $0.uuid == DashKitGatt.otaService }) else {
@@ -112,10 +126,9 @@ final class DashKitOtaUpdate: DashKitGattListener {
             setState(.error("OTA characteristics not found"))
             return
         }
-        canChar = peripheral.services?
-            .first { $0.uuid == DashKitGatt.canService }?
-            .characteristics?
-            .first { $0.uuid == DashKitGatt.canCharacteristic }
+        let canService = peripheral.services?.first { $0.uuid == DashKitGatt.canService }
+        canChar = canService?.characteristics?.first { $0.uuid == DashKitGatt.canCharacteristic }
+        controlChar = canService?.characteristics?.first { $0.uuid == DashKitGatt.controlCharacteristic }
         if let canChar, canChar.isNotifying {
             canWasNotifying = true
             peripheral.setNotifyValue(false, for: canChar)
@@ -141,12 +154,21 @@ final class DashKitOtaUpdate: DashKitGattListener {
     }
 
     func onCharacteristicWrite(_ characteristic: CBCharacteristic, error: Error?) {
-        guard characteristic.uuid == DashKitGatt.otaControlCharacteristic ||
-              characteristic.uuid == DashKitGatt.otaDataCharacteristic else { return }
+        if characteristic.uuid == DashKitGatt.controlCharacteristic {
+            guard pingInFlight else { return }
+            pingInFlight = false
+        } else if characteristic.uuid != DashKitGatt.otaControlCharacteristic,
+                  characteristic.uuid != DashKitGatt.otaDataCharacteristic {
+            return
+        }
         if let error {
             setState(.error("Write failed (\(error.localizedDescription))"))
             resumeCanNotifications()
             return
+        }
+        if characteristic.uuid == DashKitGatt.otaDataCharacteristic,
+           let fw = firmware, firmwareOffset >= fw.count {
+            uploadFinished = true
         }
         sendNextChunk()
     }
@@ -154,7 +176,11 @@ final class DashKitOtaUpdate: DashKitGattListener {
     func onDisconnected() {
         // Rebooting expects this drop; the listener stays registered so the
         // reconnect's onServicesReady can clear the completed state.
-        if !rebooting, state != .idle {
+        if uploadFinished, !rebooting {
+            print("[DashKitOta] link dropped after the last chunk; treating as reboot")
+            rebooting = true
+            setState(.rebooting)
+        } else if !rebooting, state != .idle {
             setState(.error("Disconnected unexpectedly"))
         }
         manager.suppressPings = false
@@ -164,7 +190,9 @@ final class DashKitOtaUpdate: DashKitGattListener {
         dataChar = nil
         statusChar = nil
         canChar = nil
+        controlChar = nil
         canWasNotifying = false
+        pingInFlight = false
     }
 
     // MARK: - Upload
@@ -182,12 +210,22 @@ final class DashKitOtaUpdate: DashKitGattListener {
         print("[DashKitOta] sending OTA Begin: \(size) bytes")
         setState(.uploading(0))
         firmwareOffset = 0
+        lastPingAt = .distantPast
+        pingInFlight = false
         peripheral.writeValue(cmd, for: ctrl, type: .withResponse)
     }
 
     private func sendNextChunk() {
         guard let fw = firmware, let peripheral, let data = dataChar else { return }
         guard firmwareOffset < fw.count else { return }
+
+        if let controlChar, Date().timeIntervalSince(lastPingAt) >= Self.pingInterval {
+            lastPingAt = Date()
+            pingInFlight = true
+            let ping = VehicleControl.payload(opcode: VehicleControl.cmdPing, value: 1)
+            peripheral.writeValue(ping, for: controlChar, type: .withResponse)
+            return
+        }
 
         // .withoutResponse reports the true MTU-3 payload; .withResponse
         // reports 512, which turns each chunk into a slow ATT long write.
@@ -223,6 +261,7 @@ final class DashKitOtaUpdate: DashKitGattListener {
             setState(.error("Device reported error (0x\(String(errCode, radix: 16)))"))
             manager.removeGattListener(self)
             manager.suppressPings = false
+            uploadFinished = false
             resumeCanNotifications()
             firmware = nil
         default:

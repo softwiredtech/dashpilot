@@ -11,8 +11,8 @@ private let errorRed = Color(red: 1, green: 0.32, blue: 0.32)
 struct DashKitSettingsView: View {
 
     let bleManager: DashKitBleManager
+    let updateManager: FirmwareUpdateManager
 
-    @State private var updateManager: FirmwareUpdateManager?
     @State private var showPairDialog = false
     @State private var showRebootDialog = false
     @State private var pairStatus: String?
@@ -25,24 +25,13 @@ struct DashKitSettingsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
             firmwareInfoSection
-            if let updateManager {
-                FirmwareUpdateSection(updateManager: updateManager)
-            }
+            FirmwareUpdateSection(updateManager: updateManager)
             pairingSection
             maintenanceSection
         }
-        .onAppear {
-            if updateManager == nil {
-                updateManager = FirmwareUpdateManager(manager: bleManager)
-            }
-        }
-        .onDisappear {
-            updateManager?.dispose()
-            updateManager = nil
-        }
         // On connect, read the installed version and check for updates.
         .task(id: connected) {
-            guard connected, let updateManager else { return }
+            guard connected else { return }
             updateManager.start()
             await updateManager.checkForUpdate()
         }
@@ -76,7 +65,7 @@ struct DashKitSettingsView: View {
         VStack(alignment: .leading, spacing: 8) {
             SectionHeader("Firmware info")
             InfoRow(label: "Status", value: connected ? "Connected" : "Disconnected")
-            InfoRow(label: "Firmware version", value: updateManager?.installedVersion ?? "Unknown")
+            InfoRow(label: "Firmware version", value: updateManager.installedVersion ?? "Unknown")
         }
     }
 

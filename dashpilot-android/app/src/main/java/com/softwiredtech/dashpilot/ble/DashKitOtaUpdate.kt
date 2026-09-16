@@ -33,6 +33,7 @@ class DashKitOtaUpdate(
         private val OTA_DATA_UUID = UUID.fromString("CADA0102-CA00-B1E0-B0D6-C000AA0100A1")
         private val OTA_STATUS_UUID = UUID.fromString("CADA0103-CA00-B1E0-B0D6-C000AA0100A1")
         private val CCCD_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
+        private const val PING_INTERVAL_MS = 15_000L
     }
 
     private val _state = MutableStateFlow<OtaState>(OtaState.Idle)
@@ -43,6 +44,11 @@ class DashKitOtaUpdate(
     private var ctrlChar: BluetoothGattCharacteristic? = null
     private var dataChar: BluetoothGattCharacteristic? = null
     private var statusChar: BluetoothGattCharacteristic? = null
+    private var controlChar: BluetoothGattCharacteristic? = null
+    private var lastPingAt = 0L
+    private var pingInFlight = false
+    @Volatile
+    private var uploadFinished = false
 
     fun start(fw: ByteArray) {
         if (fw.isEmpty()) {
@@ -51,6 +57,7 @@ class DashKitOtaUpdate(
         }
         firmware = fw
         firmwareOffset = 0
+        uploadFinished = false
 
         manager.suppressPings = true
         manager.addGattListener(this)
@@ -72,6 +79,9 @@ class DashKitOtaUpdate(
         ctrlChar = null
         dataChar = null
         statusChar = null
+        controlChar = null
+        pingInFlight = false
+        uploadFinished = false
         _state.value = OtaState.Idle
     }
 
@@ -100,6 +110,8 @@ class DashKitOtaUpdate(
             _state.value = OtaState.Error("OTA characteristics not found")
             return
         }
+        controlChar = g.getService(VehicleControl.SERVICE_UUID)
+            ?.getCharacteristic(VehicleControl.CONTROL_CHAR_UUID)
 
         g.setCharacteristicNotification(statusChar, true)
         val descriptor = statusChar!!.getDescriptor(CCCD_UUID)
@@ -140,10 +152,19 @@ class DashKitOtaUpdate(
         characteristic: BluetoothGattCharacteristic,
         status: Int
     ) {
-        if (characteristic.uuid != OTA_CTRL_UUID && characteristic.uuid != OTA_DATA_UUID) return
+        if (characteristic.uuid == VehicleControl.CONTROL_CHAR_UUID) {
+            if (!pingInFlight) return
+            pingInFlight = false
+        } else if (characteristic.uuid != OTA_CTRL_UUID && characteristic.uuid != OTA_DATA_UUID) {
+            return
+        }
         if (status != BluetoothGatt.GATT_SUCCESS) {
             _state.value = OtaState.Error("Write failed (status $status)")
             return
+        }
+        val fw = firmware
+        if (characteristic.uuid == OTA_DATA_UUID && fw != null && firmwareOffset >= fw.size) {
+            uploadFinished = true
         }
         sendNextChunk(gatt)
     }
@@ -152,7 +173,10 @@ class DashKitOtaUpdate(
         val currentState = _state.value
         // Rebooting expects this drop; the listener stays registered so the
         // reconnect's onServicesReady can clear the completed state.
-        if (currentState !is OtaState.Rebooting && currentState !is OtaState.Idle) {
+        if (uploadFinished && currentState !is OtaState.Rebooting) {
+            Log.d(TAG, "Link dropped after the last chunk; treating as reboot")
+            _state.value = OtaState.Rebooting
+        } else if (currentState !is OtaState.Rebooting && currentState !is OtaState.Idle) {
             _state.value = OtaState.Error("Disconnected unexpectedly")
         }
         manager.suppressPings = false
@@ -160,6 +184,8 @@ class DashKitOtaUpdate(
         ctrlChar = null
         dataChar = null
         statusChar = null
+        controlChar = null
+        pingInFlight = false
     }
 
     private fun sendBeginCommand(g: BluetoothGatt) {
@@ -175,22 +201,25 @@ class DashKitOtaUpdate(
         Log.d(TAG, "Sending OTA Begin: ${fw.size} bytes")
         _state.value = OtaState.Uploading(0f)
         firmwareOffset = 0
+        lastPingAt = 0L
+        pingInFlight = false
 
         val ctrl = ctrlChar ?: return
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            g.writeCharacteristic(ctrl, cmd, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
-        } else {
-            @Suppress("DEPRECATION")
-            ctrl.value = cmd
-            ctrl.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
-            @Suppress("DEPRECATION")
-            g.writeCharacteristic(ctrl)
-        }
+        write(g, ctrl, cmd)
     }
 
     private fun sendNextChunk(g: BluetoothGatt) {
         val fw = firmware ?: return
         if (firmwareOffset >= fw.size) return
+
+        val control = controlChar
+        val now = System.currentTimeMillis()
+        if (control != null && now - lastPingAt >= PING_INTERVAL_MS) {
+            lastPingAt = now
+            pingInFlight = true
+            write(g, control, VehicleControl.payload(VehicleControl.CMD_PING, 1))
+            return
+        }
 
         val chunkSize = minOf(manager.mtu - 3, fw.size - firmwareOffset)
         val chunk = fw.copyOfRange(firmwareOffset, firmwareOffset + chunkSize)
@@ -200,14 +229,18 @@ class DashKitOtaUpdate(
         _state.value = OtaState.Uploading(progress)
 
         val data = dataChar ?: return
+        write(g, data, chunk)
+    }
+
+    private fun write(g: BluetoothGatt, characteristic: BluetoothGattCharacteristic, value: ByteArray) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            g.writeCharacteristic(data, chunk, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
+            g.writeCharacteristic(characteristic, value, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
         } else {
             @Suppress("DEPRECATION")
-            data.value = chunk
-            data.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+            characteristic.value = value
+            characteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
             @Suppress("DEPRECATION")
-            g.writeCharacteristic(data)
+            g.writeCharacteristic(characteristic)
         }
     }
 
@@ -235,6 +268,7 @@ class DashKitOtaUpdate(
                 _state.value = OtaState.Error("Device reported error (0x${errCode.toString(16)})")
                 manager.removeGattListener(this)
                 manager.suppressPings = false
+                uploadFinished = false
                 firmware = null
             }
         }
