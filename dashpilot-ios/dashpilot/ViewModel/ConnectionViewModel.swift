@@ -34,6 +34,8 @@ final class ConnectionViewModel {
     /// send control commands and the settings screen for firmware/OTA access.
     private(set) var bleManager: DashKitBleManager?
 
+    private(set) var firmwareUpdateManager: FirmwareUpdateManager?
+
     /// Source of the current (or last) session; stays set after a DashKit
     /// error so foregrounding retries the same source, like Android.
     private(set) var activeSourceType: DataSourceType?
@@ -128,6 +130,7 @@ final class ConnectionViewModel {
 
         let manager = DashKitBleManager()
         bleManager = manager
+        firmwareUpdateManager = FirmwareUpdateManager(manager: manager)
         manager.onStateChange = { [weak self] state in
             guard let self else { return }
             // Surface BLE failures while we are still waiting for the first
@@ -241,6 +244,8 @@ final class ConnectionViewModel {
         connectTask = nil
         dataSource?.disconnect()
         dataSource = nil
+        firmwareUpdateManager?.dispose()
+        firmwareUpdateManager = nil
         bleManager?.onStateChange = nil
         bleManager?.disconnect()
         bleManager = nil

@@ -164,14 +164,17 @@ enum VehicleControl {
             print("[VehicleControl] no connection; cannot send command 0x\(String(opcode, radix: 16))")
             return false
         }
+        print("[VehicleControl] sending control 0x\(String(opcode, radix: 16)) value=\(value & 0xFFFF)")
+        peripheral.writeValue(payload(opcode: opcode, value: value), for: characteristic, type: .withResponse)
+        return true
+    }
+
+    static func payload(opcode: Int, value: Int) -> Data {
         let v = value & 0xFFFF
-        let payload = Data([
+        return Data([
             UInt8(opcode & 0xFF),
             UInt8(v & 0xFF),
             UInt8((v >> 8) & 0xFF)
         ])
-        print("[VehicleControl] sending control 0x\(String(opcode, radix: 16)) value=\(v)")
-        peripheral.writeValue(payload, for: characteristic, type: .withResponse)
-        return true
     }
 }

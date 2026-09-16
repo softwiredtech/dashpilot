@@ -59,8 +59,8 @@ enum FirmwareUpdateRepository {
 ///  4. download the binary,
 ///  5. hand the bytes to the `DashKitOtaUpdate` BLE upload path.
 ///
-/// One instance per connected `DashKitBleManager`, disposed when the settings
-/// screen goes away.
+/// One instance per connected `DashKitBleManager`, owned by
+/// `ConnectionViewModel` for the life of the session.
 @Observable
 final class FirmwareUpdateManager {
 
@@ -81,9 +81,19 @@ final class FirmwareUpdateManager {
     var otaState: OtaState { ota.state }
     var installedVersion: String? { versionReader.version }
 
+    private var otaActive: Bool {
+        switch ota.state {
+        case .connecting, .uploading, .rebooting: return true
+        case .idle, .error: return false
+        }
+    }
+
     init(manager: DashKitBleManager) {
         ota = DashKitOtaUpdate(manager: manager)
         versionReader = DashKitFirmwareVersion(manager: manager)
+        ota.onCompleted = { [weak self] in
+            Task { @MainActor in await self?.runCheck() }
+        }
     }
 
     /// Begin reading the installed firmware version over BLE.
@@ -95,6 +105,12 @@ final class FirmwareUpdateManager {
     /// installed version first (waiting briefly if it hasn't arrived yet).
     @MainActor
     func checkForUpdate() async {
+        guard !downloading, !otaActive, check != .checking else { return }
+        await runCheck()
+    }
+
+    @MainActor
+    private func runCheck() async {
         check = .checking
         guard let manifest = await FirmwareUpdateRepository.fetchManifest() else {
             check = .error("Could not reach update server")

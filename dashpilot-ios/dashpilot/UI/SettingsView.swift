@@ -133,8 +133,9 @@ struct SettingsView: View {
 
     @ViewBuilder
     private var dashKitTab: some View {
-        if let bleManager = connectionVM.bleManager {
-            DashKitSettingsView(bleManager: bleManager)
+        if let bleManager = connectionVM.bleManager,
+           let updateManager = connectionVM.firmwareUpdateManager {
+            DashKitSettingsView(bleManager: bleManager, updateManager: updateManager)
                 .padding(.horizontal, 24)
         } else {
             Text("Connect to a DashKit device to manage it.")
