@@ -43,7 +43,7 @@ struct ClimateView: View {
                         if climateKeep {
                             ValuePickerFooter(
                                 label: "Stop after",
-                                unit: "min",
+                                unit: String(localized: "min"),
                                 options: Array(climateKeepMinuteRange),
                                 value: $climateKeepMinutes,
                                 expanded: $minutesWheelExpanded
@@ -135,13 +135,13 @@ struct ClimateView: View {
 
     // MARK: - Sections
 
-    private func sectionTitle(_ title: String) -> some View {
+    private func sectionTitle(_ title: LocalizedStringKey) -> some View {
         Text(title)
             .foregroundColor(.dashTextMuted)
             .font(.system(size: 13, weight: .semibold))
     }
 
-    private func section(_ title: String, rows: [(String, String)]) -> some View {
+    private func section(_ title: LocalizedStringKey, rows: [(LocalizedStringKey, String)]) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             sectionTitle(title)
             VStack(spacing: 0) {
@@ -171,10 +171,16 @@ struct ClimateView: View {
 
     // MARK: - Formatters
 
-    private static let powerLabels = ["Off", "On", "Preconditioning", "Overheat protection (fan)", "Overheat protection"]
-    private static let acLabels = ["Auto", "Off", "On"]
-    private static let recircLabels = ["Auto", "Recirculate", "Fresh air"]
-    private static let keepLabels = ["Off", "Keep", "Dog mode", "Camp mode"]
+    private static let powerLabels = [
+        String(localized: "Off"),
+        String(localized: "On"),
+        String(localized: "Preconditioning"),
+        String(localized: "Overheat protection (fan)"),
+        String(localized: "Overheat protection")
+    ]
+    private static let acLabels = [String(localized: "Auto"), String(localized: "Off"), String(localized: "On")]
+    private static let recircLabels = [String(localized: "Auto"), String(localized: "Recirculate"), String(localized: "Fresh air")]
+    private static let keepLabels = [String(localized: "Off"), String(localized: "Keep"), String(localized: "Dog mode"), String(localized: "Camp mode")]
 
     private func setpointText(_ value: Float?) -> String {
         guard let value, value != 0 else { return "—" }
@@ -194,8 +200,8 @@ struct ClimateView: View {
     private func fanText(_ value: Float?) -> String {
         guard live, let value else { return "—" }
         switch Int(value.rounded()) {
-        case 0: return "Off"
-        case 11: return "Auto"
+        case 0: return String(localized: "Off")
+        case 11: return String(localized: "Auto")
         case 1...10: return "\(Int(value.rounded()))"
         default: return "—"
         }

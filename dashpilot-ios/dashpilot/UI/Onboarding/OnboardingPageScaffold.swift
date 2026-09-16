@@ -26,8 +26,8 @@ enum OnboardingStyle {
 /// anchor mid-screen, optional extra content sits between subtitle and CTA,
 /// and the primary CTA pins to the bottom.
 struct OnboardingPageScaffold<Hero: View, Extra: View, Cta: View>: View {
-    let title: String
-    let subtitle: String
+    let title: LocalizedStringKey
+    let subtitle: LocalizedStringKey
     @ViewBuilder let hero: Hero
     @ViewBuilder let extra: Extra
     @ViewBuilder let cta: Cta
@@ -68,7 +68,7 @@ struct OnboardingPageScaffold<Hero: View, Extra: View, Cta: View>: View {
 
 /// Full-width accent CTA button (port of the Android `PrimaryCta`).
 struct OnboardingPrimaryButton: View {
-    let label: String
+    let label: LocalizedStringKey
     var systemImage: String? = nil
     var showSpinner = false
     var enabled = true

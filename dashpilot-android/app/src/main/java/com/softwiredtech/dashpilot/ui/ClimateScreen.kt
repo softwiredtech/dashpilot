@@ -34,6 +34,8 @@ import com.softwiredtech.dashpilot.ui.theme.DarkColors
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlin.math.roundToInt
+import androidx.compose.ui.res.stringResource
+import com.softwiredtech.dashpilot.R
 
 @Composable
 fun ClimateScreen(
@@ -63,7 +65,7 @@ fun ClimateScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp, vertical = 24.dp)
         ) {
-            ScreenHeader(title = "Climate", onBack = onBack)
+            ScreenHeader(title = stringResource(R.string.climate_title), onBack = onBack)
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -71,20 +73,20 @@ fun ClimateScreen(
 
             Spacer(modifier = Modifier.height(28.dp))
 
-            SectionTitle("Automation")
+            SectionTitle(stringResource(R.string.climate_section_automation))
             Spacer(modifier = Modifier.height(8.dp))
             AutomationRow(
                 icon = Icons.Rounded.AcUnit,
-                title = "Keep climate on",
-                subtitle = "Keep the climate on when you leave the car. The automation stops after the set time, or when you return to the car.",
+                title = stringResource(R.string.automations_keep_climate_title),
+                subtitle = stringResource(R.string.automations_keep_climate_subtitle),
                 checked = climateKeepEnabled,
                 onToggle = { onClimateKeepChange(!climateKeepEnabled) },
                 extraContent = if (climateKeepEnabled) {
                     {
                         NumberPickerFooter(
-                            label = "Stop after",
+                            label = stringResource(R.string.automations_stop_after),
                             value = climateKeepMinutes,
-                            unit = "min",
+                            unit = stringResource(R.string.unit_min),
                             range = CLIMATE_KEEP_MINUTE_RANGE,
                             onValueChange = onClimateKeepMinutesChange
                         )
@@ -95,23 +97,23 @@ fun ClimateScreen(
             Spacer(modifier = Modifier.height(28.dp))
 
             InfoSection(
-                "Setpoints",
+                stringResource(R.string.climate_section_setpoints),
                 listOf(
-                    "Driver" to setpointText(car.acTemp, imperial),
-                    "Passenger" to setpointText(car.acTempRight, imperial)
+                    stringResource(R.string.climate_driver) to setpointText(car.acTemp, imperial),
+                    stringResource(R.string.climate_passenger) to setpointText(car.acTempRight, imperial)
                 )
             )
 
             Spacer(modifier = Modifier.height(28.dp))
 
             InfoSection(
-                "Settings",
+                stringResource(R.string.climate_section_settings),
                 listOf(
-                    "Power" to enumText(live, car.hvacPowerState, POWER_LABELS),
-                    "Fan" to fanText(live, car.hvacFanLevel),
-                    "A/C" to enumText(live, car.hvacAcMode, AC_LABELS),
-                    "Recirculation" to enumText(live, car.hvacRecirc, RECIRC_LABELS),
-                    "Keep climate" to enumText(live, car.hvacKeepClimateOn, KEEP_LABELS)
+                    stringResource(R.string.climate_power) to enumText(live, car.hvacPowerState, POWER_LABELS),
+                    stringResource(R.string.climate_fan) to fanText(live, car.hvacFanLevel),
+                    stringResource(R.string.climate_ac) to enumText(live, car.hvacAcMode, AC_LABELS),
+                    stringResource(R.string.climate_recirculation) to enumText(live, car.hvacRecirc, RECIRC_LABELS),
+                    stringResource(R.string.climate_keep_climate) to enumText(live, car.hvacKeepClimateOn, KEEP_LABELS)
                 )
             )
 
@@ -148,7 +150,7 @@ private fun SetpointCard(car: CarState, imperial: Boolean) {
             )
         }
         Text(
-            text = "Driver setpoint",
+            text = stringResource(R.string.climate_driver_setpoint),
             color = DarkColors.TextMuted,
             fontSize = 13.sp
         )
@@ -201,10 +203,16 @@ private fun InfoSection(title: String, rows: List<Pair<String, String>>) {
     }
 }
 
-private val POWER_LABELS = listOf("Off", "On", "Preconditioning", "Overheat protection (fan)", "Overheat protection")
-private val AC_LABELS = listOf("Auto", "Off", "On")
-private val RECIRC_LABELS = listOf("Auto", "Recirculate", "Fresh air")
-private val KEEP_LABELS = listOf("Off", "Keep", "Dog mode", "Camp mode")
+private val POWER_LABELS = listOf(
+    R.string.climate_value_off,
+    R.string.climate_value_on,
+    R.string.climate_value_preconditioning,
+    R.string.climate_value_overheat_fan,
+    R.string.climate_value_overheat
+)
+private val AC_LABELS = listOf(R.string.climate_value_auto, R.string.climate_value_off, R.string.climate_value_on)
+private val RECIRC_LABELS = listOf(R.string.climate_value_auto, R.string.climate_value_recirculate, R.string.climate_value_fresh_air)
+private val KEEP_LABELS = listOf(R.string.climate_value_off, R.string.climate_value_keep, R.string.climate_value_dog_mode, R.string.climate_value_camp_mode)
 
 private fun setpointText(value: Float, imperial: Boolean): String {
     if (value == 0f) return "—"
@@ -217,14 +225,16 @@ private fun setpointText(value: Float, imperial: Boolean): String {
     }
 }
 
-private fun enumText(live: Boolean, value: Float, labels: List<String>): String =
-    if (live) labels.getOrNull(value.roundToInt()) ?: "—" else "—"
+@Composable
+private fun enumText(live: Boolean, value: Float, labels: List<Int>): String =
+    if (live) labels.getOrNull(value.roundToInt())?.let { stringResource(it) } ?: "—" else "—"
 
+@Composable
 private fun fanText(live: Boolean, value: Float): String {
     if (!live) return "—"
     return when (val level = value.roundToInt()) {
-        0 -> "Off"
-        11 -> "Auto"
+        0 -> stringResource(R.string.climate_value_off)
+        11 -> stringResource(R.string.climate_value_auto)
         in 1..10 -> "$level"
         else -> "—"
     }

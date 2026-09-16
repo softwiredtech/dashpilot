@@ -1,0 +1,1866 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "Controls": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vezérlők"
+          }
+        }
+      }
+    },
+    "Battery": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Akkumulátor"
+          }
+        }
+      }
+    },
+    "Climate": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klíma"
+          }
+        }
+      }
+    },
+    "Automations": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatizálások"
+          }
+        }
+      }
+    },
+    "Settings": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beállítások"
+          }
+        }
+      }
+    },
+    "Pinned": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rögzítve"
+          }
+        }
+      }
+    },
+    "Drive": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vezetés"
+          }
+        }
+      }
+    },
+    "Battery Temp": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Akku hőmérséklet"
+          }
+        }
+      }
+    },
+    "AC Temp": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klíma hőfok"
+          }
+        }
+      }
+    },
+    "Odometer": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kilométer-számláló"
+          }
+        }
+      }
+    },
+    "Data source: connected": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adatforrás: csatlakozva"
+          }
+        }
+      }
+    },
+    "Data source: connecting…": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adatforrás: csatlakozás…"
+          }
+        }
+      }
+    },
+    "Data source": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adatforrás"
+          }
+        }
+      }
+    },
+    "Disconnect": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kapcsolat bontása"
+          }
+        }
+      }
+    },
+    "Connect to DashKit to send commands": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A parancsok küldéséhez csatlakozz a DashKithez"
+          }
+        }
+      }
+    },
+    "Tip: long-press a control to pin it to the home screen": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tipp: nyomj hosszan egy vezérlőt, hogy a kezdőképernyőre rögzítsd"
+          }
+        }
+      }
+    },
+    "Battery Preheat: On": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Akku előfűtés: Be"
+          }
+        }
+      }
+    },
+    "Battery Preheat: Off": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Akku előfűtés: Ki"
+          }
+        }
+      }
+    },
+    "Frunk": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Első csomagtartó"
+          }
+        }
+      }
+    },
+    "Trunk": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Csomagtartó"
+          }
+        }
+      }
+    },
+    "Charge Port: Open": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Töltőcsatlakozó: Nyitva"
+          }
+        }
+      }
+    },
+    "Charge Port: Closed": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Töltőcsatlakozó: Zárva"
+          }
+        }
+      }
+    },
+    "Mirrors: Folded": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tükrök: Behajtva"
+          }
+        }
+      }
+    },
+    "Mirrors: Unfolded": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tükrök: Kihajtva"
+          }
+        }
+      }
+    },
+    "Rear Fan: On": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hátsó ventilátor: Be"
+          }
+        }
+      }
+    },
+    "Rear Fan: Off": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hátsó ventilátor: Ki"
+          }
+        }
+      }
+    },
+    "Toggle Mirror Dip": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tükördöntés váltása"
+          }
+        }
+      }
+    },
+    "Open Glovebox": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kesztyűtartó nyitása"
+          }
+        }
+      }
+    },
+    "Preheat": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Előfűtés"
+          }
+        }
+      }
+    },
+    "State of charge": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Töltöttségi szint"
+          }
+        }
+      }
+    },
+    "Energy": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Energia"
+          }
+        }
+      }
+    },
+    "Remaining": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hátralévő"
+          }
+        }
+      }
+    },
+    "Usable": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Felhasználható"
+          }
+        }
+      }
+    },
+    "Full Pack": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Teljes csomag"
+          }
+        }
+      }
+    },
+    "Buffer": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tartalék"
+          }
+        }
+      }
+    },
+    "Power": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Teljesítmény"
+          }
+        }
+      }
+    },
+    "Max Discharge": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Max. kisütés"
+          }
+        }
+      }
+    },
+    "Max Regen": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Max. rekuperáció"
+          }
+        }
+      }
+    },
+    "Pack": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Akkucsomag"
+          }
+        }
+      }
+    },
+    "Voltage": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Feszültség"
+          }
+        }
+      }
+    },
+    "Current": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Áramerősség"
+          }
+        }
+      }
+    },
+    "Temp Min": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Min. hőmérséklet"
+          }
+        }
+      }
+    },
+    "Temp Max": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Max. hőmérséklet"
+          }
+        }
+      }
+    },
+    "Automation": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatizálás"
+          }
+        }
+      }
+    },
+    "Keep climate on": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klíma bekapcsolva tartása"
+          }
+        }
+      }
+    },
+    "Keep the climate on when you leave the car. The automation stops after the set time, or when you return to the car.": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A klíma bekapcsolva marad, amikor kiszállsz az autóból. Az automatizálás a beállított idő letelte után, vagy amikor visszatérsz az autóhoz, leáll."
+          }
+        }
+      }
+    },
+    "Stop after": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leállítás ennyi idő után"
+          }
+        }
+      }
+    },
+    "min": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "perc"
+          }
+        }
+      }
+    },
+    "Setpoints": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beállított hőfokok"
+          }
+        }
+      }
+    },
+    "Driver": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vezető"
+          }
+        }
+      }
+    },
+    "Passenger": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Utas"
+          }
+        }
+      }
+    },
+    "Fan": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ventilátor"
+          }
+        }
+      }
+    },
+    "A/C": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Légkondi"
+          }
+        }
+      }
+    },
+    "Recirculation": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Belső keringetés"
+          }
+        }
+      }
+    },
+    "Keep climate": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klíma megtartása"
+          }
+        }
+      }
+    },
+    "Driver setpoint": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vezető oldali beállított hőfok"
+          }
+        }
+      }
+    },
+    "Off": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ki"
+          }
+        }
+      }
+    },
+    "On": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Be"
+          }
+        }
+      }
+    },
+    "Preconditioning": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Előkondicionálás"
+          }
+        }
+      }
+    },
+    "Overheat protection (fan)": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Túlmelegedés-védelem (ventilátor)"
+          }
+        }
+      }
+    },
+    "Overheat protection": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Túlmelegedés-védelem"
+          }
+        }
+      }
+    },
+    "Auto": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auto"
+          }
+        }
+      }
+    },
+    "Recirculate": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keringetés"
+          }
+        }
+      }
+    },
+    "Fresh air": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Friss levegő"
+          }
+        }
+      }
+    },
+    "Keep": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Megtartás"
+          }
+        }
+      }
+    },
+    "Dog mode": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kutya mód"
+          }
+        }
+      }
+    },
+    "Camp mode": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kemping mód"
+          }
+        }
+      }
+    },
+    "Wipers": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ablaktörlők"
+          }
+        }
+      }
+    },
+    "Wiper Off": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ablaktörlő ki"
+          }
+        }
+      }
+    },
+    "Keep wipers disabled automatically": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Az ablaktörlők automatikus kikapcsolva tartása"
+          }
+        }
+      }
+    },
+    "Driving": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vezetés"
+          }
+        }
+      }
+    },
+    "Kick-down": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kick-down"
+          }
+        }
+      }
+    },
+    "Switch from Chill to Standard while the accelerator is pressed past the threshold. Reverts when you ease off.": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chill módról Standardra vált, amíg a gázpedál a küszöbérték fölött van lenyomva. Visszaáll, amikor felengeded."
+          }
+        }
+      }
+    },
+    "Pedal threshold": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pedálküszöb"
+          }
+        }
+      }
+    },
+    "Multi-touch infotainment trigger": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Többujjas infotainment-indító"
+          }
+        }
+      }
+    },
+    "Bind 3-, 4-, or 5-finger infotainment taps to a control": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rendelj 3, 4 vagy 5 ujjas koppintást az infotainment képernyőn egy vezérlőhöz"
+          }
+        }
+      }
+    },
+    "fingers": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ujj"
+          }
+        }
+      }
+    },
+    "action:": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "művelet:"
+          }
+        }
+      }
+    },
+    "Add trigger": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Indító hozzáadása"
+          }
+        }
+      }
+    },
+    "Vanilla Dashboard": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vanilla műszerfal"
+          }
+        }
+      }
+    },
+    "Ambient Dashboard": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ambient műszerfal"
+          }
+        }
+      }
+    },
+    "Analog Dashboard": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Analóg műszerfal"
+          }
+        }
+      }
+    },
+    "Retro Dashboard": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retro műszerfal"
+          }
+        }
+      }
+    },
+    "Load Rive File": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rive fájl betöltése"
+          }
+        }
+      }
+    },
+    "Choose a dashboard": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Válassz műszerfalat"
+          }
+        }
+      }
+    },
+    "Some settings depend on the selected theme": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Egyes beállítások a kiválasztott témától függenek"
+          }
+        }
+      }
+    },
+    "Dashboard Theme": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Műszerfal témája"
+          }
+        }
+      }
+    },
+    "Unsupported dashboard type: %@": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nem támogatott műszerfaltípus: %@"
+          }
+        }
+      }
+    },
+    "General": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Általános"
+          }
+        }
+      }
+    },
+    "Connect to a DashKit device to manage it.": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A kezeléshez csatlakozz egy DashKit eszközhöz."
+          }
+        }
+      }
+    },
+    "Dashboard": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Műszerfal"
+          }
+        }
+      }
+    },
+    "Configuration": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Konfiguráció"
+          }
+        }
+      }
+    },
+    "Extra Vehicle Bus": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Extra járműbusz"
+          }
+        }
+      }
+    },
+    "Display": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Megjelenítés"
+          }
+        }
+      }
+    },
+    "Show Car Battery": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autó akkumulátorának mutatása"
+          }
+        }
+      }
+    },
+    "Show Odometer": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kilométer-számláló mutatása"
+          }
+        }
+      }
+    },
+    "Use Imperial Units": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Angolszász mértékegységek"
+          }
+        }
+      }
+    },
+    "Show Phone Battery": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Telefon akkumulátorának mutatása"
+          }
+        }
+      }
+    },
+    "Dark Mode": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sötét mód"
+          }
+        }
+      }
+    },
+    "3D Visualizer": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3D megjelenítő"
+          }
+        }
+      }
+    },
+    "Always On Blind-Spot Monitor": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mindig bekapcsolt holttérfigyelő"
+          }
+        }
+      }
+    },
+    "Render Quality": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Renderelési minőség"
+          }
+        }
+      }
+    },
+    "Low": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alacsony"
+          }
+        }
+      }
+    },
+    "Med": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Közepes"
+          }
+        }
+      }
+    },
+    "High": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Magas"
+          }
+        }
+      }
+    },
+    "Replay onboarding": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bevezető újranézése"
+          }
+        }
+      }
+    },
+    "Start Demo Mode": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Demó mód indítása"
+          }
+        }
+      }
+    },
+    "Version": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verzió"
+          }
+        }
+      }
+    },
+    "Connect your comma device": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Csatlakozás a comma eszközhöz"
+          }
+        }
+      }
+    },
+    "Connecting to %@...": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Csatlakozás ehhez: %@..."
+          }
+        }
+      }
+    },
+    "Searching for device...": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eszköz keresése..."
+          }
+        }
+      }
+    },
+    "Connected to %@": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Csatlakozva ehhez: %@"
+          }
+        }
+      }
+    },
+    "Connect": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Csatlakozás"
+          }
+        }
+      }
+    },
+    "Enter IP manually": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IP-cím megadása kézzel"
+          }
+        }
+      }
+    },
+    "Device IP": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eszköz IP-címe"
+          }
+        }
+      }
+    },
+    "Cancel": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mégse"
+          }
+        }
+      }
+    },
+    "Connecting...": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Csatlakozás..."
+          }
+        }
+      }
+    },
+    "Next": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tovább"
+          }
+        }
+      }
+    },
+    "Could not find device on the network": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Az eszköz nem található a hálózaton"
+          }
+        }
+      }
+    },
+    "Pair a new device?": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Párosítasz egy új eszközt?"
+          }
+        }
+      }
+    },
+    "Open pairing": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Párosítás megnyitása"
+          }
+        }
+      }
+    },
+    "DashKit is open for pairing. Pair the new phone within 2 minutes.": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A DashKit párosításra kész. Párosítsd az új telefont 2 percen belül."
+          }
+        }
+      }
+    },
+    "Connect to DashKit first to pair a new device": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Új eszköz párosításához előbb csatlakozz a DashKithez"
+          }
+        }
+      }
+    },
+    "DashKit will allow one new device to pair for the next 2 minutes. Open DashPilot on the other phone and pair it now.": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A DashKit a következő 2 percben egy új eszköz párosítását engedélyezi. Nyisd meg a DashPilotot a másik telefonon, és párosítsd most."
+          }
+        }
+      }
+    },
+    "Reboot DashKit?": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Újraindítod a DashKitet?"
+          }
+        }
+      }
+    },
+    "Reboot": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Újraindítás"
+          }
+        }
+      }
+    },
+    "Reboot command sent. DashKit is restarting.": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Újraindítási parancs elküldve. A DashKit újraindul."
+          }
+        }
+      }
+    },
+    "Could not send reboot command.": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nem sikerült elküldeni az újraindítási parancsot."
+          }
+        }
+      }
+    },
+    "DashKit will restart and briefly disconnect. It should reconnect automatically once it is back up.": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A DashKit újraindul, és rövid időre megszakad a kapcsolat. Amint újra elindult, automatikusan újracsatlakozik."
+          }
+        }
+      }
+    },
+    "Firmware info": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Firmware adatai"
+          }
+        }
+      }
+    },
+    "Status": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Állapot"
+          }
+        }
+      }
+    },
+    "Connected": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Csatlakozva"
+          }
+        }
+      }
+    },
+    "Disconnected": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nincs kapcsolat"
+          }
+        }
+      }
+    },
+    "Firmware version": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Firmware verzió"
+          }
+        }
+      }
+    },
+    "Unknown": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ismeretlen"
+          }
+        }
+      }
+    },
+    "Pairing": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Párosítás"
+          }
+        }
+      }
+    },
+    "Pair a new device": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Új eszköz párosítása"
+          }
+        }
+      }
+    },
+    "Maintenance": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Karbantartás"
+          }
+        }
+      }
+    },
+    "Reboot DashKit": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DashKit újraindítása"
+          }
+        }
+      }
+    },
+    "Firmware": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Firmware"
+          }
+        }
+      }
+    },
+    "Downloading firmware…": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Firmware letöltése…"
+          }
+        }
+      }
+    },
+    "Checking for updates…": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frissítések keresése…"
+          }
+        }
+      }
+    },
+    "DashKit firmware is up to date": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A DashKit firmware naprakész"
+          }
+        }
+      }
+    },
+    "Version %@ is available": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elérhető a(z) %@ verzió"
+          }
+        }
+      }
+    },
+    "Install update": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frissítés telepítése"
+          }
+        }
+      }
+    },
+    "Update failed: %@": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A frissítés sikertelen: %@"
+          }
+        }
+      }
+    },
+    "Connecting…": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Csatlakozás…"
+          }
+        }
+      }
+    },
+    "Uploading firmware… %d%%": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Firmware feltöltése… %d%%"
+          }
+        }
+      }
+    },
+    "Update complete! Rebooting DashKit…": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frissítés kész! A DashKit újraindul…"
+          }
+        }
+      }
+    },
+    "Update DashKit Firmware": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DashKit firmware frissítése"
+          }
+        }
+      }
+    },
+    "Pair your DashKit": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Párosítsd a DashKitet"
+          }
+        }
+      }
+    },
+    "Looking for DashKit…": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DashKit keresése…"
+          }
+        }
+      }
+    },
+    "You're all set!": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Minden készen áll!"
+          }
+        }
+      }
+    },
+    "Couldn't pair": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nem sikerült párosítani"
+          }
+        }
+      }
+    },
+    "Plug the DashKit into your car's debug port, then tap below to pair over Bluetooth.": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Csatlakoztasd a DashKitet az autó diagnosztikai portjához, majd koppints alul a Bluetooth-párosításhoz."
+          }
+        }
+      }
+    },
+    "Hold the device close to your phone. This usually takes a few seconds.": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tartsd az eszközt a telefon közelében. Ez általában néhány másodpercet vesz igénybe."
+          }
+        }
+      }
+    },
+    "DashKit is connected and ready to stream data to your dashboard.": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A DashKit csatlakozva van, és készen áll az adatok küldésére a műszerfalra."
+          }
+        }
+      }
+    },
+    "If this DashKit is already paired with another phone, open DashPilot on that phone and tap Settings → DashKit → Pair a new device, then try again.": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ha ez a DashKit már párosítva van egy másik telefonnal, nyisd meg a DashPilotot azon a telefonon, és koppints a Beállítások → DashKit → Új eszköz párosítása lehetőségre, majd próbáld újra."
+          }
+        }
+      }
+    },
+    "Pair device": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eszköz párosítása"
+          }
+        }
+      }
+    },
+    "Pairing…": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Párosítás…"
+          }
+        }
+      }
+    },
+    "Continue": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Folytatás"
+          }
+        }
+      }
+    },
+    "Retry": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Újra"
+          }
+        }
+      }
+    },
+    "One more thing": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Még valami"
+          }
+        }
+      }
+    },
+    "You can pair additional devices and install firmware updates anytime from Settings.": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "További eszközöket párosíthatsz és firmware-frissítéseket telepíthetsz bármikor a Beállításokból."
+          }
+        }
+      }
+    },
+    "Pair more DashKit devices": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "További DashKit eszközök párosítása"
+          }
+        }
+      }
+    },
+    "Check for firmware updates": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Firmware-frissítések keresése"
+          }
+        }
+      }
+    },
+    "Get started": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kezdjük"
+          }
+        }
+      }
+    },
+    "Setup": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beállítás"
+          }
+        }
+      }
+    },
+    "Skip": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kihagyás"
+          }
+        }
+      }
+    },
+    "%lld of %lld": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld / %lld"
+          }
+        }
+      }
+    },
+    "DashKit not found": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A DashKit nem található"
+          }
+        }
+      }
+    },
+    "Could not connect to DashKit": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nem sikerült csatlakozni a DashKithez"
+          }
+        }
+      }
+    },
+    "Bluetooth permission denied": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Bluetooth-engedély megtagadva"
+          }
+        }
+      }
+    },
+    "Bluetooth is off": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A Bluetooth ki van kapcsolva"
+          }
+        }
+      }
+    },
+    "DashKit rejected this phone's pairing. If DashKit is paired with another phone, open \"Pair a new device\" in its DashPilot settings and try again. If this phone was paired before, forget \"DashKit\" in Settings > Bluetooth first.": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A DashKit elutasította a telefon párosítását. Ha a DashKit egy másik telefonnal van párosítva, nyisd meg azon a DashPilot beállításaiban az „Új eszköz párosítása” lehetőséget, és próbáld újra. Ha ez a telefon korábban már párosítva volt, előbb felejtsd el a „DashKit” eszközt a Beállítások > Bluetooth menüben."
+          }
+        }
+      }
+    },
+    "Service discovery failed": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A szolgáltatások felderítése sikertelen"
+          }
+        }
+      }
+    },
+    "Could not reach update server": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A frissítési szerver nem érhető el"
+          }
+        }
+      }
+    },
+    "Downloaded firmware failed integrity check": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A letöltött firmware integritás-ellenőrzése sikertelen"
+          }
+        }
+      }
+    },
+    "Download failed: %@": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A letöltés sikertelen: %@"
+          }
+        }
+      }
+    },
+    "Firmware file is empty": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A firmware-fájl üres"
+          }
+        }
+      }
+    },
+    "OTA service not found on device": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Az OTA-szolgáltatás nem található az eszközön"
+          }
+        }
+      }
+    },
+    "OTA characteristics not found": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Az OTA-jellemzők nem találhatók"
+          }
+        }
+      }
+    },
+    "Failed to enable OTA notifications": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nem sikerült bekapcsolni az OTA-értesítéseket"
+          }
+        }
+      }
+    },
+    "Write failed (%@)": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Az írás sikertelen (%@)"
+          }
+        }
+      }
+    },
+    "Disconnected unexpectedly": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Váratlanul megszakadt a kapcsolat"
+          }
+        }
+      }
+    },
+    "Device reported error (0x%@)": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Az eszköz hibát jelzett (0x%@)"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

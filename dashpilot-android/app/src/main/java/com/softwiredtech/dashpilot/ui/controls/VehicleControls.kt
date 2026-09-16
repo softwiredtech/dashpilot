@@ -38,6 +38,8 @@ import com.softwiredtech.dashpilot.ble.VehicleControl
 import com.softwiredtech.dashpilot.datasource.DashKitBleManager
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
 import com.softwiredtech.dashpilot.ui.theme.DarkColors
+import androidx.compose.ui.res.stringResource
+import com.softwiredtech.dashpilot.R
 
 /**
  * Session-scoped toggle state for controls the firmware exposes as separate
@@ -55,13 +57,13 @@ object ControlsState {
 }
 
 /**
- * A single vehicle control definition. [label] and [active] are read lazily so
+ * A single vehicle control definition. [labelRes] and [active] are read lazily so
  * they reflect the latest [ControlsState] each recomposition.
  */
 data class ControlAction(
     val id: String,
     val icon: ImageVector,
-    val label: () -> String,
+    val labelRes: () -> Int,
     val active: () -> Boolean,
     // Action code sent to the firmware when this control is bound to a
     // multi-finger infotainment gesture (must match multi_finger_action_t in the
@@ -78,7 +80,7 @@ val vehicleControls: List<ControlAction> = listOf(
     ControlAction(
         id = "battery_preheat",
         icon = Icons.Rounded.Thermostat,
-        label = { if (ControlsState.preheatOn) "Battery Preheat: On" else "Battery Preheat: Off" },
+        labelRes = { if (ControlsState.preheatOn) R.string.control_battery_preheat_on else R.string.control_battery_preheat_off },
         active = { ControlsState.preheatOn },
         gestureValue = 2,
         perform = { manager ->
@@ -93,7 +95,7 @@ val vehicleControls: List<ControlAction> = listOf(
     ControlAction(
         id = "frunk",
         icon = VehicleIcons.Frunk,
-        label = { "Frunk" },
+        labelRes = { R.string.control_frunk },
         active = { false },
         gestureValue = 4,
         perform = { manager ->
@@ -103,7 +105,7 @@ val vehicleControls: List<ControlAction> = listOf(
     ControlAction(
         id = "trunk",
         icon = VehicleIcons.Trunk,
-        label = { "Trunk" },
+        labelRes = { R.string.control_trunk },
         active = { false },
         gestureValue = 5,
         perform = { manager ->
@@ -113,7 +115,7 @@ val vehicleControls: List<ControlAction> = listOf(
     ControlAction(
         id = "charge_port",
         icon = Icons.Rounded.EvStation,
-        label = { if (ControlsState.chargePortOpen) "Charge Port: Open" else "Charge Port: Closed" },
+        labelRes = { if (ControlsState.chargePortOpen) R.string.control_charge_port_open else R.string.control_charge_port_closed },
         active = { ControlsState.chargePortOpen },
         gestureValue = 6,
         perform = { manager ->
@@ -127,7 +129,7 @@ val vehicleControls: List<ControlAction> = listOf(
     ControlAction(
         id = "mirror_fold",
         icon = Icons.Rounded.Flip,
-        label = { if (ControlsState.mirrorsFolded) "Mirrors: Folded" else "Mirrors: Unfolded" },
+        labelRes = { if (ControlsState.mirrorsFolded) R.string.control_mirrors_folded else R.string.control_mirrors_unfolded },
         active = { ControlsState.mirrorsFolded },
         gestureValue = 3,
         perform = { manager ->
@@ -141,7 +143,7 @@ val vehicleControls: List<ControlAction> = listOf(
     ControlAction(
         id = "rear_fan",
         icon = Icons.Rounded.Air,
-        label = { if (ControlsState.rearFanOn) "Rear Fan: On" else "Rear Fan: Off" },
+        labelRes = { if (ControlsState.rearFanOn) R.string.control_rear_fan_on else R.string.control_rear_fan_off },
         active = { ControlsState.rearFanOn },
         gestureValue = 7,
         perform = { manager ->
@@ -155,7 +157,7 @@ val vehicleControls: List<ControlAction> = listOf(
     ControlAction(
         id = "mirror_dip",
         icon = Icons.Rounded.SouthEast,
-        label = { "Toggle Mirror Dip" },
+        labelRes = { R.string.control_mirror_dip },
         active = { false },
         gestureValue = 8,
         perform = { manager ->
@@ -166,7 +168,7 @@ val vehicleControls: List<ControlAction> = listOf(
     ControlAction(
         id = "glovebox",
         icon = Icons.Rounded.Inbox,
-        label = { "Open Glovebox" },
+        labelRes = { R.string.control_glovebox },
         active = { false },
         gestureValue = 1,
         perform = { manager ->
@@ -235,7 +237,7 @@ fun ControlActionButton(
             }
             Spacer(modifier = Modifier.size(12.dp))
             Text(
-                text = action.label(),
+                text = stringResource(action.labelRes()),
                 color = Color.White,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.SemiBold,
@@ -245,7 +247,7 @@ fun ControlActionButton(
         if (pinned) {
             Icon(
                 imageVector = Icons.Rounded.PushPin,
-                contentDescription = "Pinned",
+                contentDescription = stringResource(R.string.control_pinned_cd),
                 tint = Color.White,
                 modifier = Modifier
                     .align(Alignment.TopEnd)

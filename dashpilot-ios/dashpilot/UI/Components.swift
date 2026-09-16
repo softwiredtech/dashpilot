@@ -4,7 +4,7 @@ import SwiftUI
 /// centered on the screen — mirrors the home screen header so all top-level
 /// screens line up (port of Android `ScreenHeader`).
 struct ScreenHeader: View {
-    let title: String
+    let title: LocalizedStringKey
     let onBack: () -> Void
 
     var body: some View {

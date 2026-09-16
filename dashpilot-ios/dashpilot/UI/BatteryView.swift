@@ -116,7 +116,7 @@ struct BatteryView: View {
 
     // MARK: - Sections
 
-    private func section(_ title: String, rows: [(String, String)]) -> some View {
+    private func section(_ title: LocalizedStringKey, rows: [(LocalizedStringKey, String)]) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
                 .foregroundColor(.dashTextMuted)

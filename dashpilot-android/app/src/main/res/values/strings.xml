@@ -179,4 +179,136 @@
     <string name="settings_tesla_reset_failed">Couldn\'t remove the connection. Try again.</string>
     <string name="tesla_connection_removing">Removing connection…</string>
     <string name="settings_pair_caption">Pairs another phone — separate from your Tesla connection.</string>
+
+    <!-- Common -->
+    <string name="common_back">Back</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_ok">OK</string>
+    <string name="unit_min">min</string>
+
+    <!-- Home -->
+    <string name="home_pinned">Pinned</string>
+    <string name="home_automations">Automations</string>
+    <string name="home_controls">Controls</string>
+    <string name="home_drive">Drive</string>
+    <string name="home_widget_battery">Battery</string>
+    <string name="home_widget_battery_temp">Battery Temp</string>
+    <string name="home_widget_ac_temp">AC Temp</string>
+    <string name="home_widget_odometer">Odometer</string>
+    <string name="setup_vehicle_cd">Vehicle</string>
+    <string name="setup_phone_cd">Phone</string>
+
+    <!-- Data source menu -->
+    <string name="data_source">Data source</string>
+    <string name="data_source_connected">Data source: connected</string>
+    <string name="data_source_connecting">Data source: connecting…</string>
+    <string name="data_source_websocket_server">WebSocket server</string>
+    <string name="data_source_ip_address">IP address</string>
+
+    <!-- Controls -->
+    <string name="controls_title">Controls</string>
+    <string name="controls_connect_hint">Connect to DashKit to send commands</string>
+    <string name="controls_pin_tip">Tip: long-press a control to pin it to the home screen</string>
+    <string name="control_pinned_cd">Pinned</string>
+    <string name="control_battery_preheat_on">Battery Preheat: On</string>
+    <string name="control_battery_preheat_off">Battery Preheat: Off</string>
+    <string name="control_frunk">Frunk</string>
+    <string name="control_trunk">Trunk</string>
+    <string name="control_charge_port_open">Charge Port: Open</string>
+    <string name="control_charge_port_closed">Charge Port: Closed</string>
+    <string name="control_mirrors_folded">Mirrors: Folded</string>
+    <string name="control_mirrors_unfolded">Mirrors: Unfolded</string>
+    <string name="control_rear_fan_on">Rear Fan: On</string>
+    <string name="control_rear_fan_off">Rear Fan: Off</string>
+    <string name="control_mirror_dip">Toggle Mirror Dip</string>
+    <string name="control_glovebox">Open Glovebox</string>
+
+    <!-- Automations -->
+    <string name="automations_title">Automations</string>
+    <string name="automations_section_wipers">Wipers</string>
+    <string name="automations_wiper_off_title">Wiper Off</string>
+    <string name="automations_wiper_off_subtitle">Keep wipers disabled automatically</string>
+    <string name="automations_section_climate">Climate</string>
+    <string name="automations_keep_climate_title">Keep climate on</string>
+    <string name="automations_keep_climate_subtitle">Keep the climate on when you leave the car. The automation stops after the set time, or when you return to the car.</string>
+    <string name="automations_stop_after">Stop after</string>
+    <string name="automations_section_driving">Driving</string>
+    <string name="automations_kickdown_title">Kick-down</string>
+    <string name="automations_kickdown_subtitle">Switch from Chill to Standard while the accelerator is pressed past the threshold. Reverts when you ease off.</string>
+    <string name="automations_pedal_threshold">Pedal threshold</string>
+    <string name="automations_multitouch_title">Multi-touch infotainment trigger</string>
+    <string name="automations_multitouch_subtitle">Bind 3-, 4-, or 5-finger infotainment taps to a control</string>
+    <string name="automations_fingers">fingers</string>
+    <string name="automations_action">action:</string>
+    <string name="automations_remove">Remove</string>
+    <string name="automations_add_trigger">Add trigger</string>
+
+    <!-- Climate -->
+    <string name="climate_title">Climate</string>
+    <string name="climate_section_automation">Automation</string>
+    <string name="climate_driver_setpoint">Driver setpoint</string>
+    <string name="climate_section_setpoints">Setpoints</string>
+    <string name="climate_driver">Driver</string>
+    <string name="climate_passenger">Passenger</string>
+    <string name="climate_section_settings">Settings</string>
+    <string name="climate_power">Power</string>
+    <string name="climate_fan">Fan</string>
+    <string name="climate_ac">A/C</string>
+    <string name="climate_recirculation">Recirculation</string>
+    <string name="climate_keep_climate">Keep climate</string>
+    <string name="climate_value_off">Off</string>
+    <string name="climate_value_on">On</string>
+    <string name="climate_value_preconditioning">Preconditioning</string>
+    <string name="climate_value_overheat_fan">Overheat protection (fan)</string>
+    <string name="climate_value_overheat">Overheat protection</string>
+    <string name="climate_value_auto">Auto</string>
+    <string name="climate_value_recirculate">Recirculate</string>
+    <string name="climate_value_fresh_air">Fresh air</string>
+    <string name="climate_value_keep">Keep</string>
+    <string name="climate_value_dog_mode">Dog mode</string>
+    <string name="climate_value_camp_mode">Camp mode</string>
+
+    <!-- Battery -->
+    <string name="battery_title">Battery</string>
+    <string name="battery_preheat">Preheat</string>
+    <string name="battery_state_of_charge">State of charge</string>
+    <string name="battery_section_energy">Energy</string>
+    <string name="battery_remaining">Remaining</string>
+    <string name="battery_usable">Usable</string>
+    <string name="battery_full_pack">Full Pack</string>
+    <string name="battery_buffer">Buffer</string>
+    <string name="battery_section_power">Power</string>
+    <string name="battery_power">Power</string>
+    <string name="battery_max_discharge">Max Discharge</string>
+    <string name="battery_max_regen">Max Regen</string>
+    <string name="battery_section_pack">Pack</string>
+    <string name="battery_voltage">Voltage</string>
+    <string name="battery_current">Current</string>
+    <string name="battery_temp_min">Temp Min</string>
+    <string name="battery_temp_max">Temp Max</string>
+
+    <!-- BLE connection errors -->
+    <string name="ble_dashkit_not_found">DashKit not found</string>
+    <string name="ble_could_not_connect">Could not connect to DashKit</string>
+    <string name="ble_pairing_rejected">DashKit did not accept pairing. Open \"Pair a new device\" in DashPilot settings on an already-paired phone, then try again.</string>
+    <string name="ble_scan_failed_code">BLE scan failed (error %1$d)</string>
+    <string name="ble_could_not_start_pairing">Could not start pairing</string>
+    <string name="ble_service_discovery_failed">Service discovery failed</string>
+    <string name="ble_bluetooth_unavailable">Bluetooth not available</string>
+    <string name="ble_scanner_unavailable">BLE scanner not available</string>
+    <string name="ble_missing_permission">Missing BLE permission</string>
+    <string name="ble_scan_failed">Scan failed: %1$s</string>
+    <string name="connection_discovery_cancelled">Discovery cancelled</string>
+
+    <!-- Firmware update errors -->
+    <string name="fw_error_unreachable">Could not reach update server</string>
+    <string name="fw_error_integrity">Downloaded firmware failed integrity check</string>
+    <string name="fw_error_download">Download failed: %1$s</string>
+    <string name="ota_error_empty">Firmware file is empty</string>
+    <string name="ota_error_service_not_found">OTA service not found on device</string>
+    <string name="ota_error_chars_not_found">OTA characteristics not found</string>
+    <string name="ota_error_notify">Failed to enable OTA notifications</string>
+    <string name="ota_error_write">Write failed (status %1$d)</string>
+    <string name="ota_error_disconnected">Disconnected unexpectedly</string>
+    <string name="ota_error_device">Device reported error (0x%1$s)</string>
 </resources>

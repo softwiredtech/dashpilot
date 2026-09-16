@@ -127,7 +127,7 @@ struct SetupView: View {
         .frame(maxWidth: .infinity)
     }
 
-    private func statusText(_ text: String) -> some View {
+    private func statusText(_ text: LocalizedStringKey) -> some View {
         Text(text)
             .foregroundColor(Color(white: 0.53))
             .font(.system(size: 14))
@@ -213,14 +213,15 @@ struct SetupView: View {
     }
 
     private func nextButton(isConnecting: Bool) -> some View {
-        Button {
+        let label: LocalizedStringKey = isConnecting ? "Connecting..." : "Next"
+        return Button {
             if let ip = connectionVM.discoveredAddress {
                 UserDefaults.standard.set(ip, forKey: "device_ip")
             }
             let dash = selectedDashboard()
             navigationPath.append(AppRoute.dashboard(type: dash.type.rawValue, url: dash.url))
         } label: {
-            Text(isConnecting ? "Connecting..." : "Next")
+            Text(label)
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundColor(isConnecting ? Color(white: 0.67) : .black)
                 .frame(maxWidth: .infinity)

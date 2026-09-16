@@ -1,0 +1,16 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "NSBluetoothAlwaysUsageDescription": {
+      "localizations": {
+        "hu": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A DashPilot Bluetoothon keresztül csatlakozik a DashKithez, hogy élő járműadatokat jelenítsen meg és járműparancsokat küldjön."
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

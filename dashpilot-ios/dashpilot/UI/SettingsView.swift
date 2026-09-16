@@ -107,9 +107,11 @@ struct SettingsView: View {
 
     // MARK: - Tabs
 
+    private static let tabTitles: [LocalizedStringKey] = ["General", "DashKit"]
+
     private var tabRow: some View {
         HStack(spacing: 0) {
-            ForEach(Array(["General", "DashKit"].enumerated()), id: \.offset) { index, title in
+            ForEach(Array(Self.tabTitles.enumerated()), id: \.offset) { index, title in
                 Button {
                     selectedTab = index
                 } label: {
@@ -324,7 +326,7 @@ struct SettingsView: View {
 
     // MARK: - Helpers
 
-    private func sectionTitle(_ title: String) -> some View {
+    private func sectionTitle(_ title: LocalizedStringKey) -> some View {
         Text(title)
             .foregroundColor(mutedText)
             .font(.system(size: 16, weight: .medium))
@@ -336,7 +338,7 @@ struct SettingsView: View {
 // MARK: - Toggle Row
 
 private struct SettingsToggleRow: View {
-    let label: String
+    let label: LocalizedStringKey
     @Binding var isOn: Bool
 
     var body: some View {
@@ -358,7 +360,7 @@ private struct SettingsToggleRow: View {
 private struct RenderQualityPicker: View {
     @Binding var selected: Int
 
-    private let options: [(Int, String)] = [(1, "Low"), (2, "Med"), (3, "High")]
+    private let options: [(Int, LocalizedStringKey)] = [(1, "Low"), (2, "Med"), (3, "High")]
     private let accent = Color(red: 0x5C / 255.0, green: 0xBD / 255.0, blue: 0x68 / 255.0)
 
     var body: some View {

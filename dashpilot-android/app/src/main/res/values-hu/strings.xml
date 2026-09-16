@@ -1,0 +1,313 @@
+<resources>
+    <string name="app_name">DashPilot</string>
+    <string name="connection_device_ip">Eszköz IP-címe</string>
+    <string name="setup_select_data_source">Válassz adatforrást</string>
+    <string name="setup_connect_your_comma_device">Csatlakozás a comma eszközhöz</string>
+    <string name="setup_connect">Csatlakozás</string>
+    <string name="setup_connecting">Csatlakozás…</string>
+    <string name="setup_cancel">Mégse</string>
+    <string name="setup_disconnect">Kapcsolat bontása</string>
+    <string name="setup_next">Tovább</string>
+    <string name="settings_title">Beállítások</string>
+    <string name="settings_back">Vissza</string>
+    <string name="settings_version">Verzió</string>
+    <string name="settings_section_dashboard">Műszerfal</string>
+    <string name="settings_dashboard_subtitle">Válaszd ki, mi nyíljon meg csatlakozás után</string>
+    <string name="dashboard_name_vanilla">Vanilla</string>
+    <string name="dashboard_name_ambient">Ambient</string>
+    <string name="dashboard_name_retro">Retro</string>
+    <string name="dashboard_name_expo">Expo</string>
+    <string name="dashboard_name_analog">Analog</string>
+    <string name="dashboard_name_rive">Rive</string>
+    <string name="dashboard_name_dev_rive">Rive fájl betöltése</string>
+    <string name="settings_section_display">Megjelenítés</string>
+    <string name="settings_section_configuration">Konfiguráció</string>
+    <string name="settings_theme_availability_note">Egyes beállítások a kiválasztott témától függenek</string>
+    <string name="settings_theme_picker_title">Műszerfal témája</string>
+    <string name="settings_section_3d_visualizer">3D megjelenítő</string>
+    <string name="settings_toggle_show_phone_battery">Telefon akkumulátorának mutatása</string>
+    <string name="settings_toggle_show_car_battery">Autó akkumulátorának mutatása</string>
+    <string name="settings_toggle_show_odometer">Kilométer-számláló mutatása</string>
+    <string name="settings_units_title">Mértékegységek</string>
+    <string name="settings_toggle_use_imperial">Angolszász mértékegységek</string>
+    <string name="settings_units_km">km</string>
+    <string name="settings_units_mi">mi</string>
+    <string name="settings_render_quality_title">Renderelési minőség</string>
+    <string name="settings_render_low">Alacsony</string>
+    <string name="settings_render_med">Közepes</string>
+    <string name="settings_render_high">Magas</string>
+    <string name="settings_toggle_extra_vehicle_bus">Extra járműbusz</string>
+    <string name="settings_vehicle_bus_requires_extra">A szerkesztéshez kapcsold be az Extra járműbuszt.</string>
+    <string name="settings_toggle_always_on_blind_spot_monitor">Mindig bekapcsolt holttérfigyelő</string>
+    <string name="settings_toggle_dark_mode">Sötét mód</string>
+    <string name="settings_dark_mode_background_brightness">Háttér fényereje</string>
+    <string name="dashboard_rotate_prompt">Fordítsd a telefont fekvő helyzetbe</string>
+    <string name="settings_section_firmware">Firmware</string>
+    <string name="settings_firmware_update">DashKit firmware frissítése</string>
+    <string name="settings_firmware_scanning">DashKit keresése…</string>
+    <string name="settings_firmware_connecting">Csatlakozás…</string>
+    <string name="settings_firmware_uploading">Firmware feltöltése… %1$d%%</string>
+    <string name="settings_firmware_rebooting">Frissítés kész! A DashKit újraindul…</string>
+    <string name="settings_firmware_error">A frissítés sikertelen: %1$s</string>
+    <string name="settings_firmware_not_connected">A firmware frissítéséhez előbb csatlakozz a DashKithez</string>
+    <string name="settings_firmware_checking">Frissítések keresése…</string>
+    <string name="settings_firmware_up_to_date">A DashKit firmware naprakész</string>
+    <string name="settings_firmware_available">Elérhető a(z) %1$s verzió</string>
+    <string name="settings_firmware_install">Frissítés telepítése</string>
+    <string name="settings_firmware_downloading">Firmware letöltése… %1$d%%</string>
+
+    <!-- Settings tabs -->
+    <string name="settings_tab_general">Általános</string>
+    <string name="settings_tab_dashkit">DashKit</string>
+
+    <!-- DashKit firmware info -->
+    <string name="settings_section_firmware_info">Firmware adatai</string>
+    <string name="settings_firmware_info_status">Állapot</string>
+    <string name="settings_firmware_info_connected">Csatlakozva</string>
+    <string name="settings_firmware_info_disconnected">Nincs kapcsolat</string>
+    <string name="settings_firmware_info_version">Firmware verzió</string>
+    <string name="settings_firmware_info_unknown">Ismeretlen</string>
+
+    <!-- DashKit maintenance -->
+    <string name="settings_section_maintenance">Karbantartás</string>
+    <string name="settings_passthrough">Passthrough</string>
+    <string name="settings_reboot">DashKit újraindítása</string>
+    <string name="settings_reboot_dialog_title">Újraindítod a DashKitet?</string>
+    <string name="settings_reboot_dialog_body">A DashKit újraindul, és rövid időre megszakad a kapcsolat. Amint újra elindult, automatikusan újracsatlakozik.</string>
+    <string name="settings_reboot_dialog_confirm">Újraindítás</string>
+    <string name="settings_reboot_dialog_cancel">Mégse</string>
+    <string name="settings_reboot_sent">Újraindítási parancs elküldve. A DashKit újraindul.</string>
+    <string name="settings_reboot_failed">Nem sikerült elküldeni az újraindítási parancsot.</string>
+    <string name="settings_dashkit_not_connected">A kezeléshez csatlakozz egy DashKit eszközhöz.</string>
+
+    <!-- Pair a new device -->
+    <string name="settings_section_pairing">Párosítás</string>
+    <string name="settings_pair_new_device">Új eszköz párosítása</string>
+    <string name="settings_pair_not_connected">Új eszköz párosításához előbb csatlakozz a DashKithez</string>
+    <string name="settings_pair_dialog_title">Párosítasz egy új eszközt?</string>
+    <string name="settings_pair_dialog_body">A DashKit a következő 2 percben egy új eszköz párosítását engedélyezi. Nyisd meg a DashPilotot a másik telefonon, és párosítsd most.</string>
+    <string name="settings_pair_dialog_confirm">Párosítás megnyitása</string>
+    <string name="settings_pair_dialog_cancel">Mégse</string>
+    <string name="settings_pair_opened">A DashKit párosításra kész. Párosítsd az új telefont 2 percen belül.</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_top_title">Beállítás</string>
+    <string name="onboarding_skip">Kihagyás</string>
+    <string name="onboarding_step_progress">%1$d / %2$d</string>
+
+    <string name="onboarding_pair_cta">Eszköz párosítása</string>
+    <string name="onboarding_pair_searching_cta">Párosítás…</string>
+    <string name="onboarding_pair_idle_title">Párosítsd a DashKitet</string>
+    <string name="onboarding_pair_idle_subtitle">Csatlakoztasd a DashKitet az autó diagnosztikai portjához, majd koppints alul a Bluetooth-párosításhoz.</string>
+    <string name="onboarding_pair_searching_title">DashKit keresése…</string>
+    <string name="onboarding_pair_searching_subtitle">Tartsd az eszközt a telefon közelében. Ez általában néhány másodpercet vesz igénybe.</string>
+    <string name="onboarding_pair_success_title">Minden készen áll!</string>
+    <string name="onboarding_pair_success_subtitle">A DashKit csatlakozva van, és készen áll az adatok küldésére a műszerfalra.</string>
+    <string name="onboarding_pair_success_cta">Folytatás</string>
+
+    <string name="onboarding_tips_title">Még valami</string>
+    <string name="onboarding_tips_subtitle">További eszközöket párosíthatsz és firmware-frissítéseket telepíthetsz bármikor a Beállításokból.</string>
+    <string name="onboarding_tips_cta">Kezdjük</string>
+    <string name="onboarding_tips_row_pair">További DashKit eszközök párosítása</string>
+    <string name="onboarding_tips_row_firmware">Firmware-frissítések keresése</string>
+
+    <string name="settings_replay_onboarding">Bevezető újranézése</string>
+
+    <!-- ================= Tesla Connection ================= -->
+    <string name="tesla_label">Tesla</string>
+    <string name="tesla_tile_connect">Tesla csatlakoztatása</string>
+    <string name="tesla_tile_key_not_set_up">Nincs csatlakoztatva</string>
+    <string name="tesla_tile_staged">Autó megtalálva — Csatlakozás</string>
+    <string name="tesla_tile_not_connected">Az autó nincs csatlakoztatva</string>
+    <string name="tesla_tile_fault">A csatlakozás sikertelen — koppints az újrapróbáláshoz</string>
+    <string name="tesla_tile_connected">Csatlakoztatva</string>
+    <string name="tesla_status_present">Jelen</string>
+    <string name="tesla_status_not_present">Nincs jelen</string>
+    <string name="tesla_status_locked">Zárva</string>
+    <string name="tesla_status_unlocked">Nyitva</string>
+    <string name="tesla_status_asleep">Alszik</string>
+    <string name="tesla_status_awake">Ébren</string>
+    <string name="tesla_status_pairing">Kártya érintésére kész</string>
+    <string name="tesla_status_fault">A csatlakozás sikertelen</string>
+
+    <!-- Enroll flow -->
+    <string name="tesla_enroll_title">Tesla csatlakoztatása</string>
+    <string name="tesla_enroll_explain_body">A DashKit töltéskezelőként (Charging Manager) adja hozzá magát a Teslához — le tudja olvasni az állapotot és vezérli a töltést, de nem tudja kinyitni vagy vezetni az autót.</string>
+    <string name="tesla_enroll_role_chip">Töltéskezelő · Olvasás + töltés</string>
+    <string name="tesla_enroll_start">Csatlakozás</string>
+    <string name="tesla_enroll_need_card">Készítsd elő a kulcskártyát.</string>
+    <string name="tesla_enroll_connecting_body">Kapcsolatfelvétel az autóval… A DashKit párosítást kezdeményez.</string>
+    <string name="tesla_enroll_connecting_hint">Tartsd a telefont és a DashKitet a közelben.</string>
+    <string name="tesla_enroll_checking">DashKit ellenőrzése…</string>
+    <string name="tesla_enroll_reading_vin">Járműazonosító olvasása…</string>
+    <string name="tesla_enroll_finding">Tesla keresése…</string>
+    <string name="tesla_enroll_masked_vin">Tesla · Alvázszám %1$s</string>
+    <string name="tesla_enroll_found">Autó megtalálva — csatlakozás a DashKithez…</string>
+    <string name="tesla_enroll_provision_failed">A DashKit nem erősítette meg az autót. Ellenőrizd a kapcsolatot, és próbáld újra.</string>
+    <string name="tesla_enroll_firmware_update_needed">A Tesla csatlakoztatásához frissítsd a DashKit firmware-ét.</string>
+    <string name="tesla_enroll_vin_timeout">Nem sikerült beolvasni az alvázszámot. Ébreszd fel a járművet, és próbáld újra. Ha a hiba továbbra is fennáll, frissítsd a DashKit firmware-ét.</string>
+    <string name="tesla_enroll_scan_timeout">Ellenőrizd, hogy a Bluetooth be van kapcsolva, és maradj a jármű közelében.</string>
+    <string name="tesla_enroll_tap_title">Érintsd oda a kulcskártyát</string>
+    <string name="tesla_enroll_tap_body">Helyezd a kulcskártyát a középkonzolra, majd hagyd jóvá az autó érintőképernyőjén.</string>
+    <string name="tesla_enroll_tap_hint">%1$d mp van hátra</string>
+    <string name="tesla_enroll_tap_ready">Az autó kész — érintsd oda most a kulcskártyát (%1$d mp)</string>
+    <string name="tesla_enroll_success_title">Csatlakoztatva</string>
+    <string name="tesla_enroll_success_body">A DashKit mostantól töltéskezelő a Tesládon.</string>
+    <string name="tesla_enroll_success_role">Olvasás + töltés engedélyezve</string>
+    <string name="tesla_enroll_done">Kész</string>
+    <string name="tesla_enroll_error_title">A csatlakozás sikertelen</string>
+    <string name="tesla_enroll_retry">Újra</string>
+    <string name="tesla_enroll_cancel">Mégse</string>
+    <string name="tesla_fault_tap_timeout">Nem érintetted oda időben a kártyát. Próbáld újra.</string>
+    <string name="tesla_fault_rejected">Az autó elutasította a csatlakozást. Ellenőrizd, hogy a megfelelő autó közelében vagy, és annak kulcskártyáját használod.</string>
+    <string name="tesla_fault_protocol">A DashKit nem tudott kommunikálni az autóval. Próbáld újra.</string>
+    <string name="tesla_fault_persist">A DashKit nem tudta elmenteni a kapcsolatot. Próbáld újra.</string>
+    <string name="tesla_fault_generic">Hiba történt. Próbáld újra.</string>
+
+    <!-- Settings: Tesla Connection section -->
+    <string name="settings_section_tesla_key">Tesla-kapcsolat</string>
+    <string name="settings_tesla_key_caption">Állapot olvasása és töltésvezérlés BLE-n keresztül.</string>
+    <string name="settings_tesla_key_status">Állapot</string>
+    <string name="settings_tesla_enroll">Tesla csatlakoztatása</string>
+    <string name="settings_tesla_reset">Tesla-kapcsolat eltávolítása</string>
+    <string name="settings_tesla_reset_dialog_title">Eltávolítod a Tesla-kapcsolatot?</string>
+    <string name="settings_tesla_reset_dialog_body">Távolítsd el a DashKitet az autó Zárak képernyőjéről, majd távolítsd el itt a kapcsolatot. Az újracsatlakozáshoz szükséged lesz a kulcskártyára.</string>
+    <string name="settings_tesla_reset_dialog_confirm">Eltávolítás</string>
+    <string name="settings_tesla_reset_dialog_cancel">Mégse</string>
+    <string name="settings_tesla_reset_sent">Tesla-kapcsolat eltávolítása…</string>
+    <string name="settings_tesla_reset_failed">Nem sikerült eltávolítani a kapcsolatot. Próbáld újra.</string>
+    <string name="tesla_connection_removing">Kapcsolat eltávolítása…</string>
+    <string name="settings_pair_caption">Egy másik telefont párosít — a Tesla-kapcsolattól függetlenül.</string>
+
+    <!-- Common -->
+    <string name="common_back">Vissza</string>
+    <string name="common_cancel">Mégse</string>
+    <string name="common_ok">OK</string>
+    <string name="unit_min">perc</string>
+
+    <!-- Home -->
+    <string name="home_pinned">Rögzítve</string>
+    <string name="home_automations">Automatizálások</string>
+    <string name="home_controls">Vezérlők</string>
+    <string name="home_drive">Vezetés</string>
+    <string name="home_widget_battery">Akkumulátor</string>
+    <string name="home_widget_battery_temp">Akku hőmérséklet</string>
+    <string name="home_widget_ac_temp">Klíma hőfok</string>
+    <string name="home_widget_odometer">Kilométer-számláló</string>
+    <string name="setup_vehicle_cd">Jármű</string>
+    <string name="setup_phone_cd">Telefon</string>
+
+    <!-- Data source menu -->
+    <string name="data_source">Adatforrás</string>
+    <string name="data_source_connected">Adatforrás: csatlakozva</string>
+    <string name="data_source_connecting">Adatforrás: csatlakozás…</string>
+    <string name="data_source_websocket_server">WebSocket-szerver</string>
+    <string name="data_source_ip_address">IP-cím</string>
+
+    <!-- Controls -->
+    <string name="controls_title">Vezérlők</string>
+    <string name="controls_connect_hint">A parancsok küldéséhez csatlakozz a DashKithez</string>
+    <string name="controls_pin_tip">Tipp: nyomj hosszan egy vezérlőt, hogy a kezdőképernyőre rögzítsd</string>
+    <string name="control_pinned_cd">Rögzítve</string>
+    <string name="control_battery_preheat_on">Akku előfűtés: Be</string>
+    <string name="control_battery_preheat_off">Akku előfűtés: Ki</string>
+    <string name="control_frunk">Első csomagtartó</string>
+    <string name="control_trunk">Csomagtartó</string>
+    <string name="control_charge_port_open">Töltőcsatlakozó: Nyitva</string>
+    <string name="control_charge_port_closed">Töltőcsatlakozó: Zárva</string>
+    <string name="control_mirrors_folded">Tükrök: Behajtva</string>
+    <string name="control_mirrors_unfolded">Tükrök: Kihajtva</string>
+    <string name="control_rear_fan_on">Hátsó ventilátor: Be</string>
+    <string name="control_rear_fan_off">Hátsó ventilátor: Ki</string>
+    <string name="control_mirror_dip">Tükördöntés váltása</string>
+    <string name="control_glovebox">Kesztyűtartó nyitása</string>
+
+    <!-- Automations -->
+    <string name="automations_title">Automatizálások</string>
+    <string name="automations_section_wipers">Ablaktörlők</string>
+    <string name="automations_wiper_off_title">Ablaktörlő ki</string>
+    <string name="automations_wiper_off_subtitle">Az ablaktörlők automatikus kikapcsolva tartása</string>
+    <string name="automations_section_climate">Klíma</string>
+    <string name="automations_keep_climate_title">Klíma bekapcsolva tartása</string>
+    <string name="automations_keep_climate_subtitle">A klíma bekapcsolva marad, amikor kiszállsz az autóból. Az automatizálás a beállított idő letelte után, vagy amikor visszatérsz az autóhoz, leáll.</string>
+    <string name="automations_stop_after">Leállítás ennyi idő után</string>
+    <string name="automations_section_driving">Vezetés</string>
+    <string name="automations_kickdown_title">Kick-down</string>
+    <string name="automations_kickdown_subtitle">Chill módról Standardra vált, amíg a gázpedál a küszöbérték fölött van lenyomva. Visszaáll, amikor felengeded.</string>
+    <string name="automations_pedal_threshold">Pedálküszöb</string>
+    <string name="automations_multitouch_title">Többujjas infotainment-indító</string>
+    <string name="automations_multitouch_subtitle">Rendelj 3, 4 vagy 5 ujjas koppintást az infotainment képernyőn egy vezérlőhöz</string>
+    <string name="automations_fingers">ujj</string>
+    <string name="automations_action">művelet:</string>
+    <string name="automations_remove">Eltávolítás</string>
+    <string name="automations_add_trigger">Indító hozzáadása</string>
+
+    <!-- Climate -->
+    <string name="climate_title">Klíma</string>
+    <string name="climate_section_automation">Automatizálás</string>
+    <string name="climate_driver_setpoint">Vezető oldali beállított hőfok</string>
+    <string name="climate_section_setpoints">Beállított hőfokok</string>
+    <string name="climate_driver">Vezető</string>
+    <string name="climate_passenger">Utas</string>
+    <string name="climate_section_settings">Beállítások</string>
+    <string name="climate_power">Bekapcsolás</string>
+    <string name="climate_fan">Ventilátor</string>
+    <string name="climate_ac">Légkondi</string>
+    <string name="climate_recirculation">Belső keringetés</string>
+    <string name="climate_keep_climate">Klíma megtartása</string>
+    <string name="climate_value_off">Ki</string>
+    <string name="climate_value_on">Be</string>
+    <string name="climate_value_preconditioning">Előkondicionálás</string>
+    <string name="climate_value_overheat_fan">Túlmelegedés-védelem (ventilátor)</string>
+    <string name="climate_value_overheat">Túlmelegedés-védelem</string>
+    <string name="climate_value_auto">Auto</string>
+    <string name="climate_value_recirculate">Keringetés</string>
+    <string name="climate_value_fresh_air">Friss levegő</string>
+    <string name="climate_value_keep">Megtartás</string>
+    <string name="climate_value_dog_mode">Kutya mód</string>
+    <string name="climate_value_camp_mode">Kemping mód</string>
+
+    <!-- Battery -->
+    <string name="battery_title">Akkumulátor</string>
+    <string name="battery_preheat">Előfűtés</string>
+    <string name="battery_state_of_charge">Töltöttségi szint</string>
+    <string name="battery_section_energy">Energia</string>
+    <string name="battery_remaining">Hátralévő</string>
+    <string name="battery_usable">Felhasználható</string>
+    <string name="battery_full_pack">Teljes csomag</string>
+    <string name="battery_buffer">Tartalék</string>
+    <string name="battery_section_power">Teljesítmény</string>
+    <string name="battery_power">Teljesítmény</string>
+    <string name="battery_max_discharge">Max. kisütés</string>
+    <string name="battery_max_regen">Max. rekuperáció</string>
+    <string name="battery_section_pack">Akkucsomag</string>
+    <string name="battery_voltage">Feszültség</string>
+    <string name="battery_current">Áramerősség</string>
+    <string name="battery_temp_min">Min. hőmérséklet</string>
+    <string name="battery_temp_max">Max. hőmérséklet</string>
+
+    <!-- BLE connection errors -->
+    <string name="ble_dashkit_not_found">A DashKit nem található</string>
+    <string name="ble_could_not_connect">Nem sikerült csatlakozni a DashKithez</string>
+    <string name="ble_pairing_rejected">A DashKit nem fogadta el a párosítást. Nyisd meg az „Új eszköz párosítása” lehetőséget a DashPilot beállításaiban egy már párosított telefonon, majd próbáld újra.</string>
+    <string name="ble_scan_failed_code">A BLE-keresés sikertelen (hibakód: %1$d)</string>
+    <string name="ble_could_not_start_pairing">Nem sikerült elindítani a párosítást</string>
+    <string name="ble_service_discovery_failed">A szolgáltatások felderítése sikertelen</string>
+    <string name="ble_bluetooth_unavailable">A Bluetooth nem érhető el</string>
+    <string name="ble_scanner_unavailable">A BLE-kereső nem érhető el</string>
+    <string name="ble_missing_permission">Hiányzó BLE-engedély</string>
+    <string name="ble_scan_failed">A keresés sikertelen: %1$s</string>
+    <string name="connection_discovery_cancelled">Keresés megszakítva</string>
+
+    <!-- Firmware update errors -->
+    <string name="fw_error_unreachable">A frissítési szerver nem érhető el</string>
+    <string name="fw_error_integrity">A letöltött firmware integritás-ellenőrzése sikertelen</string>
+    <string name="fw_error_download">A letöltés sikertelen: %1$s</string>
+    <string name="ota_error_empty">A firmware-fájl üres</string>
+    <string name="ota_error_service_not_found">Az OTA-szolgáltatás nem található az eszközön</string>
+    <string name="ota_error_chars_not_found">Az OTA-jellemzők nem találhatók</string>
+    <string name="ota_error_notify">Nem sikerült bekapcsolni az OTA-értesítéseket</string>
+    <string name="ota_error_write">Az írás sikertelen (állapot: %1$d)</string>
+    <string name="ota_error_disconnected">Váratlanul megszakadt a kapcsolat</string>
+    <string name="ota_error_device">Az eszköz hibát jelzett (0x%1$s)</string>
+</resources>

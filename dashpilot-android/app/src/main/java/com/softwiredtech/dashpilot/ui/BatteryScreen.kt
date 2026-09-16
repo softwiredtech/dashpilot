@@ -39,6 +39,8 @@ import com.softwiredtech.dashpilot.ui.theme.DarkColors
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlin.math.roundToInt
+import androidx.compose.ui.res.stringResource
+import com.softwiredtech.dashpilot.R
 
 @Composable
 fun BatteryScreen(
@@ -62,7 +64,7 @@ fun BatteryScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp, vertical = 24.dp)
         ) {
-            ScreenHeader(title = "Battery", onBack = onBack)
+            ScreenHeader(title = stringResource(R.string.battery_title), onBack = onBack)
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -70,7 +72,7 @@ fun BatteryScreen(
             controlById("battery_preheat")?.let { action ->
                 Spacer(modifier = Modifier.height(28.dp))
                 Text(
-                    text = "Preheat",
+                    text = stringResource(R.string.battery_preheat),
                     color = DarkColors.TextMuted,
                     fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold
@@ -87,35 +89,35 @@ fun BatteryScreen(
             Spacer(modifier = Modifier.height(28.dp))
 
             InfoSection(
-                "Energy",
+                stringResource(R.string.battery_section_energy),
                 listOf(
-                    "Remaining" to energyText(car.nominalEnergyRemaining),
-                    "Usable" to usableEnergyText(car),
-                    "Full Pack" to energyText(car.fullPackEnergy),
-                    "Buffer" to bufferText(car)
+                    stringResource(R.string.battery_remaining) to energyText(car.nominalEnergyRemaining),
+                    stringResource(R.string.battery_usable) to usableEnergyText(car),
+                    stringResource(R.string.battery_full_pack) to energyText(car.fullPackEnergy),
+                    stringResource(R.string.battery_buffer) to bufferText(car)
                 )
             )
 
             Spacer(modifier = Modifier.height(28.dp))
 
             InfoSection(
-                "Power",
+                stringResource(R.string.battery_section_power),
                 listOf(
-                    "Power" to powerText(car),
-                    "Max Discharge" to kilowattText(car.maxDischargePower),
-                    "Max Regen" to kilowattText(car.maxRegenPower)
+                    stringResource(R.string.battery_power) to powerText(car),
+                    stringResource(R.string.battery_max_discharge) to kilowattText(car.maxDischargePower),
+                    stringResource(R.string.battery_max_regen) to kilowattText(car.maxRegenPower)
                 )
             )
 
             Spacer(modifier = Modifier.height(28.dp))
 
             InfoSection(
-                "Pack",
+                stringResource(R.string.battery_section_pack),
                 listOf(
-                    "Voltage" to voltageText(car),
-                    "Current" to currentText(car),
-                    "Temp Min" to tempText(car.packTMin),
-                    "Temp Max" to tempText(car.packTMax)
+                    stringResource(R.string.battery_voltage) to voltageText(car),
+                    stringResource(R.string.battery_current) to currentText(car),
+                    stringResource(R.string.battery_temp_min) to tempText(car.packTMin),
+                    stringResource(R.string.battery_temp_max) to tempText(car.packTMax)
                 )
             )
 
@@ -166,7 +168,7 @@ private fun SocCard(car: CarState) {
             )
         }
         Text(
-            text = "State of charge",
+            text = stringResource(R.string.battery_state_of_charge),
             color = DarkColors.TextMuted,
             fontSize = 13.sp
         )

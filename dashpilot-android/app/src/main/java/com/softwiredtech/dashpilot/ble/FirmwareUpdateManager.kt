@@ -8,6 +8,7 @@ import com.softwiredtech.dashpilot.util.SemVer
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.security.MessageDigest
+import com.softwiredtech.dashpilot.R
 
 /**
  * Orchestrates the end-to-end firmware update flow:
@@ -60,7 +61,7 @@ class FirmwareUpdateManager(
         _check.value = Check.Checking
         val manifest = FirmwareUpdateRepository.fetchManifest()
         if (manifest == null) {
-            _check.value = Check.Error("Could not reach update server")
+            _check.value = Check.Error(manager.context.getString(R.string.fw_error_unreachable))
             return
         }
         val current = installedVersion.value ?: versionReader.await()
@@ -93,14 +94,14 @@ class FirmwareUpdateManager(
             if (!expected.isNullOrEmpty()) {
                 val actual = sha256Hex(bytes)
                 if (actual != expected) {
-                    _check.value = Check.Error("Downloaded firmware failed integrity check")
+                    _check.value = Check.Error(manager.context.getString(R.string.fw_error_integrity))
                     return
                 }
             }
             ota.start(bytes)
         } catch (e: Exception) {
             _downloadProgress.value = null
-            _check.value = Check.Error("Download failed: ${e.message}")
+            _check.value = Check.Error(manager.context.getString(R.string.fw_error_download, e.message))
         }
     }
 

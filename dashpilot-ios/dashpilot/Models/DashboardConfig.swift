@@ -18,35 +18,35 @@ struct DashboardConfig: Identifiable {
 let availableDashboards: [DashboardConfig] = [
     DashboardConfig(
         id: "vanilla",
-        name: "Vanilla Dashboard",
+        name: String(localized: "Vanilla Dashboard"),
         url: "vanilla",
         type: .web,
         screenshotName: "preview_vanilla"
     ),
     DashboardConfig(
         id: "ambient",
-        name: "Ambient Dashboard",
+        name: String(localized: "Ambient Dashboard"),
         url: "ambient",
         type: .web,
         screenshotName: "preview_ambient"
     ),
     DashboardConfig(
         id: "analog",
-        name: "Analog Dashboard",
+        name: String(localized: "Analog Dashboard"),
         url: "analog",
         type: .web,
         screenshotName: "preview_analog"
     ),
     DashboardConfig(
         id: "retro",
-        name: "Retro Dashboard",
+        name: String(localized: "Retro Dashboard"),
         url: "retro",
         type: .web,
         screenshotName: "preview_retro"
     ),
     DashboardConfig(
         id: "dev_rive",
-        name: "Load Rive File",
+        name: String(localized: "Load Rive File"),
         url: "",
         type: .devRive,
         screenshotName: nil

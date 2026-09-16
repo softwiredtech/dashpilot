@@ -198,7 +198,7 @@ final class ConnectionViewModel {
 
             guard !Task.isCancelled, let ip = foundIp else {
                 if !Task.isCancelled {
-                    self.discoveryError = "Could not find device on the network"
+                    self.discoveryError = String(localized: "Could not find device on the network")
                     self.connectionStatus = .disconnected
                 }
                 return
