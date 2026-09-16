@@ -98,7 +98,7 @@
     <string name="onboarding_pair_cta">Eszköz párosítása</string>
     <string name="onboarding_pair_searching_cta">Párosítás…</string>
     <string name="onboarding_pair_idle_title">Párosítsd a DashKitet</string>
-    <string name="onboarding_pair_idle_subtitle">Csatlakoztasd a DashKitet az autó diagnosztikai portjához, majd koppints alul a Bluetooth-párosításhoz.</string>
+    <string name="onboarding_pair_idle_subtitle">Csatlakoztasd a DashKitet az autó diagnosztikai portjához, majd nyomj az alábbi gombra a Bluetooth-párosításhoz.</string>
     <string name="onboarding_pair_searching_title">DashKit keresése…</string>
     <string name="onboarding_pair_searching_subtitle">Tartsd az eszközt a telefon közelében. Ez általában néhány másodpercet vesz igénybe.</string>
     <string name="onboarding_pair_success_title">Minden készen áll!</string>
@@ -117,9 +117,9 @@
     <string name="tesla_label">Tesla</string>
     <string name="tesla_tile_connect">Tesla csatlakoztatása</string>
     <string name="tesla_tile_key_not_set_up">Nincs csatlakoztatva</string>
-    <string name="tesla_tile_staged">Autó megtalálva — Csatlakozás</string>
+    <string name="tesla_tile_staged">Autó megtalálva - Csatlakozás</string>
     <string name="tesla_tile_not_connected">Az autó nincs csatlakoztatva</string>
-    <string name="tesla_tile_fault">A csatlakozás sikertelen — koppints az újrapróbáláshoz</string>
+    <string name="tesla_tile_fault">A csatlakozás sikertelen - koppints az újrapróbáláshoz</string>
     <string name="tesla_tile_connected">Csatlakoztatva</string>
     <string name="tesla_status_present">Jelen</string>
     <string name="tesla_status_not_present">Nincs jelen</string>
@@ -132,7 +132,7 @@
 
     <!-- Enroll flow -->
     <string name="tesla_enroll_title">Tesla csatlakoztatása</string>
-    <string name="tesla_enroll_explain_body">A DashKit töltéskezelőként (Charging Manager) adja hozzá magát a Teslához — le tudja olvasni az állapotot és vezérli a töltést, de nem tudja kinyitni vagy vezetni az autót.</string>
+    <string name="tesla_enroll_explain_body">A DashKit töltéskezelőként (Charging Manager) adja hozzá magát a Teslához - le tudja olvasni az állapotot és vezérli a töltést, de nem tudja kinyitni vagy vezetni az autót.</string>
     <string name="tesla_enroll_role_chip">Töltéskezelő · Olvasás + töltés</string>
     <string name="tesla_enroll_start">Csatlakozás</string>
     <string name="tesla_enroll_need_card">Készítsd elő a kulcskártyát.</string>
@@ -142,7 +142,7 @@
     <string name="tesla_enroll_reading_vin">Járműazonosító olvasása…</string>
     <string name="tesla_enroll_finding">Tesla keresése…</string>
     <string name="tesla_enroll_masked_vin">Tesla · Alvázszám %1$s</string>
-    <string name="tesla_enroll_found">Autó megtalálva — csatlakozás a DashKithez…</string>
+    <string name="tesla_enroll_found">Autó megtalálva - csatlakozás a DashKithez…</string>
     <string name="tesla_enroll_provision_failed">A DashKit nem erősítette meg az autót. Ellenőrizd a kapcsolatot, és próbáld újra.</string>
     <string name="tesla_enroll_firmware_update_needed">A Tesla csatlakoztatásához frissítsd a DashKit firmware-ét.</string>
     <string name="tesla_enroll_vin_timeout">Nem sikerült beolvasni az alvázszámot. Ébreszd fel a járművet, és próbáld újra. Ha a hiba továbbra is fennáll, frissítsd a DashKit firmware-ét.</string>
@@ -150,7 +150,7 @@
     <string name="tesla_enroll_tap_title">Érintsd oda a kulcskártyát</string>
     <string name="tesla_enroll_tap_body">Helyezd a kulcskártyát a középkonzolra, majd hagyd jóvá az autó érintőképernyőjén.</string>
     <string name="tesla_enroll_tap_hint">%1$d mp van hátra</string>
-    <string name="tesla_enroll_tap_ready">Az autó kész — érintsd oda most a kulcskártyát (%1$d mp)</string>
+    <string name="tesla_enroll_tap_ready">Az autó kész - érintsd oda most a kulcskártyát (%1$d mp)</string>
     <string name="tesla_enroll_success_title">Csatlakoztatva</string>
     <string name="tesla_enroll_success_body">A DashKit mostantól töltéskezelő a Tesládon.</string>
     <string name="tesla_enroll_success_role">Olvasás + töltés engedélyezve</string>
@@ -177,7 +177,7 @@
     <string name="settings_tesla_reset_sent">Tesla-kapcsolat eltávolítása…</string>
     <string name="settings_tesla_reset_failed">Nem sikerült eltávolítani a kapcsolatot. Próbáld újra.</string>
     <string name="tesla_connection_removing">Kapcsolat eltávolítása…</string>
-    <string name="settings_pair_caption">Egy másik telefont párosít — a Tesla-kapcsolattól függetlenül.</string>
+    <string name="settings_pair_caption">Egy másik telefont párosít - a Tesla-kapcsolattól függetlenül.</string>
 
     <!-- Common -->
     <string name="common_back">Vissza</string>
@@ -187,8 +187,8 @@
 
     <!-- Home -->
     <string name="home_pinned">Rögzítve</string>
-    <string name="home_automations">Automatizálások</string>
-    <string name="home_controls">Vezérlők</string>
+    <string name="home_automations">Automatizációk</string>
+    <string name="home_controls">Vezérlés</string>
     <string name="home_drive">Vezetés</string>
     <string name="home_widget_battery">Akkumulátor</string>
     <string name="home_widget_battery_temp">Akku hőmérséklet</string>
@@ -205,9 +205,9 @@
     <string name="data_source_ip_address">IP-cím</string>
 
     <!-- Controls -->
-    <string name="controls_title">Vezérlők</string>
+    <string name="controls_title">Vezérlés</string>
     <string name="controls_connect_hint">A parancsok küldéséhez csatlakozz a DashKithez</string>
-    <string name="controls_pin_tip">Tipp: nyomj hosszan egy vezérlőt, hogy a kezdőképernyőre rögzítsd</string>
+    <string name="controls_pin_tip">Tipp: nyomj hosszan egy parancsra, hogy a kezdőképernyőre rögzítsd</string>
     <string name="control_pinned_cd">Rögzítve</string>
     <string name="control_battery_preheat_on">Akku előfűtés: Be</string>
     <string name="control_battery_preheat_off">Akku előfűtés: Ki</string>
@@ -223,28 +223,28 @@
     <string name="control_glovebox">Kesztyűtartó nyitása</string>
 
     <!-- Automations -->
-    <string name="automations_title">Automatizálások</string>
+    <string name="automations_title">Automatizációk</string>
     <string name="automations_section_wipers">Ablaktörlők</string>
     <string name="automations_wiper_off_title">Ablaktörlő ki</string>
-    <string name="automations_wiper_off_subtitle">Az ablaktörlők automatikus kikapcsolva tartása</string>
+    <string name="automations_wiper_off_subtitle">Az ablaktörlők automatikus kikapcsolva tartása miközben aktív az Autopilot.</string>
     <string name="automations_section_climate">Klíma</string>
     <string name="automations_keep_climate_title">Klíma bekapcsolva tartása</string>
-    <string name="automations_keep_climate_subtitle">A klíma bekapcsolva marad, amikor kiszállsz az autóból. Az automatizálás a beállított idő letelte után, vagy amikor visszatérsz az autóhoz, leáll.</string>
+    <string name="automations_keep_climate_subtitle">A klíma bekapcsolva marad, amikor kiszállsz az autóból. Az automatizáció a beállított idő letelte után, vagy amikor visszatérsz az autóhoz, leáll.</string>
     <string name="automations_stop_after">Leállítás ennyi idő után</string>
     <string name="automations_section_driving">Vezetés</string>
     <string name="automations_kickdown_title">Kick-down</string>
-    <string name="automations_kickdown_subtitle">Chill módról Standardra vált, amíg a gázpedál a küszöbérték fölött van lenyomva. Visszaáll, amikor felengeded.</string>
+    <string name="automations_kickdown_subtitle">Chill módról Standardra vált, amíg a gázpedál a küszöbérték fölött van lenyomva. Visszaáll Chill-re, amikor felengeded a pedált.</string>
     <string name="automations_pedal_threshold">Pedálküszöb</string>
-    <string name="automations_multitouch_title">Többujjas infotainment-indító</string>
-    <string name="automations_multitouch_subtitle">Rendelj 3, 4 vagy 5 ujjas koppintást az infotainment képernyőn egy vezérlőhöz</string>
+    <string name="automations_multitouch_title">Többujjas infotainment parancs</string>
+    <string name="automations_multitouch_subtitle">Rendelj parancsokat az infotainment képernyő 3, 4, vagy 5 ujjal történő megérintéséhez (Pl.: kesztyűtartó nyitás 3 ujjas érintésre).</string>
     <string name="automations_fingers">ujj</string>
     <string name="automations_action">művelet:</string>
     <string name="automations_remove">Eltávolítás</string>
-    <string name="automations_add_trigger">Indító hozzáadása</string>
+    <string name="automations_add_trigger">Parancs hozzáadása</string>
 
     <!-- Climate -->
     <string name="climate_title">Klíma</string>
-    <string name="climate_section_automation">Automatizálás</string>
+    <string name="climate_section_automation">Automatizáció</string>
     <string name="climate_driver_setpoint">Vezető oldali beállított hőfok</string>
     <string name="climate_section_setpoints">Beállított hőfokok</string>
     <string name="climate_driver">Vezető</string>
@@ -254,7 +254,7 @@
     <string name="climate_fan">Ventilátor</string>
     <string name="climate_ac">Légkondi</string>
     <string name="climate_recirculation">Belső keringetés</string>
-    <string name="climate_keep_climate">Klíma megtartása</string>
+    <string name="climate_keep_climate">Klíma bekapcsolva tartása</string>
     <string name="climate_value_off">Ki</string>
     <string name="climate_value_on">Be</string>
     <string name="climate_value_preconditioning">Előkondicionálás</string>
@@ -264,7 +264,7 @@
     <string name="climate_value_recirculate">Keringetés</string>
     <string name="climate_value_fresh_air">Friss levegő</string>
     <string name="climate_value_keep">Megtartás</string>
-    <string name="climate_value_dog_mode">Kutya mód</string>
+    <string name="climate_value_dog_mode">Kisállat mód</string>
     <string name="climate_value_camp_mode">Kemping mód</string>
 
     <!-- Battery -->
@@ -274,13 +274,13 @@
     <string name="battery_section_energy">Energia</string>
     <string name="battery_remaining">Hátralévő</string>
     <string name="battery_usable">Felhasználható</string>
-    <string name="battery_full_pack">Teljes csomag</string>
+    <string name="battery_full_pack">Teljes pack</string>
     <string name="battery_buffer">Tartalék</string>
     <string name="battery_section_power">Teljesítmény</string>
     <string name="battery_power">Teljesítmény</string>
     <string name="battery_max_discharge">Max. kisütés</string>
-    <string name="battery_max_regen">Max. rekuperáció</string>
-    <string name="battery_section_pack">Akkucsomag</string>
+    <string name="battery_max_regen">Max. újratöltés</string>
+    <string name="battery_section_pack">Akkupack</string>
     <string name="battery_voltage">Feszültség</string>
     <string name="battery_current">Áramerősség</string>
     <string name="battery_temp_min">Min. hőmérséklet</string>
@@ -289,7 +289,7 @@
     <!-- BLE connection errors -->
     <string name="ble_dashkit_not_found">A DashKit nem található</string>
     <string name="ble_could_not_connect">Nem sikerült csatlakozni a DashKithez</string>
-    <string name="ble_pairing_rejected">A DashKit nem fogadta el a párosítást. Nyisd meg az „Új eszköz párosítása” lehetőséget a DashPilot beállításaiban egy már párosított telefonon, majd próbáld újra.</string>
+    <string name="ble_pairing_rejected">A DashKit nem fogadta el a párosítást. Nyisd meg az "Új eszköz párosítása" lehetőséget a DashPilot beállításaiban egy már párosított telefonon, majd próbáld újra.</string>
     <string name="ble_scan_failed_code">A BLE-keresés sikertelen (hibakód: %1$d)</string>
     <string name="ble_could_not_start_pairing">Nem sikerült elindítani a párosítást</string>
     <string name="ble_service_discovery_failed">A szolgáltatások felderítése sikertelen</string>
