@@ -193,7 +193,7 @@
     <string name="home_drive">Drive</string>
     <string name="home_widget_battery">Battery</string>
     <string name="home_widget_battery_temp">Battery Temp</string>
-    <string name="home_widget_ac_temp">AC Temp</string>
+    <string name="home_widget_ac_temp">AC Setpoint</string>
     <string name="home_widget_odometer">Odometer</string>
     <string name="setup_vehicle_cd">Vehicle</string>
     <string name="setup_phone_cd">Phone</string>

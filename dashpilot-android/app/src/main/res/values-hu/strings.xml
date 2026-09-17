@@ -192,7 +192,7 @@
     <string name="home_drive">Vezetés</string>
     <string name="home_widget_battery">Akkumulátor</string>
     <string name="home_widget_battery_temp">Akku hőmérséklet</string>
-    <string name="home_widget_ac_temp">Klíma hőfok</string>
+    <string name="home_widget_ac_temp">Klíma beállított hőfok</string>
     <string name="home_widget_odometer">Kilométer-számláló</string>
     <string name="setup_vehicle_cd">Jármű</string>
     <string name="setup_phone_cd">Telefon</string>

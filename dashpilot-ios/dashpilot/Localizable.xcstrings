@@ -76,18 +76,18 @@
         }
       }
     },
-    "AC Temp" : {
+    "AC Setpoint" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Klimatemperatur"
+            "value" : "Klima-Sollwert"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Klíma hőfok"
+            "value" : "Klíma beállított hőfok"
           }
         }
       }
@@ -1489,7 +1489,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Halte das Gerät nah an dein Handy. Das dauert normalerweise nur ein paar Sekunden."
+            "value" : "Halte dein Smartphone in der Nähe des DashKits. Die Kopplung dauert normalerweise nur ein paar Sekunden."
           }
         },
         "hu" : {
@@ -1736,6 +1736,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Közepes"
+          }
+        }
+      }
+    },
+    "home_widget_battery" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ladezustand"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Battery"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Akkumulátor"
           }
         }
       }
@@ -2001,7 +2023,7 @@
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Neues Gerät koppeln"
+            "value" : "Neues Smartphone koppeln"
           }
         },
         "hu" : {

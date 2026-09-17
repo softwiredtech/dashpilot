@@ -82,7 +82,7 @@
 
     <!-- Pair a new device -->
     <string name="settings_section_pairing">Kopplung</string>
-    <string name="settings_pair_new_device">Neues Gerät koppeln</string>
+    <string name="settings_pair_new_device">Neues Smartphone koppeln</string>
     <string name="settings_pair_not_connected">Verbinde dich zuerst mit dem DashKit, um ein neues Gerät zu koppeln</string>
     <string name="settings_pair_dialog_title">Neues Gerät koppeln?</string>
     <string name="settings_pair_dialog_body">Das DashKit erlaubt in den nächsten 2 Minuten die Kopplung eines neuen Geräts. Öffne DashPilot auf dem anderen Handy und kopple es jetzt.</string>
@@ -100,7 +100,7 @@
     <string name="onboarding_pair_idle_title">Kopple dein DashKit</string>
     <string name="onboarding_pair_idle_subtitle">Stecke das DashKit in den Diagnoseanschluss deines Autos und tippe dann unten, um es über Bluetooth zu koppeln.</string>
     <string name="onboarding_pair_searching_title">Suche nach DashKit…</string>
-    <string name="onboarding_pair_searching_subtitle">Halte das Gerät nah an dein Handy. Das dauert normalerweise nur ein paar Sekunden.</string>
+    <string name="onboarding_pair_searching_subtitle">Halte dein Smartphone in der Nähe des DashKits. Die Kopplung dauert normalerweise nur ein paar Sekunden.</string>
     <string name="onboarding_pair_success_title">Alles bereit!</string>
     <string name="onboarding_pair_success_subtitle">Das DashKit ist verbunden und bereit, Daten an dein Dashboard zu streamen.</string>
     <string name="onboarding_pair_success_cta">Weiter</string>
@@ -137,14 +137,14 @@
     <string name="tesla_enroll_role_chip">Lademanager · Lesen + Laden</string>
     <string name="tesla_enroll_start">Verbinden</string>
     <string name="tesla_enroll_need_card">Halte deine Schlüsselkarte bereit.</string>
-    <string name="tesla_enroll_connecting_body">Kontaktiere dein Auto… Das DashKit versucht, sich zu koppeln.</string>
+    <string name="tesla_enroll_connecting_body">Verbindungsversuch mit deinem Auto… Das DashKit versucht, sich zu koppeln.</string>
     <string name="tesla_enroll_connecting_hint">Halte dein Handy und das DashKit in der Nähe.</string>
     <string name="tesla_enroll_checking">Prüfe DashKit…</string>
     <string name="tesla_enroll_reading_vin">Lese Fahrzeugidentität…</string>
     <string name="tesla_enroll_finding">Suche deinen Tesla…</string>
     <string name="tesla_enroll_masked_vin">Tesla · FIN %1$s</string>
     <string name="tesla_enroll_found">Auto gefunden - verbinde mit DashKit…</string>
-    <string name="tesla_enroll_provision_failed">Das DashKit hat das Auto nicht bestätigt. Prüfe die Verbindung und versuche es erneut.</string>
+    <string name="tesla_enroll_provision_failed">Verbindung zwischen DashKit und Auto nicht bestätigt. Prüfe die Verbindung und versuche es erneut.</string>
     <string name="tesla_enroll_firmware_update_needed">Aktualisiere die DashKit-Firmware, um deinen Tesla zu verbinden.</string>
     <string name="tesla_enroll_vin_timeout">Die FIN konnte nicht gelesen werden. Wecke das Fahrzeug und versuche es erneut. Falls das weiterhin passiert, aktualisiere die DashKit-Firmware.</string>
     <string name="tesla_enroll_scan_timeout">Stelle sicher, dass Bluetooth eingeschaltet ist, und bleibe in der Nähe des Fahrzeugs.</string>
@@ -167,12 +167,12 @@
 
     <!-- Settings: Tesla Connection section -->
     <string name="settings_section_tesla_key">Tesla-Verbindung</string>
-    <string name="settings_tesla_key_caption">Status lesen und Laden per BLE steuern.</string>
+    <string name="settings_tesla_key_caption">Fahrzeugstatus lesen und das Laden per BLE steuern.</string>
     <string name="settings_tesla_key_status">Status</string>
     <string name="settings_tesla_enroll">Tesla verbinden</string>
     <string name="settings_tesla_reset">Tesla-Verbindung entfernen</string>
     <string name="settings_tesla_reset_dialog_title">Tesla-Verbindung entfernen?</string>
-    <string name="settings_tesla_reset_dialog_body">Entferne das DashKit im Auto unter Schlösser und entferne dann hier die Verbindung. Zum erneuten Verbinden brauchst du deine Schlüsselkarte.</string>
+    <string name="settings_tesla_reset_dialog_body">Entferne das DashKit im Auto unter Verriegelung und entferne dann hier die Verbindung. Zum erneuten Verbinden brauchst du deine Schlüsselkarte.</string>
     <string name="settings_tesla_reset_dialog_confirm">Entfernen</string>
     <string name="settings_tesla_reset_dialog_cancel">Abbrechen</string>
     <string name="settings_tesla_reset_sent">Tesla-Verbindung wird entfernt…</string>
@@ -191,9 +191,9 @@
     <string name="home_automations">Automatisierungen</string>
     <string name="home_controls">Befehle</string>
     <string name="home_drive">Fahren</string>
-    <string name="home_widget_battery">Akku</string>
+    <string name="home_widget_battery">Ladezustand</string>
     <string name="home_widget_battery_temp">Akkutemperatur</string>
-    <string name="home_widget_ac_temp">Klimatemperatur</string>
+    <string name="home_widget_ac_temp">Klima-Sollwert</string>
     <string name="home_widget_odometer">Kilometerstand</string>
     <string name="setup_vehicle_cd">Fahrzeug</string>
     <string name="setup_phone_cd">Handy</string>

@@ -128,7 +128,7 @@ struct HomeView: View {
                 } label: {
                     InfoWidget(
                         icon: "battery.100.bolt",
-                        label: "Battery",
+                        label: "home_widget_battery",
                         value: socText,
                         fillHeight: fillHeight
                     )
@@ -152,7 +152,7 @@ struct HomeView: View {
                 } label: {
                     InfoWidget(
                         icon: "snowflake",
-                        label: "AC Temp",
+                        label: "AC Setpoint",
                         value: acTempText,
                         fillHeight: fillHeight
                     )
