@@ -29,7 +29,7 @@ struct OnboardingTipsPage: View {
 
 private struct TipRow: View {
     let systemImage: String
-    let text: String
+    let text: LocalizedStringKey
 
     var body: some View {
         HStack(spacing: 12) {

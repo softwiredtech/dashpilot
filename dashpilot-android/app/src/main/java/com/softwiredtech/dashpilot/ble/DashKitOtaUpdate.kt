@@ -12,6 +12,7 @@ import com.softwiredtech.dashpilot.datasource.GattListener
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.util.UUID
+import com.softwiredtech.dashpilot.R
 
 sealed class OtaState {
     object Idle : OtaState()
@@ -52,7 +53,7 @@ class DashKitOtaUpdate(
 
     fun start(fw: ByteArray) {
         if (fw.isEmpty()) {
-            _state.value = OtaState.Error("Firmware file is empty")
+            _state.value = OtaState.Error(manager.context.getString(R.string.ota_error_empty))
             return
         }
         firmware = fw
@@ -98,7 +99,7 @@ class DashKitOtaUpdate(
     private fun setupOtaService(g: BluetoothGatt) {
         val service = g.getService(OTA_SERVICE_UUID)
         if (service == null) {
-            _state.value = OtaState.Error("OTA service not found on device")
+            _state.value = OtaState.Error(manager.context.getString(R.string.ota_error_service_not_found))
             return
         }
 
@@ -107,7 +108,7 @@ class DashKitOtaUpdate(
         statusChar = service.getCharacteristic(OTA_STATUS_UUID)
 
         if (ctrlChar == null || dataChar == null || statusChar == null) {
-            _state.value = OtaState.Error("OTA characteristics not found")
+            _state.value = OtaState.Error(manager.context.getString(R.string.ota_error_chars_not_found))
             return
         }
         controlChar = g.getService(VehicleControl.SERVICE_UUID)
@@ -132,7 +133,7 @@ class DashKitOtaUpdate(
         // Only handle OTA status descriptor
         if (descriptor.characteristic?.uuid != OTA_STATUS_UUID) return
         if (status != BluetoothGatt.GATT_SUCCESS) {
-            _state.value = OtaState.Error("Failed to enable OTA notifications")
+            _state.value = OtaState.Error(manager.context.getString(R.string.ota_error_notify))
             return
         }
         sendBeginCommand(gatt)
@@ -159,7 +160,7 @@ class DashKitOtaUpdate(
             return
         }
         if (status != BluetoothGatt.GATT_SUCCESS) {
-            _state.value = OtaState.Error("Write failed (status $status)")
+            _state.value = OtaState.Error(manager.context.getString(R.string.ota_error_write, status))
             return
         }
         val fw = firmware
@@ -177,7 +178,7 @@ class DashKitOtaUpdate(
             Log.d(TAG, "Link dropped after the last chunk; treating as reboot")
             _state.value = OtaState.Rebooting
         } else if (currentState !is OtaState.Rebooting && currentState !is OtaState.Idle) {
-            _state.value = OtaState.Error("Disconnected unexpectedly")
+            _state.value = OtaState.Error(manager.context.getString(R.string.ota_error_disconnected))
         }
         manager.suppressPings = false
         firmware = null
@@ -265,7 +266,7 @@ class DashKitOtaUpdate(
             0xFF -> {
                 val errCode = if (value.size > 1) value[1].toInt() and 0xFF else 0
                 Log.e(TAG, "OTA error from device: 0x${errCode.toString(16)}")
-                _state.value = OtaState.Error("Device reported error (0x${errCode.toString(16)})")
+                _state.value = OtaState.Error(manager.context.getString(R.string.ota_error_device, errCode.toString(16)))
                 manager.removeGattListener(this)
                 manager.suppressPings = false
                 uploadFinished = false

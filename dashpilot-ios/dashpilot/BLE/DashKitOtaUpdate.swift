@@ -60,7 +60,7 @@ final class DashKitOtaUpdate: DashKitGattListener {
 
     func start(firmware fw: Data) {
         guard !fw.isEmpty else {
-            setState(.error("Firmware file is empty"))
+            setState(.error(String(localized: "Firmware file is empty")))
             return
         }
         firmware = fw
@@ -115,7 +115,7 @@ final class DashKitOtaUpdate: DashKitGattListener {
             return
         }
         guard let service = peripheral.services?.first(where: { $0.uuid == DashKitGatt.otaService }) else {
-            setState(.error("OTA service not found on device"))
+            setState(.error(String(localized: "OTA service not found on device")))
             return
         }
         self.peripheral = peripheral
@@ -123,7 +123,7 @@ final class DashKitOtaUpdate: DashKitGattListener {
         dataChar = service.characteristics?.first { $0.uuid == DashKitGatt.otaDataCharacteristic }
         statusChar = service.characteristics?.first { $0.uuid == DashKitGatt.otaStatusCharacteristic }
         guard let statusChar, ctrlChar != nil, dataChar != nil else {
-            setState(.error("OTA characteristics not found"))
+            setState(.error(String(localized: "OTA characteristics not found")))
             return
         }
         let canService = peripheral.services?.first { $0.uuid == DashKitGatt.canService }
@@ -141,7 +141,7 @@ final class DashKitOtaUpdate: DashKitGattListener {
     func onNotificationStateUpdated(_ characteristic: CBCharacteristic, error: Error?) {
         guard characteristic.uuid == DashKitGatt.otaStatusCharacteristic else { return }
         if error != nil {
-            setState(.error("Failed to enable OTA notifications"))
+            setState(.error(String(localized: "Failed to enable OTA notifications")))
             resumeCanNotifications()
             return
         }
@@ -162,7 +162,7 @@ final class DashKitOtaUpdate: DashKitGattListener {
             return
         }
         if let error {
-            setState(.error("Write failed (\(error.localizedDescription))"))
+            setState(.error(String(localized: "Write failed (\(error.localizedDescription))")))
             resumeCanNotifications()
             return
         }
@@ -181,7 +181,7 @@ final class DashKitOtaUpdate: DashKitGattListener {
             rebooting = true
             setState(.rebooting)
         } else if !rebooting, state != .idle {
-            setState(.error("Disconnected unexpectedly"))
+            setState(.error(String(localized: "Disconnected unexpectedly")))
         }
         manager.suppressPings = false
         firmware = nil
@@ -258,7 +258,7 @@ final class DashKitOtaUpdate: DashKitGattListener {
         case 0xFF:
             let errCode = value.count > 1 ? value[1] : 0
             print("[DashKitOta] OTA error from device: 0x\(String(errCode, radix: 16))")
-            setState(.error("Device reported error (0x\(String(errCode, radix: 16)))"))
+            setState(.error(String(localized: "Device reported error (0x\(String(errCode, radix: 16)))")))
             manager.removeGattListener(self)
             manager.suppressPings = false
             uploadFinished = false

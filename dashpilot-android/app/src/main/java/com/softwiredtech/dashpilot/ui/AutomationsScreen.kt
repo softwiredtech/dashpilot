@@ -52,6 +52,8 @@ import com.softwiredtech.dashpilot.ui.controls.controlById
 import com.softwiredtech.dashpilot.ui.controls.vehicleControls
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
 import com.softwiredtech.dashpilot.ui.theme.DarkColors
+import androidx.compose.ui.res.stringResource
+import com.softwiredtech.dashpilot.R
 
 // Finger counts that can be bound to an infotainment gesture (matches the
 // firmware's MULTI_FINGER_MIN/MAX_FINGERS).
@@ -101,36 +103,36 @@ fun AutomationsScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp, vertical = 24.dp)
         ) {
-            ScreenHeader(title = "Automations", onBack = onBack)
+            ScreenHeader(title = stringResource(R.string.automations_title), onBack = onBack)
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            SectionLabel("Wipers")
+            SectionLabel(stringResource(R.string.automations_section_wipers))
             Spacer(modifier = Modifier.height(8.dp))
             AutomationRow(
                 icon = Icons.Rounded.WaterDrop,
-                title = "Wiper Off",
-                subtitle = "Keep wipers disabled automatically",
+                title = stringResource(R.string.automations_wiper_off_title),
+                subtitle = stringResource(R.string.automations_wiper_off_subtitle),
                 checked = wiperOffEnabled,
                 onToggle = { onWiperOffChange(!wiperOffEnabled) }
             )
 
             Spacer(modifier = Modifier.height(28.dp))
 
-            SectionLabel("Climate")
+            SectionLabel(stringResource(R.string.automations_section_climate))
             Spacer(modifier = Modifier.height(8.dp))
             AutomationRow(
                 icon = Icons.Rounded.AcUnit,
-                title = "Keep climate on",
-                subtitle = "Keep the climate on when you leave the car. The automation stops after the set time, or when you return to the car.",
+                title = stringResource(R.string.automations_keep_climate_title),
+                subtitle = stringResource(R.string.automations_keep_climate_subtitle),
                 checked = climateKeepEnabled,
                 onToggle = { onClimateKeepChange(!climateKeepEnabled) },
                 extraContent = if (climateKeepEnabled) {
                     {
                         NumberPickerFooter(
-                            label = "Stop after",
+                            label = stringResource(R.string.automations_stop_after),
                             value = climateKeepMinutes,
-                            unit = "min",
+                            unit = stringResource(R.string.unit_min),
                             range = CLIMATE_KEEP_MINUTE_RANGE,
                             onValueChange = onClimateKeepMinutesChange
                         )
@@ -140,18 +142,18 @@ fun AutomationsScreen(
 
             Spacer(modifier = Modifier.height(28.dp))
 
-            SectionLabel("Driving")
+            SectionLabel(stringResource(R.string.automations_section_driving))
             Spacer(modifier = Modifier.height(8.dp))
             AutomationRow(
                 icon = Icons.Rounded.Speed,
-                title = "Kick-down",
-                subtitle = "Switch from Chill to Standard while the accelerator is pressed past the threshold. Reverts when you ease off.",
+                title = stringResource(R.string.automations_kickdown_title),
+                subtitle = stringResource(R.string.automations_kickdown_subtitle),
                 checked = sportKickdownEnabled,
                 onToggle = { onSportKickdownChange(!sportKickdownEnabled) },
                 extraContent = if (sportKickdownEnabled) {
                     {
                         NumberPickerFooter(
-                            label = "Pedal threshold",
+                            label = stringResource(R.string.automations_pedal_threshold),
                             value = sportKickdownPercent,
                             unit = "%",
                             range = SPORT_KICKDOWN_PERCENT_RANGE,
@@ -164,10 +166,10 @@ fun AutomationsScreen(
 
             Spacer(modifier = Modifier.height(28.dp))
 
-            SectionLabel("Multi-touch infotainment trigger")
+            SectionLabel(stringResource(R.string.automations_multitouch_title))
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Bind 3-, 4-, or 5-finger infotainment taps to a control",
+                text = stringResource(R.string.automations_multitouch_subtitle),
                 color = DarkColors.TextMuted,
                 fontSize = 13.sp,
                 modifier = Modifier.padding(start = 4.dp)
@@ -275,10 +277,10 @@ internal fun NumberPickerFooter(
                 TextButton(onClick = {
                     showPicker = false
                     onValueChange(pending)
-                }) { Text("OK") }
+                }) { Text(stringResource(R.string.common_ok)) }
             },
             dismissButton = {
-                TextButton(onClick = { showPicker = false }) { Text("Cancel") }
+                TextButton(onClick = { showPicker = false }) { Text(stringResource(R.string.common_cancel)) }
             }
         )
     }
@@ -307,21 +309,21 @@ private fun FingerActionRow(
             onSelect = onFingerCountChange
         )
         Spacer(modifier = Modifier.size(6.dp))
-        Text(text = "fingers", color = DarkColors.TextMuted, fontSize = 14.sp)
+        Text(text = stringResource(R.string.automations_fingers), color = DarkColors.TextMuted, fontSize = 14.sp)
         Spacer(modifier = Modifier.size(10.dp))
-        Text(text = "action:", color = DarkColors.TextMuted, fontSize = 14.sp)
+        Text(text = stringResource(R.string.automations_action), color = DarkColors.TextMuted, fontSize = 14.sp)
         Spacer(modifier = Modifier.size(6.dp))
         DropdownPicker(
-            selectedLabel = controlById(controlId)?.label?.invoke() ?: controlId,
+            selectedLabel = controlById(controlId)?.let { stringResource(it.labelRes()) } ?: controlId,
             options = vehicleControls,
-            optionLabel = { it.label() },
+            optionLabel = { stringResource(it.labelRes()) },
             onSelect = { onActionChange(it.id) },
             modifier = Modifier.weight(1f)
         )
         IconButton(onClick = onRemove) {
             Icon(
                 imageVector = Icons.Rounded.Close,
-                contentDescription = "Remove",
+                contentDescription = stringResource(R.string.automations_remove),
                 tint = DarkColors.TextMuted,
                 modifier = Modifier.size(20.dp)
             )
@@ -334,7 +336,7 @@ private fun FingerActionRow(
 private fun <T> DropdownPicker(
     selectedLabel: String,
     options: List<T>,
-    optionLabel: (T) -> String,
+    optionLabel: @Composable (T) -> String,
     onSelect: (T) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -388,13 +390,13 @@ private fun AddTriggerButton(onClick: () -> Unit) {
     ) {
         Icon(
             imageVector = Icons.Rounded.Add,
-            contentDescription = "Add trigger",
+            contentDescription = stringResource(R.string.automations_add_trigger),
             tint = AccentColor,
             modifier = Modifier.size(22.dp)
         )
         Spacer(modifier = Modifier.size(8.dp))
         Text(
-            text = "Add trigger",
+            text = stringResource(R.string.automations_add_trigger),
             color = AccentColor,
             fontSize = 15.sp,
             fontWeight = FontWeight.SemiBold

@@ -240,7 +240,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 },
                                 onSkip = {
-                                    connectionVM.disconnect()
+                                    connectionVM.disconnect(context)
                                     setOnboardingCompleted(context, true)
                                     navController.navigate(SetupRoute) {
                                         popUpTo(OnboardingRoute) { inclusive = true }
@@ -273,7 +273,7 @@ class MainActivity : ComponentActivity() {
                                     )
                                 },
                                 onDisconnect = {
-                                    connectionVM.disconnect()
+                                    connectionVM.disconnect(context)
                                 },
                                 onNext = toDashboard,
                                 onBattery = {
@@ -374,7 +374,7 @@ class MainActivity : ComponentActivity() {
                                 onRemoveTesla = { teslaSource?.requestReset() == true },
                                 onEnrollTesla = { navController.navigate(TeslaEnrollRoute) },
                                 onReplayOnboarding = {
-                                    connectionVM.disconnect()
+                                    connectionVM.disconnect(context)
                                     setOnboardingCompleted(context, false)
                                     navController.navigate(OnboardingRoute) {
                                         popUpTo(SetupRoute) { inclusive = false }

@@ -77,7 +77,7 @@ struct AutomationsView: View {
                         if climateKeep {
                             ValuePickerFooter(
                                 label: "Stop after",
-                                unit: "min",
+                                unit: String(localized: "min"),
                                 options: Array(climateKeepMinuteRange),
                                 value: $climateKeepMinutes,
                                 expanded: $minutesWheelExpanded
@@ -281,9 +281,9 @@ struct AutomationsView: View {
 
 /// Small muted section heading (Android `SectionLabel`).
 private struct SectionLabel: View {
-    let text: String
+    let text: LocalizedStringKey
 
-    init(_ text: String) {
+    init(_ text: LocalizedStringKey) {
         self.text = text
     }
 
@@ -301,15 +301,15 @@ private struct SectionLabel: View {
 /// an optional footer rendered inside the same card (Android `AutomationRow`).
 struct AutomationRow<Footer: View>: View {
     let icon: String
-    let title: String
-    let subtitle: String?
+    let title: LocalizedStringKey
+    let subtitle: LocalizedStringKey?
     @Binding var isOn: Bool
     let footer: Footer
 
     init(
         icon: String,
-        title: String,
-        subtitle: String?,
+        title: LocalizedStringKey,
+        subtitle: LocalizedStringKey?,
         isOn: Binding<Bool>,
         @ViewBuilder footer: () -> Footer
     ) {
@@ -360,7 +360,7 @@ struct AutomationRow<Footer: View>: View {
 }
 
 extension AutomationRow where Footer == EmptyView {
-    init(icon: String, title: String, subtitle: String?, isOn: Binding<Bool>) {
+    init(icon: String, title: LocalizedStringKey, subtitle: LocalizedStringKey?, isOn: Binding<Bool>) {
         self.init(icon: icon, title: title, subtitle: subtitle, isOn: isOn) { EmptyView() }
     }
 }
@@ -370,7 +370,7 @@ extension AutomationRow where Footer == EmptyView {
 /// "Label  N unit" line inside an automation card; tapping the value expands a
 /// wheel over `options` (Android `NumberPickerFooter`).
 struct ValuePickerFooter: View {
-    let label: String
+    let label: LocalizedStringKey
     let unit: String
     let options: [Int]
     @Binding var value: Int

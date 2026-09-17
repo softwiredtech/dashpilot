@@ -43,7 +43,7 @@ let vehicleControls: [ControlAction] = [
     ControlAction(
         id: "battery_preheat",
         icon: "thermometer",
-        label: { ControlsState.shared.preheatOn ? "Battery Preheat: On" : "Battery Preheat: Off" },
+        label: { ControlsState.shared.preheatOn ? String(localized: "Battery Preheat: On") : String(localized: "Battery Preheat: Off") },
         active: { ControlsState.shared.preheatOn },
         gestureValue: 2,
         perform: { manager in
@@ -57,7 +57,7 @@ let vehicleControls: [ControlAction] = [
     ControlAction(
         id: "frunk",
         icon: "car.fill",
-        label: { "Frunk" },
+        label: { String(localized: "Frunk") },
         active: { false },
         gestureValue: 4,
         perform: { manager in
@@ -68,7 +68,7 @@ let vehicleControls: [ControlAction] = [
     ControlAction(
         id: "trunk",
         icon: "shippingbox.fill",
-        label: { "Trunk" },
+        label: { String(localized: "Trunk") },
         active: { false },
         gestureValue: 5,
         perform: { manager in
@@ -79,7 +79,7 @@ let vehicleControls: [ControlAction] = [
     ControlAction(
         id: "charge_port",
         icon: "bolt.car.fill",
-        label: { ControlsState.shared.chargePortOpen ? "Charge Port: Open" : "Charge Port: Closed" },
+        label: { ControlsState.shared.chargePortOpen ? String(localized: "Charge Port: Open") : String(localized: "Charge Port: Closed") },
         active: { ControlsState.shared.chargePortOpen },
         gestureValue: 6,
         perform: { manager in
@@ -94,7 +94,7 @@ let vehicleControls: [ControlAction] = [
     ControlAction(
         id: "mirror_fold",
         icon: "arrow.left.arrow.right",
-        label: { ControlsState.shared.mirrorsFolded ? "Mirrors: Folded" : "Mirrors: Unfolded" },
+        label: { ControlsState.shared.mirrorsFolded ? String(localized: "Mirrors: Folded") : String(localized: "Mirrors: Unfolded") },
         active: { ControlsState.shared.mirrorsFolded },
         gestureValue: 3,
         perform: { manager in
@@ -110,7 +110,7 @@ let vehicleControls: [ControlAction] = [
     ControlAction(
         id: "rear_fan",
         icon: "wind",
-        label: { ControlsState.shared.rearFanOn ? "Rear Fan: On" : "Rear Fan: Off" },
+        label: { ControlsState.shared.rearFanOn ? String(localized: "Rear Fan: On") : String(localized: "Rear Fan: Off") },
         active: { ControlsState.shared.rearFanOn },
         gestureValue: 7,
         perform: { manager in
@@ -124,7 +124,7 @@ let vehicleControls: [ControlAction] = [
     ControlAction(
         id: "mirror_dip",
         icon: "arrow.down.right",
-        label: { "Toggle Mirror Dip" },
+        label: { String(localized: "Toggle Mirror Dip") },
         active: { false },
         gestureValue: 8,
         perform: { manager in
@@ -136,7 +136,7 @@ let vehicleControls: [ControlAction] = [
     ControlAction(
         id: "glovebox",
         icon: "tray.fill",
-        label: { "Open Glovebox" },
+        label: { String(localized: "Open Glovebox") },
         active: { false },
         gestureValue: 1,
         perform: { manager in

@@ -504,7 +504,14 @@ private fun RenderQualitySelector(selected: Int, onSelected: (Int) -> Unit) {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = stringResource(R.string.settings_render_quality_title), color = Color.White, fontSize = 16.sp)
+        Text(
+            text = stringResource(R.string.settings_render_quality_title),
+            color = Color.White,
+            fontSize = 16.sp,
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 12.dp)
+        )
         Row(
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
@@ -523,7 +530,8 @@ private fun RenderQualitySelector(selected: Int, onSelected: (Int) -> Unit) {
                     Text(
                         text = label,
                         color = if (isSelected) Color.White else DarkColors.TextMuted,
-                        fontSize = 13.sp
+                        fontSize = 13.sp,
+                        maxLines = 1
                     )
                 }
             }

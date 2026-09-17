@@ -16,6 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.softwiredtech.dashpilot.R
 
 /**
  * Shared header for back-navigable screens: back button on the left, title
@@ -35,7 +37,7 @@ fun ScreenHeader(title: String, onBack: () -> Unit) {
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                contentDescription = "Back",
+                contentDescription = stringResource(R.string.common_back),
                 tint = Color.White,
                 modifier = Modifier.size(24.dp)
             )

@@ -69,6 +69,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlin.math.roundToInt
+import androidx.compose.ui.res.stringResource
+import com.softwiredtech.dashpilot.R
 
 /**
  * Landing screen. DashKit is the default source and shows the connected home
@@ -252,13 +254,13 @@ private fun Header(
         ) {
             Icon(
                 imageVector = Icons.Rounded.Settings,
-                contentDescription = "Settings",
+                contentDescription = stringResource(R.string.settings_title),
                 tint = DarkColors.TextMuted,
                 modifier = Modifier.size(24.dp)
             )
         }
         Text(
-            text = "DashPilot",
+            text = stringResource(R.string.app_name),
             color = Color.White,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
@@ -306,7 +308,7 @@ private fun PortraitContent(
 
         pinned?.let { action ->
             Text(
-                text = "Pinned",
+                text = stringResource(R.string.home_pinned),
                 color = DarkColors.TextMuted,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.SemiBold
@@ -317,14 +319,14 @@ private fun PortraitContent(
         }
 
         ActionButton(
-            label = "Automations",
+            label = stringResource(R.string.home_automations),
             icon = Icons.Rounded.AutoAwesome,
             accent = false,
             onClick = onAutomations
         )
         Spacer(modifier = Modifier.height(12.dp))
         ActionButton(
-            label = "Controls",
+            label = stringResource(R.string.home_controls),
             icon = Icons.Rounded.Tune,
             accent = false,
             onClick = onControls
@@ -387,7 +389,7 @@ private fun LandscapeContent(
                 horizontalArrangement = Arrangement.spacedBy(GridGap)
             ) {
                 ActionTile(
-                    label = "Automations",
+                    label = stringResource(R.string.home_automations),
                     icon = Icons.Rounded.AutoAwesome,
                     onClick = onAutomations,
                     modifier = Modifier
@@ -395,7 +397,7 @@ private fun LandscapeContent(
                         .fillMaxHeight()
                 )
                 ActionTile(
-                    label = "Controls",
+                    label = stringResource(R.string.home_controls),
                     icon = Icons.Rounded.Tune,
                     onClick = onControls,
                     modifier = Modifier
@@ -442,7 +444,7 @@ private fun WidgetGrid(
         ) {
             InfoWidget(
                 icon = Icons.Rounded.BatteryChargingFull,
-                label = "Battery",
+                label = stringResource(R.string.home_widget_battery),
                 value = socText(car),
                 fillHeight = fillHeight,
                 modifier = Modifier.weight(1f),
@@ -450,7 +452,7 @@ private fun WidgetGrid(
             )
             InfoWidget(
                 icon = Icons.Rounded.DeviceThermostat,
-                label = "Battery Temp",
+                label = stringResource(R.string.home_widget_battery_temp),
                 value = batteryTempText(car),
                 fillHeight = fillHeight,
                 modifier = Modifier.weight(1f),
@@ -463,7 +465,7 @@ private fun WidgetGrid(
         ) {
             InfoWidget(
                 icon = Icons.Rounded.AcUnit,
-                label = "AC Temp",
+                label = stringResource(R.string.home_widget_ac_temp),
                 value = tempText(car.acTemp),
                 fillHeight = fillHeight,
                 modifier = Modifier.weight(1f),
@@ -471,7 +473,7 @@ private fun WidgetGrid(
             )
             InfoWidget(
                 icon = Icons.Rounded.Speed,
-                label = "Odometer",
+                label = stringResource(R.string.home_widget_odometer),
                 value = odometerText(car.odometer, useImperial),
                 fillHeight = fillHeight,
                 modifier = Modifier.weight(1f)
@@ -494,7 +496,7 @@ private fun PinnedButton(action: ControlAction, bleManager: DashKitBleManager?) 
 @Composable
 private fun DriveButton(onDrive: () -> Unit) {
     ActionButton(
-        label = "Drive",
+        label = stringResource(R.string.home_drive),
         icon = Icons.Rounded.DirectionsCar,
         accent = true,
         onClick = onDrive

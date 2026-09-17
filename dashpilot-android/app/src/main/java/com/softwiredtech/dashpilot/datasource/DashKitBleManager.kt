@@ -24,6 +24,7 @@ import java.util.UUID
 import com.softwiredtech.dashpilot.ble.VehicleControl
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import com.softwiredtech.dashpilot.R
 
 interface GattListener {
     fun onServicesReady(gatt: BluetoothGatt) {}
@@ -39,7 +40,7 @@ interface GattListener {
 class BleConnectionException(message: String) : Exception(message)
 
 @SuppressLint("MissingPermission")
-class DashKitBleManager(private val context: Context) {
+class DashKitBleManager(internal val context: Context) {
 
     companion object {
         private const val TAG = "DashKitBleManager"
@@ -186,7 +187,7 @@ class DashKitBleManager(private val context: Context) {
         Log.w(TAG, "Scan timed out without finding DashKit (attempt $attemptCount/$MAX_ATTEMPTS)")
         crashlytics.log("BLE: scan timed out (attempt $attemptCount/$MAX_ATTEMPTS)")
         stopScan()
-        retryOrFail("DashKit not found")
+        retryOrFail(context.getString(R.string.ble_dashkit_not_found))
     }
 
     private val connectTimeoutRunnable = Runnable {
@@ -195,7 +196,7 @@ class DashKitBleManager(private val context: Context) {
         Log.w(TAG, "Connect attempt timed out (attempt $attemptCount/$MAX_ATTEMPTS)")
         crashlytics.log("BLE: connect attempt timed out (attempt $attemptCount/$MAX_ATTEMPTS)")
         try { pending.close() } catch (_: Exception) {}
-        retryOrFail("Could not connect to DashKit")
+        retryOrFail(context.getString(R.string.ble_could_not_connect))
     }
 
     // Retry after a short pause while attempts remain, otherwise publish an
@@ -281,7 +282,7 @@ class DashKitBleManager(private val context: Context) {
         override fun onScanFailed(errorCode: Int) {
             Log.e(TAG, "BLE scan failed: $errorCode")
             crashlytics.recordException(BleConnectionException("BLE scan failed (error $errorCode)"))
-            _connectionState.value = ConnectionStatus.Error("BLE scan failed (error $errorCode)")
+            _connectionState.value = ConnectionStatus.Error(context.getString(R.string.ble_scan_failed_code, errorCode))
         }
     }
 
@@ -327,7 +328,7 @@ class DashKitBleManager(private val context: Context) {
                             Log.e(TAG, "createBond() failed to start")
                             crashlytics.recordException(BleConnectionException("Could not start pairing (createBond failed)"))
                             _connectionState.value =
-                                ConnectionStatus.Error("Could not start pairing")
+                                ConnectionStatus.Error(context.getString(R.string.ble_could_not_start_pairing))
                         }
                     }
                 }
@@ -360,9 +361,9 @@ class DashKitBleManager(private val context: Context) {
                     // pairing window is open.
                     val message =
                         if (g.device.bondState == BluetoothDevice.BOND_BONDED) {
-                            "Could not connect to DashKit"
+                            context.getString(R.string.ble_could_not_connect)
                         } else {
-                            "DashKit did not accept pairing. Open \"Pair a new device\" in DashPilot settings on an already-paired phone, then try again."
+                            context.getString(R.string.ble_pairing_rejected)
                         }
                     retryOrFail(message)
                     return
@@ -448,7 +449,7 @@ class DashKitBleManager(private val context: Context) {
             if (status != BluetoothGatt.GATT_SUCCESS) {
                 Log.e(TAG, "Service discovery failed: $status")
                 crashlytics.recordException(BleConnectionException("Service discovery failed (status=$status)"))
-                _connectionState.value = ConnectionStatus.Error("Service discovery failed")
+                _connectionState.value = ConnectionStatus.Error(context.getString(R.string.ble_service_discovery_failed))
                 return
             }
             Log.d(TAG, "Discovered ${g.services.size} services:")
@@ -602,13 +603,13 @@ class DashKitBleManager(private val context: Context) {
             .adapter ?: run {
             Log.e(TAG, "Bluetooth not available")
             crashlytics.recordException(BleConnectionException("Bluetooth not available"))
-            _connectionState.value = ConnectionStatus.Error("Bluetooth not available")
+            _connectionState.value = ConnectionStatus.Error(context.getString(R.string.ble_bluetooth_unavailable))
             return
         }
         val scanner = adapter.bluetoothLeScanner ?: run {
             Log.e(TAG, "BLE scanner not available")
             crashlytics.recordException(BleConnectionException("BLE scanner not available (Bluetooth off?)"))
-            _connectionState.value = ConnectionStatus.Error("BLE scanner not available")
+            _connectionState.value = ConnectionStatus.Error(context.getString(R.string.ble_scanner_unavailable))
             return
         }
         val settings = ScanSettings.Builder()
@@ -631,11 +632,11 @@ class DashKitBleManager(private val context: Context) {
         } catch (e: SecurityException) {
             Log.e(TAG, "BLE scan failed — missing permission: ${e.message}")
             crashlytics.recordException(BleConnectionException("BLE scan failed — missing permission: ${e.message}"))
-            _connectionState.value = ConnectionStatus.Error("Missing BLE permission")
+            _connectionState.value = ConnectionStatus.Error(context.getString(R.string.ble_missing_permission))
         } catch (e: Exception) {
             Log.e(TAG, "BLE scan failed: ${e.message}")
             crashlytics.recordException(BleConnectionException("BLE scan failed: ${e.message}"))
-            _connectionState.value = ConnectionStatus.Error("Scan failed: ${e.message}")
+            _connectionState.value = ConnectionStatus.Error(context.getString(R.string.ble_scan_failed, e.message))
         }
     }
 

@@ -39,8 +39,8 @@ struct DashKitSettingsView: View {
             Button("Open pairing") {
                 let ok = VehicleControl.sendEnterPairing(bleManager)
                 pairStatus = ok
-                    ? "DashKit is open for pairing. Pair the new phone within 2 minutes."
-                    : "Connect to DashKit first to pair a new device"
+                    ? String(localized: "DashKit is open for pairing. Pair the new phone within 2 minutes.")
+                    : String(localized: "Connect to DashKit first to pair a new device")
             }
             Button("Cancel", role: .cancel) {}
         } message: {
@@ -50,8 +50,8 @@ struct DashKitSettingsView: View {
             Button("Reboot") {
                 let ok = VehicleControl.sendReboot(bleManager)
                 rebootStatus = ok
-                    ? "Reboot command sent. DashKit is restarting."
-                    : "Could not send reboot command."
+                    ? String(localized: "Reboot command sent. DashKit is restarting.")
+                    : String(localized: "Could not send reboot command.")
             }
             Button("Cancel", role: .cancel) {}
         } message: {
@@ -64,8 +64,8 @@ struct DashKitSettingsView: View {
     private var firmwareInfoSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             SectionHeader("Firmware info")
-            InfoRow(label: "Status", value: connected ? "Connected" : "Disconnected")
-            InfoRow(label: "Firmware version", value: updateManager.installedVersion ?? "Unknown")
+            InfoRow(label: "Status", value: connected ? String(localized: "Connected") : String(localized: "Disconnected"))
+            InfoRow(label: "Firmware version", value: updateManager.installedVersion ?? String(localized: "Unknown"))
         }
     }
 
@@ -180,7 +180,7 @@ private struct FirmwareUpdateSection: View {
                 .foregroundColor(mutedText)
                 .font(.system(size: 14))
         case .uploading(let progress):
-            Text("Uploading firmware… \(Int(progress * 100))%")
+            Text(String(format: String(localized: "Uploading firmware… %d%%"), Int(progress * 100)))
                 .foregroundColor(.white)
                 .font(.system(size: 14))
             ProgressView(value: progress)
@@ -203,9 +203,9 @@ private struct FirmwareUpdateSection: View {
 // MARK: - Shared pieces
 
 private struct SectionHeader: View {
-    let title: String
+    let title: LocalizedStringKey
 
-    init(_ title: String) {
+    init(_ title: LocalizedStringKey) {
         self.title = title
     }
 
@@ -217,7 +217,7 @@ private struct SectionHeader: View {
 }
 
 private struct InfoRow: View {
-    let label: String
+    let label: LocalizedStringKey
     let value: String
 
     var body: some View {
@@ -235,7 +235,7 @@ private struct InfoRow: View {
 }
 
 private struct WideButton: View {
-    let label: String
+    let label: LocalizedStringKey
     let enabled: Bool
     let action: () -> Void
 

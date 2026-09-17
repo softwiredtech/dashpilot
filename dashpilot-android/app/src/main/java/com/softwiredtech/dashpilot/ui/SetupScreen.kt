@@ -267,7 +267,7 @@ fun SetupScreen(
         ) {
             Icon(
                 imageVector = Icons.Rounded.Settings,
-                contentDescription = "Settings",
+                contentDescription = stringResource(R.string.settings_title),
                 tint = DarkColors.TextMuted,
                 modifier = Modifier.size(24.dp)
             )
@@ -318,7 +318,7 @@ private fun ConnectionVisualization(
         ) {
             Icon(
                 imageVector = Icons.Rounded.DirectionsCar,
-                contentDescription = "Vehicle",
+                contentDescription = stringResource(R.string.setup_vehicle_cd),
                 tint = Color.White,
                 modifier = Modifier.size(36.dp)
             )
@@ -388,7 +388,7 @@ private fun ConnectionVisualization(
         ) {
             Icon(
                 imageVector = Icons.Rounded.PhoneAndroid,
-                contentDescription = "Phone",
+                contentDescription = stringResource(R.string.setup_phone_cd),
                 tint = Color.White,
                 modifier = Modifier.size(36.dp)
             )

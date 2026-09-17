@@ -82,6 +82,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.coroutines.resume
+import com.softwiredtech.dashpilot.R
 
 class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     private val _dataSource = MutableStateFlow<IDataSource?>(null)
@@ -344,7 +345,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
             if (gate != null) {
                 gate { connect(context, manualServerAddress, dataSourceType, userInitiated) }
             } else {
-                _connectionStatus.value = ConnectionStatus.Error("Missing BLE permission")
+                _connectionStatus.value = ConnectionStatus.Error(context.getString(R.string.ble_missing_permission))
             }
             return
         }
@@ -499,11 +500,11 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         _hasAutoNavigatedToDashboard.value = false
     }
 
-    fun disconnect() {
+    fun disconnect(context: Context) {
         val wasConnecting = _connectionStatus.value is ConnectionStatus.Connecting
         teardownConnection()
         _connectionStatus.value = if (wasConnecting) {
-            ConnectionStatus.Error("Discovery cancelled")
+            ConnectionStatus.Error(context.getString(R.string.connection_discovery_cancelled))
         } else {
             ConnectionStatus.Disconnected
         }

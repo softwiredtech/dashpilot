@@ -309,7 +309,7 @@ final class DashKitBleManager: NSObject {
             guard let self, let central = self.central, central.isScanning else { return }
             print("[DashKitBleManager] scan timed out without finding DashKit")
             self.stopScan()
-            self.retryOrFail("DashKit not found")
+            self.retryOrFail(String(localized: "DashKit not found"))
         }
     }
 
@@ -334,10 +334,10 @@ extension DashKitBleManager: CBCentralManagerDelegate {
                 startScan()
             }
         case .unauthorized:
-            setState(.error("Bluetooth permission denied"))
+            setState(.error(String(localized: "Bluetooth permission denied")))
         case .poweredOff:
             if state == .connecting {
-                setState(.error("Bluetooth is off"))
+                setState(.error(String(localized: "Bluetooth is off")))
             }
         default:
             break
@@ -365,7 +365,7 @@ extension DashKitBleManager: CBCentralManagerDelegate {
             print("[DashKitBleManager] connect attempt timed out")
             self.central?.cancelPeripheralConnection(pending)
             self.peripheral = nil
-            self.retryOrFail("Could not connect to DashKit")
+            self.retryOrFail(String(localized: "Could not connect to DashKit"))
         }
     }
 
@@ -385,7 +385,7 @@ extension DashKitBleManager: CBCentralManagerDelegate {
         connectTimeoutTask = nil
         peripheral = nil
         print("[DashKitBleManager] connect failed: \(error?.localizedDescription ?? "unknown")")
-        retryOrFail("Could not connect to DashKit")
+        retryOrFail(String(localized: "Could not connect to DashKit"))
     }
 
     func centralManager(_ central: CBCentralManager,
@@ -407,7 +407,7 @@ extension DashKitBleManager: CBCentralManagerDelegate {
             // attempt itself failed. Retry a few times before surfacing an
             // error.
             print("[DashKitBleManager] link dropped before setup completed")
-            retryOrFail("Could not connect to DashKit")
+            retryOrFail(String(localized: "Could not connect to DashKit"))
             return
         }
         if ProcessInfo.processInfo.systemUptime < pairingWindowUntil {
@@ -437,7 +437,7 @@ extension DashKitBleManager: CBCentralManagerDelegate {
             // rejecting this phone's pairing. iOS cannot delete a bond
             // programmatically, so stop flapping and tell the user what to do.
             print("[DashKitBleManager] repeated drops right after connect; giving up")
-            setState(.error("DashKit rejected this phone's pairing. If DashKit is paired with another phone, open \"Pair a new device\" in its DashPilot settings and try again. If this phone was paired before, forget \"DashKit\" in Settings > Bluetooth first."))
+            setState(.error(String(localized: "DashKit rejected this phone's pairing. If DashKit is paired with another phone, open \"Pair a new device\" in its DashPilot settings and try again. If this phone was paired before, forget \"DashKit\" in Settings > Bluetooth first.")))
             forEachListener { $0.onDisconnected() }
             return
         }
@@ -460,12 +460,12 @@ extension DashKitBleManager: CBPeripheralDelegate {
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         if let error {
             print("[DashKitBleManager] service discovery failed: \(error.localizedDescription)")
-            setState(.error("Service discovery failed"))
+            setState(.error(String(localized: "Service discovery failed")))
             return
         }
         let services = peripheral.services ?? []
         guard !services.isEmpty else {
-            setState(.error("Service discovery failed"))
+            setState(.error(String(localized: "Service discovery failed")))
             return
         }
         for service in services {

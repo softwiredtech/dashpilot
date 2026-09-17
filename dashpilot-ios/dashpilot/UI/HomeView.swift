@@ -311,7 +311,7 @@ private struct DataSourceMenu: View {
         }
     }
 
-    private var dataSourceLabel: String {
+    private var dataSourceLabel: LocalizedStringKey {
         switch connectionVM.connectionStatus {
         case .connected: return "Data source: connected"
         case .connecting: return "Data source: connecting…"
@@ -326,7 +326,7 @@ private struct DataSourceMenu: View {
 private struct InfoWidget: View {
 
     let icon: String
-    let label: String
+    let label: LocalizedStringKey
     let value: String
     var fillHeight: Bool = false
 
@@ -370,7 +370,7 @@ private struct InfoWidget: View {
 /// and the label at the bottom, sized to match the stat tiles beside it.
 private struct ActionTile: View {
 
-    let label: String
+    let label: LocalizedStringKey
     let icon: String
     let action: () -> Void
 
@@ -400,7 +400,7 @@ private struct ActionTile: View {
 /// green accent background; otherwise the standard dark surface.
 private struct ActionButton: View {
 
-    let label: String
+    let label: LocalizedStringKey
     let icon: String
     var accent: Bool = false
     let action: () -> Void

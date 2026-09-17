@@ -113,7 +113,7 @@ final class FirmwareUpdateManager {
     private func runCheck() async {
         check = .checking
         guard let manifest = await FirmwareUpdateRepository.fetchManifest() else {
-            check = .error("Could not reach update server")
+            check = .error(String(localized: "Could not reach update server"))
             return
         }
         var current = installedVersion
@@ -140,13 +140,13 @@ final class FirmwareUpdateManager {
                !expected.isEmpty {
                 let actual = SHA256.hash(data: bytes).map { String(format: "%02x", $0) }.joined()
                 guard actual == expected else {
-                    check = .error("Downloaded firmware failed integrity check")
+                    check = .error(String(localized: "Downloaded firmware failed integrity check"))
                     return
                 }
             }
             ota.start(firmware: bytes)
         } catch {
-            check = .error("Download failed: \(error.localizedDescription)")
+            check = .error(String(localized: "Download failed: \(error.localizedDescription)"))
         }
     }
 

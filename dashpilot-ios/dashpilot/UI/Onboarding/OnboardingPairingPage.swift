@@ -56,7 +56,7 @@ struct OnboardingPairingPage: View {
         }
     }
 
-    private var title: String {
+    private var title: LocalizedStringKey {
         switch state {
         case .idle: return "Pair your DashKit"
         case .searching: return "Looking for DashKit…"
@@ -65,7 +65,7 @@ struct OnboardingPairingPage: View {
         }
     }
 
-    private var subtitle: String {
+    private var subtitle: LocalizedStringKey {
         switch state {
         case .idle:
             return "Plug the DashKit into your car's debug port, then tap below to pair over Bluetooth."
@@ -74,12 +74,11 @@ struct OnboardingPairingPage: View {
         case .paired:
             return "DashKit is connected and ready to stream data to your dashboard."
         case .failed:
-            return "If this DashKit is already paired with another phone, open DashPilot "
-                + "on that phone and tap Settings → DashKit → Pair a new device, then try again."
+            return "If this DashKit is already paired with another phone, open DashPilot on that phone and tap Settings → DashKit → Pair a new device, then try again."
         }
     }
 
-    private var ctaLabel: String {
+    private var ctaLabel: LocalizedStringKey {
         switch state {
         case .idle: return "Pair device"
         case .searching: return "Pairing…"

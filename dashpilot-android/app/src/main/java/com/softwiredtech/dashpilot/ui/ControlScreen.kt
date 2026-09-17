@@ -22,6 +22,8 @@ import com.softwiredtech.dashpilot.datasource.DashKitBleManager
 import com.softwiredtech.dashpilot.ui.controls.ControlActionButton
 import com.softwiredtech.dashpilot.ui.controls.vehicleControls
 import com.softwiredtech.dashpilot.ui.theme.DarkColors
+import androidx.compose.ui.res.stringResource
+import com.softwiredtech.dashpilot.R
 
 /**
  * Vehicle control screen. Exposes the available DashKit commands as single
@@ -51,12 +53,12 @@ fun ControlScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp, vertical = 24.dp)
         ) {
-            ScreenHeader(title = "Controls", onBack = onBack)
+            ScreenHeader(title = stringResource(R.string.controls_title), onBack = onBack)
 
             if (!enabled) {
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Connect to DashKit to send commands",
+                    text = stringResource(R.string.controls_connect_hint),
                     color = DarkColors.TextMuted,
                     fontSize = 13.sp,
                     textAlign = TextAlign.Center,
@@ -81,7 +83,7 @@ fun ControlScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
             Text(
-                text = "Tip: long-press a control to pin it to the home screen",
+                text = stringResource(R.string.controls_pin_tip),
                 color = DarkColors.TextSubtle,
                 fontSize = 12.sp,
                 textAlign = TextAlign.Center,

@@ -28,6 +28,8 @@ import com.softwiredtech.dashpilot.datamodel.dash.DASH_PREFS_NAME
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.DataSourceType
 import com.softwiredtech.dashpilot.ui.theme.DarkColors
+import androidx.compose.ui.res.stringResource
+import com.softwiredtech.dashpilot.R
 
 private const val PREF_LAST_WEBSOCKET_ADDRESS = "last_websocket_address"
 
@@ -56,9 +58,9 @@ fun DebugDataSourceMenu(
         TextButton(onClick = { expanded = true }) {
             Text(
                 text = when (connectionStatus) {
-                    is ConnectionStatus.Connected -> "Data source: connected"
-                    is ConnectionStatus.Connecting -> "Data source: connecting…"
-                    else -> "Data source"
+                    is ConnectionStatus.Connected -> stringResource(R.string.data_source_connected)
+                    is ConnectionStatus.Connecting -> stringResource(R.string.data_source_connecting)
+                    else -> stringResource(R.string.data_source)
                 },
                 color = DarkColors.TextMuted,
                 fontSize = 13.sp
@@ -88,7 +90,7 @@ fun DebugDataSourceMenu(
                 }
             } else {
                 DropdownMenuItem(
-                    text = { Text("Disconnect") },
+                    text = { Text(stringResource(R.string.setup_disconnect)) },
                     onClick = {
                         expanded = false
                         onDisconnect()
@@ -109,12 +111,12 @@ fun DebugDataSourceMenu(
         var address by remember { mutableStateOf(getLastWebsocketAddress(context)) }
         AlertDialog(
             onDismissRequest = { showIpDialog = false },
-            title = { Text("WebSocket server") },
+            title = { Text(stringResource(R.string.data_source_websocket_server)) },
             text = {
                 OutlinedTextField(
                     value = address,
                     onValueChange = { address = it },
-                    label = { Text("IP address") },
+                    label = { Text(stringResource(R.string.data_source_ip_address)) },
                     singleLine = true
                 )
             },
@@ -127,10 +129,10 @@ fun DebugDataSourceMenu(
                         onSelectDataSource(DataSourceType.WEBSOCKET)
                         onConnect(address.trim(), DataSourceType.WEBSOCKET)
                     }
-                ) { Text("Connect") }
+                ) { Text(stringResource(R.string.setup_connect)) }
             },
             dismissButton = {
-                TextButton(onClick = { showIpDialog = false }) { Text("Cancel") }
+                TextButton(onClick = { showIpDialog = false }) { Text(stringResource(R.string.common_cancel)) }
             }
         )
     }
