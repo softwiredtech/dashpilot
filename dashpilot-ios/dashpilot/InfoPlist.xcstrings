@@ -1,16 +1,36 @@
 {
-  "sourceLanguage": "en",
-  "strings": {
-    "NSBluetoothAlwaysUsageDescription": {
-      "localizations": {
-        "hu": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A DashPilot Bluetoothon keresztül csatlakozik a DashKithez, hogy élő járműadatokat jelenítsen meg és járműparancsokat küldjön."
+  "sourceLanguage" : "en",
+  "strings" : {
+    "CFBundleName" : {
+      "comment" : "Bundle name",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "dashpilot"
+          }
+        }
+      }
+    },
+    "NSBluetoothAlwaysUsageDescription" : {
+      "comment" : "Privacy - Bluetooth Always Usage Description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DashPilot connects to your DashKit over Bluetooth to show live vehicle data and send vehicle commands."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "A DashPilot Bluetoothon keresztül csatlakozik a DashKithez, hogy élő járműadatokat jelenítsen meg és járműparancsokat küldjön."
           }
         }
       }
     }
   },
-  "version": "1.0"
+  "version" : "1.0"
 }

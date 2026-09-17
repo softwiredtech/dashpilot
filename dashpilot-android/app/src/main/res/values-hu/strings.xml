@@ -188,7 +188,7 @@
     <!-- Home -->
     <string name="home_pinned">Rögzítve</string>
     <string name="home_automations">Automatizációk</string>
-    <string name="home_controls">Vezérlés</string>
+    <string name="home_controls">Parancsok</string>
     <string name="home_drive">Vezetés</string>
     <string name="home_widget_battery">Akkumulátor</string>
     <string name="home_widget_battery_temp">Akku hőmérséklet</string>
@@ -205,7 +205,7 @@
     <string name="data_source_ip_address">IP-cím</string>
 
     <!-- Controls -->
-    <string name="controls_title">Vezérlés</string>
+    <string name="controls_title">Parancsok</string>
     <string name="controls_connect_hint">A parancsok küldéséhez csatlakozz a DashKithez</string>
     <string name="controls_pin_tip">Tipp: nyomj hosszan egy parancsra, hogy a kezdőképernyőre rögzítsd</string>
     <string name="control_pinned_cd">Rögzítve</string>
@@ -237,7 +237,7 @@
     <string name="automations_pedal_threshold">Pedálküszöb</string>
     <string name="automations_multitouch_title">Többujjas infotainment parancs</string>
     <string name="automations_multitouch_subtitle">Rendelj parancsokat az infotainment képernyő 3, 4, vagy 5 ujjal történő megérintéséhez (Pl.: kesztyűtartó nyitás 3 ujjas érintésre).</string>
-    <string name="automations_fingers">ujj</string>
+    <string name="automations_fingers">ujjas</string>
     <string name="automations_action">művelet:</string>
     <string name="automations_remove">Eltávolítás</string>
     <string name="automations_add_trigger">Parancs hozzáadása</string>
@@ -272,7 +272,7 @@
     <string name="battery_preheat">Előfűtés</string>
     <string name="battery_state_of_charge">Töltöttségi szint</string>
     <string name="battery_section_energy">Energia</string>
-    <string name="battery_remaining">Hátralévő</string>
+    <string name="battery_remaining">Bruttó kapacitás</string>
     <string name="battery_usable">Felhasználható</string>
     <string name="battery_full_pack">Teljes pack</string>
     <string name="battery_buffer">Tartalék</string>

@@ -253,8 +253,9 @@ struct SettingsView: View {
             Text("Render Quality")
                 .foregroundColor(.white)
                 .font(.system(size: 16))
-            Spacer()
+            Spacer(minLength: 12)
             RenderQualityPicker(selected: $renderQuality)
+                .layoutPriority(1)
         }
         .padding(.vertical, 4)
     }
@@ -371,6 +372,8 @@ private struct RenderQualityPicker: View {
                 } label: {
                     Text(label)
                         .font(.system(size: 13, weight: .medium))
+                        .lineLimit(1)
+                        .fixedSize()
                         .foregroundColor(selected == value ? .white : Color(white: 0.53))
                         .padding(.horizontal, 14)
                         .padding(.vertical, 8)
