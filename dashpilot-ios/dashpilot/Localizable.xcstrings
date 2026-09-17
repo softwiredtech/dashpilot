@@ -30,6 +30,12 @@
     },
     "%lld of %lld" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld von %lld"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -40,6 +46,12 @@
     },
     "3D Visualizer" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3D-Visualisierung"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -50,6 +62,12 @@
     },
     "A/C" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A/C"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -60,6 +78,12 @@
     },
     "AC Temp" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klimatemperatur"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -70,6 +94,12 @@
     },
     "action:" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aktion:"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -80,6 +110,12 @@
     },
     "Add trigger" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Befehl hinzufügen"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -90,6 +126,12 @@
     },
     "Always On Blind-Spot Monitor" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toter-Winkel-Warner immer an"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -100,6 +142,12 @@
     },
     "Ambient Dashboard" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ambient-Dashboard"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -110,6 +158,12 @@
     },
     "Analog Dashboard" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Analog-Dashboard"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -120,6 +174,12 @@
     },
     "Auto" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -130,6 +190,12 @@
     },
     "Automation" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatisierung"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -140,6 +206,12 @@
     },
     "Automations" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Automatisierungen"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -150,6 +222,12 @@
     },
     "Battery" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Akku"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -160,6 +238,12 @@
     },
     "Battery Preheat: Off" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Akku-Vorheizen: Aus"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -170,6 +254,12 @@
     },
     "Battery Preheat: On" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Akku-Vorheizen: An"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -180,6 +270,12 @@
     },
     "Battery Temp" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Akkutemperatur"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -190,6 +286,12 @@
     },
     "Bind 3-, 4-, or 5-finger infotainment taps to a control" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weise Befehle dem Tippen mit 3, 4 oder 5 Fingern auf dem Infotainment-Bildschirm zu (z. B. Handschuhfach öffnen bei 3 Fingern)."
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -200,6 +302,12 @@
     },
     "Bluetooth is off" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bluetooth ist ausgeschaltet"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -210,6 +318,12 @@
     },
     "Bluetooth permission denied" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bluetooth-Berechtigung verweigert"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -220,6 +334,12 @@
     },
     "Buffer" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Puffer"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -230,6 +350,12 @@
     },
     "Camp mode" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Campingmodus"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -240,6 +366,12 @@
     },
     "Cancel" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abbrechen"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -250,6 +382,12 @@
     },
     "Charge Port: Closed" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ladeanschluss: Geschlossen"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -260,6 +398,12 @@
     },
     "Charge Port: Open" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ladeanschluss: Offen"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -270,6 +414,12 @@
     },
     "Check for firmware updates" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nach Firmware-Updates suchen"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -280,6 +430,12 @@
     },
     "Checking for updates…" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suche nach Updates…"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -290,6 +446,12 @@
     },
     "Choose a dashboard" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dashboard auswählen"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -300,6 +462,12 @@
     },
     "Climate" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klima"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -314,6 +482,12 @@
     },
     "Configuration" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konfiguration"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -324,6 +498,12 @@
     },
     "Connect" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbinden"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -334,6 +514,12 @@
     },
     "Connect to a DashKit device to manage it." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbinde dich mit einem DashKit, um es zu verwalten."
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -344,6 +530,12 @@
     },
     "Connect to DashKit first to pair a new device" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbinde dich zuerst mit dem DashKit, um ein neues Gerät zu koppeln"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -354,6 +546,12 @@
     },
     "Connect to DashKit to send commands" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbinde dich mit dem DashKit, um Befehle zu senden"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -364,6 +562,12 @@
     },
     "Connect your comma device" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbinde dein comma-Gerät"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -374,6 +578,12 @@
     },
     "Connected" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbunden"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -384,6 +594,12 @@
     },
     "Connected to %@" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbunden mit %@"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -394,6 +610,12 @@
     },
     "Connecting to %@..." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbinde mit %@..."
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -404,6 +626,12 @@
     },
     "Connecting..." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbinde..."
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -414,6 +642,12 @@
     },
     "Connecting…" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbinde…"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -424,6 +658,12 @@
     },
     "Continue" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weiter"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -434,6 +674,12 @@
     },
     "Controls" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Befehle"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -444,6 +690,12 @@
     },
     "Could not connect to DashKit" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verbindung zum DashKit fehlgeschlagen"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -454,6 +706,12 @@
     },
     "Could not find device on the network" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gerät im Netzwerk nicht gefunden"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -464,6 +722,12 @@
     },
     "Could not reach update server" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update-Server nicht erreichbar"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -474,6 +738,12 @@
     },
     "Could not send reboot command." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neustart-Befehl konnte nicht gesendet werden."
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -484,6 +754,12 @@
     },
     "Couldn't pair" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopplung fehlgeschlagen"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -494,6 +770,12 @@
     },
     "Current" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Strom"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -504,6 +786,12 @@
     },
     "Dark Mode" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dunkelmodus"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -514,6 +802,12 @@
     },
     "Dashboard" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dashboard"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -524,6 +818,12 @@
     },
     "Dashboard Theme" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dashboard-Design"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -538,6 +838,12 @@
     },
     "DashKit firmware is up to date" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die DashKit-Firmware ist aktuell"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -548,6 +854,12 @@
     },
     "DashKit is connected and ready to stream data to your dashboard." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das DashKit ist verbunden und bereit, Daten an dein Dashboard zu streamen."
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -558,6 +870,12 @@
     },
     "DashKit is open for pairing. Pair the new phone within 2 minutes." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das DashKit ist bereit zur Kopplung. Kopple das neue Handy innerhalb von 2 Minuten."
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -568,6 +886,12 @@
     },
     "DashKit not found" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DashKit nicht gefunden"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -578,6 +902,12 @@
     },
     "DashKit rejected this phone's pairing. If DashKit is paired with another phone, open \"Pair a new device\" in its DashPilot settings and try again. If this phone was paired before, forget \"DashKit\" in Settings > Bluetooth first." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das DashKit hat die Kopplung dieses Handys abgelehnt. Falls das DashKit mit einem anderen Handy gekoppelt ist, öffne dort in den DashPilot-Einstellungen \"Neues Gerät koppeln\" und versuche es erneut. Falls dieses Handy schon einmal gekoppelt war, ignoriere zuerst \"DashKit\" unter Einstellungen > Bluetooth."
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -588,6 +918,12 @@
     },
     "DashKit will allow one new device to pair for the next 2 minutes. Open DashPilot on the other phone and pair it now." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das DashKit erlaubt in den nächsten 2 Minuten die Kopplung eines neuen Geräts. Öffne DashPilot auf dem anderen Handy und kopple es jetzt."
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -598,6 +934,12 @@
     },
     "DashKit will restart and briefly disconnect. It should reconnect automatically once it is back up." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Das DashKit startet neu und trennt kurz die Verbindung. Es sollte sich automatisch wieder verbinden, sobald es hochgefahren ist."
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -616,6 +958,12 @@
     },
     "Data source" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datenquelle"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -626,6 +974,12 @@
     },
     "Data source: connected" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datenquelle: verbunden"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -636,6 +990,12 @@
     },
     "Data source: connecting…" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Datenquelle: verbinde…"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -646,6 +1006,12 @@
     },
     "Device IP" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geräte-IP"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -656,6 +1022,12 @@
     },
     "Device reported error (0x%@)" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gerät hat einen Fehler gemeldet (0x%@)"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -666,6 +1038,12 @@
     },
     "Disconnect" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trennen"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -676,6 +1054,12 @@
     },
     "Disconnected" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Getrennt"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -686,6 +1070,12 @@
     },
     "Disconnected unexpectedly" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unerwartet getrennt"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -696,6 +1086,12 @@
     },
     "Display" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anzeige"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -706,6 +1102,12 @@
     },
     "Dog mode" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Haustiermodus"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -716,6 +1118,12 @@
     },
     "Download failed: %@" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Download fehlgeschlagen: %@"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -726,6 +1134,12 @@
     },
     "Downloaded firmware failed integrity check" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heruntergeladene Firmware hat die Integritätsprüfung nicht bestanden"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -736,6 +1150,12 @@
     },
     "Downloading firmware…" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Firmware wird heruntergeladen…"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -746,6 +1166,12 @@
     },
     "Drive" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fahren"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -756,6 +1182,12 @@
     },
     "Driver" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fahrer"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -766,6 +1198,12 @@
     },
     "Driver setpoint" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fahrer-Sollwert"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -776,6 +1214,12 @@
     },
     "Driving" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fahren"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -786,6 +1230,12 @@
     },
     "Energy" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Energie"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -796,6 +1246,12 @@
     },
     "Enter IP manually" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "IP manuell eingeben"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -806,6 +1262,12 @@
     },
     "Extra Vehicle Bus" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zusätzlicher Fahrzeugbus"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -816,6 +1278,12 @@
     },
     "Failed to enable OTA notifications" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OTA-Benachrichtigungen konnten nicht aktiviert werden"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -826,6 +1294,12 @@
     },
     "Fan" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gebläse"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -836,6 +1310,12 @@
     },
     "fingers" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finger"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -846,6 +1326,12 @@
     },
     "Firmware" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Firmware"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -856,6 +1342,12 @@
     },
     "Firmware file is empty" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Firmware-Datei ist leer"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -866,6 +1358,12 @@
     },
     "Firmware info" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Firmware-Info"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -876,6 +1374,12 @@
     },
     "Firmware version" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Firmware-Version"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -886,6 +1390,12 @@
     },
     "Fresh air" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frischluft"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -896,6 +1406,12 @@
     },
     "Frunk" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frunk"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -906,6 +1422,12 @@
     },
     "Full Pack" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volles Pack"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -916,6 +1438,12 @@
     },
     "General" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allgemein"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -926,6 +1454,12 @@
     },
     "Get started" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Los geht's"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -936,6 +1470,12 @@
     },
     "High" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoch"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -946,6 +1486,12 @@
     },
     "Hold the device close to your phone. This usually takes a few seconds." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Halte das Gerät nah an dein Handy. Das dauert normalerweise nur ein paar Sekunden."
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -956,6 +1502,12 @@
     },
     "If this DashKit is already paired with another phone, open DashPilot on that phone and tap Settings → DashKit → Pair a new device, then try again." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Falls dieses DashKit bereits mit einem anderen Handy gekoppelt ist, öffne DashPilot auf diesem Handy, tippe auf Einstellungen → DashKit → Neues Gerät koppeln und versuche es dann erneut."
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -966,6 +1518,12 @@
     },
     "Install update" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update installieren"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -976,6 +1534,12 @@
     },
     "Keep" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anlassen"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -986,6 +1550,12 @@
     },
     "Keep climate" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klima anlassen"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -996,6 +1566,12 @@
     },
     "Keep climate on" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klima anlassen"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1006,6 +1582,12 @@
     },
     "Keep the climate on when you leave the car. The automation stops after the set time, or when you return to the car." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lässt die Klimaanlage an, wenn du das Auto verlässt. Die Automatisierung endet nach der eingestellten Zeit oder wenn du zum Auto zurückkehrst."
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1016,6 +1598,12 @@
     },
     "Keep wipers disabled automatically" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scheibenwischer automatisch deaktiviert halten, solange Autopilot aktiv ist."
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1026,6 +1614,12 @@
     },
     "Kick-down" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kick-down"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1036,6 +1630,12 @@
     },
     "Load Rive File" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rive-Datei laden"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1046,6 +1646,12 @@
     },
     "Looking for DashKit…" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suche nach DashKit…"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1056,6 +1662,12 @@
     },
     "Low" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niedrig"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1066,6 +1678,12 @@
     },
     "Maintenance" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wartung"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1076,6 +1694,12 @@
     },
     "Max Discharge" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Max. Entladung"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1086,6 +1710,12 @@
     },
     "Max Regen" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Max. Rekuperation"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1096,6 +1726,12 @@
     },
     "Med" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mittel"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1106,6 +1742,12 @@
     },
     "min" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Min."
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1116,6 +1758,12 @@
     },
     "Mirrors: Folded" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spiegel: Eingeklappt"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1126,6 +1774,12 @@
     },
     "Mirrors: Unfolded" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spiegel: Ausgeklappt"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1136,6 +1790,12 @@
     },
     "Multi-touch infotainment trigger" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Multi-Touch-Infotainment-Befehl"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1146,6 +1806,12 @@
     },
     "Next" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weiter"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1156,6 +1822,12 @@
     },
     "Odometer" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kilometerstand"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1166,6 +1838,12 @@
     },
     "Off" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aus"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1176,6 +1854,12 @@
     },
     "On" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "An"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1186,6 +1870,12 @@
     },
     "One more thing" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Noch etwas"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1196,6 +1886,12 @@
     },
     "Open Glovebox" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Handschuhfach öffnen"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1206,6 +1902,12 @@
     },
     "Open pairing" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopplung öffnen"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1216,6 +1918,12 @@
     },
     "OTA characteristics not found" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OTA-Charakteristiken nicht gefunden"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1226,6 +1934,12 @@
     },
     "OTA service not found on device" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OTA-Dienst auf dem Gerät nicht gefunden"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1236,6 +1950,12 @@
     },
     "Overheat protection" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überhitzungsschutz"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1246,6 +1966,12 @@
     },
     "Overheat protection (fan)" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überhitzungsschutz (Gebläse)"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1256,6 +1982,12 @@
     },
     "Pack" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Akkupack"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1266,6 +1998,12 @@
     },
     "Pair a new device" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neues Gerät koppeln"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1276,6 +2014,12 @@
     },
     "Pair a new device?" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neues Gerät koppeln?"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1286,6 +2030,12 @@
     },
     "Pair device" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gerät koppeln"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1296,6 +2046,12 @@
     },
     "Pair more DashKit devices" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weitere DashKit-Geräte koppeln"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1306,6 +2062,12 @@
     },
     "Pair your DashKit" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopple dein DashKit"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1316,6 +2078,12 @@
     },
     "Pairing" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopplung"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1326,6 +2094,12 @@
     },
     "Pairing…" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopplung…"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1336,6 +2110,12 @@
     },
     "Passenger" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beifahrer"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1346,6 +2126,12 @@
     },
     "Pedal threshold" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pedalschwelle"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1356,6 +2142,12 @@
     },
     "Pinned" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Angeheftet"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1366,6 +2158,12 @@
     },
     "Plug the DashKit into your car's debug port, then tap below to pair over Bluetooth." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stecke das DashKit in den Diagnoseanschluss deines Autos und tippe dann unten, um es über Bluetooth zu koppeln."
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1376,6 +2174,12 @@
     },
     "Power" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leistung"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1386,6 +2190,12 @@
     },
     "Preconditioning" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorklimatisierung"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1396,6 +2206,12 @@
     },
     "Preheat" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vorheizen"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1406,6 +2222,12 @@
     },
     "Rear Fan: Off" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hinteres Gebläse: Aus"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1416,6 +2238,12 @@
     },
     "Rear Fan: On" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hinteres Gebläse: An"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1426,6 +2254,12 @@
     },
     "Reboot" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neu starten"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1436,6 +2270,12 @@
     },
     "Reboot command sent. DashKit is restarting." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neustart-Befehl gesendet. Das DashKit startet neu."
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1446,6 +2286,12 @@
     },
     "Reboot DashKit" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DashKit neu starten"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1456,6 +2302,12 @@
     },
     "Reboot DashKit?" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DashKit neu starten?"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1466,6 +2318,12 @@
     },
     "Recirculate" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Umluft"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1476,6 +2334,12 @@
     },
     "Recirculation" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Umluft"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1486,6 +2350,12 @@
     },
     "Remaining" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bruttokapazität"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1496,6 +2366,12 @@
     },
     "Render Quality" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Renderqualität"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1506,6 +2382,12 @@
     },
     "Replay onboarding" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einführung erneut ansehen"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1516,6 +2398,12 @@
     },
     "Retro Dashboard" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retro-Dashboard"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1526,6 +2414,12 @@
     },
     "Retry" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erneut versuchen"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1536,6 +2430,12 @@
     },
     "Searching for device..." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suche nach Gerät..."
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1546,6 +2446,12 @@
     },
     "Service discovery failed" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dienstsuche fehlgeschlagen"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1556,6 +2462,12 @@
     },
     "Setpoints" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sollwerte"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1566,6 +2478,12 @@
     },
     "Settings" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einstellungen"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1576,6 +2494,12 @@
     },
     "Setup" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einrichtung"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1586,6 +2510,12 @@
     },
     "Show Car Battery" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fahrzeugakku anzeigen"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1596,6 +2526,12 @@
     },
     "Show Odometer" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kilometerstand anzeigen"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1606,6 +2542,12 @@
     },
     "Show Phone Battery" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Handy-Akku anzeigen"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1616,6 +2558,12 @@
     },
     "Skip" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Überspringen"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1626,6 +2574,12 @@
     },
     "Some settings depend on the selected theme" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einige Einstellungen hängen vom gewählten Design ab"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1636,6 +2590,12 @@
     },
     "Start Demo Mode" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demomodus starten"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1646,6 +2606,12 @@
     },
     "State of charge" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ladezustand"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1656,6 +2622,12 @@
     },
     "Status" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1666,6 +2638,12 @@
     },
     "Stop after" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beenden nach"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1676,6 +2654,12 @@
     },
     "Switch from Chill to Standard while the accelerator is pressed past the threshold. Reverts when you ease off." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wechselt von Chill zu Standard, solange das Gaspedal über die Schwelle hinaus gedrückt wird. Wechselt zurück zu Chill, wenn du das Pedal loslässt."
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1686,6 +2670,12 @@
     },
     "Temp Max" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temp. Max."
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1696,6 +2686,12 @@
     },
     "Temp Min" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Temp. Min."
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1706,6 +2702,12 @@
     },
     "Tip: long-press a control to pin it to the home screen" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tipp: Halte einen Befehl gedrückt, um ihn auf dem Startbildschirm anzuheften"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1716,6 +2718,12 @@
     },
     "Toggle Mirror Dip" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spiegelabsenkung umschalten"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1726,6 +2734,12 @@
     },
     "Trunk" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kofferraum"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1736,6 +2750,12 @@
     },
     "Unknown" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Unbekannt"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1746,6 +2766,12 @@
     },
     "Unsupported dashboard type: %@" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nicht unterstützter Dashboard-Typ: %@"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1756,6 +2782,12 @@
     },
     "Update complete! Rebooting DashKit…" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update abgeschlossen! DashKit wird neu gestartet…"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1766,6 +2798,12 @@
     },
     "Update DashKit Firmware" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DashKit-Firmware aktualisieren"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1776,6 +2814,12 @@
     },
     "Update failed: %@" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update fehlgeschlagen: %@"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1786,6 +2830,12 @@
     },
     "Uploading firmware… %d%%" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Firmware wird hochgeladen… %d%%"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1796,6 +2846,12 @@
     },
     "Usable" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nutzbar"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1806,6 +2862,12 @@
     },
     "Use Imperial Units" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imperiale Einheiten verwenden"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1816,6 +2878,12 @@
     },
     "Vanilla Dashboard" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vanilla-Dashboard"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1826,6 +2894,12 @@
     },
     "Version" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1836,6 +2910,12 @@
     },
     "Version %@ is available" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Version %@ ist verfügbar"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1846,6 +2926,12 @@
     },
     "Voltage" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spannung"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1856,6 +2942,12 @@
     },
     "Wiper Off" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wischer aus"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1866,6 +2958,12 @@
     },
     "Wipers" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scheibenwischer"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1876,6 +2974,12 @@
     },
     "Write failed (%@)" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schreiben fehlgeschlagen (%@)"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1886,6 +2990,12 @@
     },
     "You can pair additional devices and install firmware updates anytime from Settings." : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Du kannst jederzeit in den Einstellungen weitere Geräte koppeln und Firmware-Updates installieren."
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1896,6 +3006,12 @@
     },
     "You're all set!" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alles bereit!"
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",

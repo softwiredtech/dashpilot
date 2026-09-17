@@ -1,0 +1,314 @@
+<resources>
+    <string name="app_name">DashPilot</string>
+    <string name="connection_device_ip">Geräte-IP</string>
+    <string name="setup_select_data_source">Datenquelle auswählen</string>
+    <string name="setup_connect_your_comma_device">Mit deinem comma-Gerät verbinden</string>
+    <string name="setup_connect">Verbinden</string>
+    <string name="setup_connecting">Verbinde…</string>
+    <string name="setup_cancel">Abbrechen</string>
+    <string name="setup_disconnect">Trennen</string>
+    <string name="setup_next">Weiter</string>
+    <string name="settings_title">Einstellungen</string>
+    <string name="settings_back">Zurück</string>
+    <string name="settings_version">Version</string>
+    <string name="settings_section_dashboard">Dashboard</string>
+    <string name="settings_dashboard_subtitle">Wähle, was nach dem Verbinden geöffnet wird</string>
+    <string name="dashboard_name_vanilla">Vanilla</string>
+    <string name="dashboard_name_ambient">Ambient</string>
+    <string name="dashboard_name_retro">Retro</string>
+    <string name="dashboard_name_expo">Expo</string>
+    <string name="dashboard_name_analog">Analog</string>
+    <string name="dashboard_name_rive">Rive</string>
+    <string name="dashboard_name_dev_rive">Rive-Datei laden</string>
+    <string name="settings_section_display">Anzeige</string>
+    <string name="settings_section_configuration">Konfiguration</string>
+    <string name="settings_theme_availability_note">Einige Einstellungen hängen vom gewählten Design ab</string>
+    <string name="settings_theme_picker_title">Dashboard-Design</string>
+    <string name="settings_section_3d_visualizer">3D-Visualisierung</string>
+    <string name="settings_toggle_show_phone_battery">Handy-Akku anzeigen</string>
+    <string name="settings_toggle_show_car_battery">Fahrzeugakku anzeigen</string>
+    <string name="settings_toggle_show_odometer">Kilometerstand anzeigen</string>
+    <string name="settings_units_title">Einheiten</string>
+    <string name="settings_toggle_use_imperial">Imperiale Einheiten verwenden</string>
+    <string name="settings_units_km">km</string>
+    <string name="settings_units_mi">mi</string>
+    <string name="settings_render_quality_title">Renderqualität</string>
+    <string name="settings_render_low">Niedrig</string>
+    <string name="settings_render_med">Mittel</string>
+    <string name="settings_render_high">Hoch</string>
+    <string name="settings_toggle_extra_vehicle_bus">Zusätzlicher Fahrzeugbus</string>
+    <string name="settings_vehicle_bus_requires_extra">Aktiviere den zusätzlichen Fahrzeugbus, um diese zu bearbeiten.</string>
+    <string name="settings_toggle_always_on_blind_spot_monitor">Toter-Winkel-Warner immer an</string>
+    <string name="settings_toggle_dark_mode">Dunkelmodus</string>
+    <string name="settings_dark_mode_background_brightness">Hintergrundhelligkeit</string>
+    <string name="dashboard_rotate_prompt">Drehe dein Handy ins Querformat</string>
+    <string name="settings_section_firmware">Firmware</string>
+    <string name="settings_firmware_update">DashKit-Firmware aktualisieren</string>
+    <string name="settings_firmware_scanning">Suche nach DashKit…</string>
+    <string name="settings_firmware_connecting">Verbinde…</string>
+    <string name="settings_firmware_uploading">Firmware wird hochgeladen… %1$d%%</string>
+    <string name="settings_firmware_rebooting">Update abgeschlossen! DashKit wird neu gestartet…</string>
+    <string name="settings_firmware_error">Update fehlgeschlagen: %1$s</string>
+    <string name="settings_firmware_not_connected">Verbinde dich zuerst mit dem DashKit, um die Firmware zu aktualisieren</string>
+    <string name="settings_firmware_checking">Suche nach Updates…</string>
+    <string name="settings_firmware_up_to_date">Die DashKit-Firmware ist aktuell</string>
+    <string name="settings_firmware_available">Version %1$s ist verfügbar</string>
+    <string name="settings_firmware_install">Update installieren</string>
+    <string name="settings_firmware_downloading">Firmware wird heruntergeladen… %1$d%%</string>
+
+    <!-- Settings tabs -->
+    <string name="settings_tab_general">Allgemein</string>
+    <string name="settings_tab_dashkit">DashKit</string>
+
+    <!-- DashKit firmware info -->
+    <string name="settings_section_firmware_info">Firmware-Info</string>
+    <string name="settings_firmware_info_status">Status</string>
+    <string name="settings_firmware_info_connected">Verbunden</string>
+    <string name="settings_firmware_info_disconnected">Getrennt</string>
+    <string name="settings_firmware_info_version">Firmware-Version</string>
+    <string name="settings_firmware_info_unknown">Unbekannt</string>
+
+    <!-- DashKit maintenance -->
+    <string name="settings_section_maintenance">Wartung</string>
+    <string name="settings_passthrough">Passthrough</string>
+    <string name="settings_reboot">DashKit neu starten</string>
+    <string name="settings_reboot_dialog_title">DashKit neu starten?</string>
+    <string name="settings_reboot_dialog_body">Das DashKit startet neu und trennt kurz die Verbindung. Es sollte sich automatisch wieder verbinden, sobald es hochgefahren ist.</string>
+    <string name="settings_reboot_dialog_confirm">Neu starten</string>
+    <string name="settings_reboot_dialog_cancel">Abbrechen</string>
+    <string name="settings_reboot_sent">Neustart-Befehl gesendet. Das DashKit startet neu.</string>
+    <string name="settings_reboot_failed">Neustart-Befehl konnte nicht gesendet werden.</string>
+    <string name="settings_dashkit_not_connected">Verbinde dich mit einem DashKit, um es zu verwalten.</string>
+
+    <!-- Pair a new device -->
+    <string name="settings_section_pairing">Kopplung</string>
+    <string name="settings_pair_new_device">Neues Gerät koppeln</string>
+    <string name="settings_pair_not_connected">Verbinde dich zuerst mit dem DashKit, um ein neues Gerät zu koppeln</string>
+    <string name="settings_pair_dialog_title">Neues Gerät koppeln?</string>
+    <string name="settings_pair_dialog_body">Das DashKit erlaubt in den nächsten 2 Minuten die Kopplung eines neuen Geräts. Öffne DashPilot auf dem anderen Handy und kopple es jetzt.</string>
+    <string name="settings_pair_dialog_confirm">Kopplung öffnen</string>
+    <string name="settings_pair_dialog_cancel">Abbrechen</string>
+    <string name="settings_pair_opened">Das DashKit ist bereit zur Kopplung. Kopple das neue Handy innerhalb von 2 Minuten.</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_top_title">Einrichtung</string>
+    <string name="onboarding_skip">Überspringen</string>
+    <string name="onboarding_step_progress">%1$d von %2$d</string>
+
+    <string name="onboarding_pair_cta">Gerät koppeln</string>
+    <string name="onboarding_pair_searching_cta">Kopplung…</string>
+    <string name="onboarding_pair_idle_title">Kopple dein DashKit</string>
+    <string name="onboarding_pair_idle_subtitle">Stecke das DashKit in den Diagnoseanschluss deines Autos und tippe dann unten, um es über Bluetooth zu koppeln.</string>
+    <string name="onboarding_pair_searching_title">Suche nach DashKit…</string>
+    <string name="onboarding_pair_searching_subtitle">Halte das Gerät nah an dein Handy. Das dauert normalerweise nur ein paar Sekunden.</string>
+    <string name="onboarding_pair_success_title">Alles bereit!</string>
+    <string name="onboarding_pair_success_subtitle">Das DashKit ist verbunden und bereit, Daten an dein Dashboard zu streamen.</string>
+    <string name="onboarding_pair_success_cta">Weiter</string>
+
+    <string name="onboarding_tips_title">Noch etwas</string>
+    <string name="onboarding_tips_subtitle">Du kannst jederzeit in den Einstellungen weitere Geräte koppeln und Firmware-Updates installieren.</string>
+    <string name="onboarding_tips_cta">Los geht\'s</string>
+    <string name="onboarding_tips_row_pair">Weitere DashKit-Geräte koppeln</string>
+    <string name="onboarding_tips_row_firmware">Nach Firmware-Updates suchen</string>
+
+    <string name="settings_replay_onboarding">Einführung erneut ansehen</string>
+
+    <!-- ================= Tesla Connection (Phase 4) ================= -->
+    <string name="tesla_label">Tesla</string>
+    <!-- Home tile -->
+    <string name="tesla_tile_connect">Verbinde deinen Tesla</string>
+    <string name="tesla_tile_key_not_set_up">Nicht verbunden</string>
+    <string name="tesla_tile_staged">Auto gefunden - Verbinden</string>
+    <string name="tesla_tile_not_connected">Auto nicht verbunden</string>
+    <string name="tesla_tile_fault">Verbindung fehlgeschlagen - tippen zum Wiederholen</string>
+    <string name="tesla_tile_connected">Verbunden</string>
+    <string name="tesla_status_present">Anwesend</string>
+    <string name="tesla_status_not_present">Nicht anwesend</string>
+    <string name="tesla_status_locked">Verriegelt</string>
+    <string name="tesla_status_unlocked">Entriegelt</string>
+    <string name="tesla_status_asleep">Im Ruhezustand</string>
+    <string name="tesla_status_awake">Wach</string>
+    <string name="tesla_status_pairing">Bereit für die Schlüsselkarte</string>
+    <string name="tesla_status_fault">Verbindung fehlgeschlagen</string>
+
+    <!-- Enroll flow -->
+    <string name="tesla_enroll_title">Verbinde deinen Tesla</string>
+    <string name="tesla_enroll_explain_body">Das DashKit fügt sich deinem Tesla als Lademanager (Charging Manager) hinzu - es kann den Status lesen und das Laden steuern, aber das Auto weder entriegeln noch fahren.</string>
+    <string name="tesla_enroll_role_chip">Lademanager · Lesen + Laden</string>
+    <string name="tesla_enroll_start">Verbinden</string>
+    <string name="tesla_enroll_need_card">Halte deine Schlüsselkarte bereit.</string>
+    <string name="tesla_enroll_connecting_body">Kontaktiere dein Auto… Das DashKit versucht, sich zu koppeln.</string>
+    <string name="tesla_enroll_connecting_hint">Halte dein Handy und das DashKit in der Nähe.</string>
+    <string name="tesla_enroll_checking">Prüfe DashKit…</string>
+    <string name="tesla_enroll_reading_vin">Lese Fahrzeugidentität…</string>
+    <string name="tesla_enroll_finding">Suche deinen Tesla…</string>
+    <string name="tesla_enroll_masked_vin">Tesla · FIN %1$s</string>
+    <string name="tesla_enroll_found">Auto gefunden - verbinde mit DashKit…</string>
+    <string name="tesla_enroll_provision_failed">Das DashKit hat das Auto nicht bestätigt. Prüfe die Verbindung und versuche es erneut.</string>
+    <string name="tesla_enroll_firmware_update_needed">Aktualisiere die DashKit-Firmware, um deinen Tesla zu verbinden.</string>
+    <string name="tesla_enroll_vin_timeout">Die FIN konnte nicht gelesen werden. Wecke das Fahrzeug und versuche es erneut. Falls das weiterhin passiert, aktualisiere die DashKit-Firmware.</string>
+    <string name="tesla_enroll_scan_timeout">Stelle sicher, dass Bluetooth eingeschaltet ist, und bleibe in der Nähe des Fahrzeugs.</string>
+    <string name="tesla_enroll_tap_title">Schlüsselkarte auflegen</string>
+    <string name="tesla_enroll_tap_body">Lege deine Schlüsselkarte auf die Mittelkonsole und bestätige dann auf dem Touchscreen des Autos.</string>
+    <string name="tesla_enroll_tap_hint">Noch %1$d s</string>
+    <string name="tesla_enroll_tap_ready">Auto bereit - lege jetzt deine Schlüsselkarte auf (%1$d s)</string>
+    <string name="tesla_enroll_success_title">Verbunden</string>
+    <string name="tesla_enroll_success_body">Das DashKit ist jetzt Lademanager in deinem Tesla.</string>
+    <string name="tesla_enroll_success_role">Lesen + Laden aktiviert</string>
+    <string name="tesla_enroll_done">Fertig</string>
+    <string name="tesla_enroll_error_title">Verbindung fehlgeschlagen</string>
+    <string name="tesla_enroll_retry">Erneut versuchen</string>
+    <string name="tesla_enroll_cancel">Abbrechen</string>
+    <string name="tesla_fault_tap_timeout">Du hast die Karte nicht rechtzeitig aufgelegt. Versuche es erneut.</string>
+    <string name="tesla_fault_rejected">Das Auto hat die Verbindung abgelehnt. Prüfe, ob du beim richtigen Auto bist und dessen Schlüsselkarte verwendest.</string>
+    <string name="tesla_fault_protocol">Das DashKit konnte nicht mit dem Auto kommunizieren. Versuche es erneut.</string>
+    <string name="tesla_fault_persist">Das DashKit konnte die Verbindung nicht speichern. Versuche es erneut.</string>
+    <string name="tesla_fault_generic">Etwas ist schiefgelaufen. Versuche es erneut.</string>
+
+    <!-- Settings: Tesla Connection section -->
+    <string name="settings_section_tesla_key">Tesla-Verbindung</string>
+    <string name="settings_tesla_key_caption">Status lesen und Laden per BLE steuern.</string>
+    <string name="settings_tesla_key_status">Status</string>
+    <string name="settings_tesla_enroll">Tesla verbinden</string>
+    <string name="settings_tesla_reset">Tesla-Verbindung entfernen</string>
+    <string name="settings_tesla_reset_dialog_title">Tesla-Verbindung entfernen?</string>
+    <string name="settings_tesla_reset_dialog_body">Entferne das DashKit im Auto unter Schlösser und entferne dann hier die Verbindung. Zum erneuten Verbinden brauchst du deine Schlüsselkarte.</string>
+    <string name="settings_tesla_reset_dialog_confirm">Entfernen</string>
+    <string name="settings_tesla_reset_dialog_cancel">Abbrechen</string>
+    <string name="settings_tesla_reset_sent">Tesla-Verbindung wird entfernt…</string>
+    <string name="settings_tesla_reset_failed">Die Verbindung konnte nicht entfernt werden. Versuche es erneut.</string>
+    <string name="tesla_connection_removing">Verbindung wird entfernt…</string>
+    <string name="settings_pair_caption">Koppelt ein weiteres Handy - unabhängig von deiner Tesla-Verbindung.</string>
+
+    <!-- Common -->
+    <string name="common_back">Zurück</string>
+    <string name="common_cancel">Abbrechen</string>
+    <string name="common_ok">OK</string>
+    <string name="unit_min">Min.</string>
+
+    <!-- Home -->
+    <string name="home_pinned">Angeheftet</string>
+    <string name="home_automations">Automatisierungen</string>
+    <string name="home_controls">Befehle</string>
+    <string name="home_drive">Fahren</string>
+    <string name="home_widget_battery">Akku</string>
+    <string name="home_widget_battery_temp">Akkutemperatur</string>
+    <string name="home_widget_ac_temp">Klimatemperatur</string>
+    <string name="home_widget_odometer">Kilometerstand</string>
+    <string name="setup_vehicle_cd">Fahrzeug</string>
+    <string name="setup_phone_cd">Handy</string>
+
+    <!-- Data source menu -->
+    <string name="data_source">Datenquelle</string>
+    <string name="data_source_connected">Datenquelle: verbunden</string>
+    <string name="data_source_connecting">Datenquelle: verbinde…</string>
+    <string name="data_source_websocket_server">WebSocket-Server</string>
+    <string name="data_source_ip_address">IP-Adresse</string>
+
+    <!-- Controls -->
+    <string name="controls_title">Befehle</string>
+    <string name="controls_connect_hint">Verbinde dich mit dem DashKit, um Befehle zu senden</string>
+    <string name="controls_pin_tip">Tipp: Halte einen Befehl gedrückt, um ihn auf dem Startbildschirm anzuheften</string>
+    <string name="control_pinned_cd">Angeheftet</string>
+    <string name="control_battery_preheat_on">Akku-Vorheizen: An</string>
+    <string name="control_battery_preheat_off">Akku-Vorheizen: Aus</string>
+    <string name="control_frunk">Frunk</string>
+    <string name="control_trunk">Kofferraum</string>
+    <string name="control_charge_port_open">Ladeanschluss: Offen</string>
+    <string name="control_charge_port_closed">Ladeanschluss: Geschlossen</string>
+    <string name="control_mirrors_folded">Spiegel: Eingeklappt</string>
+    <string name="control_mirrors_unfolded">Spiegel: Ausgeklappt</string>
+    <string name="control_rear_fan_on">Hinteres Gebläse: An</string>
+    <string name="control_rear_fan_off">Hinteres Gebläse: Aus</string>
+    <string name="control_mirror_dip">Spiegelabsenkung umschalten</string>
+    <string name="control_glovebox">Handschuhfach öffnen</string>
+
+    <!-- Automations -->
+    <string name="automations_title">Automatisierungen</string>
+    <string name="automations_section_wipers">Scheibenwischer</string>
+    <string name="automations_wiper_off_title">Wischer aus</string>
+    <string name="automations_wiper_off_subtitle">Scheibenwischer automatisch deaktiviert halten, solange Autopilot aktiv ist.</string>
+    <string name="automations_section_climate">Klima</string>
+    <string name="automations_keep_climate_title">Klima anlassen</string>
+    <string name="automations_keep_climate_subtitle">Lässt die Klimaanlage an, wenn du das Auto verlässt. Die Automatisierung endet nach der eingestellten Zeit oder wenn du zum Auto zurückkehrst.</string>
+    <string name="automations_stop_after">Beenden nach</string>
+    <string name="automations_section_driving">Fahren</string>
+    <string name="automations_kickdown_title">Kick-down</string>
+    <string name="automations_kickdown_subtitle">Wechselt von Chill zu Standard, solange das Gaspedal über die Schwelle hinaus gedrückt wird. Wechselt zurück zu Chill, wenn du das Pedal loslässt.</string>
+    <string name="automations_pedal_threshold">Pedalschwelle</string>
+    <string name="automations_multitouch_title">Multi-Touch-Infotainment-Befehl</string>
+    <string name="automations_multitouch_subtitle">Weise Befehle dem Tippen mit 3, 4 oder 5 Fingern auf dem Infotainment-Bildschirm zu (z. B. Handschuhfach öffnen bei 3 Fingern).</string>
+    <string name="automations_fingers">Finger</string>
+    <string name="automations_action">Aktion:</string>
+    <string name="automations_remove">Entfernen</string>
+    <string name="automations_add_trigger">Befehl hinzufügen</string>
+
+    <!-- Climate -->
+    <string name="climate_title">Klima</string>
+    <string name="climate_section_automation">Automatisierung</string>
+    <string name="climate_driver_setpoint">Fahrer-Sollwert</string>
+    <string name="climate_section_setpoints">Sollwerte</string>
+    <string name="climate_driver">Fahrer</string>
+    <string name="climate_passenger">Beifahrer</string>
+    <string name="climate_section_settings">Einstellungen</string>
+    <string name="climate_power">Ein/Aus</string>
+    <string name="climate_fan">Gebläse</string>
+    <string name="climate_ac">A/C</string>
+    <string name="climate_recirculation">Umluft</string>
+    <string name="climate_keep_climate">Klima anlassen</string>
+    <string name="climate_value_off">Aus</string>
+    <string name="climate_value_on">An</string>
+    <string name="climate_value_preconditioning">Vorklimatisierung</string>
+    <string name="climate_value_overheat_fan">Überhitzungsschutz (Gebläse)</string>
+    <string name="climate_value_overheat">Überhitzungsschutz</string>
+    <string name="climate_value_auto">Auto</string>
+    <string name="climate_value_recirculate">Umluft</string>
+    <string name="climate_value_fresh_air">Frischluft</string>
+    <string name="climate_value_keep">Anlassen</string>
+    <string name="climate_value_dog_mode">Haustiermodus</string>
+    <string name="climate_value_camp_mode">Campingmodus</string>
+
+    <!-- Battery -->
+    <string name="battery_title">Akku</string>
+    <string name="battery_preheat">Vorheizen</string>
+    <string name="battery_state_of_charge">Ladezustand</string>
+    <string name="battery_section_energy">Energie</string>
+    <string name="battery_remaining">Bruttokapazität</string>
+    <string name="battery_usable">Nutzbar</string>
+    <string name="battery_full_pack">Volles Pack</string>
+    <string name="battery_buffer">Puffer</string>
+    <string name="battery_section_power">Leistung</string>
+    <string name="battery_power">Leistung</string>
+    <string name="battery_max_discharge">Max. Entladung</string>
+    <string name="battery_max_regen">Max. Rekuperation</string>
+    <string name="battery_section_pack">Akkupack</string>
+    <string name="battery_voltage">Spannung</string>
+    <string name="battery_current">Strom</string>
+    <string name="battery_temp_min">Temp. Min.</string>
+    <string name="battery_temp_max">Temp. Max.</string>
+
+    <!-- BLE connection errors -->
+    <string name="ble_dashkit_not_found">DashKit nicht gefunden</string>
+    <string name="ble_could_not_connect">Verbindung zum DashKit fehlgeschlagen</string>
+    <string name="ble_pairing_rejected">Das DashKit hat die Kopplung abgelehnt. Öffne \"Neues Gerät koppeln\" in den DashPilot-Einstellungen auf einem bereits gekoppelten Handy und versuche es erneut.</string>
+    <string name="ble_scan_failed_code">BLE-Scan fehlgeschlagen (Fehler %1$d)</string>
+    <string name="ble_could_not_start_pairing">Kopplung konnte nicht gestartet werden</string>
+    <string name="ble_service_discovery_failed">Dienstsuche fehlgeschlagen</string>
+    <string name="ble_bluetooth_unavailable">Bluetooth nicht verfügbar</string>
+    <string name="ble_scanner_unavailable">BLE-Scanner nicht verfügbar</string>
+    <string name="ble_missing_permission">Fehlende BLE-Berechtigung</string>
+    <string name="ble_scan_failed">Scan fehlgeschlagen: %1$s</string>
+    <string name="connection_discovery_cancelled">Suche abgebrochen</string>
+
+    <!-- Firmware update errors -->
+    <string name="fw_error_unreachable">Update-Server nicht erreichbar</string>
+    <string name="fw_error_integrity">Heruntergeladene Firmware hat die Integritätsprüfung nicht bestanden</string>
+    <string name="fw_error_download">Download fehlgeschlagen: %1$s</string>
+    <string name="ota_error_empty">Firmware-Datei ist leer</string>
+    <string name="ota_error_service_not_found">OTA-Dienst auf dem Gerät nicht gefunden</string>
+    <string name="ota_error_chars_not_found">OTA-Charakteristiken nicht gefunden</string>
+    <string name="ota_error_notify">OTA-Benachrichtigungen konnten nicht aktiviert werden</string>
+    <string name="ota_error_write">Schreiben fehlgeschlagen (Status %1$d)</string>
+    <string name="ota_error_disconnected">Unerwartet getrennt</string>
+    <string name="ota_error_device">Gerät hat einen Fehler gemeldet (0x%1$s)</string>
+</resources>

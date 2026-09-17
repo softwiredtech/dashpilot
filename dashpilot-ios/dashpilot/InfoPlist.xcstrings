@@ -23,6 +23,12 @@
             "value" : "DashPilot connects to your DashKit over Bluetooth to show live vehicle data and send vehicle commands."
           }
         },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DashPilot verbindet sich über Bluetooth mit deinem DashKit, um Live-Fahrzeugdaten anzuzeigen und Fahrzeugbefehle zu senden."
+          }
+        },
         "hu" : {
           "stringUnit" : {
             "state" : "needs_review",
