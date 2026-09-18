@@ -192,15 +192,15 @@
     <string name="home_drive">Vezetés</string>
     <string name="home_widget_battery">Akkumulátor</string>
     <string name="home_widget_battery_temp">Akku hőmérséklet</string>
-    <string name="home_widget_ac_temp">Klíma hőfok</string>
+    <string name="home_widget_ac_temp">Klíma beállított hőfok</string>
     <string name="home_widget_odometer">Kilométer-számláló</string>
     <string name="setup_vehicle_cd">Jármű</string>
     <string name="setup_phone_cd">Telefon</string>
 
     <!-- Data source menu -->
     <string name="data_source">Adatforrás</string>
-    <string name="data_source_connected">Adatforrás: csatlakozva</string>
-    <string name="data_source_connecting">Adatforrás: csatlakozás…</string>
+    <string name="data_source_connected">%1$s csatlakoztatva</string>
+    <string name="data_source_connecting">Csatlakozás: %1$s…</string>
     <string name="data_source_websocket_server">WebSocket-szerver</string>
     <string name="data_source_ip_address">IP-cím</string>
 

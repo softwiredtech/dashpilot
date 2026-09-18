@@ -136,7 +136,7 @@ fun SettingsScreen(
     val sharedPrefs = remember { context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE) }
 
     val extraBusState = remember {
-        mutableStateOf(sharedPrefs.getBoolean(PREF_EXTRA_VEHICLE_BUS, DEFAULT_EXTRA_VEHICLE_BUS))
+        mutableStateOf(BuildConfig.DEBUG && sharedPrefs.getBoolean(PREF_EXTRA_VEHICLE_BUS, DEFAULT_EXTRA_VEHICLE_BUS))
     }
 
     val showPhoneBatteryState = remember {
@@ -314,11 +314,13 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(stringResource(R.string.settings_section_configuration), color = DarkColors.TextMuted, fontSize = 16.sp)
+            if (BuildConfig.DEBUG) {
+                Text(stringResource(R.string.settings_section_configuration), color = DarkColors.TextMuted, fontSize = 16.sp)
 
-            SettingsToggle(stringResource(R.string.settings_toggle_extra_vehicle_bus), extraBusState.value) { enabled ->
-                extraBusState.value = enabled
-                sharedPrefs.edit { putBoolean(PREF_EXTRA_VEHICLE_BUS, enabled) }
+                SettingsToggle(stringResource(R.string.settings_toggle_extra_vehicle_bus), extraBusState.value) { enabled ->
+                    extraBusState.value = enabled
+                    sharedPrefs.edit { putBoolean(PREF_EXTRA_VEHICLE_BUS, enabled) }
+                }
             }
 
             Text(stringResource(R.string.settings_section_display), color = DarkColors.TextMuted, fontSize = 16.sp)

@@ -128,7 +128,7 @@ struct HomeView: View {
                 } label: {
                     InfoWidget(
                         icon: "battery.100.bolt",
-                        label: "Battery",
+                        label: "home_widget_battery",
                         value: socText,
                         fillHeight: fillHeight
                     )
@@ -152,7 +152,7 @@ struct HomeView: View {
                 } label: {
                     InfoWidget(
                         icon: "snowflake",
-                        label: "AC Temp",
+                        label: "AC Setpoint",
                         value: acTempText,
                         fillHeight: fillHeight
                     )
@@ -312,9 +312,11 @@ private struct DataSourceMenu: View {
     }
 
     private var dataSourceLabel: LocalizedStringKey {
+        let name = connectionVM.activeSourceType?.displayName
+            ?? String(localized: "Data source")
         switch connectionVM.connectionStatus {
-        case .connected: return "Data source: connected"
-        case .connecting: return "Data source: connecting…"
+        case .connected: return "\(name) connected"
+        case .connecting: return "Connecting to \(name)…"
         case .disconnected, .error: return "Data source"
         }
     }
