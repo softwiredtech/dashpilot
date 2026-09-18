@@ -44,6 +44,7 @@ private val debugSources = buildList {
 @Composable
 fun DebugDataSourceMenu(
     connectionStatus: ConnectionStatus,
+    activeSourceType: String?,
     onSelectDataSource: (String) -> Unit,
     onConnect: (serverAddress: String, dataSourceType: String) -> Unit,
     onDisconnect: () -> Unit
@@ -53,13 +54,15 @@ fun DebugDataSourceMenu(
     var showIpDialog by remember { mutableStateOf(false) }
     val idle = connectionStatus is ConnectionStatus.Disconnected ||
             connectionStatus is ConnectionStatus.Error
+    val sourceName = debugSources.firstOrNull { it.first == activeSourceType }?.second
+        ?: stringResource(R.string.data_source)
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         TextButton(onClick = { expanded = true }) {
             Text(
                 text = when (connectionStatus) {
-                    is ConnectionStatus.Connected -> stringResource(R.string.data_source_connected)
-                    is ConnectionStatus.Connecting -> stringResource(R.string.data_source_connecting)
+                    is ConnectionStatus.Connected -> stringResource(R.string.data_source_connected, sourceName)
+                    is ConnectionStatus.Connecting -> stringResource(R.string.data_source_connecting, sourceName)
                     else -> stringResource(R.string.data_source)
                 },
                 color = DarkColors.TextMuted,

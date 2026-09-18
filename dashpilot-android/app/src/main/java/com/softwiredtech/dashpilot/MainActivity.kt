@@ -251,6 +251,7 @@ class MainActivity : ComponentActivity() {
                         composable<SetupRoute> {
                             val manager by connectionVM.bleManager.collectAsState()
                             val dashStateFlow by connectionVM.dashState.collectAsState()
+                            val activeSourceType by connectionVM.activeSourceType.collectAsState()
                             val toDashboard = {
                                 val dashboard = getSelectedDashboard(context)
                                 navController.navigate(DashboardRoute(
@@ -260,6 +261,7 @@ class MainActivity : ComponentActivity() {
                             }
                             HomeScreen(
                                 connectionStatus = connectionStatus,
+                                activeSourceType = activeSourceType,
                                 bleManager = manager,
                                 dashState = dashStateFlow,
                                 pinnedControlId = pinnedControl,

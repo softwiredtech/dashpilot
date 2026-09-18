@@ -80,6 +80,7 @@ import com.softwiredtech.dashpilot.R
 @Composable
 fun HomeScreen(
     connectionStatus: ConnectionStatus,
+    activeSourceType: String?,
     bleManager: DashKitBleManager?,
     dashState: Flow<DashState>?,
     pinnedControlId: String?,
@@ -108,6 +109,7 @@ fun HomeScreen(
                 dashState = dashState,
                 bleManager = bleManager,
                 connectionStatus = connectionStatus,
+                activeSourceType = activeSourceType,
                 pinnedControlId = pinnedControlId,
                 teslaStatus = teslaStatus,
                 teslaResetPending = teslaResetPending,
@@ -145,6 +147,7 @@ private fun ConnectedHomeContent(
     dashState: Flow<DashState>?,
     bleManager: DashKitBleManager?,
     connectionStatus: ConnectionStatus,
+    activeSourceType: String?,
     pinnedControlId: String?,
     teslaStatus: StateFlow<TeslaStatus>?,
     teslaResetPending: StateFlow<Boolean>?,
@@ -182,6 +185,7 @@ private fun ConnectedHomeContent(
             Header(
                 showDataSource = landscape,
                 connectionStatus = connectionStatus,
+                activeSourceType = activeSourceType,
                 onSelectDataSource = onSelectDataSource,
                 onConnect = onConnect,
                 onDisconnect = onDisconnect,
@@ -215,6 +219,7 @@ private fun ConnectedHomeContent(
                     tesla = tesla,
                     resetPending = resetPending,
                     connectionStatus = connectionStatus,
+                    activeSourceType = activeSourceType,
                     onEnrollTesla = onEnrollTesla,
                     onConnect = onConnect,
                     onDisconnect = onDisconnect,
@@ -234,6 +239,7 @@ private fun ConnectedHomeContent(
 private fun Header(
     showDataSource: Boolean,
     connectionStatus: ConnectionStatus,
+    activeSourceType: String?,
     onSelectDataSource: (String) -> Unit,
     onConnect: (serverAddress: String, dataSourceType: String) -> Unit,
     onDisconnect: () -> Unit,
@@ -272,7 +278,7 @@ private fun Header(
                     .align(Alignment.CenterEnd)
                     .offset(x = 12.dp)
             ) {
-                DebugDataSourceMenu(connectionStatus, onSelectDataSource, onConnect, onDisconnect)
+                DebugDataSourceMenu(connectionStatus, activeSourceType, onSelectDataSource, onConnect, onDisconnect)
             }
         }
     }
@@ -287,6 +293,7 @@ private fun PortraitContent(
     tesla: TeslaStatus,
     resetPending: Boolean,
     connectionStatus: ConnectionStatus,
+    activeSourceType: String?,
     onEnrollTesla: () -> Unit,
     onConnect: (serverAddress: String, dataSourceType: String) -> Unit,
     onDisconnect: () -> Unit,
@@ -335,7 +342,7 @@ private fun PortraitContent(
         DriveButton(onDrive)
         Spacer(modifier = Modifier.height(12.dp))
         Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-            DebugDataSourceMenu(connectionStatus, onSelectDataSource, onConnect, onDisconnect)
+            DebugDataSourceMenu(connectionStatus, activeSourceType, onSelectDataSource, onConnect, onDisconnect)
         }
     }
 }

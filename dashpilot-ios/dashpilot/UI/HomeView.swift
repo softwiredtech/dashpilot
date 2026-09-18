@@ -312,9 +312,11 @@ private struct DataSourceMenu: View {
     }
 
     private var dataSourceLabel: LocalizedStringKey {
+        let name = connectionVM.activeSourceType?.displayName
+            ?? String(localized: "Data source")
         switch connectionVM.connectionStatus {
-        case .connected: return "Data source: connected"
-        case .connecting: return "Data source: connecting…"
+        case .connected: return "\(name) connected"
+        case .connecting: return "Connecting to \(name)…"
         case .disconnected, .error: return "Data source"
         }
     }

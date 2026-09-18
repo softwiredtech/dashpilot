@@ -259,7 +259,11 @@ final class ConnectionViewModel {
     // MARK: - Private
 
     private func startCommaDataSource(address: String) {
+        #if DEBUG
         let extraBus = UserDefaults.standard.bool(forKey: DisplaySettings.keyExtraVehicleBus)
+        #else
+        let extraBus = false
+        #endif
         let ds: CommaDataSource
         if extraBus {
             ds = CommaDataSource(

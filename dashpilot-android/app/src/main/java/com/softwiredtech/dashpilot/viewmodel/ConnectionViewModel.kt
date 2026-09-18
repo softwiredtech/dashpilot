@@ -21,6 +21,7 @@ import com.softwiredtech.dashpilot.datamodel.dash.DisplaySettings
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_ALWAYS_ON_BLIND_SPOT_MONITOR
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_DARK_MODE
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_DARK_MODE_BACKGROUND_GRAY
+import com.softwiredtech.dashpilot.BuildConfig
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_EXTRA_VEHICLE_BUS
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_RENDER_QUALITY
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_SHOW_CAR_BATTERY
@@ -231,6 +232,8 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     private var startupDiscoveryStarted = false
     private var discoveryGeneration = 0
 
+    private val _activeSourceType = MutableStateFlow<String?>(null)
+    val activeSourceType = _activeSourceType.asStateFlow()
     private var lastDataSourceType: String? = null
     private var lastServerAddress: String = ""
 
@@ -355,6 +358,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
 
         if (userInitiated) userSelectedType = dataSourceType
         lastDataSourceType = dataSourceType
+        _activeSourceType.value = dataSourceType
         lastServerAddress = manualServerAddress
 
         var finalServerAddress = manualServerAddress
@@ -362,7 +366,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         connectionJob = viewModelScope.launch(Dispatchers.IO) {
             val vehicleName = "tesla" // TODO: make configurable via UI
             val prefs = context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
-            val extraBus = prefs.getBoolean(PREF_EXTRA_VEHICLE_BUS, DEFAULT_EXTRA_VEHICLE_BUS)
+            val extraBus = BuildConfig.DEBUG && prefs.getBoolean(PREF_EXTRA_VEHICLE_BUS, DEFAULT_EXTRA_VEHICLE_BUS)
             val configFile = when (dataSourceType) {
                 DataSourceType.DASHKIT -> "config_dashkit.json"
                 else -> if (extraBus) "config_comma_extra_bus.json" else "config_comma_normal.json"
@@ -495,6 +499,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         _dataSource.value = null
         _bleManager.value?.disconnect()
         _bleManager.value = null
+        _activeSourceType.value = null
         _dashState.value = null
         _vehicleVin.value = null
         _hasAutoNavigatedToDashboard.value = false

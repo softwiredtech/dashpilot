@@ -199,8 +199,8 @@
 
     <!-- Data source menu -->
     <string name="data_source">Adatforrás</string>
-    <string name="data_source_connected">Adatforrás: csatlakozva</string>
-    <string name="data_source_connecting">Adatforrás: csatlakozás…</string>
+    <string name="data_source_connected">%1$s csatlakoztatva</string>
+    <string name="data_source_connecting">Csatlakozás: %1$s…</string>
     <string name="data_source_websocket_server">WebSocket-szerver</string>
     <string name="data_source_ip_address">IP-cím</string>
 

@@ -63,7 +63,9 @@ struct SettingsView: View {
                     VStack(alignment: .leading, spacing: 0) {
                         if selectedTab == 0 {
                             dashboardSection
+                            #if DEBUG
                             configurationSection
+                            #endif
                             displaySection
                             if showVisualizerSettings {
                                 visualizerSection
@@ -196,6 +198,14 @@ struct SettingsView: View {
             .clipped()
     }
 
+    private var extraVehicleBusEnabled: Bool {
+        #if DEBUG
+        return extraVehicleBus
+        #else
+        return false
+        #endif
+    }
+
     // MARK: - Configuration Section
 
     private var configurationSection: some View {
@@ -212,10 +222,10 @@ struct SettingsView: View {
     private var displaySection: some View {
         VStack(alignment: .leading, spacing: 8) {
             sectionTitle("Display")
-            if extraVehicleBus && showCarBatteryToggle {
+            if extraVehicleBusEnabled && showCarBatteryToggle {
                 SettingsToggleRow(label: "Show Car Battery", isOn: $showCarBattery)
             }
-            if extraVehicleBus && showOdometerToggle {
+            if extraVehicleBusEnabled && showOdometerToggle {
                 SettingsToggleRow(label: "Show Odometer", isOn: $showOdometer)
             }
             if showUseImperialToggle {

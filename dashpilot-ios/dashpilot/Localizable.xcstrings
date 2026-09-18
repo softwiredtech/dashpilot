@@ -972,34 +972,34 @@
         }
       }
     },
-    "Data source: connected" : {
+    "%@ connected" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Datenquelle: verbunden"
+            "value" : "%@ verbunden"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Adatforrás: csatlakozva"
+            "value" : "%@ csatlakoztatva"
           }
         }
       }
     },
-    "Data source: connecting…" : {
+    "Connecting to %@…" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Datenquelle: verbinde…"
+            "value" : "Verbinde mit %@…"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Adatforrás: csatlakozás…"
+            "value" : "Csatlakozás: %@…"
           }
         }
       }

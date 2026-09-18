@@ -200,8 +200,8 @@
 
     <!-- Data source menu -->
     <string name="data_source">Data source</string>
-    <string name="data_source_connected">Data source: connected</string>
-    <string name="data_source_connecting">Data source: connecting…</string>
+    <string name="data_source_connected">%1$s connected</string>
+    <string name="data_source_connecting">Connecting to %1$s…</string>
     <string name="data_source_websocket_server">WebSocket server</string>
     <string name="data_source_ip_address">IP address</string>
 
