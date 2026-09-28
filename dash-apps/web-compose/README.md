@@ -39,6 +39,8 @@ the car pulls away while it is open.
   taking the other's position and size
 - drag the bottom-right corner to resize
 - tap to select: Settings, Duplicate, Remove
+- Settings > Type turns a widget into another one in place; what the new type
+  can't use falls back to its defaults and returns on switching back
 - **+ Add** lists every registered widget with its preview
 - **Done** saves through the host, **Cancel** restores the layout as it was
 

@@ -26,12 +26,17 @@
     return Object.assign(props, stored || {});
   }
 
+  // A stored signal of a kind this bind can't show (left over from another
+  // widget type) is kept in the layout, and the bind's default is shown instead.
+  function acceptedSignal(bind, id) {
+    const signal = id ? DC.signals.get(id) : undefined;
+    return signal && (!bind.kinds || bind.kinds.includes(signal.kind)) ? signal : null;
+  }
+
   function resolveBinds(descriptor, stored) {
     const binds = {};
     for (const b of descriptor.binds || []) {
-      const id = (stored && stored[b.key]) || b.default;
-      const signal = id ? DC.signals.get(id) : undefined;
-      binds[b.key] = signal && (!b.kinds || b.kinds.includes(signal.kind)) ? signal : null;
+      binds[b.key] = acceptedSignal(b, stored && stored[b.key]) || acceptedSignal(b, b.default);
     }
     return binds;
   }
@@ -42,5 +47,6 @@
     all: () => Array.from(widgets.values()),
     resolveProps,
     resolveBinds,
+    acceptedSignal,
   };
 })();

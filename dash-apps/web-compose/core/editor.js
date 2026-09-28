@@ -326,7 +326,7 @@
       if (!placement(descriptor)) {
         card.disabled = true;
         card.classList.add("palette__item--full");
-        card.append(el("span", "palette__note", t("editor.nospace")));
+        card.append(el("span", "palette__note", t("editor.full")));
       }
       card.addEventListener("click", () => add(descriptor));
       list.appendChild(card);
@@ -363,7 +363,9 @@
       }
       select.appendChild(group);
     }
-    select.value = (item.bind && item.bind[bind.key]) || bind.default || "";
+    const shown = DC.registry.acceptedSignal(bind, item.bind && item.bind[bind.key])
+      || DC.registry.acceptedSignal(bind, bind.default);
+    select.value = shown ? shown.id : "";
     select.addEventListener("change", () => {
       item.bind = item.bind || {};
       if (select.value) item.bind[bind.key] = select.value;
@@ -427,16 +429,48 @@
     return control;
   }
 
+  // The widget keeps its area, like a swap, even below the new type's minimum.
+  // Binds and props are left as stored: whatever the new type can use carries
+  // over, the rest falls back to its defaults and comes back on switching back.
+  function changeType(item, type) {
+    item.type = type;
+    DC.runtime.remount();
+    select(item.uid);
+    openSettings(item);
+  }
+
+  function typeControl(item) {
+    const control = el("select", "field__control");
+    for (const { descriptor } of DC.registry.all()) {
+      const option = el("option", null, DC.i18n.localized(descriptor.name));
+      option.value = descriptor.type;
+      control.appendChild(option);
+    }
+    control.value = item.type;
+    control.addEventListener("change", () => changeType(item, control.value));
+    return control;
+  }
+
   function openSettings(item) {
     const entry = DC.registry.get(item.type);
     if (!entry) return;
     const descriptor = entry.descriptor;
     const body = openSheet(DC.i18n.localized(descriptor.name));
+    // Every widget captions itself with its value's signal name unless the
+    // label prop overrides it; the empty field shows that name.
+    let labelInput = null;
+    const defaultLabel = () => {
+      const signal = DC.registry.resolveBinds(descriptor, item.bind).value;
+      return signal ? DC.signals.label(signal) : "";
+    };
     // Re-mounting on every change keeps the preview honest, including size rules.
     const refresh = () => {
       DC.runtime.remount();
       select(item.uid);
+      if (labelInput) labelInput.placeholder = defaultLabel();
     };
+
+    body.appendChild(field(t("editor.type"), typeControl(item)));
 
     if ((descriptor.binds || []).length) {
       body.appendChild(el("h3", "sheet__section", t("editor.shows")));
@@ -448,7 +482,12 @@
     if ((descriptor.props || []).length) {
       body.appendChild(el("h3", "sheet__section", t("editor.appearance")));
       for (const prop of descriptor.props) {
-        body.appendChild(field(DC.i18n.localized(prop.name), propControl(item, prop, refresh)));
+        const control = propControl(item, prop, refresh);
+        if (prop.key === "label") {
+          labelInput = control;
+          control.placeholder = defaultLabel();
+        }
+        body.appendChild(field(DC.i18n.localized(prop.name), control));
       }
     }
   }

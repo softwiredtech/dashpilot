@@ -5,9 +5,14 @@ function create(ctx) {
   el.dataset.align = props.align;
   if (props.accent) el.style.setProperty("--accent", props.accent);
 
-  const label = document.createElement("div");
-  label.className = "readout__label";
-  label.textContent = props.label || ctx.label("value");
+  let label = null;
+  if (props.showLabel) {
+    label = document.createElement("div");
+    label.className = "readout__label";
+    label.textContent = props.label || ctx.label("value");
+  } else {
+    el.dataset.bare = "1";
+  }
 
   const line = document.createElement("div");
   line.className = "readout__line";
@@ -20,7 +25,8 @@ function create(ctx) {
   unit.textContent = ctx.unit("value");
   line.append(value, unit);
 
-  el.append(label, line);
+  if (label) el.append(label);
+  el.append(line);
   el.style.setProperty("--unit-chars", unit.textContent.length);
 
   // --chars drives the font size in widget.css so long values (odometer) fit.

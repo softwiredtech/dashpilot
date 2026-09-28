@@ -90,7 +90,7 @@
     {
       "key": "showLabel",
       "type": "bool",
-      "default": true,
+      "default": false,
       "name": {
         "en": "Show label",
         "hu": "Felirat mutatása",

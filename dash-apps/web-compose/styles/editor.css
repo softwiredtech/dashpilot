@@ -160,7 +160,32 @@
   font: inherit;
   font-size: 14px;
 }
-.field__control--check { min-width: 0; width: 22px; height: 22px; }
+.field__control--check {
+  position: relative;
+  flex: none;
+  min-width: 0;
+  width: 46px;
+  height: 28px;
+  padding: 0;
+  border-radius: 999px;
+  background: var(--track);
+  cursor: pointer;
+  transition: background-color 150ms ease;
+}
+.field__control--check::before {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 30%);
+  transition: transform 150ms ease;
+}
+.field__control--check:checked { background: var(--brand); border-color: var(--brand); }
+.field__control--check:checked::before { transform: translateX(18px); }
 .field__control--color {
   display: flex;
   align-items: center;
@@ -173,7 +198,7 @@
 
 .palette {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 10px;
   padding-top: 10px;
 }
@@ -193,8 +218,10 @@
   cursor: pointer;
 }
 .palette__item img { width: 100%; height: 52px; object-fit: contain; }
+/* Previews are drawn in the dark palette; flipped, they read as light widgets. */
+[data-theme="light"] .palette__item img { filter: invert(1) hue-rotate(180deg); }
 .palette__item--full { opacity: 0.45; cursor: not-allowed; }
-.palette__note { font-size: 11px; color: var(--text-dim); text-align: center; }
+.palette__note { font-size: 11px; line-height: 1; color: var(--text-dim); white-space: nowrap; }
 
 .editor__toast {
   position: fixed;

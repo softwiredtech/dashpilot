@@ -2,7 +2,7 @@
 (function () {
   const register = window.DashCompose.registerWidget;
   // --- bar
-  register({"type":"bar","version":1,"renderer":"dom","name":{"en":"Bar","hu":"Sáv","de":"Balken"},"defaultSize":{"w":4,"h":2},"minSize":{"w":2,"h":1},"binds":[{"key":"value","kinds":["number"],"name":{"en":"Value","hu":"Érték","de":"Wert"},"default":"batteryPercent"}],"props":[{"key":"label","type":"string","default":"","name":{"en":"Label","hu":"Felirat","de":"Beschriftung"}},{"key":"min","type":"number","default":null,"name":{"en":"Minimum","hu":"Minimum","de":"Minimum"}},{"key":"max","type":"number","default":null,"name":{"en":"Maximum","hu":"Maximum","de":"Maximum"}},{"key":"precision","type":"number","default":null,"min":0,"max":3,"name":{"en":"Decimals","hu":"Tizedesjegyek","de":"Nachkommastellen"}},{"key":"accent","type":"color","default":"","name":{"en":"Bar color","hu":"Sáv színe","de":"Balkenfarbe"}},{"key":"showValue","type":"bool","default":true,"name":{"en":"Show value","hu":"Érték mutatása","de":"Wert anzeigen"}}]}, (function () {
+  register({"type":"bar","version":1,"renderer":"dom","name":{"en":"Bar","hu":"Sáv","de":"Balken"},"defaultSize":{"w":4,"h":2},"minSize":{"w":2,"h":1},"binds":[{"key":"value","kinds":["number"],"name":{"en":"Value","hu":"Érték","de":"Wert"},"default":"batteryPercent"}],"props":[{"key":"label","type":"string","default":"","name":{"en":"Label","hu":"Felirat","de":"Beschriftung"}},{"key":"showLabel","type":"bool","default":true,"name":{"en":"Show label","hu":"Felirat mutatása","de":"Beschriftung anzeigen"}},{"key":"min","type":"number","default":null,"name":{"en":"Minimum","hu":"Minimum","de":"Minimum"}},{"key":"max","type":"number","default":null,"name":{"en":"Maximum","hu":"Maximum","de":"Maximum"}},{"key":"precision","type":"number","default":null,"min":0,"max":3,"name":{"en":"Decimals","hu":"Tizedesjegyek","de":"Nachkommastellen"}},{"key":"accent","type":"color","default":"","name":{"en":"Bar color","hu":"Sáv színe","de":"Balkenfarbe"}},{"key":"showValue","type":"bool","default":true,"name":{"en":"Show value","hu":"Érték mutatása","de":"Wert anzeigen"}}]}, (function () {
     // Horizontal bar. Ranges that cross zero (power: regen vs. discharge) fill
     // from the zero point outwards. One transform write per visible change.
     function create(ctx) {
@@ -11,10 +11,12 @@
 
       const head = document.createElement("div");
       head.className = "bar__head";
-      const label = document.createElement("span");
-      label.className = "bar__label";
-      label.textContent = props.label || ctx.label("value");
-      head.appendChild(label);
+      if (props.showLabel) {
+        const label = document.createElement("span");
+        label.className = "bar__label";
+        label.textContent = props.label || ctx.label("value");
+        head.appendChild(label);
+      }
 
       let text = null;
       if (props.showValue) {
@@ -34,7 +36,9 @@
       const fill = document.createElement("div");
       fill.className = "bar__fill";
       track.appendChild(fill);
-      el.append(head, track);
+      if (head.firstChild) el.append(head);
+      else el.dataset.bare = "1";
+      el.append(track);
 
       function bounds() {
         const range = ctx.range("value") || [0, 100];
@@ -82,7 +86,7 @@
     return create;
   })());
   // --- lamp
-  register({"type":"lamp","version":1,"renderer":"dom","name":{"en":"Indicator","hu":"Jelzőfény","de":"Kontrollleuchte"},"defaultSize":{"w":2,"h":2},"minSize":{"w":1,"h":1},"binds":[{"key":"value","kinds":["bool"],"name":{"en":"Condition","hu":"Feltétel","de":"Bedingung"},"default":"adasOn"}],"props":[{"key":"label","type":"string","default":"","name":{"en":"Label","hu":"Felirat","de":"Beschriftung"}},{"key":"icon","type":"enum","default":"dot","options":["dot","arrow-left","arrow-right","warning","wheel"],"name":{"en":"Icon","hu":"Ikon","de":"Symbol"}},{"key":"color","type":"color","default":"#22c55e","name":{"en":"Active color","hu":"Aktív szín","de":"Aktive Farbe"}},{"key":"blink","type":"bool","default":false,"name":{"en":"Blink when active","hu":"Villogjon aktívan","de":"Blinken wenn aktiv"}},{"key":"hideWhenOff","type":"bool","default":false,"name":{"en":"Hide when off","hu":"Rejtve, ha nem aktív","de":"Ausblenden wenn aus"}},{"key":"showLabel","type":"bool","default":true,"name":{"en":"Show label","hu":"Felirat mutatása","de":"Beschriftung anzeigen"}}]}, (function () {
+  register({"type":"lamp","version":1,"renderer":"dom","name":{"en":"Indicator","hu":"Jelzőfény","de":"Kontrollleuchte"},"defaultSize":{"w":2,"h":2},"minSize":{"w":1,"h":1},"binds":[{"key":"value","kinds":["bool"],"name":{"en":"Condition","hu":"Feltétel","de":"Bedingung"},"default":"adasOn"}],"props":[{"key":"label","type":"string","default":"","name":{"en":"Label","hu":"Felirat","de":"Beschriftung"}},{"key":"icon","type":"enum","default":"dot","options":["dot","arrow-left","arrow-right","warning","wheel"],"name":{"en":"Icon","hu":"Ikon","de":"Symbol"}},{"key":"color","type":"color","default":"#22c55e","name":{"en":"Active color","hu":"Aktív szín","de":"Aktive Farbe"}},{"key":"blink","type":"bool","default":false,"name":{"en":"Blink when active","hu":"Villogjon aktívan","de":"Blinken wenn aktiv"}},{"key":"hideWhenOff","type":"bool","default":false,"name":{"en":"Hide when off","hu":"Rejtve, ha nem aktív","de":"Ausblenden wenn aus"}},{"key":"showLabel","type":"bool","default":false,"name":{"en":"Show label","hu":"Felirat mutatása","de":"Beschriftung anzeigen"}}]}, (function () {
     // On/off indicator for any bool signal. The whole visual state is one
     // data-on attribute on the cell body; colors and blinking live in CSS.
     function create(ctx) {
@@ -127,7 +131,7 @@
     return create;
   })());
   // --- radial
-  register({"type":"radial","version":1,"renderer":"svg","name":{"en":"Radial gauge","hu":"Kör műszer","de":"Rundinstrument"},"defaultSize":{"w":4,"h":4},"minSize":{"w":2,"h":2},"binds":[{"key":"value","kinds":["number"],"name":{"en":"Value","hu":"Érték","de":"Wert"},"default":"egoSpeed"},{"key":"marker","kinds":["number"],"default":null,"name":{"en":"Marker","hu":"Jelölő","de":"Markierung"}}],"props":[{"key":"label","type":"string","default":"","name":{"en":"Label","hu":"Felirat","de":"Beschriftung"}},{"key":"min","type":"number","default":null,"name":{"en":"Minimum","hu":"Minimum","de":"Minimum"}},{"key":"max","type":"number","default":null,"name":{"en":"Maximum","hu":"Maximum","de":"Maximum"}},{"key":"precision","type":"number","default":null,"min":0,"max":3,"name":{"en":"Decimals","hu":"Tizedesjegyek","de":"Nachkommastellen"}},{"key":"accent","type":"color","default":"","name":{"en":"Arc color","hu":"Ív színe","de":"Bogenfarbe"}},{"key":"showLabel","type":"bool","default":false,"name":{"en":"Show label","hu":"Felirat mutatása","de":"Beschriftung anzeigen"}}]}, (function () {
+  register({"type":"radial","version":1,"renderer":"svg","name":{"en":"Radial gauge","hu":"Kör műszer","de":"Rundinstrument"},"defaultSize":{"w":4,"h":4},"minSize":{"w":2,"h":2},"binds":[{"key":"value","kinds":["number"],"name":{"en":"Value","hu":"Érték","de":"Wert"},"default":"egoSpeed"},{"key":"marker","kinds":["number"],"default":null,"name":{"en":"Marker","hu":"Jelölő","de":"Markierung"}}],"props":[{"key":"label","type":"string","default":"","name":{"en":"Label","hu":"Felirat","de":"Beschriftung"}},{"key":"min","type":"number","default":null,"name":{"en":"Minimum","hu":"Minimum","de":"Minimum"}},{"key":"max","type":"number","default":null,"name":{"en":"Maximum","hu":"Maximum","de":"Maximum"}},{"key":"precision","type":"number","default":null,"min":0,"max":3,"name":{"en":"Decimals","hu":"Tizedesjegyek","de":"Nachkommastellen"}},{"key":"accent","type":"color","default":"","name":{"en":"Arc color","hu":"Ív színe","de":"Bogenfarbe"}},{"key":"showLabel","type":"bool","default":true,"name":{"en":"Show label","hu":"Felirat mutatása","de":"Beschriftung anzeigen"}}]}, (function () {
     // 270° arc gauge in a 200×200 viewBox; the SVG scales to any square-ish cell.
     // The value arc uses pathLength=100, so progress is a single dashoffset write.
     function create(ctx) {
@@ -226,7 +230,7 @@
     return create;
   })());
   // --- readout
-  register({"type":"readout","version":1,"renderer":"dom","name":{"en":"Readout","hu":"Kijelző","de":"Anzeige"},"defaultSize":{"w":3,"h":2},"minSize":{"w":2,"h":1},"binds":[{"key":"value","kinds":["number","enum","string"],"name":{"en":"Value","hu":"Érték","de":"Wert"},"default":"egoSpeed"}],"props":[{"key":"label","type":"string","default":"","name":{"en":"Label","hu":"Felirat","de":"Beschriftung"}},{"key":"precision","type":"number","default":null,"min":0,"max":3,"name":{"en":"Decimals","hu":"Tizedesjegyek","de":"Nachkommastellen"}},{"key":"accent","type":"color","default":"","name":{"en":"Value color","hu":"Érték színe","de":"Wertfarbe"}},{"key":"align","type":"enum","default":"start","options":["start","center","end"],"name":{"en":"Alignment","hu":"Igazítás","de":"Ausrichtung"}}]}, (function () {
+  register({"type":"readout","version":1,"renderer":"dom","name":{"en":"Readout","hu":"Kijelző","de":"Anzeige"},"defaultSize":{"w":3,"h":2},"minSize":{"w":2,"h":1},"binds":[{"key":"value","kinds":["number","enum","string"],"name":{"en":"Value","hu":"Érték","de":"Wert"},"default":"egoSpeed"}],"props":[{"key":"label","type":"string","default":"","name":{"en":"Label","hu":"Felirat","de":"Beschriftung"}},{"key":"showLabel","type":"bool","default":true,"name":{"en":"Show label","hu":"Felirat mutatása","de":"Beschriftung anzeigen"}},{"key":"precision","type":"number","default":null,"min":0,"max":3,"name":{"en":"Decimals","hu":"Tizedesjegyek","de":"Nachkommastellen"}},{"key":"accent","type":"color","default":"","name":{"en":"Value color","hu":"Érték színe","de":"Wertfarbe"}},{"key":"align","type":"enum","default":"start","options":["start","center","end"],"name":{"en":"Alignment","hu":"Igazítás","de":"Ausrichtung"}}]}, (function () {
     // Label, big value, unit. Layout adapts to the cell through container queries
     // in widget.css; this file only writes the value text.
     function create(ctx) {
@@ -234,9 +238,14 @@
       el.dataset.align = props.align;
       if (props.accent) el.style.setProperty("--accent", props.accent);
 
-      const label = document.createElement("div");
-      label.className = "readout__label";
-      label.textContent = props.label || ctx.label("value");
+      let label = null;
+      if (props.showLabel) {
+        label = document.createElement("div");
+        label.className = "readout__label";
+        label.textContent = props.label || ctx.label("value");
+      } else {
+        el.dataset.bare = "1";
+      }
 
       const line = document.createElement("div");
       line.className = "readout__line";
@@ -249,7 +258,8 @@
       unit.textContent = ctx.unit("value");
       line.append(value, unit);
 
-      el.append(label, line);
+      if (label) el.append(label);
+      el.append(line);
       el.style.setProperty("--unit-chars", unit.textContent.length);
 
       // --chars drives the font size in widget.css so long values (odometer) fit.

@@ -41,6 +41,16 @@
       }
     },
     {
+      "key": "showLabel",
+      "type": "bool",
+      "default": true,
+      "name": {
+        "en": "Show label",
+        "hu": "Felirat mutatása",
+        "de": "Beschriftung anzeigen"
+      }
+    },
+    {
       "key": "min",
       "type": "number",
       "default": null,

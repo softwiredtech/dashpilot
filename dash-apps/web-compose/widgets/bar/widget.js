@@ -6,10 +6,12 @@ function create(ctx) {
 
   const head = document.createElement("div");
   head.className = "bar__head";
-  const label = document.createElement("span");
-  label.className = "bar__label";
-  label.textContent = props.label || ctx.label("value");
-  head.appendChild(label);
+  if (props.showLabel) {
+    const label = document.createElement("span");
+    label.className = "bar__label";
+    label.textContent = props.label || ctx.label("value");
+    head.appendChild(label);
+  }
 
   let text = null;
   if (props.showValue) {
@@ -29,7 +31,9 @@ function create(ctx) {
   const fill = document.createElement("div");
   fill.className = "bar__fill";
   track.appendChild(fill);
-  el.append(head, track);
+  if (head.firstChild) el.append(head);
+  else el.dataset.bare = "1";
+  el.append(track);
 
   function bounds() {
     const range = ctx.range("value") || [0, 100];

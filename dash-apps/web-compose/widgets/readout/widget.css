@@ -7,6 +7,7 @@
 }
 .w-readout[data-align="center"] { text-align: center; }
 .w-readout[data-align="end"] { text-align: end; }
+.w-readout[data-bare] { justify-content: center; }
 
 .readout__label {
   color: var(--text-dim);
@@ -39,5 +40,8 @@
 @container (max-height: 90px) {
   .w-readout { flex-direction: row; align-items: center; gap: 0.6em; }
   .readout__label { flex: 1; }
+  .w-readout[data-bare] { justify-content: flex-start; }
+  .w-readout[data-bare][data-align="center"] { justify-content: center; }
+  .w-readout[data-bare][data-align="end"] { justify-content: flex-end; }
   .readout__line { font-size: max(14px, min(55cqh, calc(48cqw / (var(--chars, 3) * 0.6 + var(--unit-chars, 0) * 0.2 + 0.35)), 44px)); }
 }

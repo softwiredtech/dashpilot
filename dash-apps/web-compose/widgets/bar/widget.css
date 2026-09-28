@@ -5,6 +5,8 @@
   gap: 8px;
   padding: clamp(8px, 7cqmin, 24px);
 }
+/* Nothing but the track: keep it centred rather than at the bottom. */
+.w-bar[data-bare] { justify-content: center; }
 .bar__head {
   display: flex;
   flex-direction: column;
