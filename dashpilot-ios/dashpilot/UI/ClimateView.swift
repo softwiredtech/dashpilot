@@ -50,6 +50,8 @@ struct ClimateView: View {
                             )
                         }
                     }
+                    Spacer().frame(height: 8)
+                    AcSwingRow()
 
                     Spacer().frame(height: 28)
 

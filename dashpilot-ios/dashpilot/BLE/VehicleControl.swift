@@ -83,6 +83,13 @@ enum VehicleControl {
     // Trigger pedal percent, clamped to 10..95. Persisted in NVS by the firmware.
     static let cmdSportKickdownThreshold = 0x4A
 
+    // --- AC swing (UI_ventPanelControlRequest 0x253) ---
+    static let cmdAcSwingEnable = 0x4B
+    // 0=driver, 1=passenger, 2=both
+    static let cmdAcSwingSide = 0x4C
+    // 0=low, 1=medium, 2=full
+    static let cmdAcSwingIntensity = 0x4D
+
     /// Bind (or clear, with actionValue 0) an N-finger tap to a control action.
     @discardableResult
     static func sendFingerAction(_ manager: DashKitBleManager, fingers: Int, actionValue: Int) -> Bool {
@@ -150,6 +157,21 @@ enum VehicleControl {
     @discardableResult
     static func sendSportKickdownThreshold(_ manager: DashKitBleManager, percent: Int) -> Bool {
         send(manager, opcode: cmdSportKickdownThreshold, value: percent)
+    }
+
+    @discardableResult
+    static func sendAcSwing(_ manager: DashKitBleManager, enabled: Bool) -> Bool {
+        send(manager, opcode: cmdAcSwingEnable, value: enabled ? 1 : 0)
+    }
+
+    @discardableResult
+    static func sendAcSwingSide(_ manager: DashKitBleManager, side: Int) -> Bool {
+        send(manager, opcode: cmdAcSwingSide, value: side)
+    }
+
+    @discardableResult
+    static func sendAcSwingIntensity(_ manager: DashKitBleManager, intensity: Int) -> Bool {
+        send(manager, opcode: cmdAcSwingIntensity, value: intensity)
     }
 
     /// Write a control command to the DashKit. Returns true if the write was

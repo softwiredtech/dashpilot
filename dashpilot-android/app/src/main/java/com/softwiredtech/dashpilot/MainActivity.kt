@@ -170,6 +170,7 @@ class MainActivity : ComponentActivity() {
                 val climateKeepMinutes by connectionVM.climateKeepMinutes.collectAsState()
                 val sportKickdownAutomation by connectionVM.sportKickdownAutomation.collectAsState()
                 val sportKickdownPercent by connectionVM.sportKickdownPercent.collectAsState()
+                val acSwing by connectionVM.acSwing.collectAsState()
                 val fingerActions by connectionVM.fingerActions.collectAsState()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val onDashboard = navBackStackEntry?.destination?.route
@@ -317,6 +318,8 @@ class MainActivity : ComponentActivity() {
                                 onClimateKeepMinutesChange = {
                                     connectionVM.updateClimateKeepMinutes(context, it)
                                 },
+                                acSwing = acSwing,
+                                onAcSwingChange = { connectionVM.updateAcSwing(context, it) },
                                 onBack = { navController.popBackStack() }
                             )
                         }
@@ -343,6 +346,8 @@ class MainActivity : ComponentActivity() {
                                 onClimateKeepMinutesChange = {
                                     connectionVM.updateClimateKeepMinutes(context, it)
                                 },
+                                acSwing = acSwing,
+                                onAcSwingChange = { connectionVM.updateAcSwing(context, it) },
                                 sportKickdownEnabled = sportKickdownAutomation,
                                 onSportKickdownChange = {
                                     connectionVM.updateSportKickdownAutomation(context, it)

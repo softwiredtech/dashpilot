@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.softwiredtech.dashpilot.datamodel.dash.AcSwingSettings
 import com.softwiredtech.dashpilot.datamodel.dash.CarState
 import com.softwiredtech.dashpilot.datamodel.dash.DashState
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
@@ -44,6 +45,8 @@ fun ClimateScreen(
     onClimateKeepChange: (Boolean) -> Unit,
     climateKeepMinutes: Int,
     onClimateKeepMinutesChange: (Int) -> Unit,
+    acSwing: AcSwingSettings,
+    onAcSwingChange: (AcSwingSettings) -> Unit,
     onBack: () -> Unit
 ) {
     val fallback = DashState()
@@ -93,6 +96,8 @@ fun ClimateScreen(
                     }
                 } else null
             )
+            Spacer(modifier = Modifier.height(8.dp))
+            AcSwingRow(acSwing, onAcSwingChange)
 
             Spacer(modifier = Modifier.height(28.dp))
 

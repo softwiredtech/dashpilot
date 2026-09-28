@@ -2,6 +2,8 @@ package com.softwiredtech.dashpilot.ui
 
 import android.widget.NumberPicker
 import androidx.compose.foundation.background
+import com.softwiredtech.dashpilot.datamodel.dash.AcSwingSettings
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AcUnit
+import androidx.compose.material.icons.rounded.Air
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material.icons.rounded.Close
@@ -81,6 +84,8 @@ fun AutomationsScreen(
     onClimateKeepChange: (Boolean) -> Unit,
     climateKeepMinutes: Int,
     onClimateKeepMinutesChange: (Int) -> Unit,
+    acSwing: AcSwingSettings,
+    onAcSwingChange: (AcSwingSettings) -> Unit,
     sportKickdownEnabled: Boolean,
     onSportKickdownChange: (Boolean) -> Unit,
     sportKickdownPercent: Int,
@@ -139,6 +144,8 @@ fun AutomationsScreen(
                     }
                 } else null
             )
+            Spacer(modifier = Modifier.height(8.dp))
+            AcSwingRow(acSwing, onAcSwingChange)
 
             Spacer(modifier = Modifier.height(28.dp))
 
@@ -401,6 +408,77 @@ private fun AddTriggerButton(onClick: () -> Unit) {
             fontSize = 15.sp,
             fontWeight = FontWeight.SemiBold
         )
+    }
+}
+
+@Composable
+internal fun AcSwingRow(value: AcSwingSettings, onChange: (AcSwingSettings) -> Unit) {
+    AutomationRow(
+        icon = Icons.Rounded.Air,
+        title = stringResource(R.string.automations_ac_swing_title),
+        subtitle = stringResource(R.string.automations_ac_swing_subtitle),
+        checked = value.enabled,
+        onToggle = { onChange(value.copy(enabled = !value.enabled)) },
+        extraContent = if (value.enabled) {
+            {
+                ChoiceFooter(
+                    label = stringResource(R.string.automations_ac_swing_side),
+                    options = listOf(
+                        stringResource(R.string.climate_driver),
+                        stringResource(R.string.climate_passenger),
+                        stringResource(R.string.automations_ac_swing_both)
+                    ),
+                    selected = value.side,
+                    onSelect = { onChange(value.copy(side = it)) }
+                )
+                ChoiceFooter(
+                    label = stringResource(R.string.automations_ac_swing_intensity),
+                    options = listOf(
+                        stringResource(R.string.automations_ac_swing_low),
+                        stringResource(R.string.automations_ac_swing_medium),
+                        stringResource(R.string.automations_ac_swing_full)
+                    ),
+                    selected = value.intensity,
+                    onSelect = { onChange(value.copy(intensity = it)) }
+                )
+            }
+        } else null
+    )
+}
+
+@Composable
+private fun ChoiceFooter(label: String, options: List<String>, selected: Int, onSelect: (Int) -> Unit) {
+    Spacer(modifier = Modifier.height(12.dp))
+    Text(text = label, color = DarkColors.TextMuted, fontSize = 14.sp)
+    Spacer(modifier = Modifier.height(6.dp))
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10.dp))
+            .background(DarkColors.Background)
+            .padding(3.dp),
+        horizontalArrangement = Arrangement.spacedBy(3.dp)
+    ) {
+        options.forEachIndexed { index, option ->
+            val isSelected = index == selected
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(if (isSelected) AccentColor else Color.Transparent)
+                    .clickable { onSelect(index) }
+                    .padding(vertical = 8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = option,
+                    color = if (isSelected) Color.White else DarkColors.TextMuted,
+                    fontSize = 14.sp,
+                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+                    maxLines = 1
+                )
+            }
+        }
     }
 }
 

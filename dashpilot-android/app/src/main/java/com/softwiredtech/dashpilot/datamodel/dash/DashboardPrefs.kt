@@ -28,6 +28,9 @@ const val PREF_CLIMATE_KEEP_AUTOMATION = "climate_keep_automation"
 const val PREF_CLIMATE_KEEP_MINUTES = "climate_keep_minutes"
 const val PREF_SPORT_KICKDOWN_AUTOMATION = "sport_kickdown_automation"
 const val PREF_SPORT_KICKDOWN_PERCENT = "sport_kickdown_percent"
+const val PREF_AC_SWING_AUTOMATION = "ac_swing_automation"
+const val PREF_AC_SWING_SIDE = "ac_swing_side"
+const val PREF_AC_SWING_INTENSITY = "ac_swing_intensity"
 // Map of finger count (3..5) -> control id, serialized as "3=glovebox;4=frunk".
 const val PREF_FINGER_ACTIONS = "finger_actions"
 // Legacy single three-finger binding, migrated into PREF_FINGER_ACTIONS.
@@ -155,6 +158,24 @@ fun getSportKickdownPercent(context: Context): Int =
 fun setSportKickdownPercent(context: Context, value: Int) {
     context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
         .edit { putInt(PREF_SPORT_KICKDOWN_PERCENT, value) }
+}
+
+fun getAcSwing(context: Context): AcSwingSettings {
+    val prefs = context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
+    val defaults = AcSwingSettings()
+    return AcSwingSettings(
+        enabled = prefs.getBoolean(PREF_AC_SWING_AUTOMATION, defaults.enabled),
+        side = prefs.getInt(PREF_AC_SWING_SIDE, defaults.side),
+        intensity = prefs.getInt(PREF_AC_SWING_INTENSITY, defaults.intensity),
+    )
+}
+
+fun setAcSwing(context: Context, value: AcSwingSettings) {
+    context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE).edit {
+        putBoolean(PREF_AC_SWING_AUTOMATION, value.enabled)
+        putInt(PREF_AC_SWING_SIDE, value.side)
+        putInt(PREF_AC_SWING_INTENSITY, value.intensity)
+    }
 }
 
 /**

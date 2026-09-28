@@ -233,6 +233,14 @@
     <string name="automations_keep_climate_title">Klima anlassen</string>
     <string name="automations_keep_climate_subtitle">Lässt die Klimaanlage an, wenn du das Auto verlässt. Die Automatisierung endet nach der eingestellten Zeit oder wenn du zum Auto zurückkehrst.</string>
     <string name="automations_stop_after">Beenden nach</string>
+    <string name="automations_ac_swing_title">Klima-Schwenkmodus</string>
+    <string name="automations_ac_swing_subtitle">Schwenkt die Lüftung fortlaufend nach links und rechts.</string>
+    <string name="automations_ac_swing_side">Seite</string>
+    <string name="automations_ac_swing_both">Beide</string>
+    <string name="automations_ac_swing_intensity">Intensität</string>
+    <string name="automations_ac_swing_low">Niedrig</string>
+    <string name="automations_ac_swing_medium">Mittel</string>
+    <string name="automations_ac_swing_full">Voll</string>
     <string name="automations_section_driving">Fahren</string>
     <string name="automations_kickdown_title">Kick-down</string>
     <string name="automations_kickdown_subtitle">Wechselt von Chill zu Standard, solange das Gaspedal über die Schwelle hinaus gedrückt wird. Wechselt zurück zu Chill, wenn du das Pedal loslässt.</string>

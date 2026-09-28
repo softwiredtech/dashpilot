@@ -52,6 +52,9 @@ import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SPORT_KICKDOWN_PERCENT
 import com.softwiredtech.dashpilot.datamodel.dash.getSportKickdownAutomation
 import com.softwiredtech.dashpilot.datamodel.dash.setSportKickdownAutomation
 import com.softwiredtech.dashpilot.datamodel.dash.getSportKickdownPercent
+import com.softwiredtech.dashpilot.datamodel.dash.AcSwingSettings
+import com.softwiredtech.dashpilot.datamodel.dash.getAcSwing
+import com.softwiredtech.dashpilot.datamodel.dash.setAcSwing
 import com.softwiredtech.dashpilot.datamodel.dash.setSportKickdownPercent
 import com.softwiredtech.dashpilot.ui.controls.controlById
 import com.softwiredtech.dashpilot.datasource.DataSourceType
@@ -132,6 +135,9 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     private val _sportKickdownPercent = MutableStateFlow(DEFAULT_SPORT_KICKDOWN_PERCENT)
     val sportKickdownPercent = _sportKickdownPercent.asStateFlow()
 
+    private val _acSwing = MutableStateFlow(AcSwingSettings())
+    val acSwing = _acSwing.asStateFlow()
+
     private val _fingerActions = MutableStateFlow<Map<Int, String>>(emptyMap())
     val fingerActions = _fingerActions.asStateFlow()
 
@@ -141,6 +147,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         _climateKeepMinutes.value = getClimateKeepMinutes(context)
         _sportKickdownAutomation.value = getSportKickdownAutomation(context)
         _sportKickdownPercent.value = getSportKickdownPercent(context)
+        _acSwing.value = getAcSwing(context)
         _fingerActions.value = getFingerActions(context)
     }
 
@@ -177,6 +184,20 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         setSportKickdownAutomation(context, value)
         _sportKickdownAutomation.value = value
         _bleManager.value?.let { VehicleControl.sendSportKickdown(it, value) }
+    }
+
+    fun updateAcSwing(context: Context, value: AcSwingSettings) {
+        val previous = _acSwing.value
+        setAcSwing(context, value)
+        _acSwing.value = value
+        _bleManager.value?.let { pushAcSwing(it, value, previous) }
+    }
+
+    // Side and intensity go before the enable flag, so a swing never starts on stale settings.
+    private fun pushAcSwing(manager: DashKitBleManager, value: AcSwingSettings, previous: AcSwingSettings? = null) {
+        if (value.side != previous?.side) VehicleControl.sendAcSwingSide(manager, value.side)
+        if (value.intensity != previous?.intensity) VehicleControl.sendAcSwingIntensity(manager, value.intensity)
+        if (value.enabled != previous?.enabled) VehicleControl.sendAcSwing(manager, value.enabled)
     }
 
     private var sportKickdownPercentPush: Job? = null
@@ -478,6 +499,10 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
                 val sportKickdownPct = getSportKickdownPercent(context)
                 _sportKickdownPercent.value = sportKickdownPct
                 VehicleControl.sendSportKickdownThreshold(mgr, sportKickdownPct)
+
+                val acSwing = getAcSwing(context)
+                _acSwing.value = acSwing
+                pushAcSwing(mgr, acSwing)
             }
         }
     }

@@ -92,6 +92,11 @@ object VehicleControl {
     // Trigger pedal percent, clamped to 10..95. Persisted in NVS by the firmware.
     const val CMD_SPORT_KICKDOWN_THRESHOLD: Int = 0x4A
 
+    // --- AC swing (UI_ventPanelControlRequest 0x253), values in AcSwingSettings.kt ---
+    const val CMD_AC_SWING_ENABLE: Int = 0x4B
+    const val CMD_AC_SWING_SIDE: Int = 0x4C
+    const val CMD_AC_SWING_INTENSITY: Int = 0x4D
+
     /** Bind (or clear, with actionValue 0) an N-finger tap to a control action. */
     fun sendFingerAction(manager: DashKitBleManager, fingers: Int, actionValue: Int): Boolean =
         send(manager, CMD_MULTI_FINGER_ACTION, (fingers shl 8) or (actionValue and 0xFF))
@@ -113,6 +118,15 @@ object VehicleControl {
 
     fun sendSportKickdownThreshold(manager: DashKitBleManager, percent: Int): Boolean =
         send(manager, CMD_SPORT_KICKDOWN_THRESHOLD, percent)
+
+    fun sendAcSwing(manager: DashKitBleManager, enabled: Boolean): Boolean =
+        send(manager, CMD_AC_SWING_ENABLE, if (enabled) 1 else 0)
+
+    fun sendAcSwingSide(manager: DashKitBleManager, side: Int): Boolean =
+        send(manager, CMD_AC_SWING_SIDE, side)
+
+    fun sendAcSwingIntensity(manager: DashKitBleManager, intensity: Int): Boolean =
+        send(manager, CMD_AC_SWING_INTENSITY, intensity)
 
     /** Ask the DashKit to open a pairing window for one new device. */
     fun sendEnterPairing(manager: DashKitBleManager): Boolean {

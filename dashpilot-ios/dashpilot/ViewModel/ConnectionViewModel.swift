@@ -170,6 +170,10 @@ final class ConnectionViewModel {
         VehicleControl.sendSportKickdown(manager, enabled: sportKickdown)
         let sportKickdownPercent = UserDefaults.standard.integer(forKey: "sport_kickdown_percent")
         VehicleControl.sendSportKickdownThreshold(manager, percent: sportKickdownPercent > 0 ? sportKickdownPercent : 80)
+        let defaults = UserDefaults.standard
+        VehicleControl.sendAcSwingSide(manager, side: defaults.integer(forKey: "ac_swing_side"))
+        VehicleControl.sendAcSwingIntensity(manager, intensity: defaults.object(forKey: "ac_swing_intensity") as? Int ?? 2)
+        VehicleControl.sendAcSwing(manager, enabled: defaults.bool(forKey: "ac_swing_automation"))
     }
 
     // MARK: - Comma (WiFi)

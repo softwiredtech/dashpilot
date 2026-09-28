@@ -232,6 +232,14 @@
     <string name="automations_keep_climate_title">Klíma bekapcsolva tartása</string>
     <string name="automations_keep_climate_subtitle">A klíma bekapcsolva marad, amikor kiszállsz az autóból. Az automatizáció a beállított idő letelte után, vagy amikor visszatérsz az autóhoz, leáll.</string>
     <string name="automations_stop_after">Leállítás ennyi idő után</string>
+    <string name="automations_ac_swing_title">Klíma legyező mód</string>
+    <string name="automations_ac_swing_subtitle">A szellőzőket folyamatosan balra-jobbra mozgatja.</string>
+    <string name="automations_ac_swing_side">Oldal</string>
+    <string name="automations_ac_swing_both">Mindkettő</string>
+    <string name="automations_ac_swing_intensity">Intenzitás</string>
+    <string name="automations_ac_swing_low">Alacsony</string>
+    <string name="automations_ac_swing_medium">Közepes</string>
+    <string name="automations_ac_swing_full">Teljes</string>
     <string name="automations_section_driving">Vezetés</string>
     <string name="automations_kickdown_title">Kick-down</string>
     <string name="automations_kickdown_subtitle">Chill módról Standardra vált, amíg a gázpedál a küszöbérték fölött van lenyomva. Visszaáll Chill-re, amikor felengeded a pedált.</string>

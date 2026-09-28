@@ -84,6 +84,8 @@ struct AutomationsView: View {
                             )
                         }
                     }
+                    Spacer().frame(height: 8)
+                    AcSwingRow()
 
                     Spacer().frame(height: 28)
 
@@ -362,6 +364,83 @@ struct AutomationRow<Footer: View>: View {
 extension AutomationRow where Footer == EmptyView {
     init(icon: String, title: LocalizedStringKey, subtitle: LocalizedStringKey?, isOn: Binding<Bool>) {
         self.init(icon: icon, title: title, subtitle: subtitle, isOn: isOn) { EmptyView() }
+    }
+}
+
+// MARK: - AC swing
+
+struct AcSwingRow: View {
+    @Environment(ConnectionViewModel.self) private var connectionVM
+
+    @AppStorage("ac_swing_automation") private var enabled: Bool = false
+    @AppStorage("ac_swing_side") private var side: Int = 0
+    @AppStorage("ac_swing_intensity") private var intensity: Int = 2
+
+    var body: some View {
+        AutomationRow(
+            icon: "wind",
+            title: "AC swing mode",
+            subtitle: "Sweep the air vents left and right continuously.",
+            isOn: $enabled
+        ) {
+            if enabled {
+                ChoiceFooter(label: "Side", options: ["Driver", "Passenger", "Both"], selection: $side)
+                ChoiceFooter(label: "Intensity", options: ["Low", "Medium", "Full"], selection: $intensity)
+            }
+        }
+        .onChange(of: enabled) { _, newValue in
+            if let manager = connectionVM.bleManager {
+                VehicleControl.sendAcSwing(manager, enabled: newValue)
+            }
+        }
+        .onChange(of: side) { _, newValue in
+            if let manager = connectionVM.bleManager {
+                VehicleControl.sendAcSwingSide(manager, side: newValue)
+            }
+        }
+        .onChange(of: intensity) { _, newValue in
+            if let manager = connectionVM.bleManager {
+                VehicleControl.sendAcSwingIntensity(manager, intensity: newValue)
+            }
+        }
+    }
+}
+
+struct ChoiceFooter: View {
+    let label: LocalizedStringKey
+    let options: [LocalizedStringKey]
+    @Binding var selection: Int
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(label)
+                .foregroundColor(.dashTextMuted)
+                .font(.system(size: 14))
+
+            HStack(spacing: 3) {
+                ForEach(options.indices, id: \.self) { index in
+                    let isSelected = index == selection
+                    Button {
+                        selection = index
+                    } label: {
+                        Text(options[index])
+                            .font(.system(size: 14, weight: isSelected ? .semibold : .regular))
+                            .foregroundColor(isSelected ? .white : .dashTextMuted)
+                            .lineLimit(1)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 8)
+                            .background(isSelected ? Color.dashAccent : Color.clear)
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(3)
+            .background(Color.dashBackground)
+            .clipShape(RoundedRectangle(cornerRadius: DashMetrics.smallCorner))
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.top, 12)
     }
 }
 
