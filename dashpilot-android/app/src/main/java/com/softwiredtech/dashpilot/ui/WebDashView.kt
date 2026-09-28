@@ -46,10 +46,10 @@ fun WebDashView(
 ) {
     val context = LocalContext.current
     val currentOnEditingChange by rememberUpdatedState(onEditingChange)
-    val carStateBridge = remember(context) {
+    // Bridge calls arrive on the WebView's JavaBridge thread; state goes to the main one.
+    val mainHandler = remember { Handler(Looper.getMainLooper()) }
+    val carStateBridge = remember {
         val prefs = context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
-        // Bridge calls arrive on the WebView's JS thread; state goes to the main one.
-        val mainHandler = Handler(Looper.getMainLooper())
         CarStateBridge(
             loadLayout = { prefs.getString(PREF_COMPOSE_LAYOUT, "") ?: "" },
             storeLayout = { json -> prefs.edit { putString(PREF_COMPOSE_LAYOUT, json) } },
@@ -93,6 +93,8 @@ fun WebDashView(
                     }
 
                     override fun onPageFinished(view: WebView?, url: String?) {
+                        // A freshly loaded page has no editor open, even if the previous one did.
+                        currentOnEditingChange(false)
                         pageLoaded = true
                     }
                 }
@@ -120,6 +122,8 @@ fun WebDashView(
 
     DisposableEffect(webView) {
         onDispose {
+            // A flag posted just before disposal must not land after the reset.
+            mainHandler.removeCallbacksAndMessages(null)
             currentOnEditingChange(false)
             webView.stopLoading()
             webView.loadUrl("about:blank")

@@ -1,8 +1,0 @@
-{
-  "name": "dashpilot-compose-test",
-  "private": true,
-  "description": "Tests for the web-compose dash-app. Lives outside the app folder so nothing here ships in the app bundle.",
-  "engines": { "node": ">=20" },
-  "scripts": { "test": "node --test" },
-  "dependencies": { "jsdom": "^29.1.1" }
-}
