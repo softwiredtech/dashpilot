@@ -26,8 +26,6 @@
     return Object.assign(props, stored || {});
   }
 
-  // A stored signal of a kind this bind can't show (left over from another
-  // widget type) is kept in the layout, and the bind's default is shown instead.
   function acceptedSignal(bind, id) {
     const signal = id ? DC.signals.get(id) : undefined;
     return signal && (!bind.kinds || bind.kinds.includes(signal.kind)) ? signal : null;

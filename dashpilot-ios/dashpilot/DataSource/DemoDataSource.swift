@@ -50,8 +50,6 @@ final class DemoDataSource: IDataSource {
     private static let goEnd: TimeInterval = 78
     // cycleLength is the end of the accelerate-back-to-cruise phase.
 
-    /// Debug builds sit parked so dash-app editors (which lock above walking
-    /// speed) can be tested; release builds keep the full drive.
     #if DEBUG
     private static let parked = true
     #else

@@ -124,9 +124,7 @@
     return true;
   }
 
-  // The grid is usually full, so dropping a widget onto another one trades
-  // their areas, position and size both. Each lands exactly where the other
-  // was, so a swap always fits; it deliberately ignores the size limits.
+  // Swapping trades whole areas, so it always fits; size limits are ignored on purpose.
   function swap(a, b) {
     const area = { x: a.x, y: a.y, w: a.w, h: a.h };
     Object.assign(a, { x: b.x, y: b.y, w: b.w, h: b.h });
@@ -429,9 +427,6 @@
     return control;
   }
 
-  // The widget keeps its area, like a swap, even below the new type's minimum.
-  // Binds and props are left as stored: whatever the new type can use carries
-  // over, the rest falls back to its defaults and comes back on switching back.
   function changeType(item, type) {
     item.type = type;
     DC.runtime.remount();
@@ -456,8 +451,6 @@
     if (!entry) return;
     const descriptor = entry.descriptor;
     const body = openSheet(DC.i18n.localized(descriptor.name));
-    // Every widget captions itself with its value's signal name unless the
-    // label prop overrides it; the empty field shows that name.
     let labelInput = null;
     const defaultLabel = () => {
       const signal = DC.registry.resolveBinds(descriptor, item.bind).value;

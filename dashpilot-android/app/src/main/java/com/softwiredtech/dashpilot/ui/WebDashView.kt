@@ -27,13 +27,16 @@ import androidx.core.content.edit
 import androidx.webkit.WebViewAssetLoader
 import com.softwiredtech.dashpilot.datamodel.dash.DASH_PREFS_NAME
 import com.softwiredtech.dashpilot.datamodel.dash.DashState
-import com.softwiredtech.dashpilot.datamodel.dash.PREF_COMPOSE_LAYOUT
+import com.softwiredtech.dashpilot.datamodel.dash.PREF_DASH_APP_DATA_PREFIX
 import com.softwiredtech.dashpilot.js.CarStateBridge
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
 private const val ASSET_LOADER_DOMAIN = "appassets.androidplatform.net"
 const val LOCAL_ASSET_BASE_URL = "https://$ASSET_LOADER_DOMAIN/assets/"
+
+private fun localDashAppId(url: String): String? =
+    url.removePrefix(LOCAL_ASSET_BASE_URL).takeIf { it != url }?.substringBefore('/')?.takeIf { it.isNotEmpty() }
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
@@ -50,10 +53,11 @@ fun WebDashView(
     val mainHandler = remember { Handler(Looper.getMainLooper()) }
     val carStateBridge = remember {
         val prefs = context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
+        val dataKey = localDashAppId(url)?.let { PREF_DASH_APP_DATA_PREFIX + it }
         CarStateBridge(
-            loadLayout = { prefs.getString(PREF_COMPOSE_LAYOUT, "") ?: "" },
-            storeLayout = { json -> prefs.edit { putString(PREF_COMPOSE_LAYOUT, json) } },
-            setEditing = { editing -> mainHandler.post { currentOnEditingChange(editing) } },
+            loadAppData = { dataKey?.let { prefs.getString(it, "") } ?: "" },
+            storeAppData = { json -> dataKey?.let { prefs.edit { putString(it, json) } } },
+            onEditingChange = { editing -> mainHandler.post { currentOnEditingChange(editing) } },
         )
     }
     val webView = remember { WebView(context) }
@@ -93,7 +97,6 @@ fun WebDashView(
                     }
 
                     override fun onPageFinished(view: WebView?, url: String?) {
-                        // A freshly loaded page has no editor open, even if the previous one did.
                         currentOnEditingChange(false)
                         pageLoaded = true
                     }
@@ -122,7 +125,7 @@ fun WebDashView(
 
     DisposableEffect(webView) {
         onDispose {
-            // A flag posted just before disposal must not land after the reset.
+            // Drop a pending "editing" post so it can't land after the reset.
             mainHandler.removeCallbacksAndMessages(null)
             currentOnEditingChange(false)
             webView.stopLoading()

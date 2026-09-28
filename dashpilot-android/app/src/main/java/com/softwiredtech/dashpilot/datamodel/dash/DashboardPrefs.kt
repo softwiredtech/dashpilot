@@ -7,8 +7,7 @@ const val DASH_PREFS_NAME = "dash_prefs"
 const val PREF_SELECTED_DASHBOARD_ID = "selected_dashboard_id"
 const val PREF_DEV_RIVE_FILE_URI = "dev_rive_file_uri"
 
-// Layout document of the web-compose dashboard, saved by its in-app editor.
-const val PREF_COMPOSE_LAYOUT = "compose_layout"
+const val PREF_DASH_APP_DATA_PREFIX = "dash_app_data."
 
 // Display settings pref keys
 const val PREF_SHOW_PHONE_BATTERY = "show_phone_battery"

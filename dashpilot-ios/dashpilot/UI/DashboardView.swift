@@ -15,7 +15,6 @@ struct DashboardView: View {
     /// Set after the first swipe; nil means "show what the route passed in".
     @State private var swipedDashboard: DashboardConfig?
     @State private var switchedToName: String?
-    /// Raised by a dash-app that has its own editor open (see WebDashView).
     @State private var dashAppEditing = false
     @State private var nameOverlayDismiss: Task<Void, Never>?
 

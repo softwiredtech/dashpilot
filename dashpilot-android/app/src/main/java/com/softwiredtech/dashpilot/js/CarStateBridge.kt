@@ -5,13 +5,11 @@ import com.softwiredtech.dashpilot.datamodel.dash.CarState
 import com.softwiredtech.dashpilot.datamodel.dash.DisplaySettings
 
 class CarStateBridge(
-    // web-compose stores its layout through the host: a WebView's own storage is
-    // not guaranteed to survive, and this keeps the layout in app preferences.
-    private val loadLayout: () -> String = { "" },
-    private val storeLayout: (String) -> Unit = {},
+    private val loadAppData: () -> String = { "" },
+    private val storeAppData: (String) -> Unit = {},
     // Raised while a dash-app's own editor is open, so the host can suspend
     // gestures of its own (the dashboard carousel) for the duration.
-    private val setEditing: (Boolean) -> Unit = {},
+    private val onEditingChange: (Boolean) -> Unit = {},
 ) {
 
     @Volatile private var egoSteeringAngle: Float = 0f
@@ -136,11 +134,11 @@ class CarStateBridge(
 
     @JavascriptInterface fun getDataSourceType(): String = dataSourceType
 
-    @JavascriptInterface fun getComposeLayout(): String = loadLayout()
+    @JavascriptInterface fun getAppData(): String = loadAppData()
 
-    @JavascriptInterface fun saveComposeLayout(json: String) = storeLayout(json)
+    @JavascriptInterface fun setAppData(json: String) = storeAppData(json)
 
-    @JavascriptInterface fun setComposeEditing(editing: Boolean) = setEditing(editing)
+    @JavascriptInterface fun setEditing(editing: Boolean) = onEditingChange(editing)
 
     fun updatePhoneBattery(level: Int) {
         phoneBattery = level

@@ -76,26 +76,22 @@ final class AppSchemeHandler: NSObject, WKURLSchemeHandler {
     }
 }
 
-// web-compose stores its layout document through the host: a WKWebView served
-// over a custom scheme has an opaque origin, where localStorage is unavailable.
-enum ComposeLayoutStore {
-    static let key = "dash_compose_layout"
-    static let dashboardId = "compose"
-    static let messageName = "composeLayout"
-    static let editingMessageName = "composeEditing"
+// localStorage is unavailable on the app:// scheme's opaque origin.
+enum DashAppDataStore {
+    static let messageName = "appData"
+    static let editingMessageName = "editing"
 
-    static var saved: String? { UserDefaults.standard.string(forKey: key) }
+    private static func key(_ appId: String) -> String { "dash_app_data.\(appId)" }
 
-    static func save(_ json: String) {
-        UserDefaults.standard.set(json, forKey: key)
+    static func save(_ json: String, for appId: String) {
+        UserDefaults.standard.set(json, forKey: key(appId))
     }
 
-    // The layout is read before the first script runs, so the page renders it directly.
-    static func injectionScript() -> WKUserScript? {
-        guard let json = saved,
+    static func injectionScript(for appId: String) -> WKUserScript? {
+        guard let json = UserDefaults.standard.string(forKey: key(appId)),
               let data = try? JSONSerialization.data(withJSONObject: json, options: [.fragmentsAllowed]),
               let literal = String(data: data, encoding: .utf8) else { return nil }
-        return WKUserScript(source: "window.__DASHPILOT_COMPOSE_LAYOUT__ = \(literal);",
+        return WKUserScript(source: "window.__DASHPILOT_APP_DATA__ = \(literal);",
                             injectionTime: .atDocumentStart,
                             forMainFrameOnly: true)
     }
@@ -105,8 +101,6 @@ struct WebDashView: UIViewRepresentable {
 
     let url: String
     let incomingMessages: AsyncStream<DashState>
-    /// Raised while a dash-app's own editor is open, so the host can suspend
-    /// gestures of its own (the dashboard carousel) for the duration.
     var onEditingChange: (Bool) -> Void = { _ in }
 
     func makeCoordinator() -> Coordinator {
@@ -119,16 +113,15 @@ struct WebDashView: UIViewRepresentable {
         let config = WKWebViewConfiguration()
         config.userContentController.add(context.coordinator, name: "log")
 
-        if url == ComposeLayoutStore.dashboardId {
-            config.userContentController.add(context.coordinator, name: ComposeLayoutStore.messageName)
-            config.userContentController.add(context.coordinator, name: ComposeLayoutStore.editingMessageName)
-            if let script = ComposeLayoutStore.injectionScript() {
+        if Self.localApps.contains(url) {
+            let appId = "web-\(url)"
+            context.coordinator.appId = appId
+            config.userContentController.add(context.coordinator, name: DashAppDataStore.messageName)
+            config.userContentController.add(context.coordinator, name: DashAppDataStore.editingMessageName)
+            if let script = DashAppDataStore.injectionScript(for: appId) {
                 config.userContentController.addUserScript(script)
             }
-        }
-
-        if Self.localApps.contains(url) {
-            let bundleDir = Bundle.main.bundleURL.appendingPathComponent("web-\(url)")
+            let bundleDir = Bundle.main.bundleURL.appendingPathComponent(appId)
             config.setURLSchemeHandler(AppSchemeHandler(bundleDir: bundleDir), forURLScheme: "app")
         }
 
@@ -154,8 +147,7 @@ struct WebDashView: UIViewRepresentable {
         context.coordinator.onEditingChange = onEditingChange
     }
 
-    // The content controller retains its message handlers, and so the coordinator
-    // and its stream task, until they are removed.
+    // The content controller retains its handlers (and so the coordinator) until removed.
     static func dismantleUIView(_ uiView: WKWebView, coordinator: Coordinator) {
         uiView.stopLoading()
         uiView.configuration.userContentController.removeAllScriptMessageHandlers()
@@ -168,10 +160,10 @@ struct WebDashView: UIViewRepresentable {
         weak var webView: WKWebView?
         var incomingMessages: AsyncStream<DashState>?
         var onEditingChange: (Bool) -> Void = { _ in }
+        var appId: String?
         private var receiveTask: Task<Void, Never>?
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-            // A freshly loaded page has no editor open, even if the previous one did.
             onEditingChange(false)
             guard let stream = incomingMessages else { return }
             startReceiving(stream)
@@ -199,9 +191,9 @@ struct WebDashView: UIViewRepresentable {
                                    didReceive message: WKScriptMessage) {
             if message.name == "log" {
                 print("WebView JS: \(message.body)")
-            } else if message.name == ComposeLayoutStore.messageName, let json = message.body as? String {
-                ComposeLayoutStore.save(json)
-            } else if message.name == ComposeLayoutStore.editingMessageName {
+            } else if message.name == DashAppDataStore.messageName, let appId, let json = message.body as? String {
+                DashAppDataStore.save(json, for: appId)
+            } else if message.name == DashAppDataStore.editingMessageName {
                 onEditingChange((message.body as? NSNumber)?.boolValue ?? false)
             }
         }

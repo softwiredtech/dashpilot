@@ -105,24 +105,18 @@ and appending a migration step. Never edit an existing step.
 Data in: the same as every other web dash-app (`NativeCarState` +
 `onCarStateUpdate()` on Android, `receiveMessage(json)` on iOS).
 
-Optional host capabilities, with the fallback used until they exist:
-
-| capability | Android | iOS | fallback |
-|---|---|---|---|
-| load layout | `NativeCarState.getComposeLayout()` | `window.__DASHPILOT_COMPOSE_LAYOUT__` injected before load | `localStorage` |
-| save layout | `NativeCarState.saveComposeLayout(json)` | `webkit.messageHandlers.composeLayout` | `localStorage` |
-| editor open | `NativeCarState.setComposeEditing(bool)` | `webkit.messageHandlers.composeEditing` | ignored |
-| app language | `NativeCarState.getLocale()` | `locale` field in the pushed JSON | `navigator.language` |
+It uses the generic host capabilities in [`../README.md`](../README.md#host-capabilities):
+its saved data is the layout document, and the editing flag is raised while the
+editor is open. Fallbacks: `localStorage` for the layout (browsers only), and
+`navigator.language` for the language.
 
 The editor-open flag matters: both apps switch dashboards on a horizontal drag
 across the dashboard, which would otherwise fire while a widget is being dragged
 or resized. Both platforms suspend that carousel while the flag is raised, and
 release it on Done, on Cancel, when the car pulls away, and when the view goes away.
 
-Both platforms implement the layout capability (Android: `SharedPreferences`,
-iOS: `UserDefaults`). The `localStorage` fallback is for browsers only — a
-WKWebView served over a custom scheme has an opaque origin, where it throws.
-The language capability is not implemented yet; `navigator.language` is used.
+The `localStorage` fallback is for browsers only — a WKWebView served over a
+custom scheme has an opaque origin, where it throws.
 
 Units: like the other dash-apps, the host sends speed in the display unit and
 converts odometer / temperatures / speed limit itself. The app only labels them.

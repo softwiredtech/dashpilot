@@ -218,7 +218,6 @@
   cursor: pointer;
 }
 .palette__item img { width: 100%; height: 52px; object-fit: contain; }
-/* Previews are drawn in the dark palette; flipped, they read as light widgets. */
 [data-theme="light"] .palette__item img { filter: invert(1) hue-rotate(180deg); }
 .palette__item--full { opacity: 0.45; cursor: not-allowed; }
 .palette__note { font-size: 11px; line-height: 1; color: var(--text-dim); white-space: nowrap; }

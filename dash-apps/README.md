@@ -3,6 +3,27 @@
 Dash apps are the sandboxed applications running inside the Dashpilot android app.
 They can be either web apps running in the `WebDashView` Composable, or Rive apps running in `RiveDashView`.
 
+## Host capabilities
+
+Beyond car data (`NativeCarState` + `onCarStateUpdate()` on Android,
+`receiveMessage(json)` on iOS), both apps offer every bundled dash-app:
+
+| capability | Android | iOS |
+|---|---|---|
+| load saved data | `NativeCarState.getAppData()` → string, `""` if none | `window.__DASHPILOT_APP_DATA__`, injected before the first script |
+| save data | `NativeCarState.setAppData(json)` | `webkit.messageHandlers.appData.postMessage(json)` |
+| editing flag | `NativeCarState.setEditing(bool)` | `webkit.messageHandlers.editing.postMessage(bool)` |
+| app language | `NativeCarState.getLocale()` (planned) | `locale` field in the pushed JSON (planned) |
+
+Saved data is one opaque string, usually JSON, stored per dash-app folder
+(`dash_app_data.web-compose`: `SharedPreferences` / `UserDefaults`). A page sees
+only its own; a remote page gets nothing and its saves are dropped. Version the
+document yourself if its format may change.
+
+Raise the editing flag while the dash-app has its own drag gestures active: both
+apps read a horizontal drag as "next dashboard" and suspend that while it is up.
+It resets whenever a page loads or the view goes away.
+
 ## Performance requirements
 
 Dash-apps render live driving data - even one second of stale speed is unacceptable. Web

@@ -5,8 +5,7 @@
 // tick through window.receiveMessage(json). Both end up as the same flat `raw`
 // object, keyed by the CarState field names.
 //
-// Layout persistence and locale are optional host capabilities. Until a native
-// side implements them, the app falls back to localStorage / navigator.language.
+// Saved data, editing flag and locale: optional host capabilities, see dash-apps/README.md.
 (function () {
   const DC = (window.DashCompose = window.DashCompose || {});
 
@@ -78,7 +77,7 @@
     return hasNative() && typeof window.NativeCarState[method] === "function";
   }
 
-  // The Java bridge matches methods by argument count, so a getter gets no argument at all.
+  // The Java bridge matches by argument count: getters must get none.
   function nativeCall(method, arg) {
     if (!hasNativeMethod(method)) return undefined;
     try {
@@ -88,7 +87,6 @@
     }
   }
 
-  // Sends `value` to whichever host is present; false when neither implements it.
   function toHost(androidMethod, iosHandlerName, value) {
     if (hasNativeMethod(androidMethod)) {
       nativeCall(androidMethod, value);
@@ -117,26 +115,23 @@
     }
   }
 
-  // Returns the saved layout document as a string, or null.
-  // Android: NativeCarState.getComposeLayout(). iOS: injected before load as
-  // window.__DASHPILOT_COMPOSE_LAYOUT__. Browser: localStorage.
   function loadLayout() {
-    const fromAndroid = nativeCall("getComposeLayout");
+    const fromAndroid = nativeCall("getAppData");
     if (typeof fromAndroid === "string" && fromAndroid) return fromAndroid;
-    const fromIos = window.__DASHPILOT_COMPOSE_LAYOUT__;
+    const fromIos = window.__DASHPILOT_APP_DATA__;
     if (typeof fromIos === "string" && fromIos) return fromIos;
     return storageGet(LAYOUT_STORAGE_KEY);
   }
 
   function saveLayout(json) {
-    if (!toHost("saveComposeLayout", "composeLayout", json)) storageSet(LAYOUT_STORAGE_KEY, json);
+    if (!toHost("setAppData", "appData", json)) storageSet(LAYOUT_STORAGE_KEY, json);
   }
 
   // Tells the host the editor is open, so it can suspend its own gestures —
   // the native dashboard carousel reads a horizontal drag as "next dashboard",
   // which would otherwise fire while a widget is being dragged or resized.
   function setEditing(editing) {
-    toHost("setComposeEditing", "composeEditing", !!editing);
+    toHost("setEditing", "editing", !!editing);
   }
 
   // The app language can differ from the system one (per-app locale on Android,
