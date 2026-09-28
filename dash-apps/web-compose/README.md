@@ -35,13 +35,15 @@ Long-press the dashboard to open the editor (`?edit` opens it straight away in a
 browser). It refuses to open above walking speed and closes itself — saving — if
 the car pulls away while it is open.
 
-- drag a widget to move it, drag the bottom-right corner to resize
+- drag a widget to move it; drop it on another widget to swap the two
+- drag the bottom-right corner to resize
 - tap to select: Settings, Duplicate, Remove
 - **+ Add** lists every registered widget with its preview
 - **Done** saves through the host, **Cancel** restores the layout as it was
 
-Widgets never overlap: a move or resize that would collide is refused, and a new
-widget goes into the first free space. The default layout fills the grid, so
+Widgets never overlap: a move or resize that would collide is refused (a drop
+onto another widget swaps them when both fit), and a new widget goes into the
+first free space. The default layout fills the grid, so
 adding one means removing one first.
 
 The settings panel is generated from the widget descriptor — bind pickers list
@@ -125,7 +127,7 @@ converts odometer / temperatures / speed limit itself. The app only labels them.
 ## Tests
 
 ```
-cd dash-apps/_compose-test && npm ci && npm test      # layout, widget validation, runtime (jsdom)
+node scripts/build-compose-widgets.js --check          # descriptors valid, generated files current
 cd dash-apps/_perf-gate && npm ci && node gate.js ../web-compose
 ```
 

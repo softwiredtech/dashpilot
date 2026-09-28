@@ -251,23 +251,13 @@
     orientation: () => orientation,
     root: () => root,
     raw: () => raw,
-    // `persist` false while dragging; the editor saves once, on Done.
-    setDoc(next, persist) {
+    // Never persists: the editor saves once, on Done.
+    setDoc(next) {
       doc = next;
-      if (persist) DC.host.saveLayout(JSON.stringify(doc));
       mount();
     },
     save: () => DC.host.saveLayout(JSON.stringify(doc)),
     remount: mount,
-  };
-
-  // Host hook for a layout edited outside the page (native editor, import).
-  DC.setLayout = function (input) {
-    const next = DC.layout.normalize(input);
-    if (!next) return false;
-    doc = next;
-    if (mounted) mount();
-    return true;
   };
 
   if (document.readyState === "loading") {

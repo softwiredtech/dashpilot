@@ -101,19 +101,13 @@ enum ComposeLayoutStore {
     }
 }
 
-// True while the web-compose editor is open. The dashboard carousel reads a
-// horizontal drag as "next dashboard", which would fire while a widget is being
-// dragged or resized, so the carousel suspends itself for the duration.
-@Observable
-final class ComposeEditingState {
-    static let shared = ComposeEditingState()
-    var isEditing = false
-}
-
 struct WebDashView: UIViewRepresentable {
 
     let url: String
     let incomingMessages: AsyncStream<DashState>
+    /// Raised while a dash-app's own editor is open, so the host can suspend
+    /// gestures of its own (the dashboard carousel) for the duration.
+    var onEditingChange: (Bool) -> Void = { _ in }
 
     func makeCoordinator() -> Coordinator {
         Coordinator()
@@ -132,8 +126,6 @@ struct WebDashView: UIViewRepresentable {
                 config.userContentController.addUserScript(script)
             }
         }
-        // A dashboard that cannot edit never leaves the carousel suspended.
-        ComposeEditingState.shared.isEditing = false
 
         if Self.localApps.contains(url) {
             let bundleDir = Bundle.main.bundleURL.appendingPathComponent("web-\(url)")
@@ -147,6 +139,7 @@ struct WebDashView: UIViewRepresentable {
         webView.isOpaque = false
         context.coordinator.webView = webView
         context.coordinator.incomingMessages = incomingMessages
+        context.coordinator.onEditingChange = onEditingChange
 
         if url.hasPrefix("http") || url.hasPrefix("https") {
             webView.load(URLRequest(url: URL(string: url)!))
@@ -157,17 +150,36 @@ struct WebDashView: UIViewRepresentable {
         return webView
     }
 
-    func updateUIView(_ uiView: WKWebView, context: Context) {}
+    func updateUIView(_ uiView: WKWebView, context: Context) {
+        context.coordinator.onEditingChange = onEditingChange
+    }
+
+    // The content controller retains its message handlers, and so the coordinator
+    // and its stream task, until they are removed.
+    static func dismantleUIView(_ uiView: WKWebView, coordinator: Coordinator) {
+        uiView.stopLoading()
+        uiView.configuration.userContentController.removeAllScriptMessageHandlers()
+        uiView.configuration.userContentController.removeAllUserScripts()
+        coordinator.stop()
+    }
 
     final class Coordinator: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
 
         weak var webView: WKWebView?
         var incomingMessages: AsyncStream<DashState>?
+        var onEditingChange: (Bool) -> Void = { _ in }
         private var receiveTask: Task<Void, Never>?
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            // A freshly loaded page has no editor open, even if the previous one did.
+            onEditingChange(false)
             guard let stream = incomingMessages else { return }
             startReceiving(stream)
+        }
+
+        func stop() {
+            receiveTask?.cancel()
+            receiveTask = nil
         }
 
         private func startReceiving(_ stream: AsyncStream<DashState>) {
@@ -190,7 +202,7 @@ struct WebDashView: UIViewRepresentable {
             } else if message.name == ComposeLayoutStore.messageName, let json = message.body as? String {
                 ComposeLayoutStore.save(json)
             } else if message.name == ComposeLayoutStore.editingMessageName {
-                ComposeEditingState.shared.isEditing = (message.body as? NSNumber)?.boolValue ?? false
+                onEditingChange((message.body as? NSNumber)?.boolValue ?? false)
             }
         }
 

@@ -18,6 +18,11 @@
   opacity: 0.85;
   z-index: 3;
 }
+.editing .cell--swap {
+  outline: 2px dashed var(--brand);
+  outline-offset: -2px;
+  background: color-mix(in srgb, var(--brand) 14%, transparent);
+}
 .editing .cell__body { pointer-events: none; }
 
 .cell__resize {

@@ -53,20 +53,11 @@
 
   const LAYOUT_STORAGE_KEY = "dashcompose.layout";
 
-  function readNativeGetter(method) {
-    try {
-      const fn = window.NativeCarState[method];
-      return typeof fn === "function" ? fn.call(window.NativeCarState) : undefined;
-    } catch (_error) {
-      return undefined;
-    }
-  }
-
   // Fills `out` in place so the runtime can reuse one object per tick.
   function readNative(out) {
     for (let i = 0; i < NATIVE_KEYS.length; i++) {
       const key = NATIVE_KEYS[i];
-      out[key] = readNativeGetter(NATIVE_GETTERS[key]);
+      out[key] = nativeCall(NATIVE_GETTERS[key]);
     }
     return out;
   }
@@ -83,20 +74,31 @@
     return typeof window.NativeCarState === "object" && window.NativeCarState !== null;
   }
 
+  function hasNativeMethod(method) {
+    return hasNative() && typeof window.NativeCarState[method] === "function";
+  }
+
+  // The Java bridge matches methods by argument count, so a getter gets no argument at all.
   function nativeCall(method, arg) {
-    if (!hasNative()) return undefined;
-    const fn = window.NativeCarState[method];
-    if (typeof fn !== "function") return undefined;
+    if (!hasNativeMethod(method)) return undefined;
     try {
-      return arg === undefined ? fn.call(window.NativeCarState) : fn.call(window.NativeCarState, arg);
+      return arg === undefined ? window.NativeCarState[method]() : window.NativeCarState[method](arg);
     } catch (_error) {
       return undefined;
     }
   }
 
-  function iosHandler(name) {
+  // Sends `value` to whichever host is present; false when neither implements it.
+  function toHost(androidMethod, iosHandlerName, value) {
+    if (hasNativeMethod(androidMethod)) {
+      nativeCall(androidMethod, value);
+      return true;
+    }
     const handlers = window.webkit && window.webkit.messageHandlers;
-    return handlers && handlers[name] ? handlers[name] : null;
+    const ios = handlers && handlers[iosHandlerName];
+    if (!ios) return false;
+    ios.postMessage(value);
+    return true;
   }
 
   function storageGet(key) {
@@ -127,28 +129,14 @@
   }
 
   function saveLayout(json) {
-    if (hasNative() && typeof window.NativeCarState.saveComposeLayout === "function") {
-      nativeCall("saveComposeLayout", json);
-      return;
-    }
-    const ios = iosHandler("composeLayout");
-    if (ios) {
-      ios.postMessage(json);
-      return;
-    }
-    storageSet(LAYOUT_STORAGE_KEY, json);
+    if (!toHost("saveComposeLayout", "composeLayout", json)) storageSet(LAYOUT_STORAGE_KEY, json);
   }
 
   // Tells the host the editor is open, so it can suspend its own gestures —
   // the native dashboard carousel reads a horizontal drag as "next dashboard",
   // which would otherwise fire while a widget is being dragged or resized.
   function setEditing(editing) {
-    if (hasNative() && typeof window.NativeCarState.setComposeEditing === "function") {
-      nativeCall("setComposeEditing", !!editing);
-      return;
-    }
-    const ios = iosHandler("composeEditing");
-    if (ios) ios.postMessage(!!editing);
+    toHost("setComposeEditing", "composeEditing", !!editing);
   }
 
   // The app language can differ from the system one (per-app locale on Android,

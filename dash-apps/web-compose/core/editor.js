@@ -53,13 +53,13 @@
     const style = getComputedStyle(root);
     const g = grid();
     const gap = doc().gap;
-    const left = parseFloat(style.paddingLeft);
-    const top = parseFloat(style.paddingTop);
-    const width = root.clientWidth - left - parseFloat(style.paddingRight);
-    const height = root.clientHeight - top - parseFloat(style.paddingBottom);
+    const box = root.getBoundingClientRect();
+    const px = (value) => parseFloat(value) || 0;
+    const width = root.clientWidth - px(style.paddingLeft) - px(style.paddingRight);
+    const height = root.clientHeight - px(style.paddingTop) - px(style.paddingBottom);
     return {
-      left,
-      top,
+      left: box.left + px(style.paddingLeft),
+      top: box.top + px(style.paddingTop),
       stepX: (width + gap) / g.cols,
       stepY: (height + gap) / g.rows,
       cols: g.cols,
@@ -73,9 +73,12 @@
     return a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
   }
 
+  function inGrid(rect) {
+    return rect.x >= 0 && rect.y >= 0 && rect.x + rect.w <= grid().cols && rect.y + rect.h <= grid().rows;
+  }
+
   function isFree(rect, ignoreUid) {
-    if (rect.x < 0 || rect.y < 0 || rect.x + rect.w > grid().cols || rect.y + rect.h > grid().rows) return false;
-    return !grid().items.some((item) => item.uid !== ignoreUid && overlaps(rect, item));
+    return inGrid(rect) && !grid().items.some((item) => item.uid !== ignoreUid && overlaps(rect, item));
   }
 
   function findSpot(w, h) {
@@ -121,6 +124,30 @@
     return true;
   }
 
+  // The grid is usually full, so dropping a widget onto another one trades
+  // their places. Refused when either would then leave the grid or overlap a third.
+  function swapRects(a, b) {
+    if (a === b) return null;
+    const ra = { x: b.x, y: b.y, w: a.w, h: a.h };
+    const rb = { x: a.x, y: a.y, w: b.w, h: b.h };
+    const fits = (rect) => inGrid(rect) && !grid().items.some((i) => i !== a && i !== b && overlaps(rect, i));
+    return !overlaps(ra, rb) && fits(ra) && fits(rb) ? { ra, rb } : null;
+  }
+
+  function trySwap(a, b) {
+    const rects = swapRects(a, b);
+    if (!rects) return false;
+    Object.assign(a, rects.ra);
+    Object.assign(b, rects.rb);
+    return true;
+  }
+
+  function itemAt(m, clientX, clientY) {
+    const x = Math.floor((clientX - m.left) / m.stepX);
+    const y = Math.floor((clientY - m.top) / m.stepY);
+    return grid().items.find((i) => x >= i.x && x < i.x + i.w && y >= i.y && y < i.y + i.h);
+  }
+
   function applyArea(cell, item) {
     cell.style.gridArea = (item.y + 1) + " / " + (item.x + 1) + " / span " + item.h + " / span " + item.w;
   }
@@ -135,6 +162,15 @@
     const startX = event.clientX, startY = event.clientY;
     const origin = { x: item.x, y: item.y, w: item.w, h: item.h };
     let moved = false;
+    let swapWith = null;
+
+    function markSwap(target) {
+      if (target === swapWith) return;
+      swapWith = target;
+      for (const other of DC.runtime.root().querySelectorAll(".cell")) {
+        other.classList.toggle("cell--swap", !!target && other.dataset.uid === target.uid);
+      }
+    }
 
     // Capture can fail for an odd pointer id; dragging must still work.
     try {
@@ -155,22 +191,29 @@
             w: clamp(origin.w + dx, min.w, Math.min(max.w, m.cols - origin.x)),
             h: clamp(origin.h + dy, min.h, Math.min(max.h, m.rows - origin.y)),
           };
-      if (!tryRect(item, next)) return;
-      applyArea(cell, item);
+      if (tryRect(item, next)) {
+        applyArea(cell, item);
+        markSwap(null);
+      } else if (mode === "move") {
+        const target = itemAt(m, moveEvent.clientX, moveEvent.clientY);
+        markSwap(target && swapRects(item, target) ? target : null);
+      }
     }
 
-    function onUp() {
+    function onUp(upEvent) {
       cell.removeEventListener("pointermove", onMove);
       cell.removeEventListener("pointerup", onUp);
       cell.removeEventListener("pointercancel", onUp);
       cell.classList.remove("cell--dragging");
+      const target = upEvent.type === "pointerup" ? swapWith : null;
+      markSwap(null);
       if (!moved) {
         select(item.uid);
         return;
       }
       // Size changes need a remount so the widget can lay out for its new box.
-      if (mode === "resize") DC.runtime.remount();
-      else select(item.uid);
+      if (mode === "resize" || (target && trySwap(item, target))) DC.runtime.remount();
+      select(item.uid);
     }
 
     cell.addEventListener("pointermove", onMove);
@@ -495,7 +538,7 @@
   function cancel() {
     const restore = snapshot;
     teardown();
-    DC.runtime.setDoc(restore, false);
+    DC.runtime.setDoc(restore);
   }
 
   // Re-decorate after every remount while the editor is open.
@@ -528,31 +571,6 @@
     document.addEventListener("pointerup", cancelPress);
     document.addEventListener("pointercancel", cancelPress);
   })();
-
-  DC.editor = {
-    open: openEditor,
-    close: done,
-    isOpen: () => open,
-    select: (uid) => select(uid),
-    // Same rules as dragging; returns false when the move or resize is refused.
-    move(uid, x, y) {
-      const item = itemByUid(uid);
-      if (!item || !tryRect(item, { x, y, w: item.w, h: item.h })) return false;
-      DC.runtime.remount();
-      return true;
-    },
-    resize(uid, w, h) {
-      const item = itemByUid(uid);
-      if (!item || !tryRect(item, { x: item.x, y: item.y, w, h })) return false;
-      DC.runtime.remount();
-      return true;
-    },
-    palette: openPalette,
-    settings(uid) {
-      const item = itemByUid(uid);
-      if (item) openSettings(item);
-    },
-  };
 
   if (window.location.search.indexOf("edit") >= 0) {
     document.addEventListener("DOMContentLoaded", () => setTimeout(openEditor, 0), { once: true });
