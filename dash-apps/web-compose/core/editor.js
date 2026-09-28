@@ -125,21 +125,12 @@
   }
 
   // The grid is usually full, so dropping a widget onto another one trades
-  // their places. Refused when either would then leave the grid or overlap a third.
-  function swapRects(a, b) {
-    if (a === b) return null;
-    const ra = { x: b.x, y: b.y, w: a.w, h: a.h };
-    const rb = { x: a.x, y: a.y, w: b.w, h: b.h };
-    const fits = (rect) => inGrid(rect) && !grid().items.some((i) => i !== a && i !== b && overlaps(rect, i));
-    return !overlaps(ra, rb) && fits(ra) && fits(rb) ? { ra, rb } : null;
-  }
-
-  function trySwap(a, b) {
-    const rects = swapRects(a, b);
-    if (!rects) return false;
-    Object.assign(a, rects.ra);
-    Object.assign(b, rects.rb);
-    return true;
+  // their areas, position and size both. Each lands exactly where the other
+  // was, so a swap always fits; it deliberately ignores the size limits.
+  function swap(a, b) {
+    const area = { x: a.x, y: a.y, w: a.w, h: a.h };
+    Object.assign(a, { x: b.x, y: b.y, w: b.w, h: b.h });
+    Object.assign(b, area);
   }
 
   function itemAt(m, clientX, clientY) {
@@ -196,7 +187,7 @@
         markSwap(null);
       } else if (mode === "move") {
         const target = itemAt(m, moveEvent.clientX, moveEvent.clientY);
-        markSwap(target && swapRects(item, target) ? target : null);
+        markSwap(target && target !== item ? target : null);
       }
     }
 
@@ -211,8 +202,9 @@
         select(item.uid);
         return;
       }
+      if (target) swap(item, target);
       // Size changes need a remount so the widget can lay out for its new box.
-      if (mode === "resize" || (target && trySwap(item, target))) DC.runtime.remount();
+      if (mode === "resize" || target) DC.runtime.remount();
       select(item.uid);
     }
 

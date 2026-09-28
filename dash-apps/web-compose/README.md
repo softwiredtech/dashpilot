@@ -35,14 +35,15 @@ Long-press the dashboard to open the editor (`?edit` opens it straight away in a
 browser). It refuses to open above walking speed and closes itself — saving — if
 the car pulls away while it is open.
 
-- drag a widget to move it; drop it on another widget to swap the two
+- drag a widget to move it; drop it on another widget to swap the two, each
+  taking the other's position and size
 - drag the bottom-right corner to resize
 - tap to select: Settings, Duplicate, Remove
 - **+ Add** lists every registered widget with its preview
 - **Done** saves through the host, **Cancel** restores the layout as it was
 
 Widgets never overlap: a move or resize that would collide is refused (a drop
-onto another widget swaps them when both fit), and a new widget goes into the
+onto another widget swaps their areas instead), and a new widget goes into the
 first free space. The default layout fills the grid, so
 adding one means removing one first.
 
