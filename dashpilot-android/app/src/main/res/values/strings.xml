@@ -222,6 +222,7 @@
     <string name="control_rear_fan_on">Rear Fan: On</string>
     <string name="control_rear_fan_off">Rear Fan: Off</string>
     <string name="control_mirror_dip">Toggle Mirror Dip</string>
+    <string name="control_ac_swing">Toggle AC Swing</string>
     <string name="control_glovebox">Open Glovebox</string>
 
     <!-- Automations -->
@@ -234,7 +235,7 @@
     <string name="automations_keep_climate_subtitle">Keep the climate on when you leave the car. The automation stops after the set time, or when you return to the car.</string>
     <string name="automations_stop_after">Stop after</string>
     <string name="automations_ac_swing_title">AC swing mode</string>
-    <string name="automations_ac_swing_subtitle">Sweep the air vents left and right continuously.</string>
+    <string name="automations_ac_swing_subtitle">Start it from Controls or a multi-finger tap. Stops when you move a vent, leave the car, turn climate off, or after 30 minutes.</string>
     <string name="automations_ac_swing_side">Side</string>
     <string name="automations_ac_swing_both">Both</string>
     <string name="automations_ac_swing_intensity">Intensity</string>

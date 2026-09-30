@@ -222,6 +222,7 @@
     <string name="control_rear_fan_on">Hinteres Gebläse: An</string>
     <string name="control_rear_fan_off">Hinteres Gebläse: Aus</string>
     <string name="control_mirror_dip">Spiegelabsenkung umschalten</string>
+    <string name="control_ac_swing">Klima-Schwenkmodus umschalten</string>
     <string name="control_glovebox">Handschuhfach öffnen</string>
 
     <!-- Automations -->
@@ -234,7 +235,7 @@
     <string name="automations_keep_climate_subtitle">Lässt die Klimaanlage an, wenn du das Auto verlässt. Die Automatisierung endet nach der eingestellten Zeit oder wenn du zum Auto zurückkehrst.</string>
     <string name="automations_stop_after">Beenden nach</string>
     <string name="automations_ac_swing_title">Klima-Schwenkmodus</string>
-    <string name="automations_ac_swing_subtitle">Schwenkt die Lüftung fortlaufend nach links und rechts.</string>
+    <string name="automations_ac_swing_subtitle">Start über Befehle oder Mehrfinger-Tipp. Stoppt, wenn du eine Düse verstellst, aussteigst, die Klimaanlage ausschaltest oder nach 30 Minuten.</string>
     <string name="automations_ac_swing_side">Seite</string>
     <string name="automations_ac_swing_both">Beide</string>
     <string name="automations_ac_swing_intensity">Intensität</string>

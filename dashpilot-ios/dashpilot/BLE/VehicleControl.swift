@@ -84,11 +84,11 @@ enum VehicleControl {
     static let cmdSportKickdownThreshold = 0x4A
 
     // --- AC swing (UI_ventPanelControlRequest 0x253) ---
-    static let cmdAcSwingEnable = 0x4B
     // 0=driver, 1=passenger, 2=both
     static let cmdAcSwingSide = 0x4C
     // 0=low, 1=medium, 2=full
     static let cmdAcSwingIntensity = 0x4D
+    static let cmdAcSwingToggle = 0x4E
 
     /// Bind (or clear, with actionValue 0) an N-finger tap to a control action.
     @discardableResult
@@ -160,8 +160,8 @@ enum VehicleControl {
     }
 
     @discardableResult
-    static func sendAcSwing(_ manager: DashKitBleManager, enabled: Bool) -> Bool {
-        send(manager, opcode: cmdAcSwingEnable, value: enabled ? 1 : 0)
+    static func sendAcSwingToggle(_ manager: DashKitBleManager) -> Bool {
+        send(manager, opcode: cmdAcSwingToggle, value: 0)
     }
 
     @discardableResult

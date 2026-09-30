@@ -188,22 +188,6 @@
         }
       }
     },
-    "Sweep the air vents left and right continuously." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Schwenkt die Lüftung fortlaufend nach links und rechts."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A szellőzőket folyamatosan balra-jobbra mozgatja."
-          }
-        }
-      }
-    },
     "action:" : {
       "localizations" : {
         "de" : {
@@ -2754,6 +2738,22 @@
         }
       }
     },
+    "Start it from Controls or a multi-finger tap. Stops when you move a vent, leave the car, turn climate off, or after 30 minutes." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start über Befehle oder Mehrfinger-Tipp. Stoppt, wenn du eine Düse verstellst, aussteigst, die Klimaanlage ausschaltest oder nach 30 Minuten."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Indítsd a Parancsokból vagy többujjas koppintással. Leáll, ha állítasz egy szellőzőt, kiszállsz, kikapcsolod a klímát, vagy 30 perc után."
+          }
+        }
+      }
+    },
     "State of charge" : {
       "localizations" : {
         "de" : {
@@ -2862,6 +2862,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tipp: nyomj hosszan egy parancsra, hogy a kezdőképernyőre rögzítsd"
+          }
+        }
+      }
+    },
+    "Toggle AC Swing" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klima-Schwenkmodus umschalten"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klíma legyező mód váltása"
           }
         }
       }

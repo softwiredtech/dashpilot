@@ -417,32 +417,30 @@ internal fun AcSwingRow(value: AcSwingSettings, onChange: (AcSwingSettings) -> U
         icon = Icons.Rounded.Air,
         title = stringResource(R.string.automations_ac_swing_title),
         subtitle = stringResource(R.string.automations_ac_swing_subtitle),
-        checked = value.enabled,
-        onToggle = { onChange(value.copy(enabled = !value.enabled)) },
-        extraContent = if (value.enabled) {
-            {
-                ChoiceFooter(
-                    label = stringResource(R.string.automations_ac_swing_side),
-                    options = listOf(
-                        stringResource(R.string.climate_driver),
-                        stringResource(R.string.climate_passenger),
-                        stringResource(R.string.automations_ac_swing_both)
-                    ),
-                    selected = value.side,
-                    onSelect = { onChange(value.copy(side = it)) }
-                )
-                ChoiceFooter(
-                    label = stringResource(R.string.automations_ac_swing_intensity),
-                    options = listOf(
-                        stringResource(R.string.automations_ac_swing_low),
-                        stringResource(R.string.automations_ac_swing_medium),
-                        stringResource(R.string.automations_ac_swing_full)
-                    ),
-                    selected = value.intensity,
-                    onSelect = { onChange(value.copy(intensity = it)) }
-                )
-            }
-        } else null
+        checked = false,
+        onToggle = null,
+        extraContent = {
+            ChoiceFooter(
+                label = stringResource(R.string.automations_ac_swing_side),
+                options = listOf(
+                    stringResource(R.string.climate_driver),
+                    stringResource(R.string.climate_passenger),
+                    stringResource(R.string.automations_ac_swing_both)
+                ),
+                selected = value.side,
+                onSelect = { onChange(value.copy(side = it)) }
+            )
+            ChoiceFooter(
+                label = stringResource(R.string.automations_ac_swing_intensity),
+                options = listOf(
+                    stringResource(R.string.automations_ac_swing_low),
+                    stringResource(R.string.automations_ac_swing_medium),
+                    stringResource(R.string.automations_ac_swing_full)
+                ),
+                selected = value.intensity,
+                onSelect = { onChange(value.copy(intensity = it)) }
+            )
+        }
     )
 }
 
@@ -488,7 +486,7 @@ internal fun AutomationRow(
     title: String,
     subtitle: String?,
     checked: Boolean,
-    onToggle: () -> Unit,
+    onToggle: (() -> Unit)?,
     extraContent: (@Composable () -> Unit)? = null
 ) {
     Column(
@@ -500,7 +498,7 @@ internal fun AutomationRow(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable(onClick = onToggle),
+                .clickable(enabled = onToggle != null) { onToggle?.invoke() },
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
@@ -536,16 +534,18 @@ internal fun AutomationRow(
                     )
                 }
             }
-            Switch(
-                checked = checked,
-                onCheckedChange = { onToggle() },
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = Color.White,
-                    checkedTrackColor = AccentColor,
-                    uncheckedThumbColor = Color.White,
-                    uncheckedTrackColor = DarkColors.Disabled
+            if (onToggle != null) {
+                Switch(
+                    checked = checked,
+                    onCheckedChange = { onToggle() },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = Color.White,
+                        checkedTrackColor = AccentColor,
+                        uncheckedThumbColor = Color.White,
+                        uncheckedTrackColor = DarkColors.Disabled
+                    )
                 )
-            )
+            }
         }
         extraContent?.invoke()
     }

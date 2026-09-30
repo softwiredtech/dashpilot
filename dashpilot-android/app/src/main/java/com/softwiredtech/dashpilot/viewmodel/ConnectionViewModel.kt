@@ -193,11 +193,9 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         _bleManager.value?.let { pushAcSwing(it, value, previous) }
     }
 
-    // Side and intensity go before the enable flag, so a swing never starts on stale settings.
     private fun pushAcSwing(manager: DashKitBleManager, value: AcSwingSettings, previous: AcSwingSettings? = null) {
         if (value.side != previous?.side) VehicleControl.sendAcSwingSide(manager, value.side)
         if (value.intensity != previous?.intensity) VehicleControl.sendAcSwingIntensity(manager, value.intensity)
-        if (value.enabled != previous?.enabled) VehicleControl.sendAcSwing(manager, value.enabled)
     }
 
     private var sportKickdownPercentPush: Job? = null

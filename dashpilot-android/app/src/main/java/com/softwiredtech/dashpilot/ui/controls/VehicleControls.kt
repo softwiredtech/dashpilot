@@ -18,6 +18,7 @@ import androidx.compose.material.icons.rounded.EvStation
 import androidx.compose.material.icons.rounded.Flip
 import androidx.compose.material.icons.rounded.Inbox
 import androidx.compose.material.icons.rounded.PushPin
+import androidx.compose.material.icons.rounded.SwapHoriz
 import androidx.compose.material.icons.rounded.Thermostat
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -150,6 +151,16 @@ val vehicleControls: List<ControlAction> = listOf(
             if (manager == null || VehicleControl.sendRearFanToggle(manager)) {
                 ControlsState.rearFanOn = !ControlsState.rearFanOn
             }
+        }
+    ),
+    ControlAction(
+        id = "ac_swing",
+        icon = Icons.Rounded.SwapHoriz,
+        labelRes = { R.string.control_ac_swing },
+        active = { false },
+        gestureValue = 9,
+        perform = { manager ->
+            manager?.let { VehicleControl.sendAcSwingToggle(it) }
         }
     ),
     // Momentary: the firmware only acts in reverse and drops the override when

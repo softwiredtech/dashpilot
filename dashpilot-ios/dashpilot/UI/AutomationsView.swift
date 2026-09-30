@@ -305,30 +305,32 @@ struct AutomationRow<Footer: View>: View {
     let icon: String
     let title: LocalizedStringKey
     let subtitle: LocalizedStringKey?
-    @Binding var isOn: Bool
+    let isOn: Binding<Bool>?
     let footer: Footer
 
     init(
         icon: String,
         title: LocalizedStringKey,
         subtitle: LocalizedStringKey?,
-        isOn: Binding<Bool>,
+        isOn: Binding<Bool>?,
         @ViewBuilder footer: () -> Footer
     ) {
         self.icon = icon
         self.title = title
         self.subtitle = subtitle
-        self._isOn = isOn
+        self.isOn = isOn
         self.footer = footer()
     }
+
+    private var checked: Bool { isOn?.wrappedValue ?? false }
 
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 12) {
                 IconChip(
                     systemName: icon,
-                    tint: isOn ? .dashAccent : .white,
-                    background: isOn ? Color.dashAccent.opacity(0.16) : Color.white.opacity(0.08)
+                    tint: checked ? .dashAccent : .white,
+                    background: checked ? Color.dashAccent.opacity(0.16) : Color.white.opacity(0.08)
                 )
 
                 VStack(alignment: .leading, spacing: 2) {
@@ -343,13 +345,15 @@ struct AutomationRow<Footer: View>: View {
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                Toggle("", isOn: $isOn)
-                    .labelsHidden()
-                    .tint(.dashAccent)
+                if let isOn {
+                    Toggle("", isOn: isOn)
+                        .labelsHidden()
+                        .tint(.dashAccent)
+                }
             }
             .contentShape(Rectangle())
             .onTapGesture {
-                isOn.toggle()
+                isOn?.wrappedValue.toggle()
             }
 
             footer
@@ -372,7 +376,6 @@ extension AutomationRow where Footer == EmptyView {
 struct AcSwingRow: View {
     @Environment(ConnectionViewModel.self) private var connectionVM
 
-    @AppStorage("ac_swing_automation") private var enabled: Bool = false
     @AppStorage("ac_swing_side") private var side: Int = 0
     @AppStorage("ac_swing_intensity") private var intensity: Int = 2
 
@@ -380,18 +383,11 @@ struct AcSwingRow: View {
         AutomationRow(
             icon: "wind",
             title: "AC swing mode",
-            subtitle: "Sweep the air vents left and right continuously.",
-            isOn: $enabled
+            subtitle: "Start it from Controls or a multi-finger tap. Stops when you move a vent, leave the car, turn climate off, or after 30 minutes.",
+            isOn: nil
         ) {
-            if enabled {
-                ChoiceFooter(label: "Side", options: ["Driver", "Passenger", "Both"], selection: $side)
-                ChoiceFooter(label: "Intensity", options: ["Low", "Medium", "Full"], selection: $intensity)
-            }
-        }
-        .onChange(of: enabled) { _, newValue in
-            if let manager = connectionVM.bleManager {
-                VehicleControl.sendAcSwing(manager, enabled: newValue)
-            }
+            ChoiceFooter(label: "Side", options: ["Driver", "Passenger", "Both"], selection: $side)
+            ChoiceFooter(label: "Intensity", options: ["Low", "Medium", "Full"], selection: $intensity)
         }
         .onChange(of: side) { _, newValue in
             if let manager = connectionVM.bleManager {

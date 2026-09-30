@@ -119,6 +119,17 @@ let vehicleControls: [ControlAction] = [
             }
         }
     ),
+    ControlAction(
+        id: "ac_swing",
+        icon: "arrow.left.and.right",
+        label: { String(localized: "Toggle AC Swing") },
+        active: { false },
+        gestureValue: 9,
+        perform: { manager in
+            guard let manager else { return }
+            VehicleControl.sendAcSwingToggle(manager)
+        }
+    ),
     // Momentary: the firmware only acts in reverse and drops the override when
     // the car leaves reverse, so there is no stable on/off state to show.
     ControlAction(
