@@ -1,6 +1,11 @@
 package com.softwiredtech.dashpilot.ui
 
 import android.content.Context
+import android.net.Uri
+import android.provider.OpenableColumns
+import android.text.format.Formatter
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
@@ -72,7 +77,9 @@ import com.softwiredtech.dashpilot.ble.VehicleControl
 import com.softwiredtech.dashpilot.ui.tesla.teslaTileSummary
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 import com.softwiredtech.dashpilot.BuildConfig
 import com.softwiredtech.dashpilot.R
@@ -634,7 +641,7 @@ private fun DashKitSettingsContent(
     FirmwareInfoSection(updateManager, connected)
     Spacer(modifier = Modifier.height(24.dp))
 
-    FirmwareUpdateSection(updateManager)
+    FirmwareUpdateSection(updateManager, connected)
     Spacer(modifier = Modifier.height(24.dp))
 
     PairNewDeviceSection(bleManager)
@@ -655,6 +662,7 @@ private fun DashKitSettingsContent(
 @Composable
 private fun FirmwareInfoSection(updateManager: FirmwareUpdateManager, connected: Boolean) {
     val installedVersion by updateManager.installedVersion.collectAsState()
+    val localFirmware by updateManager.localFirmware.collectAsState()
 
     SectionHeader(stringResource(R.string.settings_section_firmware_info))
     Spacer(modifier = Modifier.height(12.dp))
@@ -668,7 +676,9 @@ private fun FirmwareInfoSection(updateManager: FirmwareUpdateManager, connected:
     Spacer(modifier = Modifier.height(8.dp))
     InfoRow(
         label = stringResource(R.string.settings_firmware_info_version),
-        value = installedVersion ?: stringResource(R.string.settings_firmware_info_unknown)
+        value = installedVersion?.let {
+            if (localFirmware) stringResource(R.string.settings_firmware_info_local, it) else it
+        } ?: stringResource(R.string.settings_firmware_info_unknown)
     )
 }
 
@@ -832,11 +842,12 @@ private fun teslaStatusText(status: TeslaStatus): String = when (status.linkStat
 }
 
 @Composable
-private fun FirmwareUpdateSection(updateManager: FirmwareUpdateManager) {
+private fun FirmwareUpdateSection(updateManager: FirmwareUpdateManager, connected: Boolean) {
     val scope = rememberCoroutineScope()
     val otaState by updateManager.otaState.collectAsState()
     val checkState by updateManager.check.collectAsState()
     val downloadProgress by updateManager.downloadProgress.collectAsState()
+    val localFirmware by updateManager.localFirmware.collectAsState()
 
     Text(
         text = stringResource(R.string.settings_section_firmware),
@@ -871,7 +882,10 @@ private fun FirmwareUpdateSection(updateManager: FirmwareUpdateManager) {
                 trackColor = DarkColors.Border
             )
         }
-        uploadActive -> OtaStatus(otaState, onRetry = { scope.launch { updateManager.checkForUpdate() } })
+        uploadActive -> OtaStatus(otaState, onRetry = {
+            updateManager.cancel()
+            scope.launch { updateManager.checkForUpdate() }
+        })
         else -> {
             when (val check = checkState) {
                 is FirmwareUpdateManager.Check.Checking -> {
@@ -883,7 +897,11 @@ private fun FirmwareUpdateSection(updateManager: FirmwareUpdateManager) {
                 }
                 is FirmwareUpdateManager.Check.Available -> {
                     Text(
-                        stringResource(R.string.settings_firmware_available, check.manifest.version),
+                        stringResource(
+                            if (localFirmware) R.string.settings_firmware_published_available
+                            else R.string.settings_firmware_available,
+                            check.manifest.version
+                        ),
                         color = Color.White,
                         fontSize = 14.sp
                     )
@@ -897,7 +915,12 @@ private fun FirmwareUpdateSection(updateManager: FirmwareUpdateManager) {
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.buttonColors(containerColor = AccentColor)
                     ) {
-                        Text(stringResource(R.string.settings_firmware_install))
+                        Text(
+                            stringResource(
+                                if (localFirmware) R.string.settings_firmware_install_published
+                                else R.string.settings_firmware_install
+                            )
+                        )
                     }
                 }
                 is FirmwareUpdateManager.Check.UpToDate -> {
@@ -916,8 +939,98 @@ private fun FirmwareUpdateSection(updateManager: FirmwareUpdateManager) {
                 }
                 FirmwareUpdateManager.Check.Idle -> {}
             }
+            if (localFirmware) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    stringResource(R.string.settings_firmware_local_notice),
+                    color = DarkColors.ContentDisabled,
+                    fontSize = 13.sp
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            LocalFirmwareInstall(updateManager, connected && checkState !is FirmwareUpdateManager.Check.Checking)
         }
     }
+}
+
+private class PickedFirmware(val name: String, val bytes: ByteArray)
+
+@Composable
+private fun LocalFirmwareInstall(updateManager: FirmwareUpdateManager, enabled: Boolean) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val picked = remember { mutableStateOf<PickedFirmware?>(null) }
+
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            val firmware = withContext(Dispatchers.IO) { readFirmware(context, uri) }
+            if (firmware == null) {
+                android.widget.Toast.makeText(
+                    context, context.getString(R.string.fw_error_read_file), android.widget.Toast.LENGTH_LONG
+                ).show()
+            } else {
+                picked.value = firmware
+            }
+        }
+    }
+
+    Button(
+        onClick = { launcher.launch(arrayOf("*/*")) },
+        enabled = enabled,
+        modifier = Modifier.fillMaxWidth(),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = DarkColors.SurfaceSelected,
+            contentColor = Color.White,
+            disabledContainerColor = DarkColors.Border,
+            disabledContentColor = DarkColors.TextMuted
+        )
+    ) {
+        Text(stringResource(R.string.settings_firmware_install_file), fontSize = 16.sp)
+    }
+
+    picked.value?.let { firmware ->
+        AlertDialog(
+            onDismissRequest = { picked.value = null },
+            title = { Text(stringResource(R.string.settings_firmware_file_dialog_title)) },
+            text = {
+                Text(
+                    stringResource(
+                        R.string.settings_firmware_file_dialog_body,
+                        firmware.name,
+                        Formatter.formatShortFileSize(context, firmware.bytes.size.toLong())
+                    )
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    picked.value = null
+                    if (!updateManager.installLocal(firmware.bytes)) {
+                        android.widget.Toast.makeText(
+                            context, context.getString(R.string.fw_error_not_firmware), android.widget.Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }) {
+                    Text(stringResource(R.string.settings_firmware_file_dialog_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { picked.value = null }) {
+                    Text(stringResource(R.string.settings_firmware_file_dialog_cancel))
+                }
+            }
+        )
+    }
+}
+
+private fun readFirmware(context: Context, uri: Uri): PickedFirmware? = try {
+    val name = context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)
+        ?.use { if (it.moveToFirst()) it.getString(0) else null }
+        ?: uri.lastPathSegment.orEmpty()
+    context.contentResolver.openInputStream(uri)?.use { PickedFirmware(name, it.readBytes()) }
+} catch (e: Exception) {
+    Log.e("SettingsScreen", "Reading firmware file failed", e)
+    null
 }
 
 @Composable

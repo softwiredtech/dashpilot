@@ -56,6 +56,15 @@
     <string name="settings_firmware_available">Version %1$s ist verfügbar</string>
     <string name="settings_firmware_install">Update installieren</string>
     <string name="settings_firmware_downloading">Firmware wird heruntergeladen… %1$d%%</string>
+    <string name="settings_firmware_local_notice">Auf dem DashKit läuft eine aus einer Datei installierte Firmware. Installiere die veröffentlichte Version, um zu den offiziellen Versionen zurückzukehren.</string>
+    <string name="settings_firmware_published_available">Veröffentlichte Version %1$s ist verfügbar</string>
+    <string name="settings_firmware_install_published">Veröffentlichte Version installieren</string>
+    <string name="settings_firmware_install_file">Firmware aus Datei installieren</string>
+    <string name="settings_firmware_file_dialog_title">Firmware aus Datei installieren?</string>
+    <string name="settings_firmware_file_dialog_body">%1$s (%2$s) wird auf das DashKit hochgeladen. Installiere nur Firmware, die für das DashKit erstellt wurde.</string>
+    <string name="settings_firmware_file_dialog_confirm">Installieren</string>
+    <string name="settings_firmware_file_dialog_cancel">Abbrechen</string>
+    <string name="settings_firmware_info_local">%1$s (aus Datei)</string>
 
     <!-- Settings tabs -->
     <string name="settings_tab_general">Allgemein</string>
@@ -314,6 +323,8 @@
     <string name="fw_error_unreachable">Update-Server nicht erreichbar</string>
     <string name="fw_error_integrity">Heruntergeladene Firmware hat die Integritätsprüfung nicht bestanden</string>
     <string name="fw_error_download">Download fehlgeschlagen: %1$s</string>
+    <string name="fw_error_not_firmware">Die ausgewählte Datei ist kein DashKit-Firmware-Image</string>
+    <string name="fw_error_read_file">Die ausgewählte Datei konnte nicht gelesen werden</string>
     <string name="ota_error_empty">Firmware-Datei ist leer</string>
     <string name="ota_error_service_not_found">OTA-Dienst auf dem Gerät nicht gefunden</string>
     <string name="ota_error_chars_not_found">OTA-Charakteristiken nicht gefunden</string>

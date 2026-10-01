@@ -1,8 +1,10 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 private let accent = Color(red: 0x5C / 255.0, green: 0xBD / 255.0, blue: 0x68 / 255.0)
 private let mutedText = Color(white: 0.53)
 private let borderColor = Color(white: 0.2)
+private let secondaryFill = Color(white: 0.17)
 private let errorRed = Color(red: 1, green: 0.32, blue: 0.32)
 
 /// DashKit tab of the Settings screen (port of the Android
@@ -25,7 +27,7 @@ struct DashKitSettingsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 24) {
             firmwareInfoSection
-            FirmwareUpdateSection(updateManager: updateManager)
+            FirmwareUpdateSection(updateManager: updateManager, connected: connected)
             pairingSection
             maintenanceSection
         }
@@ -65,8 +67,13 @@ struct DashKitSettingsView: View {
         VStack(alignment: .leading, spacing: 8) {
             SectionHeader("Firmware info")
             InfoRow(label: "Status", value: connected ? String(localized: "Connected") : String(localized: "Disconnected"))
-            InfoRow(label: "Firmware version", value: updateManager.installedVersion ?? String(localized: "Unknown"))
+            InfoRow(label: "Firmware version", value: installedVersionText)
         }
+    }
+
+    private var installedVersionText: String {
+        guard let version = updateManager.installedVersion else { return String(localized: "Unknown") }
+        return updateManager.localFirmware ? String(localized: "\(version) (from file)") : version
     }
 
     // MARK: - Pairing
@@ -108,9 +115,19 @@ struct DashKitSettingsView: View {
 
 // MARK: - Firmware update section
 
+private struct PickedFirmware {
+    let name: String
+    let bytes: Data
+}
+
 private struct FirmwareUpdateSection: View {
 
     let updateManager: FirmwareUpdateManager
+    let connected: Bool
+
+    @State private var showFileImporter = false
+    @State private var picked: PickedFirmware?
+    @State private var fileError: String?
 
     /// While an upload is in progress (or just finished), show only OTA status.
     private var uploadActive: Bool {
@@ -134,7 +151,45 @@ private struct FirmwareUpdateSection: View {
                 otaStatus
             } else {
                 checkStatus
+                if updateManager.localFirmware {
+                    Text("DashKit is running a firmware installed from a file. Install the published version to go back to official releases.")
+                        .foregroundColor(mutedText)
+                        .font(.system(size: 13))
+                }
+                WideButton(label: "Install firmware from file", enabled: connected && updateManager.check != .checking, style: .secondary) {
+                    fileError = nil
+                    showFileImporter = true
+                }
+                if let fileError {
+                    Text(fileError)
+                        .foregroundColor(errorRed)
+                        .font(.system(size: 13))
+                }
             }
+        }
+        .fileImporter(isPresented: $showFileImporter, allowedContentTypes: [.data]) { result in
+            switch result {
+            case .success(let url):
+                let scoped = url.startAccessingSecurityScopedResource()
+                defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+                if let bytes = try? Data(contentsOf: url) {
+                    picked = PickedFirmware(name: url.lastPathComponent, bytes: bytes)
+                } else {
+                    fileError = String(localized: "Could not read the selected file")
+                }
+            case .failure:
+                fileError = String(localized: "Could not read the selected file")
+            }
+        }
+        .alert("Install firmware from file?", isPresented: Binding(get: { picked != nil }, set: { if !$0 { picked = nil } }), presenting: picked) { firmware in
+            Button("Install") {
+                if !updateManager.installLocal(firmware.bytes) {
+                    fileError = String(localized: "The selected file is not a DashKit firmware image")
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: { firmware in
+            Text("\(firmware.name) (\(ByteCountFormatter.string(fromByteCount: Int64(firmware.bytes.count), countStyle: .file))) will be uploaded to DashKit. Only install firmware built for DashKit.")
         }
     }
 
@@ -152,7 +207,9 @@ private struct FirmwareUpdateSection: View {
                 .foregroundColor(mutedText)
                 .font(.system(size: 14))
         case .available(let manifest):
-            Text("Version \(manifest.version) is available")
+            Text(updateManager.localFirmware
+                 ? "Published version \(manifest.version) is available"
+                 : "Version \(manifest.version) is available")
                 .foregroundColor(.white)
                 .font(.system(size: 14))
             if let notes = manifest.notes, !notes.isEmpty {
@@ -160,7 +217,7 @@ private struct FirmwareUpdateSection: View {
                     .foregroundColor(mutedText)
                     .font(.system(size: 13))
             }
-            WideButton(label: "Install update", enabled: true) {
+            WideButton(label: updateManager.localFirmware ? "Install published version" : "Install update", enabled: true) {
                 Task { await updateManager.install(manifest) }
             }
         case .error(let message):
@@ -194,6 +251,7 @@ private struct FirmwareUpdateSection: View {
                 .foregroundColor(errorRed)
                 .font(.system(size: 14))
             WideButton(label: "Update DashKit Firmware", enabled: true) {
+                updateManager.cancel()
                 Task { await updateManager.checkForUpdate() }
             }
         }
@@ -235,8 +293,11 @@ private struct InfoRow: View {
 }
 
 private struct WideButton: View {
+    enum Style { case primary, secondary }
+
     let label: LocalizedStringKey
     let enabled: Bool
+    var style: Style = .primary
     let action: () -> Void
 
     var body: some View {
@@ -247,7 +308,7 @@ private struct WideButton: View {
                 .frame(maxWidth: .infinity)
                 .frame(height: 48)
         }
-        .background(enabled ? accent : borderColor)
+        .background(enabled ? (style == .primary ? accent : secondaryFill) : borderColor)
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .disabled(!enabled)
     }

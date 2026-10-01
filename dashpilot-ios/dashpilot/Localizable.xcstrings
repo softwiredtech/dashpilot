@@ -3185,6 +3185,166 @@
           }
         }
       }
+    },
+    "%@ (from file)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ (aus Datei)"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ (fájlból)"
+          }
+        }
+      }
+    },
+    "DashKit is running a firmware installed from a file. Install the published version to go back to official releases." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auf dem DashKit läuft eine aus einer Datei installierte Firmware. Installiere die veröffentlichte Version, um zu den offiziellen Versionen zurückzukehren."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A DashKit fájlból telepített firmware-t futtat. Telepítsd a kiadott verziót a hivatalos kiadásokhoz való visszatéréshez."
+          }
+        }
+      }
+    },
+    "Install firmware from file" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Firmware aus Datei installieren"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Firmware telepítése fájlból"
+          }
+        }
+      }
+    },
+    "Install firmware from file?" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Firmware aus Datei installieren?"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Firmware telepítése fájlból?"
+          }
+        }
+      }
+    },
+    "Install" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Installieren"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Telepítés"
+          }
+        }
+      }
+    },
+    "Could not read the selected file" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die ausgewählte Datei konnte nicht gelesen werden"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A kiválasztott fájl nem olvasható"
+          }
+        }
+      }
+    },
+    "The selected file is not a DashKit firmware image" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die ausgewählte Datei ist kein DashKit-Firmware-Image"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A kiválasztott fájl nem DashKit firmware"
+          }
+        }
+      }
+    },
+    "%@ (%@) will be uploaded to DashKit. Only install firmware built for DashKit." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ (%2$@) wird auf das DashKit hochgeladen. Installiere nur Firmware, die für das DashKit erstellt wurde."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A(z) %1$@ (%2$@) feltöltésre kerül a DashKitre. Csak DashKithez készült firmware-t telepíts."
+          }
+        }
+      }
+    },
+    "Published version %@ is available" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veröffentlichte Version %@ ist verfügbar"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A(z) %@ kiadott verzió elérhető"
+          }
+        }
+      }
+    },
+    "Install published version" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veröffentlichte Version installieren"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kiadott verzió telepítése"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

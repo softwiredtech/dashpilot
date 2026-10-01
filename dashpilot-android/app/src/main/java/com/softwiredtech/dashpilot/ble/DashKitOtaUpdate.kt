@@ -40,6 +40,8 @@ class DashKitOtaUpdate(
     private val _state = MutableStateFlow<OtaState>(OtaState.Idle)
     val state: StateFlow<OtaState> = _state
 
+    var onUploaded: (() -> Unit)? = null
+
     private var firmware: ByteArray? = null
     private var firmwareOffset = 0
     private var ctrlChar: BluetoothGattCharacteristic? = null
@@ -177,6 +179,7 @@ class DashKitOtaUpdate(
         if (uploadFinished && currentState !is OtaState.Rebooting) {
             Log.d(TAG, "Link dropped after the last chunk; treating as reboot")
             _state.value = OtaState.Rebooting
+            onUploaded?.invoke()
         } else if (currentState !is OtaState.Rebooting && currentState !is OtaState.Idle) {
             _state.value = OtaState.Error(manager.context.getString(R.string.ota_error_disconnected))
         }
@@ -262,6 +265,7 @@ class DashKitOtaUpdate(
                 _state.value = OtaState.Rebooting
                 manager.suppressPings = false
                 firmware = null
+                onUploaded?.invoke()
             }
             0xFF -> {
                 val errCode = if (value.size > 1) value[1].toInt() and 0xFF else 0

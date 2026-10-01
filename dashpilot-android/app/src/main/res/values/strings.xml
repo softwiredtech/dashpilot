@@ -56,6 +56,15 @@
     <string name="settings_firmware_available">Version %1$s is available</string>
     <string name="settings_firmware_install">Install update</string>
     <string name="settings_firmware_downloading">Downloading firmware… %1$d%%</string>
+    <string name="settings_firmware_local_notice">DashKit is running a firmware installed from a file. Install the published version to go back to official releases.</string>
+    <string name="settings_firmware_published_available">Published version %1$s is available</string>
+    <string name="settings_firmware_install_published">Install published version</string>
+    <string name="settings_firmware_install_file">Install firmware from file</string>
+    <string name="settings_firmware_file_dialog_title">Install firmware from file?</string>
+    <string name="settings_firmware_file_dialog_body">%1$s (%2$s) will be uploaded to DashKit. Only install firmware built for DashKit.</string>
+    <string name="settings_firmware_file_dialog_confirm">Install</string>
+    <string name="settings_firmware_file_dialog_cancel">Cancel</string>
+    <string name="settings_firmware_info_local">%1$s (from file)</string>
 
     <!-- Settings tabs -->
     <string name="settings_tab_general">General</string>
@@ -314,6 +323,8 @@
     <string name="fw_error_unreachable">Could not reach update server</string>
     <string name="fw_error_integrity">Downloaded firmware failed integrity check</string>
     <string name="fw_error_download">Download failed: %1$s</string>
+    <string name="fw_error_not_firmware">The selected file is not a DashKit firmware image</string>
+    <string name="fw_error_read_file">Could not read the selected file</string>
     <string name="ota_error_empty">Firmware file is empty</string>
     <string name="ota_error_service_not_found">OTA service not found on device</string>
     <string name="ota_error_chars_not_found">OTA characteristics not found</string>

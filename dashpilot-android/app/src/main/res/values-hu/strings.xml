@@ -56,6 +56,15 @@
     <string name="settings_firmware_available">Elérhető a(z) %1$s verzió</string>
     <string name="settings_firmware_install">Frissítés telepítése</string>
     <string name="settings_firmware_downloading">Firmware letöltése… %1$d%%</string>
+    <string name="settings_firmware_local_notice">A DashKit fájlból telepített firmware-t futtat. Telepítsd a kiadott verziót a hivatalos kiadásokhoz való visszatéréshez.</string>
+    <string name="settings_firmware_published_available">A(z) %1$s kiadott verzió elérhető</string>
+    <string name="settings_firmware_install_published">Kiadott verzió telepítése</string>
+    <string name="settings_firmware_install_file">Firmware telepítése fájlból</string>
+    <string name="settings_firmware_file_dialog_title">Firmware telepítése fájlból?</string>
+    <string name="settings_firmware_file_dialog_body">A(z) %1$s (%2$s) feltöltésre kerül a DashKitre. Csak DashKithez készült firmware-t telepíts.</string>
+    <string name="settings_firmware_file_dialog_confirm">Telepítés</string>
+    <string name="settings_firmware_file_dialog_cancel">Mégse</string>
+    <string name="settings_firmware_info_local">%1$s (fájlból)</string>
 
     <!-- Settings tabs -->
     <string name="settings_tab_general">Általános</string>
@@ -313,6 +322,8 @@
     <string name="fw_error_unreachable">A frissítési szerver nem érhető el</string>
     <string name="fw_error_integrity">A letöltött firmware integritás-ellenőrzése sikertelen</string>
     <string name="fw_error_download">A letöltés sikertelen: %1$s</string>
+    <string name="fw_error_not_firmware">A kiválasztott fájl nem DashKit firmware</string>
+    <string name="fw_error_read_file">A kiválasztott fájl nem olvasható</string>
     <string name="ota_error_empty">A firmware-fájl üres</string>
     <string name="ota_error_service_not_found">Az OTA-szolgáltatás nem található az eszközön</string>
     <string name="ota_error_chars_not_found">Az OTA-jellemzők nem találhatók</string>

@@ -77,6 +77,11 @@ final class FirmwareUpdateManager {
 
     private(set) var check: Check = .idle
     private(set) var downloading = false
+    private(set) var localFirmware = UserDefaults.standard.bool(forKey: FirmwareUpdateManager.localFirmwareKey)
+
+    private static let localFirmwareKey = "dashkit_local_firmware_installed"
+    private static let espImageMagic: UInt8 = 0xE9
+    @ObservationIgnored private var uploadingLocal = false
 
     var otaState: OtaState { ota.state }
     var installedVersion: String? { versionReader.version }
@@ -93,6 +98,13 @@ final class FirmwareUpdateManager {
         versionReader = DashKitFirmwareVersion(manager: manager)
         ota.onCompleted = { [weak self] in
             Task { @MainActor in await self?.runCheck() }
+        }
+        ota.onUploaded = { [weak self] in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.localFirmware = self.uploadingLocal
+                UserDefaults.standard.set(self.uploadingLocal, forKey: Self.localFirmwareKey)
+            }
         }
     }
 
@@ -125,7 +137,7 @@ final class FirmwareUpdateManager {
             check = .available(manifest)
             return
         }
-        check = SemVer.isNewer(manifest.version, than: current) ? .available(manifest) : .upToDate
+        check = localFirmware || SemVer.isNewer(manifest.version, than: current) ? .available(manifest) : .upToDate
     }
 
     /// Download the firmware described by `manifest`, verify its SHA-256 if
@@ -144,10 +156,19 @@ final class FirmwareUpdateManager {
                     return
                 }
             }
+            uploadingLocal = false
             ota.start(firmware: bytes)
         } catch {
             check = .error(String(localized: "Download failed: \(error.localizedDescription)"))
         }
+    }
+
+    @MainActor
+    func installLocal(_ bytes: Data) -> Bool {
+        guard bytes.first == Self.espImageMagic else { return false }
+        uploadingLocal = true
+        ota.start(firmware: bytes)
+        return true
     }
 
     func cancel() {

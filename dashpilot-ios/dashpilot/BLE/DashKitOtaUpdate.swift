@@ -26,6 +26,9 @@ final class DashKitOtaUpdate: DashKitGattListener {
     @ObservationIgnored
     var onCompleted: (() -> Void)?
 
+    @ObservationIgnored
+    var onUploaded: (() -> Void)?
+
     private let manager: DashKitBleManager
 
     // Mutated only on the manager's BLE queue (listener callbacks) once the
@@ -180,6 +183,7 @@ final class DashKitOtaUpdate: DashKitGattListener {
             print("[DashKitOta] link dropped after the last chunk; treating as reboot")
             rebooting = true
             setState(.rebooting)
+            onUploaded?()
         } else if !rebooting, state != .idle {
             setState(.error(String(localized: "Disconnected unexpectedly")))
         }
@@ -255,6 +259,7 @@ final class DashKitOtaUpdate: DashKitGattListener {
             setState(.rebooting)
             manager.suppressPings = false
             firmware = nil
+            onUploaded?()
         case 0xFF:
             let errCode = value.count > 1 ? value[1] : 0
             print("[DashKitOta] OTA error from device: 0x\(String(errCode, radix: 16))")

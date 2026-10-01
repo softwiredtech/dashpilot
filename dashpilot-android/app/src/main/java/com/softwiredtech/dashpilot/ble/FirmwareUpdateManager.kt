@@ -1,5 +1,6 @@
 package com.softwiredtech.dashpilot.ble
 
+import android.content.Context
 import android.util.Log
 import com.softwiredtech.dashpilot.api.FirmwareManifest
 import com.softwiredtech.dashpilot.api.FirmwareUpdateRepository
@@ -26,6 +27,9 @@ class FirmwareUpdateManager(
 ) {
     companion object {
         private const val TAG = "FwUpdateManager"
+        private const val PREFS = "dashkit_firmware"
+        private const val KEY_LOCAL = "local_firmware_installed"
+        private const val ESP_IMAGE_MAGIC: Byte = 0xE9.toByte()
     }
 
     sealed class Check {
@@ -47,6 +51,18 @@ class FirmwareUpdateManager(
 
     private val _downloadProgress = MutableStateFlow<Float?>(null)
     val downloadProgress: StateFlow<Float?> = _downloadProgress
+
+    private val prefs = manager.context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    private val _localFirmware = MutableStateFlow(prefs.getBoolean(KEY_LOCAL, false))
+    val localFirmware: StateFlow<Boolean> = _localFirmware
+    private var uploadingLocal = false
+
+    init {
+        ota.onUploaded = {
+            _localFirmware.value = uploadingLocal
+            prefs.edit().putBoolean(KEY_LOCAL, uploadingLocal).apply()
+        }
+    }
 
     /** Begin reading the installed firmware version over BLE. */
     fun start() {
@@ -70,7 +86,7 @@ class FirmwareUpdateManager(
             _check.value = Check.Available(manifest)
             return
         }
-        _check.value = if (SemVer.isNewer(manifest.version, current)) {
+        _check.value = if (_localFirmware.value || SemVer.isNewer(manifest.version, current)) {
             Check.Available(manifest)
         } else {
             Check.UpToDate
@@ -98,11 +114,19 @@ class FirmwareUpdateManager(
                     return
                 }
             }
+            uploadingLocal = false
             ota.start(bytes)
         } catch (e: Exception) {
             _downloadProgress.value = null
             _check.value = Check.Error(manager.context.getString(R.string.fw_error_download, e.message))
         }
+    }
+
+    fun installLocal(bytes: ByteArray): Boolean {
+        if (bytes.firstOrNull() != ESP_IMAGE_MAGIC) return false
+        uploadingLocal = true
+        ota.start(bytes)
+        return true
     }
 
     fun cancel() {
