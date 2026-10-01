@@ -37,6 +37,7 @@ struct CarState: Codable {
     var hvacAcMode: Float = 0
     var hvacRecirc: Float = 0
     var hvacKeepClimateOn: Float = 0
+    var powerLevel: Float = 0
 
     // Openpilot state
     var madsActive: Bool = false
@@ -80,6 +81,7 @@ struct CarState: Codable {
         hvacAcMode = Float(bridge.hvacAcMode)
         hvacRecirc = Float(bridge.hvacRecirc)
         hvacKeepClimateOn = Float(bridge.hvacKeepClimateOn)
+        powerLevel = Float(bridge.powerLevel)
         madsActive = bridge.madsActive > 0
         selfdriveActive = bridge.selfdriveActive > 0
         experimentalMode = bridge.experimentalMode > 0
@@ -143,6 +145,7 @@ struct CarState: Codable {
         hvacAcMode           = try c.decodeIfPresent(Float.self, forKey: .hvacAcMode)           ?? 0
         hvacRecirc           = try c.decodeIfPresent(Float.self, forKey: .hvacRecirc)           ?? 0
         hvacKeepClimateOn    = try c.decodeIfPresent(Float.self, forKey: .hvacKeepClimateOn)    ?? 0
+        powerLevel           = try c.decodeIfPresent(Float.self, forKey: .powerLevel)           ?? 0
         madsActive           = try c.decodeIfPresent(Bool.self,  forKey: .madsActive)           ?? false
         selfdriveActive      = try c.decodeIfPresent(Bool.self,  forKey: .selfdriveActive)      ?? false
         experimentalMode     = try c.decodeIfPresent(Bool.self,  forKey: .experimentalMode)     ?? false

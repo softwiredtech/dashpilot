@@ -34,6 +34,7 @@
     maxDischargePower: "getMaxDischargePower",
     packVoltage: "getPackVoltage",
     packCurrent: "getPackCurrent",
+    powerLevel: "getPowerLevel",
     packTMin: "getPackTMin",
     packTMax: "getPackTMax",
     odometer: "getOdometer",

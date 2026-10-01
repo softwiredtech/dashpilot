@@ -37,6 +37,7 @@
       maxDischargePower: 300,
       packVoltage: 380,
       packCurrent: current,
+      powerLevel: Math.max(-1, Math.min(1, (380 * current) / 1000 / (current < 0 ? 70 : 300))) * 100,
       packTMin: 22,
       packTMax: 26 + Math.sin(t / 30) * 2,
       odometer,

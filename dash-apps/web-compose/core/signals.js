@@ -78,6 +78,8 @@
         const v = num(r.packVoltage), a = num(r.packCurrent);
         return v && a !== undefined ? (v * a) / 1000 : undefined;
       } },
+    { id: "powerLevel", kind: "number", unit: "percent", precision: 0, range: () => [-100, 100], category: "battery", bus: "vehicle",
+      read: (r) => (num(r.maxDischargePower) && num(r.maxRegenPower) ? num(r.powerLevel) : undefined) },
     { id: "packVoltage", kind: "number", unit: "volt", precision: 0, range: () => [250, 420], category: "battery", bus: "vehicle",
       read: (r) => num(r.packVoltage) || undefined },
     { id: "packCurrent", kind: "number", unit: "amp", precision: 0, range: () => [-400, 1200], category: "battery", bus: "vehicle",

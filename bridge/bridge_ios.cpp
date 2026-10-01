@@ -40,6 +40,7 @@ static void carStateToBridge(const CarState& cs, BridgeCarState* out) {
     out->hvacAcMode = cs.hvacAcMode;
     out->hvacRecirc = cs.hvacRecirc;
     out->hvacKeepClimateOn = cs.hvacKeepClimateOn;
+    out->powerLevel = cs.powerLevel;
     out->madsActive = cs.madsActive;
     out->selfdriveActive = cs.selfdriveActive;
     out->experimentalMode = cs.experimentalMode;

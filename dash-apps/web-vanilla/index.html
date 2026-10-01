@@ -744,23 +744,18 @@
         }
 
         // Power bar
-        const voltage = car.packVoltage;
-        const current = car.packCurrent;
-        const maxRegen = car.maxRegenPower;
-        const maxDischarge = car.maxDischargePower;
-        if (voltage > 0 && maxDischarge > 0 && maxRegen > 0) {
+        const powerLevel = car.powerLevel;
+        if (powerLevel != null && car.maxDischargePower > 0 && car.maxRegenPower > 0) {
           document.getElementById("powerBar").style.display = "flex";
-          const powerKw = (voltage * current) / 1000;
           const fill = document.getElementById("powerBarFill");
-          if (powerKw >= 0) {
+          const pct = Math.abs(powerLevel) / 2;
+          if (powerLevel >= 0) {
             // Discharging — bar goes up from center
-            const pct = Math.min(powerKw / maxDischarge, 1) * 50;
             fill.style.top = (50 - pct) + "%";
             fill.style.height = pct + "%";
             fill.style.background = "#555";
           } else {
             // Regenerating — bar goes down from center
-            const pct = Math.min(Math.abs(powerKw) / maxRegen, 1) * 50;
             fill.style.top = "50%";
             fill.style.height = pct + "%";
             fill.style.background = "#5cbd68";
@@ -839,6 +834,7 @@
         maxDischargePower: NativeCarState.getMaxDischargePower?.() ?? undefined,
         packVoltage: NativeCarState.getPackVoltage?.() ?? undefined,
         packCurrent: NativeCarState.getPackCurrent?.() ?? undefined,
+        powerLevel: NativeCarState.getPowerLevel?.() ?? undefined,
         showPhoneBattery: NativeCarState.getShowPhoneBattery?.() ?? true,
         showCarBattery: NativeCarState.getShowCarBattery?.() ?? true,
         showOdometer: NativeCarState.getShowOdometer?.() ?? true,

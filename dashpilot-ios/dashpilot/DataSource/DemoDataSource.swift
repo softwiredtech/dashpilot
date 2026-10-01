@@ -170,6 +170,7 @@ final class DemoDataSource: IDataSource {
         s.maxDischargePower = 300
         s.packVoltage = Float(380 + sin(t * 0.2) * 5)
         s.packCurrent = s.egoSpeed * 0.4
+        s.powerLevel = min(s.packVoltage * s.packCurrent / 1000 / s.maxDischargePower, 1) * 100
         s.packTMin = 22
         s.packTMax = 28
         s.acTemp = 22

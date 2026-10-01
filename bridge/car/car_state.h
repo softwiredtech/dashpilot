@@ -40,6 +40,7 @@ struct CarState {
     double hvacAcMode = 0;
     double hvacRecirc = 0;
     double hvacKeepClimateOn = 0;
+    double powerLevel = 0;
 
     // Openpilot state
     double madsActive = 0;
@@ -52,7 +53,7 @@ struct CarState {
     char vin[VIN_LENGTH + 1] = {};
 
     static constexpr size_t VIN_DOUBLE_COUNT = 3;
-    static constexpr size_t VIN_OFFSET = 37;
+    static constexpr size_t VIN_OFFSET = 38;
     static constexpr size_t FIELD_COUNT = VIN_OFFSET + VIN_DOUBLE_COUNT;
 
     void toArray(double* out) const {
@@ -99,6 +100,7 @@ struct CarState {
         out[34] = hvacAcMode;
         out[35] = hvacRecirc;
         out[36] = hvacKeepClimateOn;
+        out[37] = powerLevel;
 
         // VIN chars ride the double array as raw bit patterns, 8 bytes per
         // double; decoded by CanFrameDecoder.arrayToCarState.

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <array>
 #include <chrono>
 #include <cstdint>
@@ -82,6 +83,13 @@ static inline void updatePartyBus(const CANParsers& cp, CarState& cs) {
     cs.accSetSpeed = cp.get(2, "DI_state", "DI_digitalSpeed");
 }
 
+static inline double powerLevel(const CarState& cs) {
+    if (cs.packVoltage <= 0 || cs.maxDischargePower <= 0 || cs.maxRegenPower <= 0) return 0;
+    double kw = cs.packVoltage * cs.packCurrent / 1000.0;
+    double limit = kw >= 0 ? cs.maxDischargePower : cs.maxRegenPower;
+    return std::clamp(kw / limit, -1.0, 1.0) * 100.0;
+}
+
 static inline void updateVehicleBus(const CANParsers& cp, CarState& cs) {
     // Vehicle bus specific signals
     // BMS_energyStatus is multiplexed: mux 0 has pack/remaining energy, mux 1 has energyBuffer
@@ -96,6 +104,7 @@ static inline void updateVehicleBus(const CANParsers& cp, CarState& cs) {
     cs.maxDischargePower = cp.get(1, "BMS_powerAvailable", "BMS_maxDischargePower");
     cs.packVoltage = cp.get(1, "BMS_hvBusStatus", "BMS_packVoltage");
     cs.packCurrent = cp.get(1, "BMS_hvBusStatus", "BMS_packCurrent");
+    cs.powerLevel = powerLevel(cs);
     // BMS_bmbMinMax is multiplexed: mux 0 (THERM) carries the thermistor min/max
     // temps. Only update on that mux so other muxes don't zero out the last reading.
     if (static_cast<int>(cp.get(1, "BMS_bmbMinMax", "BMS_bmbMinMaxMultiplexer")) == 0) {

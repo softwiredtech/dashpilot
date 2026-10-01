@@ -106,6 +106,88 @@
 
 @keyframes lamp-blink { 50% { opacity: 0.25; } }
 
+/* --- power */
+.w-power {
+  --regen: #5cbd68;
+  --drive: var(--text-dim);
+  --start: 0.5;
+  --len: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 8px;
+  padding: clamp(6px, 7cqmin, 20px);
+}
+.power__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6em;
+  min-width: 0;
+}
+.power__label {
+  color: var(--text-dim);
+  font-size: clamp(11px, 11cqmin, 22px);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.power__value {
+  color: var(--text);
+  font-size: clamp(14px, 16cqmin, 40px);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  white-space: nowrap;
+}
+.power__unit {
+  color: var(--text-dim);
+  font-size: 0.5em;
+  margin-inline-start: 0.3em;
+}
+.power__track {
+  position: relative;
+  height: clamp(6px, 16cqh, 18px);
+  border-radius: 999px;
+  background: var(--track);
+  overflow: hidden;
+  flex: none;
+}
+.power__center {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--text-dim);
+}
+.power__fill {
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+  transform: translateX(calc(var(--start) * 100%)) scaleX(var(--len));
+  background: var(--drive);
+  will-change: transform;
+}
+.w-power[data-regen="1"] .power__fill { background: var(--regen); }
+
+/* Taller than wide: vertical, like web-vanilla. Discharge up, regen down. */
+@container (orientation: portrait) {
+  .w-power { align-items: center; }
+  .power__head { flex-direction: column; align-items: center; gap: 4px; max-width: 100%; }
+  .power__value { font-size: clamp(12px, 22cqw, 32px); }
+  .power__label { font-size: clamp(10px, 16cqw, 18px); max-width: 100%; }
+  .power__track { flex: 1; height: auto; width: clamp(6px, 16cqw, 18px); }
+  .power__center { left: 0; right: 0; top: 50%; bottom: auto; width: auto; height: 2px; margin: -1px 0 0; }
+  .power__fill {
+    transform-origin: center bottom;
+    transform: translateY(calc(var(--start) * -100%)) scaleY(var(--len));
+  }
+}
+
 /* --- radial */
 .w-radial {
   display: flex;

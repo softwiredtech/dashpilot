@@ -34,6 +34,7 @@ class CarStateBridge(
     @Volatile private var maxDischargePower: Float = 0f
     @Volatile private var packVoltage: Float = 0f
     @Volatile private var packCurrent: Float = 0f
+    @Volatile private var powerLevel: Float = 0f
     @Volatile private var packTMin: Float = 0f
     @Volatile private var packTMax: Float = 0f
     @Volatile private var odometer: Float = 0f
@@ -76,6 +77,7 @@ class CarStateBridge(
         maxDischargePower = state.maxDischargePower
         packVoltage = state.packVoltage
         packCurrent = state.packCurrent
+        powerLevel = state.powerLevel
         packTMin = state.packTMin
         packTMax = state.packTMax
         odometer = state.odometer
@@ -106,6 +108,7 @@ class CarStateBridge(
     @JavascriptInterface fun getMaxDischargePower(): Float = maxDischargePower
     @JavascriptInterface fun getPackVoltage(): Float = packVoltage
     @JavascriptInterface fun getPackCurrent(): Float = packCurrent
+    @JavascriptInterface fun getPowerLevel(): Float = powerLevel
     @JavascriptInterface fun getPackTMin(): Float = packTMin
     @JavascriptInterface fun getPackTMax(): Float = packTMax
     @JavascriptInterface fun getOdometer(): Float = odometer

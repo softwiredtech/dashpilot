@@ -37,6 +37,7 @@ data class CarState(
     val hvacAcMode: Float = 0f,
     val hvacRecirc: Float = 0f,
     val hvacKeepClimateOn: Float = 0f,
+    val powerLevel: Float = 0f,
     // Openpilot
     val selfdriveActive: Boolean = false,
     val experimentalMode: Boolean = false,
@@ -57,7 +58,7 @@ data class CarState(
     )
 
     companion object {
-        const val FIELD_COUNT = 40
+        const val FIELD_COUNT = 41
         private const val KM_TO_MILES = 0.621371f
 
         private val MILES_COUNTRIES = setOf("US", "GB", "MM", "LR")

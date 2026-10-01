@@ -1,0 +1,84 @@
+{
+  "type": "power",
+  "version": 1,
+  "renderer": "dom",
+  "name": {
+    "en": "Power bar",
+    "hu": "Teljesítménysáv",
+    "de": "Leistungsbalken"
+  },
+  "defaultSize": {
+    "w": 1,
+    "h": 3
+  },
+  "minSize": {
+    "w": 1,
+    "h": 1
+  },
+  "binds": [
+    {
+      "key": "value",
+      "kinds": [
+        "number"
+      ],
+      "name": {
+        "en": "Power",
+        "hu": "Teljesítmény",
+        "de": "Leistung"
+      },
+      "default": "powerLevel"
+    }
+  ],
+  "props": [
+    {
+      "key": "label",
+      "type": "string",
+      "default": "",
+      "name": {
+        "en": "Label",
+        "hu": "Felirat",
+        "de": "Beschriftung"
+      }
+    },
+    {
+      "key": "showLabel",
+      "type": "bool",
+      "default": false,
+      "name": {
+        "en": "Show label",
+        "hu": "Felirat mutatása",
+        "de": "Beschriftung anzeigen"
+      }
+    },
+    {
+      "key": "showValue",
+      "type": "bool",
+      "default": false,
+      "name": {
+        "en": "Show value",
+        "hu": "Érték mutatása",
+        "de": "Wert anzeigen"
+      }
+    },
+    {
+      "key": "regenColor",
+      "type": "color",
+      "default": "",
+      "name": {
+        "en": "Regen color",
+        "hu": "Visszatáplálás színe",
+        "de": "Rekuperationsfarbe"
+      }
+    },
+    {
+      "key": "driveColor",
+      "type": "color",
+      "default": "",
+      "name": {
+        "en": "Discharge color",
+        "hu": "Leadás színe",
+        "de": "Entladungsfarbe"
+      }
+    }
+  ]
+}

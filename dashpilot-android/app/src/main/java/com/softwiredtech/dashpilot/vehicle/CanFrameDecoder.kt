@@ -64,7 +64,8 @@ class CanFrameDecoder(
                 hvacAcMode = values[34].toFloat(),
                 hvacRecirc = values[35].toFloat(),
                 hvacKeepClimateOn = values[36].toFloat(),
-                vin = decodeVin(values, offset = 37)
+                powerLevel = values[37].toFloat(),
+                vin = decodeVin(values, offset = 38)
             )
         }
 
