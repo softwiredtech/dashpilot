@@ -19,6 +19,7 @@ const val PREF_ALWAYS_ON_BLIND_SPOT_MONITOR = "always_on_blind_spot_monitor"
 const val PREF_RENDER_QUALITY = "render_quality"
 const val PREF_DARK_MODE_BACKGROUND_GRAY = "dark_mode_background_gray"
 const val PREF_EXTRA_VEHICLE_BUS = "extra_vehicle_bus"
+const val PREF_JUNIPER = "juniper"
 const val PREF_ONBOARDING_COMPLETED = "onboarding_completed"
 const val PREF_PINNED_CONTROL = "pinned_control"
 
@@ -50,6 +51,7 @@ const val DEFAULT_ALWAYS_ON_BLIND_SPOT_MONITOR = true
 const val DEFAULT_RENDER_QUALITY = 3
 const val DEFAULT_DARK_MODE_BACKGROUND_GRAY = 0
 const val DEFAULT_EXTRA_VEHICLE_BUS = false
+const val DEFAULT_JUNIPER = true
 const val DEFAULT_ONBOARDING_COMPLETED = false
 
 private const val DEFAULT_DASHBOARD_ID = "vanilla"

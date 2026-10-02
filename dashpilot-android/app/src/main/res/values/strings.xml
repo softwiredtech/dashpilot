@@ -38,6 +38,7 @@
     <string name="settings_render_med">Medium</string>
     <string name="settings_render_high">High</string>
     <string name="settings_toggle_extra_vehicle_bus">Extra Vehicle bus</string>
+    <string name="settings_toggle_juniper">New-gen Model Y (Juniper)</string>
     <string name="settings_vehicle_bus_requires_extra">Enable Extra Vehicle bus to edit these.</string>
     <string name="settings_toggle_always_on_blind_spot_monitor">Always on blind-spot monitor</string>
     <string name="settings_toggle_dark_mode">Dark mode</string>

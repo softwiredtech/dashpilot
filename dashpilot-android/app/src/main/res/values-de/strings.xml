@@ -38,6 +38,7 @@
     <string name="settings_render_med">Mittel</string>
     <string name="settings_render_high">Hoch</string>
     <string name="settings_toggle_extra_vehicle_bus">Zusätzlicher Fahrzeugbus</string>
+    <string name="settings_toggle_juniper">Neues Model Y (Juniper)</string>
     <string name="settings_vehicle_bus_requires_extra">Aktiviere den zusätzlichen Fahrzeugbus, um diese zu bearbeiten.</string>
     <string name="settings_toggle_always_on_blind_spot_monitor">Toter-Winkel-Warner immer an</string>
     <string name="settings_toggle_dark_mode">Dunkelmodus</string>

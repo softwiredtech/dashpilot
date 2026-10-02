@@ -1,0 +1,8 @@
+{
+  "name": "Tesla Model Y (Juniper)",
+  "type": "tesla_juniper",
+  "buses": [
+    { "index": 0, "dbc": "new_gen_juniper.dbc" },
+    { "index": 1, "dbc": "new_gen_juniper.dbc" }
+  ]
+}

@@ -38,6 +38,7 @@
     <string name="settings_render_med">Közepes</string>
     <string name="settings_render_high">Magas</string>
     <string name="settings_toggle_extra_vehicle_bus">Extra járműbusz</string>
+    <string name="settings_toggle_juniper">Új Model Y (Juniper)</string>
     <string name="settings_vehicle_bus_requires_extra">A szerkesztéshez kapcsold be az Extra járműbuszt.</string>
     <string name="settings_toggle_always_on_blind_spot_monitor">Mindig bekapcsolt holttérfigyelő</string>
     <string name="settings_toggle_dark_mode">Sötét mód</string>

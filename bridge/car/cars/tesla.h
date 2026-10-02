@@ -115,6 +115,27 @@ static inline void updateVehicleBus(const CANParsers& cp, CarState& cs) {
 }
 
 
+// Turns the lamp-only turn-signal status (0=OFF, 1=ON, 2=FAULT, 3=SNA) into
+// the party-bus tri-state (0=off, 1=blinking/lamp off, 2=blinking/lamp on).
+struct BlinkerHold {
+    static constexpr std::chrono::milliseconds HOLD{1000};
+
+    std::chrono::steady_clock::time_point lastOn{};
+    bool seenOn = false;
+
+    double update(double rawStatus) {
+        bool lampOn = static_cast<int>(rawStatus) == 1;  // 1=ON
+        auto now = std::chrono::steady_clock::now();
+        if (lampOn) {
+            lastOn = now;
+            seenOn = true;
+        }
+        bool blinking = seenOn && (now - lastOn) <= HOLD;
+        if (!blinking) return 0.0;
+        return lampOn ? 2.0 : 1.0;
+    }
+};
+
 class TeslaCommaPartyMapper : public CarStateMapper {
 public:
     void update(const CANParsers& cp, CarState& cs) override {
@@ -183,27 +204,54 @@ public:
     }
 
 private:
-    // Turns the lamp-only turn-signal status (0=OFF, 1=ON, 2=FAULT, 3=SNA) into
-    // the party-bus tri-state (0=off, 1=blinking/lamp off, 2=blinking/lamp on).
-    struct BlinkerHold {
-        static constexpr std::chrono::milliseconds HOLD{1000};
+    BlinkerHold leftBlinkerHold_;
+    BlinkerHold rightBlinkerHold_;
+    TeslaVinUpdater vin_;
+};
 
-        std::chrono::steady_clock::time_point lastOn{};
-        bool seenOn = false;
+// New-gen Model Y (Juniper) with new_gen_juniper.dbc on both buses. Comma and
+// DashKit number the buses the same way here: 0 = chassis, 1 = vehicle.
+class TeslaJuniperMapper : public CarStateMapper {
+public:
+    void update(const CANParsers &cp, CarState &cs) override {
+        cs.egoSteeringAngle = cp.get(1, "SCCM_steeringAngleSensor", "SCCM_steeringAngle");
+        cs.gear = cp.get(0, "DI_systemStatus", "DI_gear");
+        cs.egoSpeed = cp.get(0, "DI_speed", "DI_uiSpeed");
+        cs.adasOn = cp.get(1, "DI_state", "DI_cruiseState") == 2.0 ? 1.0 : 0.0;
+        cs.accSetSpeed = cp.get(1, "DI_state", "DI_digitalSpeed");
 
-        double update(double rawStatus) {
-            bool lampOn = static_cast<int>(rawStatus) == 1;  // 1=ON
-            auto now = std::chrono::steady_clock::now();
-            if (lampOn) {
-                lastOn = now;
-                seenOn = true;
-            }
-            bool blinking = seenOn && (now - lastOn) <= HOLD;
-            if (!blinking) return 0.0;
-            return lampOn ? 2.0 : 1.0;
+        cs.leftBlindSpot = cp.get(0, "DAS_status", "DAS_blindSpotRearLeft");
+        cs.rightBlindSpot = cp.get(0, "DAS_status", "DAS_blindSpotRearRight");
+        cs.fusedSpeedLimit = cp.get(0, "DAS_status", "DAS_fusedSpeedLimit");
+        cs.laneDepartureWarning = cp.get(0, "DAS_status", "DAS_laneDepartureWarning");
+        cs.sideCollisionWarning = cp.get(0, "DAS_status", "DAS_sideCollisionWarning");
+        // DAS_road is static on Juniper: no traffic light or stop line data.
+
+        cs.leftBlinker = leftBlinkerHold_.update(
+            cp.get(1, "VCLEFT_lightStatus", "VCLEFT_turnSignalStatus"));
+        cs.rightBlinker = rightBlinkerHold_.update(
+            cp.get(1, "VCRIGHT_lightStatus", "VCRIGHT_turnSignalStatus"));
+
+        if (static_cast<int>(cp.get(1, "VCFRONT_status", "VCFRONT_statusIndex")) == 0) {
+            cs.anyDoorOpen = cp.get(1, "VCFRONT_status", "VCFRONT_anyDoorOpen");
         }
-    };
+        if (static_cast<int>(cp.get(1, "VCLEFT_switchStatus", "VCLEFT_switchStatusIndex")) == 0) {
+            cs.buckleStatus = cp.get(1, "VCLEFT_switchStatus", "VCLEFT_frontBuckleSwitch") == 2.0 ? 1.0 : 0.0;
+        }
 
+        cs.acTemp = cp.get(0, "UI_hvacRequest", "UI_hvacReqTempSetpointLeft");
+        cs.acTempRight = cp.get(0, "UI_hvacRequest", "UI_hvacReqTempSetpointRight");
+        cs.hvacFanLevel = cp.get(0, "UI_hvacRequest", "UI_hvacReqBlowerSegment");
+        cs.hvacPowerState = cp.get(0, "UI_hvacRequest", "UI_hvacReqUserPowerState");
+        cs.hvacAcMode = cp.get(0, "UI_hvacRequest", "UI_hvacReqACDisable");
+        cs.hvacRecirc = cp.get(0, "UI_hvacRequest", "UI_hvacReqRecirc");
+        cs.hvacKeepClimateOn = cp.get(0, "UI_hvacRequest", "UI_hvacReqKeepClimateOn");
+
+        updateVehicleBus(cp, cs);
+        vin_.update(cp, cs);
+    }
+
+private:
     BlinkerHold leftBlinkerHold_;
     BlinkerHold rightBlinkerHold_;
     TeslaVinUpdater vin_;
