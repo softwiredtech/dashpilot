@@ -26,6 +26,7 @@
       fusedSpeedLimit: t % 30 < 15 ? 90 : 130,
       gear: 4,
       adasOn: t > 6,
+      egoSteeringAngle: Math.sin(t * 0.5) * 45,
       leftBlinker: blinkPhase > 4 && blinkPhase < 7 ? 1 : 0,
       rightBlinker: blinkPhase > 12 && blinkPhase < 15 ? 1 : 0,
       leftBlindSpot: blinkPhase > 4.5 && blinkPhase < 6 ? 1 : 0,

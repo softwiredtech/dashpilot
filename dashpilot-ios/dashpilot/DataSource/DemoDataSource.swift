@@ -86,7 +86,7 @@ final class DemoDataSource: IDataSource {
         case ..<turnStart:
             // Cruise.
             s.egoSpeed = cruiseSpeed(at: t)
-            s.egoSteeringAngle = Float(sin(t * 0.3) * 3) // gentle lane-keeping wiggle
+            s.egoSteeringAngle = Float(sin(t * 0.3) * 15) // lane-keeping wiggle, big enough to see
             s.trafficLightColor = 0
             s.stopLineDist = 0
 
@@ -106,7 +106,7 @@ final class DemoDataSource: IDataSource {
 
         case ..<cruise2End:
             s.egoSpeed = cruiseSpeed(at: t)
-            s.egoSteeringAngle = Float(sin(t * 0.3) * 3)
+            s.egoSteeringAngle = Float(sin(t * 0.3) * 15)
             s.trafficLightColor = 0
             s.stopLineDist = 0
 

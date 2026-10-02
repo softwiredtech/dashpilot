@@ -27,6 +27,18 @@
         "de": "Bedingung"
       },
       "default": "adasOn"
+    },
+    {
+      "key": "angle",
+      "kinds": [
+        "number"
+      ],
+      "default": null,
+      "name": {
+        "en": "Rotate by",
+        "hu": "Forgatás ennyivel",
+        "de": "Drehen um"
+      }
     }
   ],
   "props": [

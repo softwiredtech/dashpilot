@@ -30,12 +30,21 @@ function create(ctx) {
   }
 
   let last = "0";
+  let lastAngle = 0;
   return {
     update(values) {
       const next = values.value ? "1" : "0";
-      if (next === last) return;
-      last = next;
-      el.dataset.on = next;
+      if (next !== last) {
+        last = next;
+        el.dataset.on = next;
+      }
+      // Optional: turn the icon by a signal (degrees), e.g. the wheel by the steering angle.
+      if (values.angle !== undefined && !el.dataset.rotate) el.dataset.rotate = "1";
+      const angle = values.angle === undefined ? 0 : Math.round(values.angle);
+      if (angle !== lastAngle) {
+        lastAngle = angle;
+        icon.style.transform = angle ? "rotate(" + angle + "deg)" : "";
+      }
     },
   };
 }

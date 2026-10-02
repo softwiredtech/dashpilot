@@ -86,7 +86,7 @@
     return create;
   })());
   // --- lamp
-  register({"type":"lamp","version":1,"renderer":"dom","name":{"en":"Indicator","hu":"Jelzőfény","de":"Kontrollleuchte"},"defaultSize":{"w":2,"h":2},"minSize":{"w":1,"h":1},"binds":[{"key":"value","kinds":["bool"],"name":{"en":"Condition","hu":"Feltétel","de":"Bedingung"},"default":"adasOn"}],"props":[{"key":"label","type":"string","default":"","name":{"en":"Label","hu":"Felirat","de":"Beschriftung"}},{"key":"icon","type":"enum","default":"dot","options":["dot","arrow-left","arrow-right","warning","wheel"],"name":{"en":"Icon","hu":"Ikon","de":"Symbol"}},{"key":"color","type":"color","default":"#22c55e","name":{"en":"Active color","hu":"Aktív szín","de":"Aktive Farbe"}},{"key":"blink","type":"bool","default":false,"name":{"en":"Blink when active","hu":"Villogjon aktívan","de":"Blinken wenn aktiv"}},{"key":"hideWhenOff","type":"bool","default":false,"name":{"en":"Hide when off","hu":"Rejtve, ha nem aktív","de":"Ausblenden wenn aus"}},{"key":"showLabel","type":"bool","default":false,"name":{"en":"Show label","hu":"Felirat mutatása","de":"Beschriftung anzeigen"}}]}, (function () {
+  register({"type":"lamp","version":1,"renderer":"dom","name":{"en":"Indicator","hu":"Jelzőfény","de":"Kontrollleuchte"},"defaultSize":{"w":2,"h":2},"minSize":{"w":1,"h":1},"binds":[{"key":"value","kinds":["bool"],"name":{"en":"Condition","hu":"Feltétel","de":"Bedingung"},"default":"adasOn"},{"key":"angle","kinds":["number"],"default":null,"name":{"en":"Rotate by","hu":"Forgatás ennyivel","de":"Drehen um"}}],"props":[{"key":"label","type":"string","default":"","name":{"en":"Label","hu":"Felirat","de":"Beschriftung"}},{"key":"icon","type":"enum","default":"dot","options":["dot","arrow-left","arrow-right","warning","wheel"],"name":{"en":"Icon","hu":"Ikon","de":"Symbol"}},{"key":"color","type":"color","default":"#22c55e","name":{"en":"Active color","hu":"Aktív szín","de":"Aktive Farbe"}},{"key":"blink","type":"bool","default":false,"name":{"en":"Blink when active","hu":"Villogjon aktívan","de":"Blinken wenn aktiv"}},{"key":"hideWhenOff","type":"bool","default":false,"name":{"en":"Hide when off","hu":"Rejtve, ha nem aktív","de":"Ausblenden wenn aus"}},{"key":"showLabel","type":"bool","default":false,"name":{"en":"Show label","hu":"Felirat mutatása","de":"Beschriftung anzeigen"}}]}, (function () {
     // On/off indicator for any bool signal. The whole visual state is one
     // data-on attribute on the cell body; colors and blinking live in CSS.
     function create(ctx) {
@@ -119,12 +119,21 @@
       }
 
       let last = "0";
+      let lastAngle = 0;
       return {
         update(values) {
           const next = values.value ? "1" : "0";
-          if (next === last) return;
-          last = next;
-          el.dataset.on = next;
+          if (next !== last) {
+            last = next;
+            el.dataset.on = next;
+          }
+          // Optional: turn the icon by a signal (degrees), e.g. the wheel by the steering angle.
+          if (values.angle !== undefined && !el.dataset.rotate) el.dataset.rotate = "1";
+          const angle = values.angle === undefined ? 0 : Math.round(values.angle);
+          if (angle !== lastAngle) {
+            lastAngle = angle;
+            icon.style.transform = angle ? "rotate(" + angle + "deg)" : "";
+          }
         },
       };
     }
