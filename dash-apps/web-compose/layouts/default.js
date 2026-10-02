@@ -23,7 +23,7 @@
           { uid: "blinker-right", type: "lamp", x: 7, y: 5, w: 1, h: 1, bind: { value: "rightBlinker" },
             props: { icon: "arrow-right", blink: true } },
 
-          { uid: "adas", type: "lamp", x: 8, y: 0, w: 2, h: 2, bind: { value: "adasOn", angle: "egoSteeringAngle" },
+          { uid: "adas", type: "lamp", x: 8, y: 0, w: 2, h: 2, bind: { value: "adasOn" },
             props: { icon: "wheel", color: "#3b82f6", showLabel: true } },
           { uid: "gear", type: "readout", x: 10, y: 0, w: 2, h: 2, bind: { value: "gear" }, props: { align: "center" } },
           { uid: "battery", type: "bar", x: 8, y: 2, w: 4, h: 2, bind: { value: "batteryPercent" } },
@@ -41,7 +41,7 @@
             props: { showLabel: false } },
           { uid: "blinker-left", type: "lamp", x: 0, y: 5, w: 1, h: 1, bind: { value: "leftBlinker" },
             props: { icon: "arrow-left", blink: true, showLabel: false } },
-          { uid: "adas", type: "lamp", x: 1, y: 5, w: 4, h: 1, bind: { value: "adasOn", angle: "egoSteeringAngle" },
+          { uid: "adas", type: "lamp", x: 1, y: 5, w: 4, h: 1, bind: { value: "adasOn" },
             props: { icon: "wheel", color: "#3b82f6", showLabel: true } },
           { uid: "blinker-right", type: "lamp", x: 5, y: 5, w: 1, h: 1, bind: { value: "rightBlinker" },
             props: { icon: "arrow-right", blink: true, showLabel: false } },

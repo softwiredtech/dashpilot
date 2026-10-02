@@ -91,8 +91,8 @@
   fill: var(--lamp-on);
   filter: drop-shadow(0 0 6px var(--lamp-on));
 }
-/* A glow re-rasterizes on every rotation step and makes the icon jitter. */
-.w-lamp[data-rotate="1"][data-on="1"] .lamp__icon { filter: none; }
+.w-lamp[data-steer="1"] .lamp__icon { will-change: transform; }
+.w-lamp[data-steer="1"][data-on="1"] .lamp__icon { filter: none; }
 .w-lamp[data-on="1"] .lamp__label { color: var(--text); }
 .w-lamp[data-on="1"][data-blink="1"] .lamp__icon { animation: lamp-blink 0.8s steps(1) infinite; }
 .w-lamp[data-hide-off="1"][data-on="0"] { visibility: hidden; }

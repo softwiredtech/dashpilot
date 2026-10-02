@@ -29,16 +29,12 @@
       "default": "adasOn"
     },
     {
-      "key": "angle",
+      "key": "steering",
       "kinds": [
         "number"
       ],
-      "default": null,
-      "name": {
-        "en": "Rotate by",
-        "hu": "Forgatás ennyivel",
-        "de": "Drehen um"
-      }
+      "default": "egoSteeringAngle",
+      "hidden": true
     }
   ],
   "props": [

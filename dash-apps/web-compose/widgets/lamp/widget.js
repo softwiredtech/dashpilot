@@ -29,6 +29,11 @@ function create(ctx) {
     el.appendChild(label);
   }
 
+  const steers = props.icon === "wheel";
+  if (steers) {
+    el.dataset.steer = "1";
+    icon.style.transform = "rotate(0deg)";
+  }
   let last = "0";
   let lastAngle = 0;
   return {
@@ -38,13 +43,11 @@ function create(ctx) {
         last = next;
         el.dataset.on = next;
       }
-      // Optional: turn the icon by a signal (degrees), e.g. the wheel by the steering angle.
-      if (values.angle !== undefined && !el.dataset.rotate) el.dataset.rotate = "1";
-      const angle = values.angle === undefined ? 0 : Math.round(values.angle);
-      if (angle !== lastAngle) {
-        lastAngle = angle;
-        icon.style.transform = angle ? "rotate(" + angle + "deg)" : "";
-      }
+      if (!steers) return;
+      const angle = values.steering === undefined ? 0 : Math.round(values.steering);
+      if (angle === lastAngle) return;
+      lastAngle = angle;
+      icon.style.transform = "rotate(" + angle + "deg)";
     },
   };
 }

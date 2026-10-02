@@ -465,9 +465,10 @@
 
     body.appendChild(field(t("editor.type"), typeControl(item)));
 
-    if ((descriptor.binds || []).length) {
+    const binds = (descriptor.binds || []).filter((bind) => !bind.hidden);
+    if (binds.length) {
       body.appendChild(el("h3", "sheet__section", t("editor.shows")));
-      for (const bind of descriptor.binds) {
+      for (const bind of binds) {
         const label = bind.name ? DC.i18n.localized(bind.name) : t("editor.shows");
         body.appendChild(field(label, bindControl(item, bind, refresh)));
       }
