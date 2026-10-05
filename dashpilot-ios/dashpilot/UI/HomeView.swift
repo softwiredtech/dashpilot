@@ -214,7 +214,12 @@ struct HomeView: View {
     }
 
     private var driveButton: some View {
-        ActionButton(label: "Drive", icon: "car.fill", accent: true) {
+        ActionButton(
+            label: "Drive",
+            icon: "car.fill",
+            accent: true,
+            enabled: connectionVM.connectionStatus == .connected
+        ) {
             let dashboard = selectedDashboard()
             navigationPath.append(
                 AppRoute.dashboard(type: dashboard.type.rawValue, url: dashboard.url)
@@ -405,6 +410,7 @@ private struct ActionButton: View {
     let label: LocalizedStringKey
     let icon: String
     var accent: Bool = false
+    var enabled: Bool = true
     let action: () -> Void
 
     var body: some View {
@@ -421,5 +427,7 @@ private struct ActionButton: View {
         }
         .background(accent ? Color.dashAccent : Color.dashSurface)
         .clipShape(RoundedRectangle(cornerRadius: DashMetrics.corner))
+        .disabled(!enabled)
+        .opacity(enabled ? 1.0 : 0.5)
     }
 }

@@ -171,6 +171,7 @@ private fun ConnectedHomeContent(
     val idleReset = remember { MutableStateFlow(false) }
     val resetPending by (teslaResetPending ?: idleReset).collectAsState()
     val pinned = controlById(pinnedControlId)
+    val driveEnabled = connectionStatus == ConnectionStatus.Connected
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val landscape = maxWidth > maxHeight
@@ -208,7 +209,8 @@ private fun ConnectedHomeContent(
                     onClimate = onClimate,
                     onAutomations = onAutomations,
                     onControls = onControls,
-                    onDrive = onDrive
+                    onDrive = onDrive,
+                    driveEnabled = driveEnabled
                 )
             } else {
                 PortraitContent(
@@ -228,7 +230,8 @@ private fun ConnectedHomeContent(
                     onClimate = onClimate,
                     onAutomations = onAutomations,
                     onControls = onControls,
-                    onDrive = onDrive
+                    onDrive = onDrive,
+                    driveEnabled = driveEnabled
                 )
             }
         }
@@ -302,7 +305,8 @@ private fun PortraitContent(
     onClimate: () -> Unit,
     onAutomations: () -> Unit,
     onControls: () -> Unit,
-    onDrive: () -> Unit
+    onDrive: () -> Unit,
+    driveEnabled: Boolean
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         WidgetGrid(car = car, useImperial = useImperial, fillHeight = false, onBattery = onBattery, onClimate = onClimate)
@@ -339,7 +343,7 @@ private fun PortraitContent(
             onClick = onControls
         )
         Spacer(modifier = Modifier.height(12.dp))
-        DriveButton(onDrive)
+        DriveButton(onDrive, driveEnabled)
         Spacer(modifier = Modifier.height(12.dp))
         Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
             DebugDataSourceMenu(connectionStatus, activeSourceType, onSelectDataSource, onConnect, onDisconnect)
@@ -364,7 +368,8 @@ private fun LandscapeContent(
     onClimate: () -> Unit,
     onAutomations: () -> Unit,
     onControls: () -> Unit,
-    onDrive: () -> Unit
+    onDrive: () -> Unit,
+    driveEnabled: Boolean
 ) {
     Row(
         modifier = Modifier
@@ -425,7 +430,7 @@ private fun LandscapeContent(
                     PinnedButton(action = action, bleManager = bleManager)
                     Spacer(modifier = Modifier.height(12.dp))
                 }
-                DriveButton(onDrive)
+                DriveButton(onDrive, driveEnabled)
             }
         }
     }
@@ -501,12 +506,13 @@ private fun PinnedButton(action: ControlAction, bleManager: DashKitBleManager?) 
 }
 
 @Composable
-private fun DriveButton(onDrive: () -> Unit) {
+private fun DriveButton(onDrive: () -> Unit, enabled: Boolean) {
     ActionButton(
         label = stringResource(R.string.home_drive),
         icon = Icons.Rounded.DirectionsCar,
         accent = true,
-        onClick = onDrive
+        onClick = onDrive,
+        enabled = enabled
     )
 }
 
@@ -594,14 +600,19 @@ private fun ActionButton(
     label: String,
     icon: ImageVector,
     accent: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    enabled: Boolean = true
 ) {
+    val containerColor = if (accent) AccentColor else DarkColors.Surface
     Button(
         onClick = onClick,
+        enabled = enabled,
         shape = RoundedCornerShape(16.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (accent) AccentColor else DarkColors.Surface,
-            contentColor = Color.White
+            containerColor = containerColor,
+            contentColor = Color.White,
+            disabledContainerColor = containerColor.copy(alpha = 0.5f),
+            disabledContentColor = Color.White.copy(alpha = 0.5f)
         ),
         modifier = Modifier
             .fillMaxWidth()
