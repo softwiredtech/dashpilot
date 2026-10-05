@@ -219,6 +219,8 @@
     <string name="controls_title">Befehle</string>
     <string name="controls_connect_hint">Verbinde dich mit dem DashKit, um Befehle zu senden</string>
     <string name="controls_pin_tip">Tipp: Halte einen Befehl gedrückt, um ihn auf dem Startbildschirm anzuheften</string>
+    <string name="controls_tab_controls">Befehle</string>
+    <string name="controls_tab_multitouch">Multi-Touch</string>
     <string name="control_pinned_cd">Angeheftet</string>
     <string name="control_battery_preheat_on">Akku-Vorheizen: An</string>
     <string name="control_battery_preheat_off">Akku-Vorheizen: Aus</string>

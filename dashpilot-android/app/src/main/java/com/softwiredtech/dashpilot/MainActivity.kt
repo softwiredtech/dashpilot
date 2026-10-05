@@ -329,6 +329,16 @@ class MainActivity : ComponentActivity() {
                                 bleManager = manager,
                                 pinnedControlId = pinnedControl,
                                 onTogglePin = { connectionVM.togglePinnedControl(context, it) },
+                                fingerActions = fingerActions,
+                                onSetFingerAction = { fingers, id ->
+                                    connectionVM.setFingerAction(context, fingers, id)
+                                },
+                                onChangeFingerCount = { from, to ->
+                                    connectionVM.changeFingerCount(context, from, to)
+                                },
+                                onRemoveFingerAction = { fingers ->
+                                    connectionVM.removeFingerAction(context, fingers)
+                                },
                                 onBack = { navController.popBackStack() }
                             )
                         }
@@ -355,16 +365,6 @@ class MainActivity : ComponentActivity() {
                                 sportKickdownPercent = sportKickdownPercent,
                                 onSportKickdownPercentChange = {
                                     connectionVM.updateSportKickdownPercent(context, it)
-                                },
-                                fingerActions = fingerActions,
-                                onSetFingerAction = { fingers, id ->
-                                    connectionVM.setFingerAction(context, fingers, id)
-                                },
-                                onChangeFingerCount = { from, to ->
-                                    connectionVM.changeFingerCount(context, from, to)
-                                },
-                                onRemoveFingerAction = { fingers ->
-                                    connectionVM.removeFingerAction(context, fingers)
                                 },
                                 onBack = { navController.popBackStack() }
                             )

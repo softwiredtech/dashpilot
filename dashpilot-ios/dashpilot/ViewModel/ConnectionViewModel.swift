@@ -153,7 +153,7 @@ final class ConnectionViewModel {
     func resyncDashKitAutomations() {
         guard let manager = bleManager else { return }
         let raw = UserDefaults.standard.string(forKey: "finger_actions") ?? ""
-        let actions = AutomationsView.parseFingerActions(raw)
+        let actions = MultiTouchSection.parseFingerActions(raw)
         let byCount = Dictionary(uniqueKeysWithValues: actions.map { ($0.fingerCount, $0.controlId) })
         for fingers in 3...5 {
             let actionValue = byCount[fingers].flatMap { controlById($0)?.gestureValue }

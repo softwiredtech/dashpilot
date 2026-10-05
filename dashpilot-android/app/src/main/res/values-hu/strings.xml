@@ -218,6 +218,8 @@
     <string name="controls_title">Parancsok</string>
     <string name="controls_connect_hint">A parancsok küldéséhez csatlakozz a DashKithez</string>
     <string name="controls_pin_tip">Tipp: nyomj hosszan egy parancsra, hogy a kezdőképernyőre rögzítsd</string>
+    <string name="controls_tab_controls">Parancsok</string>
+    <string name="controls_tab_multitouch">Többujjas</string>
     <string name="control_pinned_cd">Rögzítve</string>
     <string name="control_battery_preheat_on">Akku előfűtés: Be</string>
     <string name="control_battery_preheat_off">Akku előfűtés: Ki</string>

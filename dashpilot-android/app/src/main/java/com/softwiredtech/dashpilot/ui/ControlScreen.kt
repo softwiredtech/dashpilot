@@ -13,6 +13,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -26,17 +30,24 @@ import androidx.compose.ui.res.stringResource
 import com.softwiredtech.dashpilot.R
 
 /**
- * Vehicle control screen. Exposes the available DashKit commands as single
- * toggle/action buttons. Disabled when there is no active DashKit connection.
- * Long-pressing a control pins it to the home screen.
+ * Vehicle control screen with two tabs. Controls exposes the available DashKit
+ * commands as single toggle/action buttons, disabled when there is no active
+ * DashKit connection; long-pressing a control pins it to the home screen.
+ * Multi-touch binds multi-finger infotainment taps to those controls.
  */
 @Composable
 fun ControlScreen(
     bleManager: DashKitBleManager?,
     pinnedControlId: String?,
     onTogglePin: (String) -> Unit,
+    fingerActions: Map<Int, String>,
+    onSetFingerAction: (fingers: Int, id: String?) -> Unit,
+    onChangeFingerCount: (from: Int, to: Int) -> Unit,
+    onRemoveFingerAction: (fingers: Int) -> Unit,
     onBack: () -> Unit
 ) {
+    var selectedTab by rememberSaveable { mutableIntStateOf(0) }
+
     // In debug builds the controls behave as if connected (commands are
     // simulated) so the flow can be exercised without a DashKit.
     val enabled = bleManager != null || BuildConfig.DEBUG
@@ -55,40 +66,77 @@ fun ControlScreen(
         ) {
             ScreenHeader(title = stringResource(R.string.controls_title), onBack = onBack)
 
-            if (!enabled) {
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = stringResource(R.string.controls_connect_hint),
-                    color = DarkColors.TextMuted,
-                    fontSize = 13.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+            Spacer(modifier = Modifier.height(16.dp))
+            SegmentedSelector(
+                options = listOf(
+                    stringResource(R.string.controls_tab_controls),
+                    stringResource(R.string.controls_tab_multitouch)
+                ),
+                selected = selectedTab,
+                onSelect = { selectedTab = it },
+                containerColor = DarkColors.Surface
+            )
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            vehicleControls.forEachIndexed { index, action ->
-                if (index > 0) {
-                    Spacer(modifier = Modifier.height(12.dp))
-                }
-                ControlActionButton(
-                    action = action,
-                    pinned = action.id == pinnedControlId,
+            if (selectedTab == 0) {
+                ControlsTab(
+                    bleManager = bleManager,
                     enabled = enabled,
-                    onClick = { action.perform(bleManager) },
-                    onLongClick = { onTogglePin(action.id) }
+                    pinnedControlId = pinnedControlId,
+                    onTogglePin = onTogglePin
+                )
+            } else {
+                MultiTouchSection(
+                    fingerActions = fingerActions,
+                    onSetFingerAction = onSetFingerAction,
+                    onChangeFingerCount = onChangeFingerCount,
+                    onRemoveFingerAction = onRemoveFingerAction
                 )
             }
+        }
+    }
+}
 
-            Spacer(modifier = Modifier.height(20.dp))
+@Composable
+private fun ControlsTab(
+    bleManager: DashKitBleManager?,
+    enabled: Boolean,
+    pinnedControlId: String?,
+    onTogglePin: (String) -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        if (!enabled) {
             Text(
-                text = stringResource(R.string.controls_pin_tip),
-                color = DarkColors.TextSubtle,
-                fontSize = 12.sp,
+                text = stringResource(R.string.controls_connect_hint),
+                color = DarkColors.TextMuted,
+                fontSize = 13.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
+            Spacer(modifier = Modifier.height(16.dp))
         }
+
+        vehicleControls.forEachIndexed { index, action ->
+            if (index > 0) {
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+            ControlActionButton(
+                action = action,
+                pinned = action.id == pinnedControlId,
+                enabled = enabled,
+                onClick = { action.perform(bleManager) },
+                onLongClick = { onTogglePin(action.id) }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+        Text(
+            text = stringResource(R.string.controls_pin_tip),
+            color = DarkColors.TextSubtle,
+            fontSize = 12.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }

@@ -1,7 +1,9 @@
 import SwiftUI
 
-/// Vehicle control screen. Exposes the available DashKit commands as single
-/// toggle/action buttons. Long-pressing a control pins it to the home screen.
+/// Vehicle control screen with two tabs. Controls exposes the available
+/// DashKit commands as single toggle/action buttons; long-pressing a control
+/// pins it to the home screen. Multi-touch binds multi-finger infotainment
+/// taps to those controls (`MultiTouchSection`).
 ///
 /// Ported from Android `ControlScreen` (ControlScreen.kt). Commands are sent
 /// over the live DashKit BLE link; without one the buttons are dimmed (in
@@ -12,6 +14,7 @@ struct ControlsView: View {
     @Environment(ConnectionViewModel.self) var connectionVM
 
     @AppStorage("pinned_control_id") var pinnedControlId: String = ""
+    @State private var selectedTab = 0
 
     private var isConnected: Bool {
         connectionVM.bleManager != nil && connectionVM.connectionStatus == .connected
@@ -34,40 +37,56 @@ struct ControlsView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     ScreenHeader(title: "Controls") { dismiss() }
 
-                    if !isConnected {
-                        Spacer().frame(height: 4)
-                        Text("Connect to DashKit to send commands")
-                            .foregroundColor(.dashTextMuted)
-                            .font(.system(size: 13))
-                            .frame(maxWidth: .infinity)
-                            .multilineTextAlignment(.center)
-                    }
-
+                    Spacer().frame(height: 16)
+                    SegmentedSelector(
+                        options: ["Controls", "Multi-touch"],
+                        selection: $selectedTab,
+                        background: .dashSurface
+                    )
                     Spacer().frame(height: 24)
 
-                    VStack(spacing: 12) {
-                        ForEach(vehicleControls) { control in
-                            ControlActionButton(
-                                action: control,
-                                pinned: control.id == pinnedControlId,
-                                enabled: controlsEnabled,
-                                onTap: { control.perform(connectionVM.bleManager) },
-                                onLongPress: { togglePin(control.id) }
-                            )
-                        }
+                    if selectedTab == 0 {
+                        controlsTab
+                    } else {
+                        MultiTouchSection()
                     }
-
-                    Spacer().frame(height: 20)
-                    Text("Tip: long-press a control to pin it to the home screen")
-                        .foregroundColor(.dashTextSubtle)
-                        .font(.system(size: 12))
-                        .frame(maxWidth: .infinity)
-                        .multilineTextAlignment(.center)
                 }
                 .padding(DashMetrics.screenPadding)
             }
         }
         .navigationBarHidden(true)
+    }
+
+    private var controlsTab: some View {
+        VStack(spacing: 0) {
+            if !isConnected {
+                Text("Connect to DashKit to send commands")
+                    .foregroundColor(.dashTextMuted)
+                    .font(.system(size: 13))
+                    .frame(maxWidth: .infinity)
+                    .multilineTextAlignment(.center)
+                Spacer().frame(height: 16)
+            }
+
+            VStack(spacing: 12) {
+                ForEach(vehicleControls) { control in
+                    ControlActionButton(
+                        action: control,
+                        pinned: control.id == pinnedControlId,
+                        enabled: controlsEnabled,
+                        onTap: { control.perform(connectionVM.bleManager) },
+                        onLongPress: { togglePin(control.id) }
+                    )
+                }
+            }
+
+            Spacer().frame(height: 20)
+            Text("Tip: long-press a control to pin it to the home screen")
+                .foregroundColor(.dashTextSubtle)
+                .font(.system(size: 12))
+                .frame(maxWidth: .infinity)
+                .multilineTextAlignment(.center)
+        }
     }
 
     // MARK: - Pinning

@@ -219,6 +219,8 @@
     <string name="controls_title">Controls</string>
     <string name="controls_connect_hint">Connect to DashKit to send commands</string>
     <string name="controls_pin_tip">Tip: long-press a control to pin it to the home screen</string>
+    <string name="controls_tab_controls">Controls</string>
+    <string name="controls_tab_multitouch">Multi-touch</string>
     <string name="control_pinned_cd">Pinned</string>
     <string name="control_battery_preheat_on">Battery Preheat: On</string>
     <string name="control_battery_preheat_off">Battery Preheat: Off</string>

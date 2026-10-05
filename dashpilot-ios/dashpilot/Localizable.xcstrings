@@ -1922,6 +1922,22 @@
         }
       }
     },
+    "Multi-touch" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Multi-Touch"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Többujjas"
+          }
+        }
+      }
+    },
     "Multi-touch infotainment trigger" : {
       "localizations" : {
         "de" : {

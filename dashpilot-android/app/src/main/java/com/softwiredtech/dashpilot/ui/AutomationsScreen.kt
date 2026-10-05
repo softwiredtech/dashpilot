@@ -21,16 +21,11 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AcUnit
 import androidx.compose.material.icons.rounded.Air
-import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.ArrowDropDown
-import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Speed
 import androidx.compose.material.icons.rounded.WaterDrop
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -47,20 +42,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import com.softwiredtech.dashpilot.ui.controls.controlById
-import com.softwiredtech.dashpilot.ui.controls.vehicleControls
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
 import com.softwiredtech.dashpilot.ui.theme.DarkColors
 import androidx.compose.ui.res.stringResource
 import com.softwiredtech.dashpilot.R
-
-// Finger counts that can be bound to an infotainment gesture (matches the
-// firmware's MULTI_FINGER_MIN/MAX_FINGERS).
-private val FINGER_COUNTS = 3..5
 
 // Minutes the keep-climate-on window can run (matches the firmware clamp).
 internal val CLIMATE_KEEP_MINUTE_RANGE = 1..60
@@ -70,11 +58,8 @@ private val SPORT_KICKDOWN_PERCENT_RANGE = 10..95
 private const val SPORT_KICKDOWN_PERCENT_STEP = 5
 
 /**
- * Automations screen. Lets the user enable the wiper-off automation and bind
- * 3-, 4-, and 5-finger infotainment taps each to a vehicle control. Bindings are
- * pushed to the DashKit firmware over BLE (VC_CMD_MULTI_FINGER_ACTION).
- *
- * @param fingerActions current bindings: finger count -> control id.
+ * Automations screen: wiper, climate and driving automations. Multi-finger
+ * infotainment triggers live in the Controls screen's Multi-touch tab.
  */
 @Composable
 fun AutomationsScreen(
@@ -90,10 +75,6 @@ fun AutomationsScreen(
     onSportKickdownChange: (Boolean) -> Unit,
     sportKickdownPercent: Int,
     onSportKickdownPercentChange: (Int) -> Unit,
-    fingerActions: Map<Int, String>,
-    onSetFingerAction: (fingers: Int, id: String?) -> Unit,
-    onChangeFingerCount: (from: Int, to: Int) -> Unit,
-    onRemoveFingerAction: (fingers: Int) -> Unit,
     onBack: () -> Unit
 ) {
     Box(
@@ -170,46 +151,12 @@ fun AutomationsScreen(
                     }
                 } else null
             )
-
-            Spacer(modifier = Modifier.height(28.dp))
-
-            SectionLabel(stringResource(R.string.automations_multitouch_title))
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = stringResource(R.string.automations_multitouch_subtitle),
-                color = DarkColors.TextMuted,
-                fontSize = 13.sp,
-                modifier = Modifier.padding(start = 4.dp)
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-
-            val usedCounts = fingerActions.keys
-            fingerActions.toSortedMap().forEach { (fingers, controlId) ->
-                // Allow this row to keep its own count plus any not used elsewhere.
-                val fingerOptions = FINGER_COUNTS.filter { it == fingers || it !in usedCounts }
-                FingerActionRow(
-                    fingers = fingers,
-                    controlId = controlId,
-                    fingerOptions = fingerOptions,
-                    onFingerCountChange = { onChangeFingerCount(fingers, it) },
-                    onActionChange = { onSetFingerAction(fingers, it) },
-                    onRemove = { onRemoveFingerAction(fingers) }
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-            }
-
-            val nextFree = FINGER_COUNTS.firstOrNull { it !in usedCounts }
-            if (nextFree != null) {
-                AddTriggerButton(
-                    onClick = { onSetFingerAction(nextFree, vehicleControls.first().id) }
-                )
-            }
         }
     }
 }
 
 @Composable
-private fun SectionLabel(text: String) {
+internal fun SectionLabel(text: String) {
     Text(
         text = text,
         color = DarkColors.TextMuted,
@@ -294,124 +241,6 @@ internal fun NumberPickerFooter(
 }
 
 @Composable
-private fun FingerActionRow(
-    fingers: Int,
-    controlId: String,
-    fingerOptions: List<Int>,
-    onFingerCountChange: (Int) -> Unit,
-    onActionChange: (String) -> Unit,
-    onRemove: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(DarkColors.Surface, RoundedCornerShape(16.dp))
-            .padding(horizontal = 12.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        DropdownPicker(
-            selectedLabel = fingers.toString(),
-            options = fingerOptions,
-            optionLabel = { it.toString() },
-            onSelect = onFingerCountChange
-        )
-        Spacer(modifier = Modifier.size(6.dp))
-        Text(text = stringResource(R.string.automations_fingers), color = DarkColors.TextMuted, fontSize = 14.sp)
-        Spacer(modifier = Modifier.size(10.dp))
-        Text(text = stringResource(R.string.automations_action), color = DarkColors.TextMuted, fontSize = 14.sp)
-        Spacer(modifier = Modifier.size(6.dp))
-        DropdownPicker(
-            selectedLabel = controlById(controlId)?.let { stringResource(it.labelRes()) } ?: controlId,
-            options = vehicleControls,
-            optionLabel = { stringResource(it.labelRes()) },
-            onSelect = { onActionChange(it.id) },
-            modifier = Modifier.weight(1f)
-        )
-        IconButton(onClick = onRemove) {
-            Icon(
-                imageVector = Icons.Rounded.Close,
-                contentDescription = stringResource(R.string.automations_remove),
-                tint = DarkColors.TextMuted,
-                modifier = Modifier.size(20.dp)
-            )
-        }
-    }
-}
-
-/** A compact dropdown styled to sit inside a [DarkColors.Surface] row. */
-@Composable
-private fun <T> DropdownPicker(
-    selectedLabel: String,
-    options: List<T>,
-    optionLabel: @Composable (T) -> String,
-    onSelect: (T) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var expanded by remember { mutableStateOf(false) }
-    Box(modifier = modifier) {
-        Row(
-            modifier = Modifier
-                .clip(RoundedCornerShape(10.dp))
-                .background(DarkColors.Background)
-                .clickable { expanded = true }
-                .padding(start = 12.dp, end = 6.dp, top = 10.dp, bottom = 10.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = selectedLabel,
-                color = Color.White,
-                fontSize = 15.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f, fill = false)
-            )
-            Icon(
-                imageVector = Icons.Rounded.ArrowDropDown,
-                contentDescription = null,
-                tint = DarkColors.TextMuted,
-                modifier = Modifier.size(20.dp)
-            )
-        }
-        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            options.forEach { option ->
-                DropdownMenuItem(
-                    text = { Text(optionLabel(option)) },
-                    onClick = {
-                        onSelect(option)
-                        expanded = false
-                    }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun AddTriggerButton(onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .clip(RoundedCornerShape(12.dp))
-            .clickable(onClick = onClick)
-            .padding(vertical = 8.dp, horizontal = 4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = Icons.Rounded.Add,
-            contentDescription = stringResource(R.string.automations_add_trigger),
-            tint = AccentColor,
-            modifier = Modifier.size(22.dp)
-        )
-        Spacer(modifier = Modifier.size(8.dp))
-        Text(
-            text = stringResource(R.string.automations_add_trigger),
-            color = AccentColor,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.SemiBold
-        )
-    }
-}
-
-@Composable
 internal fun AcSwingRow(value: AcSwingSettings, onChange: (AcSwingSettings) -> Unit) {
     AutomationRow(
         icon = Icons.Rounded.Air,
@@ -449,11 +278,22 @@ private fun ChoiceFooter(label: String, options: List<String>, selected: Int, on
     Spacer(modifier = Modifier.height(12.dp))
     Text(text = label, color = DarkColors.TextMuted, fontSize = 14.sp)
     Spacer(modifier = Modifier.height(6.dp))
+    SegmentedSelector(options = options, selected = selected, onSelect = onSelect)
+}
+
+@Composable
+internal fun SegmentedSelector(
+    options: List<String>,
+    selected: Int,
+    onSelect: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    containerColor: Color = DarkColors.Background
+) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(10.dp))
-            .background(DarkColors.Background)
+            .background(containerColor)
             .padding(3.dp),
         horizontalArrangement = Arrangement.spacedBy(3.dp)
     ) {
