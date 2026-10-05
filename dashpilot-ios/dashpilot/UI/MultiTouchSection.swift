@@ -1,28 +1,17 @@
 import SwiftUI
 
-/// Finger counts that can be bound to an infotainment gesture (matches the
-/// firmware's MULTI_FINGER_MIN/MAX_FINGERS and Android `FINGER_COUNTS`).
+// Firmware MULTI_FINGER_MIN/MAX_FINGERS.
 private let fingerCounts = 3...5
 
-/// UserDefaults key holding the serialized finger-action bindings.
 private let fingerActionsKey = "finger_actions"
 
-/// A single multi-finger tap binding: `fingerCount` fingers -> vehicle
-/// control `controlId`.
 struct FingerAction: Identifiable, Equatable {
     let id = UUID()
     var fingerCount: Int
     var controlId: String
 }
 
-/// Multi-touch tab of the Controls screen (Android `MultiTouchSection`): binds
-/// 3-, 4-, and 5-finger infotainment taps each to a vehicle control.
-///
-/// Edits persist to UserDefaults and are pushed to the DashKit firmware over
-/// BLE when a link is up; the ConnectionViewModel re-syncs everything on each
-/// connect, so edits made while disconnected are not lost.
 struct MultiTouchSection: View {
-
     @Environment(ConnectionViewModel.self) private var connectionVM
 
     @State private var fingerActions: [FingerAction] = []
@@ -59,9 +48,6 @@ struct MultiTouchSection: View {
         }
     }
 
-    /// Pushes every finger slot whose binding changed, clearing freed slots
-    /// with GESTURE_ACTION_NONE (covers add, remove, count and control edits —
-    /// the same slots Android's setFingerAction/changeFingerCount push).
     private func pushChangedBindings(from old: [FingerAction], to new: [FingerAction]) {
         guard let manager = connectionVM.bleManager else { return }
         let oldByCount = Dictionary(uniqueKeysWithValues: old.map { ($0.fingerCount, $0.controlId) })
@@ -76,10 +62,6 @@ struct MultiTouchSection: View {
         }
     }
 
-    // MARK: - Finger action state
-
-    /// Counts this row may pick: its own current value plus any count not used
-    /// by another row.
     private func fingerOptions(for action: FingerAction) -> [Int] {
         let used = Set(fingerActions.map(\.fingerCount))
         return fingerCounts.filter { $0 == action.fingerCount || !used.contains($0) }
@@ -99,23 +81,16 @@ struct MultiTouchSection: View {
         fingerActions.removeAll { $0.id == action.id }
     }
 
-    // MARK: - Persistence
-
-    /// Loads bindings from UserDefaults ("3=glovebox;4=frunk" format).
     private func loadFingerActions() {
         let raw = UserDefaults.standard.string(forKey: fingerActionsKey) ?? ""
         fingerActions = Self.parseFingerActions(raw)
     }
 
-    /// Persists bindings. Called from `.onChange(of: fingerActions)` so every
-    /// add/remove/edit saves; the BLE push happens in `pushChangedBindings`.
     private func saveFingerActions() {
         let raw = Self.serializeFingerActions(fingerActions)
         UserDefaults.standard.set(raw, forKey: fingerActionsKey)
     }
 
-    /// Parses "3=glovebox;4=frunk" into bindings, dropping malformed entries,
-    /// counts outside 3...5, unknown control ids, and duplicate counts.
     static func parseFingerActions(_ raw: String) -> [FingerAction] {
         var seen = Set<Int>()
         var result: [FingerAction] = []
@@ -133,7 +108,6 @@ struct MultiTouchSection: View {
         return result.sorted { $0.fingerCount < $1.fingerCount }
     }
 
-    /// Serializes bindings as "3=glovebox;4=frunk" (sorted by finger count).
     static func serializeFingerActions(_ actions: [FingerAction]) -> String {
         actions
             .sorted { $0.fingerCount < $1.fingerCount }
@@ -142,10 +116,6 @@ struct MultiTouchSection: View {
     }
 }
 
-// MARK: - Finger action row
-
-/// One multi-finger binding row: finger-count picker, control picker, and a
-/// remove button (Android `FingerActionRow`).
 private struct FingerActionRow: View {
     @Binding var action: FingerAction
     let fingerOptions: [Int]
@@ -191,10 +161,6 @@ private struct FingerActionRow: View {
     }
 }
 
-// MARK: - Dropdown picker
-
-/// A compact `Menu`-based dropdown styled as a `.dashBackground` pill, meant to
-/// sit inside a `.dashSurface` row (Android `DropdownPicker`).
 private struct DropdownPicker<T>: View {
     let selectedLabel: String
     let options: [T]
@@ -227,9 +193,6 @@ private struct DropdownPicker<T>: View {
     }
 }
 
-// MARK: - Add trigger button
-
-/// Accent-colored "+ Add trigger" button (Android `AddTriggerButton`).
 private struct AddTriggerButton: View {
     let onTap: () -> Void
 

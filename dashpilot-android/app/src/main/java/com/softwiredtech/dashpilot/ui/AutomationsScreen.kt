@@ -50,17 +50,13 @@ import com.softwiredtech.dashpilot.ui.theme.DarkColors
 import androidx.compose.ui.res.stringResource
 import com.softwiredtech.dashpilot.R
 
-// Minutes the keep-climate-on window can run (matches the firmware clamp).
+// Firmware clamp.
 internal val CLIMATE_KEEP_MINUTE_RANGE = 1..60
 
-// Matches the firmware clamp.
+// Firmware clamp.
 private val SPORT_KICKDOWN_PERCENT_RANGE = 10..95
 private const val SPORT_KICKDOWN_PERCENT_STEP = 5
 
-/**
- * Automations screen: wiper, climate and driving automations. Multi-finger
- * infotainment triggers live in the Controls screen's Multi-touch tab.
- */
 @Composable
 fun AutomationsScreen(
     wiperOffEnabled: Boolean,

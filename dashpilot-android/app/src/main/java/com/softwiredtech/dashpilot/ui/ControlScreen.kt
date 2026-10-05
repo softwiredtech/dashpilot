@@ -29,12 +29,6 @@ import com.softwiredtech.dashpilot.ui.theme.DarkColors
 import androidx.compose.ui.res.stringResource
 import com.softwiredtech.dashpilot.R
 
-/**
- * Vehicle control screen with two tabs. Controls exposes the available DashKit
- * commands as single toggle/action buttons, disabled when there is no active
- * DashKit connection; long-pressing a control pins it to the home screen.
- * Multi-touch binds multi-finger infotainment taps to those controls.
- */
 @Composable
 fun ControlScreen(
     bleManager: DashKitBleManager?,
@@ -48,8 +42,7 @@ fun ControlScreen(
 ) {
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
 
-    // In debug builds the controls behave as if connected (commands are
-    // simulated) so the flow can be exercised without a DashKit.
+    // Debug builds simulate commands without a DashKit.
     val enabled = bleManager != null || BuildConfig.DEBUG
 
     Box(

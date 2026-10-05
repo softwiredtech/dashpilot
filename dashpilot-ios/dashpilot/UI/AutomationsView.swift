@@ -1,20 +1,12 @@
 import SwiftUI
 
-/// Minutes the keep-climate-on window can run (matches the firmware clamp).
+// Firmware clamp.
 let climateKeepMinuteRange = 1...60
 
-// Matches the firmware clamp.
+// Firmware clamp.
 private let sportKickdownPercentOptions = Array(stride(from: 10, through: 95, by: 5))
 
-/// Automations screen, ported from Android `AutomationsScreen`: wiper, climate
-/// and driving automations. Multi-finger infotainment triggers live in the
-/// Controls screen's Multi-touch tab (`MultiTouchSection`).
-///
-/// Edits persist to UserDefaults and are pushed to the DashKit firmware over
-/// BLE when a link is up; the ConnectionViewModel re-syncs everything on each
-/// connect, so edits made while disconnected are not lost.
 struct AutomationsView: View {
-
     @Environment(\.dismiss) private var dismiss
     @Environment(ConnectionViewModel.self) private var connectionVM
 
@@ -95,8 +87,7 @@ struct AutomationsView: View {
                 .padding(DashMetrics.screenPadding)
             }
         }
-        // Child controls consume their own taps, so this only sees taps on
-        // empty space: tapping outside the minutes wheel collapses it.
+        // Only sees taps on empty space; collapses open wheels.
         .contentShape(Rectangle())
         .onTapGesture {
             withAnimation {
@@ -106,7 +97,6 @@ struct AutomationsView: View {
         }
         .navigationBarHidden(true)
         .onChange(of: wiperOff) { _, newValue in
-            // Persisted by @AppStorage; arm/disarm the firmware immediately.
             if let manager = connectionVM.bleManager {
                 VehicleControl.sendWiperOff(manager, enabled: newValue)
             }
@@ -120,7 +110,7 @@ struct AutomationsView: View {
             }
         }
         .onChange(of: climateKeepMinutes) { _, newValue in
-            // Debounced: the wheel fires once per detent while spinning.
+            // Debounced: the wheel fires once per detent.
             minutesPushTask?.cancel()
             minutesPushTask = Task {
                 try? await Task.sleep(for: .milliseconds(400))
@@ -152,9 +142,6 @@ struct AutomationsView: View {
 
 }
 
-// MARK: - Section label
-
-/// Small muted section heading (Android `SectionLabel`).
 struct SectionLabel: View {
     let text: LocalizedStringKey
 
@@ -170,10 +157,6 @@ struct SectionLabel: View {
     }
 }
 
-// MARK: - Automation row
-
-/// A `.dashSurface` card with an icon, title/subtitle, a trailing toggle, and
-/// an optional footer rendered inside the same card (Android `AutomationRow`).
 struct AutomationRow<Footer: View>: View {
     let icon: String
     let title: LocalizedStringKey
@@ -244,8 +227,6 @@ extension AutomationRow where Footer == EmptyView {
     }
 }
 
-// MARK: - AC swing
-
 struct AcSwingRow: View {
     @Environment(ConnectionViewModel.self) private var connectionVM
 
@@ -293,7 +274,6 @@ struct ChoiceFooter: View {
     }
 }
 
-/// Pill-style segmented control (Android `SegmentedSelector`).
 struct SegmentedSelector: View {
     let options: [LocalizedStringKey]
     @Binding var selection: Int
@@ -324,10 +304,6 @@ struct SegmentedSelector: View {
     }
 }
 
-// MARK: - Value picker footer
-
-/// "Label  N unit" line inside an automation card; tapping the value expands a
-/// wheel over `options` (Android `NumberPickerFooter`).
 struct ValuePickerFooter: View {
     let label: LocalizedStringKey
     let unit: String

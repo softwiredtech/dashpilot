@@ -72,11 +72,6 @@ import kotlin.math.roundToInt
 import androidx.compose.ui.res.stringResource
 import com.softwiredtech.dashpilot.R
 
-/**
- * Landing screen. DashKit is the default source and shows the connected home
- * content (vehicle info widgets + primary actions) regardless of connection
- * state. Selecting any other source switches to the data-source setup flow.
- */
 @Composable
 fun HomeScreen(
     connectionStatus: ConnectionStatus,
@@ -253,8 +248,7 @@ private fun Header(
             .fillMaxWidth()
             .height(HeaderHeight)
     ) {
-        // Offset by the IconButton's built-in content inset so the gear
-        // glyph lines up with the tiles' left edge below.
+        // Offset cancels IconButton's inset so the gear aligns with the tiles.
         IconButton(
             onClick = onSettingsClick,
             modifier = Modifier
@@ -351,9 +345,6 @@ private fun PortraitContent(
     }
 }
 
-// Mirrors HomeView.swift: widget grid on the left, action tiles and the
-// primary buttons on the right, both stretched to the viewport height so the
-// screen fills without scrolling unless the content is genuinely taller.
 @Composable
 private fun LandscapeContent(
     minHeight: Dp,
@@ -551,8 +542,6 @@ private fun InfoWidget(
     }
 }
 
-// Landscape counterpart of ActionButton: icon at the top, label at the
-// bottom, sized to match the stat tiles beside it.
 @Composable
 private fun ActionTile(
     label: String,

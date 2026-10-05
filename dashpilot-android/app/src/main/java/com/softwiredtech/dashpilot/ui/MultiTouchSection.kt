@@ -40,17 +40,9 @@ import com.softwiredtech.dashpilot.ui.controls.vehicleControls
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
 import com.softwiredtech.dashpilot.ui.theme.DarkColors
 
-// Finger counts that can be bound to an infotainment gesture (matches the
-// firmware's MULTI_FINGER_MIN/MAX_FINGERS).
+// Firmware MULTI_FINGER_MIN/MAX_FINGERS.
 private val FINGER_COUNTS = 3..5
 
-/**
- * Binds 3-, 4-, and 5-finger infotainment taps each to a vehicle control.
- * Bindings are pushed to the DashKit firmware over BLE
- * (VC_CMD_MULTI_FINGER_ACTION).
- *
- * @param fingerActions current bindings: finger count -> control id.
- */
 @Composable
 internal fun MultiTouchSection(
     fingerActions: Map<Int, String>,
@@ -71,7 +63,6 @@ internal fun MultiTouchSection(
 
         val usedCounts = fingerActions.keys
         fingerActions.toSortedMap().forEach { (fingers, controlId) ->
-            // Allow this row to keep its own count plus any not used elsewhere.
             val fingerOptions = FINGER_COUNTS.filter { it == fingers || it !in usedCounts }
             FingerActionRow(
                 fingers = fingers,
@@ -138,7 +129,6 @@ private fun FingerActionRow(
     }
 }
 
-/** A compact dropdown styled to sit inside a [DarkColors.Surface] row. */
 @Composable
 private fun <T> DropdownPicker(
     selectedLabel: String,

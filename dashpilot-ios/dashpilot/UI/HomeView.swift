@@ -1,10 +1,6 @@
 import SwiftUI
 
-/// Landing screen ported from the Android app's `ConnectedHomeContent`
-/// (HomeScreen.kt): vehicle info widget grid + pinned control + primary
-/// actions. No Bluetooth yet — widgets show "—" until live data arrives.
 struct HomeView: View {
-
     @Binding var navigationPath: NavigationPath
     @Environment(ConnectionViewModel.self) var connectionVM
 
@@ -36,9 +32,6 @@ struct HomeView: View {
         }
         .navigationBarHidden(true)
         .task {
-            // Each appearance opens its own subscription (with the latest
-            // state replayed), so navigating away cancels only this view's
-            // stream — the pipeline keeps feeding the other views.
             for await state in connectionVM.dashStateStream() {
                 dash = state
             }
@@ -49,8 +42,6 @@ struct HomeView: View {
             }
         }
     }
-
-    // MARK: - Layouts
 
     private var portraitContent: some View {
         VStack(spacing: 0) {
@@ -92,8 +83,6 @@ struct HomeView: View {
         .frame(minHeight: minHeight)
     }
 
-    // MARK: - Header
-
     private func header(showDataSource: Bool) -> some View {
         ZStack {
             HStack {
@@ -117,8 +106,6 @@ struct HomeView: View {
                 .font(.system(size: 20, weight: .bold))
         }
     }
-
-    // MARK: - Widget grid
 
     private func widgetGrid(fillHeight: Bool) -> some View {
         VStack(spacing: DashMetrics.gridGap) {
@@ -168,8 +155,6 @@ struct HomeView: View {
         }
     }
 
-    // MARK: - Pinned control
-
     private var pinnedControl: ControlAction? {
         pinnedControlId.isEmpty ? nil : controlById(pinnedControlId)
     }
@@ -199,8 +184,6 @@ struct HomeView: View {
         )
     }
 
-    // MARK: - Actions
-
     private var actionButtons: some View {
         VStack(spacing: 12) {
             ActionButton(label: "Automations", icon: "sparkles") {
@@ -226,8 +209,6 @@ struct HomeView: View {
             )
         }
     }
-
-    // MARK: - Formatters (ported from HomeScreen.kt)
 
     private var socText: String {
         guard let car = dash?.carState else { return "—" }
@@ -260,20 +241,8 @@ struct HomeView: View {
     }
 }
 
-// MARK: - Data source menu
-
-/// Centered "Data source" menu below the actions (port of the Android
-/// `DebugDataSourceMenu`): pick a source while idle, disconnect while a
-/// session is up. Selecting DashKit retries the BLE link; comma leads to
-/// the WiFi connect/setup flow.
-///
-/// Kept as its own view on purpose: its body depends only on
-/// `connectionStatus`, not on the live dash state. Inside `HomeView`'s body
-/// the ~25 Hz dash updates rebuilt the presented `Menu` on every tick, which
-/// detached the visible items from their actions — tapping "Disconnect" did
-/// nothing.
+// Separate view so 25 Hz dash updates don't rebuild the open Menu (taps get dropped).
 private struct DataSourceMenu: View {
-
     @Binding var navigationPath: NavigationPath
     var alignment: Alignment = .center
     @Environment(ConnectionViewModel.self) var connectionVM
@@ -327,11 +296,7 @@ private struct DataSourceMenu: View {
     }
 }
 
-// MARK: - Info widget
-
-/// Square-ish stat card: accent icon at top, big value + muted label at bottom.
 private struct InfoWidget: View {
-
     let icon: String
     let label: LocalizedStringKey
     let value: String
@@ -371,12 +336,7 @@ private struct InfoWidget: View {
     }
 }
 
-// MARK: - Action tile
-
-/// Landscape counterpart of `ActionButton`: a card with the icon at the top
-/// and the label at the bottom, sized to match the stat tiles beside it.
 private struct ActionTile: View {
-
     let label: LocalizedStringKey
     let icon: String
     let action: () -> Void
@@ -401,12 +361,7 @@ private struct ActionTile: View {
     }
 }
 
-// MARK: - Action button
-
-/// Full-width primary action button (icon + label). `accent` renders the
-/// green accent background; otherwise the standard dark surface.
 private struct ActionButton: View {
-
     let label: LocalizedStringKey
     let icon: String
     var accent: Bool = false

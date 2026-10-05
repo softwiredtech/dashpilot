@@ -1,15 +1,6 @@
 import SwiftUI
 
-/// Vehicle control screen with two tabs. Controls exposes the available
-/// DashKit commands as single toggle/action buttons; long-pressing a control
-/// pins it to the home screen. Multi-touch binds multi-finger infotainment
-/// taps to those controls (`MultiTouchSection`).
-///
-/// Ported from Android `ControlScreen` (ControlScreen.kt). Commands are sent
-/// over the live DashKit BLE link; without one the buttons are dimmed (in
-/// debug builds they stay enabled and simulate, like Android).
 struct ControlsView: View {
-
     @Environment(\.dismiss) var dismiss
     @Environment(ConnectionViewModel.self) var connectionVM
 
@@ -89,10 +80,6 @@ struct ControlsView: View {
         }
     }
 
-    // MARK: - Pinning
-
-    /// Toggles the home-screen pin: clears it when the control is already
-    /// pinned, otherwise pins this control (replacing any previous pin).
     private func togglePin(_ id: String) {
         pinnedControlId = (pinnedControlId == id) ? "" : id
     }
