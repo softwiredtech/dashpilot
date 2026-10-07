@@ -147,6 +147,8 @@
   border-bottom: 1px solid color-mix(in srgb, var(--track) 60%, transparent);
   font-size: 14px;
 }
+/* display:flex above would otherwise win over the hidden attribute. */
+.field[hidden] { display: none; }
 .field__label { color: var(--text-dim); }
 .field__control {
   appearance: none;

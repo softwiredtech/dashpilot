@@ -446,6 +446,60 @@
     return control;
   }
 
+  // The border belongs to the cell, not the widget, so every widget gets it.
+  // A switch turns it on and off; color and width show only while it is on and
+  // are remembered while it is off.
+  function borderControls(item, onChange) {
+    const pick = {
+      color: (item.border && item.border.color) || "#3b82f6",
+      width: (item.border && item.border.width) || 2,
+    };
+    const apply = () => {
+      item.border = { color: pick.color, width: pick.width };
+      onChange();
+    };
+
+    const toggle = el("input", "field__control field__control--check");
+    toggle.type = "checkbox";
+    toggle.checked = !!item.border;
+
+    const picker = el("input", "field__control");
+    picker.type = "color";
+    picker.value = pick.color;
+    picker.addEventListener("input", () => {
+      pick.color = picker.value;
+      apply();
+    });
+
+    const width = el("select", "field__control");
+    for (let w = 1; w <= 6; w++) {
+      const option = el("option", null, w + " px");
+      option.value = w;
+      width.appendChild(option);
+    }
+    width.value = pick.width;
+    width.addEventListener("change", () => {
+      pick.width = Number(width.value);
+      apply();
+    });
+
+    const colorRow = field(t("editor.borderColor"), picker);
+    const widthRow = field(t("editor.borderWidth"), width);
+    const show = () => {
+      colorRow.hidden = widthRow.hidden = !toggle.checked;
+    };
+    show();
+    toggle.addEventListener("change", () => {
+      show();
+      if (toggle.checked) apply();
+      else {
+        delete item.border;
+        onChange();
+      }
+    });
+    return [field(t("editor.border"), toggle), colorRow, widthRow];
+  }
+
   function openSettings(item) {
     const entry = DC.registry.get(item.type);
     if (!entry) return;
@@ -473,8 +527,8 @@
         body.appendChild(field(label, bindControl(item, bind, refresh)));
       }
     }
+    body.appendChild(el("h3", "sheet__section", t("editor.appearance")));
     if ((descriptor.props || []).length) {
-      body.appendChild(el("h3", "sheet__section", t("editor.appearance")));
       for (const prop of descriptor.props) {
         const control = propControl(item, prop, refresh);
         if (prop.key === "label") {
@@ -484,6 +538,7 @@
         body.appendChild(field(DC.i18n.localized(prop.name), control));
       }
     }
+    for (const row of borderControls(item, refresh)) body.appendChild(row);
   }
 
   // ---------- document edits ----------

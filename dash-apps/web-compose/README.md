@@ -54,6 +54,10 @@ every signal of an accepted kind, grouped by category, and each prop becomes the
 control its type implies. A new widget folder is fully editable with no editor
 changes.
 
+Every widget can have a border, set in its settings (color and 1-6 px). It is
+stored on the item as `"border": { "color", "width" }`, outside `props`, so it
+works for every widget and older layouts and app versions ignore it.
+
 Each orientation has its own layout: editing landscape leaves portrait alone.
 
 ## Adding a widget

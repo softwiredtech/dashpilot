@@ -49,6 +49,12 @@
     cell.dataset.uid = item.uid;
     cell.dataset.type = item.type;
     cell.style.gridArea = (item.y + 1) + " / " + (item.x + 1) + " / span " + item.h + " / span " + item.w;
+    const border = item.border;
+    if (border && typeof border.color === "string" && border.color) {
+      cell.dataset.border = "1";
+      cell.style.setProperty("--border-color", border.color);
+      cell.style.setProperty("--border-width", Math.min(6, Math.max(1, Number(border.width) || 2)) + "px");
+    }
     // The body is the size container; the widget renders into an inner root so
     // its own @container rules can match it (a container can't query itself).
     const body = document.createElement("div");
