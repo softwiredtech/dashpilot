@@ -1,0 +1,74 @@
+{
+  "type": "battery",
+  "version": 1,
+  "renderer": "dom",
+  "name": {
+    "en": "Battery",
+    "hu": "Akkumulátor",
+    "de": "Batterie"
+  },
+  "defaultSize": {
+    "w": 2,
+    "h": 1
+  },
+  "minSize": {
+    "w": 1,
+    "h": 1
+  },
+  "binds": [
+    {
+      "key": "value",
+      "kinds": [
+        "number"
+      ],
+      "name": {
+        "en": "Value",
+        "hu": "Érték",
+        "de": "Wert"
+      },
+      "default": "batteryPercent"
+    }
+  ],
+  "props": [
+    {
+      "key": "label",
+      "type": "string",
+      "default": "",
+      "name": {
+        "en": "Label",
+        "hu": "Felirat",
+        "de": "Beschriftung"
+      }
+    },
+    {
+      "key": "showLabel",
+      "type": "bool",
+      "default": true,
+      "name": {
+        "en": "Show label",
+        "hu": "Felirat mutatása",
+        "de": "Beschriftung anzeigen"
+      }
+    },
+    {
+      "key": "showValue",
+      "type": "bool",
+      "default": true,
+      "name": {
+        "en": "Show value",
+        "hu": "Érték mutatása",
+        "de": "Wert anzeigen"
+      }
+    },
+    {
+      "key": "accent",
+      "type": "color",
+      "default": "",
+      "name": {
+        "en": "Full color",
+        "hu": "Teli szín",
+        "de": "Farbe bei voll"
+      }
+    }
+  ]
+}

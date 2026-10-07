@@ -85,6 +85,90 @@
     }
     return create;
   })());
+  // --- battery
+  register({"type":"battery","version":1,"renderer":"dom","name":{"en":"Battery","hu":"Akkumulátor","de":"Batterie"},"defaultSize":{"w":2,"h":1},"minSize":{"w":1,"h":1},"binds":[{"key":"value","kinds":["number"],"name":{"en":"Value","hu":"Érték","de":"Wert"},"default":"batteryPercent"}],"props":[{"key":"label","type":"string","default":"","name":{"en":"Label","hu":"Felirat","de":"Beschriftung"}},{"key":"showLabel","type":"bool","default":true,"name":{"en":"Show label","hu":"Felirat mutatása","de":"Beschriftung anzeigen"}},{"key":"showValue","type":"bool","default":true,"name":{"en":"Show value","hu":"Érték mutatása","de":"Wert anzeigen"}},{"key":"accent","type":"color","default":"","name":{"en":"Full color","hu":"Teli szín","de":"Farbe bei voll"}}]}, (function () {
+    // Battery icon: a shell whose fill follows the signal and changes color as the
+    // charge drops (low <= 20 %, critical <= 10 %, like the car's own indicator).
+    // The fill is one transform and the color one data attribute, each written
+    // only when it changes.
+    const LOW = 20, CRITICAL = 10;
+
+    function create(ctx) {
+      const { el, props } = ctx;
+      if (props.accent) el.style.setProperty("--accent", props.accent);
+
+      let label = null;
+      if (props.showLabel) {
+        label = document.createElement("div");
+        label.className = "battery__label";
+        label.textContent = props.label || ctx.label("value");
+      } else {
+        el.dataset.bare = "1";
+      }
+
+      const icon = document.createElement("div");
+      icon.className = "battery__icon";
+      const shell = document.createElement("div");
+      shell.className = "battery__shell";
+      const fill = document.createElement("div");
+      fill.className = "battery__fill";
+      shell.appendChild(fill);
+      const cap = document.createElement("div");
+      cap.className = "battery__cap";
+      icon.append(shell, cap);
+
+      const row = document.createElement("div");
+      row.className = "battery__row";
+      row.appendChild(icon);
+
+      let text = null;
+      if (props.showValue) {
+        const value = document.createElement("span");
+        value.className = "battery__value";
+        text = document.createTextNode("");
+        const unit = document.createElement("span");
+        unit.className = "battery__unit";
+        unit.textContent = ctx.unit("value");
+        value.append(text, unit);
+        row.appendChild(value);
+      }
+
+      if (label) el.append(label);
+      el.append(row);
+      el.dataset.level = "none";
+
+      const ratio = (v) => {
+        const [min, max] = ctx.range("value") || [0, 100];
+        return max > min ? Math.min(1, Math.max(0, (v - min) / (max - min))) : 0;
+      };
+
+      let lastText = null, lastTransform = null, lastLevel = "none";
+      return {
+        update(values) {
+          const v = values.value;
+          const r = v === undefined ? 0 : Math.round(ratio(v) * 100) / 100;
+          const transform = "scaleX(" + r + ")";
+          if (transform !== lastTransform) {
+            lastTransform = transform;
+            fill.style.transform = transform;
+          }
+          const level = v === undefined ? "none" : r * 100 <= CRITICAL ? "critical" : r * 100 <= LOW ? "low" : "ok";
+          if (level !== lastLevel) {
+            lastLevel = level;
+            el.dataset.level = level;
+          }
+          if (text) {
+            const next = ctx.format("value", v);
+            if (next !== lastText) {
+              lastText = next;
+              text.nodeValue = next;
+            }
+          }
+        },
+      };
+    }
+    return create;
+  })());
   // --- lamp
   register({"type":"lamp","version":1,"renderer":"dom","name":{"en":"Indicator","hu":"Jelzőfény","de":"Kontrollleuchte"},"defaultSize":{"w":2,"h":2},"minSize":{"w":1,"h":1},"binds":[{"key":"value","kinds":["bool"],"name":{"en":"Condition","hu":"Feltétel","de":"Bedingung"},"default":"adasOn"},{"key":"steering","kinds":["number"],"default":"egoSteeringAngle","hidden":true}],"props":[{"key":"label","type":"string","default":"","name":{"en":"Label","hu":"Felirat","de":"Beschriftung"}},{"key":"icon","type":"enum","default":"dot","options":["dot","arrow-left","arrow-right","warning","wheel"],"name":{"en":"Icon","hu":"Ikon","de":"Symbol"}},{"key":"color","type":"color","default":"#22c55e","name":{"en":"Active color","hu":"Aktív szín","de":"Aktive Farbe"}},{"key":"blink","type":"bool","default":false,"name":{"en":"Blink when active","hu":"Villogjon aktívan","de":"Blinken wenn aktiv"}},{"key":"hideWhenOff","type":"bool","default":false,"name":{"en":"Hide when off","hu":"Rejtve, ha nem aktív","de":"Ausblenden wenn aus"}},{"key":"showLabel","type":"bool","default":false,"name":{"en":"Show label","hu":"Felirat mutatása","de":"Beschriftung anzeigen"}}]}, (function () {
     // On/off indicator for any bool signal. The whole visual state is one
