@@ -14,6 +14,7 @@ struct SettingsView: View {
     @State private var selectedTab = 0
 
     @AppStorage(DisplaySettings.keyExtraVehicleBus)           private var extraVehicleBus = false
+    @AppStorage(DisplaySettings.keyJuniper)                   private var juniper = true
     @AppStorage(DisplaySettings.keyShowCarBattery)            private var showCarBattery = true
     @AppStorage(DisplaySettings.keyShowOdometer)              private var showOdometer = true
     @AppStorage(DisplaySettings.keyUseImperial)               private var useImperial = false
@@ -212,6 +213,7 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 8) {
             sectionTitle("Configuration")
             SettingsToggleRow(label: "Extra Vehicle Bus", isOn: $extraVehicleBus)
+            SettingsToggleRow(label: "New-gen Model Y (Juniper)", isOn: $juniper)
             Spacer().frame(height: 8)
         }
         .padding(.horizontal, 24)
@@ -222,10 +224,10 @@ struct SettingsView: View {
     private var displaySection: some View {
         VStack(alignment: .leading, spacing: 8) {
             sectionTitle("Display")
-            if extraVehicleBusEnabled && showCarBatteryToggle {
+            if (extraVehicleBusEnabled || juniper) && showCarBatteryToggle {
                 SettingsToggleRow(label: "Show Car Battery", isOn: $showCarBattery)
             }
-            if extraVehicleBusEnabled && showOdometerToggle {
+            if (extraVehicleBusEnabled || juniper) && showOdometerToggle {
                 SettingsToggleRow(label: "Show Odometer", isOn: $showOdometer)
             }
             if showUseImperialToggle {

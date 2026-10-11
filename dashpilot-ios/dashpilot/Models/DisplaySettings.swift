@@ -10,7 +10,15 @@ struct DisplaySettings {
     static let keyRenderQuality = "render_quality"
     static let keyDarkModeBackgroundGray = "dark_mode_background_gray"
     static let keyExtraVehicleBus = "extra_vehicle_bus"
+    static let keyJuniper = "juniper"
     static let keySelectedDashboardId = "selected_dashboard_id"
+}
+
+extension DisplaySettings {
+    static var juniper: Bool {
+        let ud = UserDefaults.standard
+        return ud.object(forKey: keyJuniper) == nil || ud.bool(forKey: keyJuniper)
+    }
 }
 
 struct DisplaySettingsState {

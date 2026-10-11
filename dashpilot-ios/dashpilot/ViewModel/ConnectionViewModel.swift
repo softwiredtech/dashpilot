@@ -140,7 +140,9 @@ final class ConnectionViewModel {
             }
         }
 
-        let ds = DashKitDataSource(manager: manager)
+        let ds = DisplaySettings.juniper
+            ? DashKitDataSource(manager: manager, vehicleType: "tesla_juniper", dbcResource: "new_gen_juniper")
+            : DashKitDataSource(manager: manager)
         dataSource = ds
         ds.connect(address: "")
         startStreaming(ds, resyncDashKit: true)
@@ -268,7 +270,15 @@ final class ConnectionViewModel {
         let extraBus = false
         #endif
         let ds: CommaDataSource
-        if extraBus {
+        if DisplaySettings.juniper {
+            ds = CommaDataSource(
+                vehicleType: "tesla_juniper",
+                dbcFiles: [
+                    (0, "new_gen_juniper"),
+                    (1, "new_gen_juniper")
+                ]
+            )
+        } else if extraBus {
             ds = CommaDataSource(
                 vehicleType: "tesla_extra",
                 dbcFiles: [

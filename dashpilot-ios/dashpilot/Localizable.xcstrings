@@ -172,6 +172,22 @@
         }
       }
     },
+    "New-gen Model Y (Juniper)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neues Model Y (Juniper)"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Új Model Y (Juniper)"
+          }
+        }
+      }
+    },
     "Side" : {
       "localizations" : {
         "de" : {

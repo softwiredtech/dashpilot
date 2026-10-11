@@ -12,6 +12,8 @@ final class DashKitDataSource: IDataSource {
     private static let emitInterval: TimeInterval = 0.04
 
     private let manager: DashKitBleManager
+    private let vehicleType: String
+    private let dbcResource: String
 
     private var continuation: AsyncStream<CarState>.Continuation?
     let incomingMessages: AsyncStream<CarState>
@@ -23,8 +25,10 @@ final class DashKitDataSource: IDataSource {
     private let decoderLock = NSLock()
     private var lastEmit: TimeInterval = 0
 
-    init(manager: DashKitBleManager) {
+    init(manager: DashKitBleManager, vehicleType: String = "dashkit", dbcResource: String = "bus_1_tesla_vehicle") {
         self.manager = manager
+        self.vehicleType = vehicleType
+        self.dbcResource = dbcResource
         var capturedContinuation: AsyncStream<CarState>.Continuation?
         incomingMessages = AsyncStream(bufferingPolicy: .bufferingNewest(1)) { continuation in
             capturedContinuation = continuation
@@ -34,14 +38,14 @@ final class DashKitDataSource: IDataSource {
 
     /// `address` is unused — DashKit is found by BLE scan, not by IP.
     func connect(address: String) {
-        // Both DashKit buses carry the vehicle bus DBC (config_dashkit.json on
-        // Android); the "dashkit" mapper reads buses 0 and 1.
+        // Both DashKit buses share one DBC (config_dashkit.json /
+        // config_juniper.json on Android); the mapper reads buses 0 and 1.
         var dbcContents: [String] = []
         var busIndices: [CInt] = []
         for bus in [0, 1] {
-            guard let url = Bundle.main.url(forResource: "bus_1_tesla_vehicle", withExtension: "dbc"),
+            guard let url = Bundle.main.url(forResource: dbcResource, withExtension: "dbc"),
                   let content = try? String(contentsOf: url) else {
-                print("[DashKitDataSource] failed to load bus_1_tesla_vehicle.dbc")
+                print("[DashKitDataSource] failed to load \(dbcResource).dbc")
                 continue
             }
             dbcContents.append(content)
@@ -49,7 +53,7 @@ final class DashKitDataSource: IDataSource {
         }
         decoder = dbcContents.withCStringArray { dbcPtrs in
             busIndices.withUnsafeBufferPointer { busBuf in
-                bridge_create_vehicle_decoder(dbcPtrs, busBuf.baseAddress, Int32(dbcContents.count), "dashkit")
+                bridge_create_vehicle_decoder(dbcPtrs, busBuf.baseAddress, Int32(dbcContents.count), vehicleType)
             }
         }
 
