@@ -11,3 +11,5 @@ dashpilot-android/app/release/
 dashpilot-ios/dashpilot/Assets.xcassets/preview_*.imageset/preview_*
 *.xcuserstate
 xcuserdata/
+
+.vscode/
