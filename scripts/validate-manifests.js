@@ -5,9 +5,7 @@ const path = require("node:path");
 const SCHEMA_PATH = path.join(__dirname, "..", "docs", "dashapp-manifest.schema.json");
 const APPS_DIR = path.join(__dirname, "..", "dash-apps");
 
-const ROOT_KEYS = new Set(["$schema", "manifestVersion", "id", "perf", "settings"]);
-const PERF_KEYS = new Set(["gate", "reason", "root"]);
-const GATE_VALUES = new Set(["standard", "exempt"]);
+const ROOT_KEYS = new Set(["$schema", "manifestVersion", "id", "settings"]);
 
 const schema = JSON.parse(fs.readFileSync(SCHEMA_PATH, "utf8"));
 const validSettings = new Set(schema.properties.settings.items.enum);
@@ -47,22 +45,6 @@ for (const folder of dirs) {
       if (!validSettings.has(s)) errors.push(`${folder}/settings: "${s}" is not a valid setting`);
       if (seen.has(s)) errors.push(`${folder}/settings: "${s}" is duplicated`);
       seen.add(s);
-    }
-  }
-
-  if (m.perf !== undefined) {
-    if (typeof m.perf !== "object" || m.perf === null) {
-      errors.push(`${folder}/perf: must be an object`);
-    } else {
-      for (const key of Object.keys(m.perf)) {
-        if (!PERF_KEYS.has(key)) errors.push(`${folder}/perf: unknown property "${key}"`);
-      }
-      if (m.perf.gate !== undefined && !GATE_VALUES.has(m.perf.gate)) {
-        errors.push(`${folder}/perf/gate: must be "standard" or "exempt"`);
-      }
-      if (m.perf.gate === "exempt" && (typeof m.perf.reason !== "string" || m.perf.reason.length < 10)) {
-        errors.push(`${folder}/perf/reason: required when gate is "exempt" (min 10 chars)`);
-      }
     }
   }
 

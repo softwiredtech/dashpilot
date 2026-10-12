@@ -2,10 +2,8 @@ import Foundation
 
 /// Generates believable `CarState` values without any hardware or network
 /// connection, so the dashboards can be demoed anywhere (Settings > Start
-/// Demo Mode). Field encodings (gear, traffic light color, etc.) mirror the
-/// ones the dash-apps already expect — see `gearMap`/`TL_COLOR_MAP` in
-/// `dash-apps/web-vanilla/index.html` and the demo generator in
-/// `dash-apps/web-expo/hooks/useCarState.ts`.
+/// Demo Mode). Field encodings (gear, traffic light color, etc.) follow
+/// `dash-apps/README.md`.
 final class DemoDataSource: IDataSource {
 
     private var continuation: AsyncStream<CarState>.Continuation?

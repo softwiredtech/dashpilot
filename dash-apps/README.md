@@ -1,85 +1,138 @@
 # dash-apps
 
-Dash apps are the sandboxed applications running inside the Dashpilot android app.
-They can be either web apps running in the `WebDashView` Composable, or Rive apps running in `RiveDashView`.
+Dashboards that run inside the Dashpilot app, fed live car data.
 
-## Host capabilities
+| folder | |
+|---|---|
+| `web-*/` | web dashboards: `index.html`, `manifest.json`, `preview.jpg` |
+| `rive/` | Rive dashboards (`.riv`) |
 
-Beyond car data (`NativeCarState` + `onCarStateUpdate()` on Android,
-`receiveMessage(json)` on iOS), both apps offer every bundled dash-app:
+## Getting data
 
-| capability | Android | iOS |
-|---|---|---|
-| load saved data | `NativeCarState.getAppData()` → string, `""` if none | `window.__DASHPILOT_APP_DATA__`, injected before the first script |
-| save data | `NativeCarState.setAppData(json)` | `webkit.messageHandlers.appData.postMessage(json)` |
-| editing flag | `NativeCarState.setEditing(bool)` | `webkit.messageHandlers.editing.postMessage(bool)` |
-| app language | `NativeCarState.getLocale()` (planned) | `locale` field in the pushed JSON (planned) |
+The app sends a new state about 25 times a second.
 
-Saved data is one opaque string, usually JSON, stored per dash-app folder
-(`dash_app_data.web-compose`: `SharedPreferences` / `UserDefaults`). A page sees
-only its own; a remote page gets nothing and its saves are dropped. Version the
-document yourself if its format may change.
+| | delivery |
+|---|---|
+| Web, Android | calls `window.onCarStateUpdate()`; read values with `window.NativeCarState.getX()` / `isX()` |
+| Web, iOS | calls `window.receiveMessage(state)` with a plain object |
+| Rive (Android only) | writes numbers into the `MainViewModel` view model, see [Rive](#rive) |
 
-Raise the editing flag while the dash-app has its own drag gestures active: both
-apps read a horizontal drag as "next dashboard" and suspend that while it is up.
-It resets whenever a page loads or the view goes away.
+A web app should handle both:
 
-## Performance requirements
+```js
+const KEYS = ["egoSpeed", "gear", "leftBlinker", "rightBlinker", "isImperial"]; // the keys you use
 
-Dash-apps render live driving data - even one second of stale speed is unacceptable. Web
-dash-apps are benchmarked by an automated performance gate before merging.
+function fromAndroid() {
+  const n = window.NativeCarState, s = {};
+  for (const k of KEYS) {
+    const cap = k[0].toUpperCase() + k.slice(1);
+    const m = k === "isImperial" ? k : n["get" + cap] ? "get" + cap : "is" + cap;
+    s[k] = n[m]?.();
+  }
+  return s;
+}
 
-**Which apps are gated** is declared in the CI matrix at
-[`.github/workflows/dashapp-perf.yml`](../.github/workflows/dashapp-perf.yml) — the matrix
-is the single source of truth. Currently gated: web-retro, web-analog, web-ambient. Not
-gated: web-vanilla (WASM/Bevy 3D renderer — invisible to the jsdom tripwire) and web-expo
-(React Native's bridge — not the `window.onCarStateUpdate` contract the gate replays). Adding
-a new dash-app to the matrix is a one-line edit in the workflow file.
-
-**The gate:** your app must define `window.onCarStateUpdate` and read values from `window.NativeCarState`. CI replays a deterministic 6 s drive (150 frames at 25 Hz) in
-jsdom (no browser) and enforces one per-tick budget documented inline in
-[`_perf-gate/gate.js`](./_perf-gate/gate.js). The gate fails when a budget is broken **three
-ticks in a row** (after a 2-second warmup):
-
-| budget | default | catches |
-|---|---|---|
-| child updates per parent | `max 6` | per-child update loops — apps that write attributes/text to many siblings sharing one parent every tick (the actual web-retro regression: `tape.cells.forEach(c => c.className = next)` = 8 hits on one parent); in-place single-element updates cost 1-2 |
-
-The gate is a regression **tripwire**, not a device-fidelity measurement: it budgets the
-DOM-mutation churn of each `onCarStateUpdate` tick in Node. Layout,
-paint, and canvas work are invisible — a canvas- or CSS-animation-heavy regression will
-pass, and the budget is an absolute jsdom record count, not head-unit time. The verdict is a
-consecutive-streak (3-in-a-row) check on per-parent mutation concentration, so a single isolated stall
-(one multi-hundred-mutation tick in an otherwise-clean run) does not fail the gate —
-deliberately no per-tick max, because a lone tick preempted by a busy CI runner would make
-the gate flaky. The streak is stricter than a p95 on clustered regressions (three bad
-ticks back-to-back trips immediately) and looser on scattered spikes. It
-exists to catch the failure mode that actually occurred: per-child update loops rewriting attributes on every sibling, every tick (e.g. web-retro's blind-spot tape).
-
-**What this gate does not catch:** a wholesale `el.innerHTML = "..."` rebuild fires ONE batched MutationObserver record regardless of child count, so neither per-parent concentration nor a total record count sees it. If a wholesale-rebuild regression ever occurs, count `addedNodes.length + removedNodes.length` inside childList records — out of scope until it shows up. Also invisible: synchronous CPU cost (the previous CPU budget was removed — only a synthetic fixture ever tripped it).
-
-`window.NativeCarState` is injected as a `Proxy` whose methods read a shared state object
-the gate mutates per tick. State keys are derived from method name by convention
-(`getEgoSpeed`→`egoSpeed`, `isAdasOn`→`adasOn`); the one exception (`isImperial`→`useImperial`)
-lives in `gate.js`. Apps reading an unknown method get `undefined`, so their own `readNative`
-fallback runs. No getter list to keep in sync with `CarStateBridge.kt` — the gate drifts with
-the Kotlin naming convention automatically.
-
-## Run the gate locally
-
-```bash
-cd dash-apps/_perf-gate
-npm ci
-node gate.js ../web-yourapp
+window.onCarStateUpdate = () => render(fromAndroid());
+window.receiveMessage = (state) => render(state);
 ```
 
-> Exit codes: `0` PASS, `1` budget violation (a `why:` line names the failing metric),
-> `2` APP_ERROR (missing `window.onCarStateUpdate` contract within 10 s, or an uncaught
-> error the app tried to swallow), `3` INFRA (bad args / no `index.html`).
+## DashState
 
-## Tuning map
+What a dash app receives: the [CarState](#carstate) fields plus these phone and settings fields, all in one flat object.
 
-- Change pass/fail thresholds: edit the `BUDGET_PER_PARENT` constant near the top of [`_perf-gate/gate.js`](./_perf-gate/gate.js) (it has a rationale comment).
-- Change the simulated drive data: edit `buildScenario()` in [`_perf-gate/gate.js`](./_perf-gate/gate.js).
-- Change `NativeCarState` injection or the key-derivation special cases: edit `keyFromMethod()` / `beforeParse` in [`_perf-gate/gate.js`](./_perf-gate/gate.js).
-- Change the CI matrix (which apps run on every PR): edit `matrix.include` in [`.github/workflows/dashapp-perf.yml`](../.github/workflows/dashapp-perf.yml).
+| key | type | meaning |
+|---|---|---|
+| `currentTime` | ms since epoch | |
+| `phoneBattery` | 0–100 | -1 = unknown |
+| `isImperial` | bool | user prefers miles / °F |
+| `darkMode` | bool | |
+| `darkModeBackgroundGray` | 0–255 | background gray picked for dark mode |
+| `showPhoneBattery`, `showCarBattery`, `showOdometer` | bool | user wants these visible |
+| `alwaysOnBlindSpotMonitor` | bool | show blind spots even without a blinker |
+| `renderQuality` | 1–3 | hint for expensive effects |
+| `dataSourceType` | string | `"dashkit"`, `"comma"`, `"websocket"`, `"demo"` |
+| `speedCameraDistance` | meters | -1 = none nearby. **Android only** |
+
+## CarState
+
+Values not received yet are `0` / `false`. For speed limit, stop line and energy fields, 0 means unknown.
+
+**Driving**
+
+| key | type | meaning |
+|---|---|---|
+| `egoSpeed` | number | speed as the car displays it. Show as-is |
+| `gear` | 0–4 | 0 unknown, 1 P, 2 R, 3 N, 4 D |
+| `egoSteeringAngle` | degrees | steering wheel angle, negative = left |
+| `leftBlinker`, `rightBlinker` | 0–2 | 0 off, 1 blinking (lamp dark), 2 blinking (lamp lit) |
+| `anyDoorOpen` | 0/1 | |
+| `buckleStatus` | 0/1 | 1 = driver buckled |
+| `odometer` | number | km, or miles when `isImperial` |
+
+**ADAS**
+
+| key | type | meaning |
+|---|---|---|
+| `adasOn` | bool | cruise / lane keeping engaged |
+| `accSetSpeed` | number | cruise set speed, same unit as `egoSpeed` |
+| `fusedSpeedLimit` | number | posted limit, in the user's unit |
+| `leftBlindSpot`, `rightBlindSpot` | 0–2 | 0 clear, 1 vehicle, 2 vehicle + urgent |
+| `laneDepartureWarning` | 0–4 | 1 left, 2 right, 3 left severe, 4 right severe |
+| `sideCollisionWarning` | 0–3 | 1 left, 2 right, 3 both. **iOS only** |
+| `trafficLightColor` | 0–3 | 0 none, 1 red, 2 green, 3 yellow |
+| `stopLineDist` | meters | distance to the stop line |
+| `changingLane` | bool | lane change in progress |
+| `madsActive`, `experimentalMode` | bool | openpilot states |
+| `selfdriveActive` | bool | openpilot engaged. **iOS only** |
+
+**Battery**
+
+| key | type | meaning |
+|---|---|---|
+| `nominalEnergyRemaining`, `fullPackEnergy`, `energyBuffer` | kWh | charge = `(remaining - buffer) / (full - buffer)` |
+| `powerLevel` | -100…100 | % of max regen (negative) or max discharge (positive) |
+| `packVoltage` | V | |
+| `packCurrent` | A | positive = discharging |
+| `maxRegenPower`, `maxDischargePower` | kW | current limits |
+| `packTMin`, `packTMax` | °C, or °F when `isImperial` | |
+
+The app's CarState also has climate fields and the VIN; dash apps don't receive those yet.
+
+## Rive
+
+The file needs a view model named `MainViewModel` with a default instance and these **number** properties. Missing ones are skipped.
+
+| property | value |
+|---|---|
+| `speed` | `egoSpeed` |
+| `speedLimit` | `fusedSpeedLimit` |
+| `gear` | `gear` |
+| `steeringAngle` | `egoSteeringAngle` |
+| `blinkerLeft`, `blinkerRight` | `leftBlinker`, `rightBlinker` |
+| `leftBlindspot`, `rightBlindspot` | `leftBlindSpot`, `rightBlindSpot` |
+| `trafficLightColor` | `trafficLightColor` |
+| `stopDist`, `trafficLightDist` | `stopLineDist` |
+
+The Android runtime is rive-android 11.7. Debug builds can load any `.riv` from the dashboard picker.
+
+## Saving settings
+
+Web apps get one string of storage, usually JSON.
+
+| | Android | iOS |
+|---|---|---|
+| load | `NativeCarState.getAppData()`, `""` if none | `window.__DASHPILOT_APP_DATA__` |
+| save | `NativeCarState.setAppData(string)` | `webkit.messageHandlers.appData.postMessage(string)` |
+| pause the swipe-to-next-dashboard gesture while you drag | `NativeCarState.setEditing(bool)` | `webkit.messageHandlers.editing.postMessage(bool)` |
+
+## Adding a web app to the apps
+
+1. `dash-apps/web-<id>/` with `index.html`, `preview.jpg` (landscape, ~2:1) and a `manifest.json`. `settings` lists the display settings your app uses, so the app only offers those:
+   ```json
+   { "$schema": "../../docs/dashapp-manifest.schema.json", "manifestVersion": 1, "id": "<id>", "settings": ["useImperial", "darkMode"] }
+   ```
+2. Add `web-<id>` to `DEFAULT_FOLDERS` in `scripts/sync-to-android.sh` and `scripts/sync-to-ios.sh`.
+3. Android: an entry in `availableDashboards` (`datamodel/dash/DashboardConfig.kt`) and a `dashboard_name_<id>` string.
+4. iOS: an entry in `availableDashboards` (`Models/DashboardConfig.swift`), `<id>` in `localApps` in `UI/WebDashView.swift`, and a `preview_<id>.imageset` in `Assets.xcassets` (copy an existing one).
+
+`node scripts/validate-manifests.js` checks the manifests; CI runs it too.

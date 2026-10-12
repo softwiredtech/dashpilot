@@ -13,7 +13,7 @@ DRAWABLES_DIR="$REPO_ROOT/dashpilot-android/app/src/main/res/drawable"
 
 # Default folders to sync (override by passing arguments)
 DEFAULT_FOLDERS=(web-vanilla web-retro web-ambient web-analog web-compose)
-PREVIEW_FOLDERS=("${DEFAULT_FOLDERS[@]}" web-expo rive)
+PREVIEW_FOLDERS=("${DEFAULT_FOLDERS[@]}" rive)
 
 if [ $# -gt 0 ]; then
   FOLDERS=("$@")
@@ -48,12 +48,8 @@ for name in "${FOLDERS[@]}"; do
 
   rsync -av --delete \
     --exclude='.DS_Store' \
-    --exclude='.firebase' \
-    --exclude='.firebaserc' \
-    --exclude='firebase.json' \
-    --exclude='.gitignore' \
     --exclude='preview.*' \
-    --exclude='serve.sh' \
+    --exclude='README.md' \
     --exclude='*.d.ts' \
     --exclude='*backup*' \
     "$src/" "$dst/"

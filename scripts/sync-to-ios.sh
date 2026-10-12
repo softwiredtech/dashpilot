@@ -51,7 +51,7 @@ for name in "${FOLDERS[@]}"; do
   if [ -n "${BUILT_PRODUCTS_DIR:-}" ] && [ -n "${CONTENTS_FOLDER_PATH:-}" ]; then
     dst="${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/${name}"
     cp -R "$src/" "$dst/"
-    rm -f "$dst"/preview.*
+    rm -f "$dst"/preview.* "$dst"/README.md
     echo "Copied $name -> app bundle"
   else
     echo "Prepared $name (run from Xcode to copy into bundle)"

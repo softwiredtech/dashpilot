@@ -15,6 +15,9 @@ jobs:
       - name: Validate dash-app manifests
         run: node scripts/validate-manifests.js
 
+      - name: Check web-compose widgets
+        run: node scripts/build-compose-widgets.js --check
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
