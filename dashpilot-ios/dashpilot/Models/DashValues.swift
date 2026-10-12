@@ -24,8 +24,6 @@ extension DashState {
             ("fusedSpeedLimit", .number(c.fusedSpeedLimit)),
             ("leftBlindSpot", .number(c.leftBlindSpot)),
             ("rightBlindSpot", .number(c.rightBlindSpot)),
-            ("laneDepartureWarning", .number(c.laneDepartureWarning)),
-            ("sideCollisionWarning", .number(c.sideCollisionWarning)),
             ("trafficLightColor", .number(c.trafficLightColor)),
             ("stopLineDist", .number(c.stopLineDist)),
             ("changingLane", .bool(c.changingLane)),

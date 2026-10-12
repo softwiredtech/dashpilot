@@ -77,8 +77,6 @@ Values not received yet are `0` / `false`. For speed limit, stop line and energy
 | `accSetSpeed` | number | cruise set speed, same unit as `egoSpeed` |
 | `fusedSpeedLimit` | number | posted limit, in the user's unit |
 | `leftBlindSpot`, `rightBlindSpot` | 0–2 | 0 clear, 1 vehicle, 2 vehicle + urgent |
-| `laneDepartureWarning` | 0–4 | 1 left, 2 right, 3 left severe, 4 right severe |
-| `sideCollisionWarning` | 0–3 | 1 left, 2 right, 3 both. **iOS only** |
 | `trafficLightColor` | 0–3 | 0 none, 1 red, 2 green, 3 yellow |
 | `stopLineDist` | meters | distance to the stop line |
 | `changingLane` | bool | lane change in progress |

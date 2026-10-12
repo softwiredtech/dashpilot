@@ -137,8 +137,6 @@ final class DemoDataSource: IDataSource {
 
         s.leftBlindSpot = t.truncatingRemainder(dividingBy: 23) < 3 ? 1 : 0
         s.rightBlindSpot = t.truncatingRemainder(dividingBy: 29) < 3 ? 1 : 0
-        s.laneDepartureWarning = 0
-        s.sideCollisionWarning = 0
 
         // BMS / power — Tesla-ish pack, slowly discharging.
         s.fullPackEnergy = 75

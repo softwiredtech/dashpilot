@@ -13,8 +13,6 @@
         <ViewModelPropertyNumber name="fusedSpeedLimit" id="1:19"/>
         <ViewModelPropertyNumber name="leftBlindSpot" id="1:20"/>
         <ViewModelPropertyNumber name="rightBlindSpot" id="1:21"/>
-        <ViewModelPropertyNumber name="laneDepartureWarning" id="1:22"/>
-        <ViewModelPropertyNumber name="sideCollisionWarning" id="1:23"/>
         <ViewModelPropertyNumber name="trafficLightColor" id="1:24"/>
         <ViewModelPropertyNumber name="stopLineDist" id="1:25"/>
         <ViewModelPropertyNumber name="nominalEnergyRemaining" id="1:26"/>
@@ -60,8 +58,6 @@
             <ViewModelInstanceNumber propertyValue="80" viewModelPropertyId="1:19"/>
             <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="1:20"/>
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="1:21"/>
-            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="1:22"/>
-            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="1:23"/>
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="1:24"/>
             <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="1:25"/>
             <ViewModelInstanceNumber propertyValue="52" viewModelPropertyId="1:26"/>

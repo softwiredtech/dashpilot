@@ -20,8 +20,6 @@ fun DashState.dashValues(): Map<String, Any> {
         "fusedSpeedLimit" to c.fusedSpeedLimit,
         "leftBlindSpot" to c.leftBlindSpot,
         "rightBlindSpot" to c.rightBlindSpot,
-        "laneDepartureWarning" to c.laneDepartureWarning,
-        "sideCollisionWarning" to c.sideCollisionWarning,
         "trafficLightColor" to c.trafficLightColor,
         "stopLineDist" to c.stopLineDist,
         "changingLane" to c.changingLane,

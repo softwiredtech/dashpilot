@@ -18,8 +18,6 @@ static void carStateToBridge(const CarState& cs, BridgeCarState* out) {
     out->fusedSpeedLimit = cs.fusedSpeedLimit;
     out->stopLineDist = cs.stopLineDist;
     out->trafficLightColor = cs.trafficLightColor;
-    out->laneDepartureWarning = cs.laneDepartureWarning;
-    out->sideCollisionWarning = cs.sideCollisionWarning;
     out->anyDoorOpen = cs.anyDoorOpen;
     out->buckleStatus = cs.buckleStatus;
     out->accSetSpeed = cs.accSetSpeed;

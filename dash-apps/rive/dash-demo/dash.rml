@@ -129,55 +129,6 @@
                         </Text>
                     </LayoutComponent>
 
-                    <LayoutComponent width="340" height="56" styleId="3:141" name="Lane Chip" id="3:140">
-                        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
-                                              flexDirectionValue="row" layoutAlignmentType="center"
-                                              gapHorizontal="12" gapHorizontalUnitsValue="points"
-                                              cornerRadiusTL="28" cornerRadiusTR="28" cornerRadiusBL="28" cornerRadiusBR="28"
-                                              name="S" id="3:141">
-                            <DataBindContext sourcePathIds="1:1-1:22" propertyKey="596" converterId="2:7"/>
-                        </LayoutComponentStyle>
-                        <Fill name="F"><SolidColor colorValue="FF33270A" name="C"/></Fill>
-                        <LayoutComponent width="20" height="24" styleId="3:143" name="Lane Left" id="3:142">
-                            <DataBindContext sourcePathIds="1:1-1:22" propertyKey="18" converterId="2:9"/>
-                            <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:143"/>
-                            <Node x="10" y="12" name="Art">
-                                <Shape name="Arrow">
-                                    <PointsPath isClosed="true" name="P">
-                                        <StraightVertex x="-8" y="0"/>
-                                        <StraightVertex x="8" y="-11"/>
-                                        <StraightVertex x="8" y="11"/>
-                                    </PointsPath>
-                                    <Fill name="F"><SolidColor colorValue="FFFFB020" name="C"/></Fill>
-                                </Shape>
-                            </Node>
-                        </LayoutComponent>
-                        <LayoutComponent width="232" height="56" styleId="3:145" name="Lane Label" id="3:144">
-                            <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:145"/>
-                            <Text sizingValue="fixed" width="232" height="56" alignValue="center" verticalAlignValue="middle"
-                                  wrapValue="noWrap" name="Lane Text" id="3:146">
-                                <TextStylePaint fontSize="24" letterSpacing="1.5" fontAssetId="2:901" name="S" id="3:147">
-                                    <Fill name="F"><SolidColor colorValue="FFFFB020" name="C"/></Fill>
-                                </TextStylePaint>
-                                <TextValueRun styleId="3:147" text="LANE DEPARTURE" name="Run"/>
-                            </Text>
-                        </LayoutComponent>
-                        <LayoutComponent width="20" height="24" styleId="3:149" name="Lane Right" id="3:148">
-                            <DataBindContext sourcePathIds="1:1-1:22" propertyKey="18" converterId="2:10"/>
-                            <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:149"/>
-                            <Node x="10" y="12" name="Art">
-                                <Shape name="Arrow">
-                                    <PointsPath isClosed="true" name="P">
-                                        <StraightVertex x="8" y="0"/>
-                                        <StraightVertex x="-8" y="-11"/>
-                                        <StraightVertex x="-8" y="11"/>
-                                    </PointsPath>
-                                    <Fill name="F"><SolidColor colorValue="FFFFB020" name="C"/></Fill>
-                                </Shape>
-                            </Node>
-                        </LayoutComponent>
-                    </LayoutComponent>
-
                     <LayoutComponent width="300" height="56" styleId="3:151" name="Camera Chip" id="3:150">
                         <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
                                               cornerRadiusTL="28" cornerRadiusTR="28" cornerRadiusBL="28" cornerRadiusBR="28"

@@ -74,35 +74,7 @@
         <FormulaTokenParenthesisClose/>
     </DataConverterFormula>
 
-    <DataConverterFormula name="Is Left" id="2:9">
-        <FormulaTokenParenthesisOpen/>
-        <FormulaTokenInput/>
-        <FormulaTokenOperation operationType="4"/>
-        <FormulaTokenValue operationValue="2"/>
-        <FormulaTokenParenthesisClose/>
-        <FormulaTokenOperation operationType="2"/>
-        <FormulaTokenFunction functionType="0"/>
-        <FormulaTokenValue operationValue="1"/>
-        <FormulaTokenArgumentSeparator/>
-        <FormulaTokenInput/>
-        <FormulaTokenParenthesisClose/>
-    </DataConverterFormula>
 
-    <DataConverterFormula name="Is Right" id="2:10">
-        <FormulaTokenFunction functionType="0"/>
-        <FormulaTokenValue operationValue="1"/>
-        <FormulaTokenArgumentSeparator/>
-        <FormulaTokenInput/>
-        <FormulaTokenParenthesisClose/>
-        <FormulaTokenOperation operationType="2"/>
-        <FormulaTokenParenthesisOpen/>
-        <FormulaTokenValue operationValue="1"/>
-        <FormulaTokenOperation operationType="1"/>
-        <FormulaTokenInput/>
-        <FormulaTokenOperation operationType="4"/>
-        <FormulaTokenValue operationValue="2"/>
-        <FormulaTokenParenthesisClose/>
-    </DataConverterFormula>
 
     <!-- 1 - min(1, |input - k|): 1 when input == k -->
     <DataConverterFormula name="Equals 1" id="2:11">
@@ -175,7 +147,6 @@
     </DataConverterFormula>
 
     <DataConverterFormula name="Urgent Left" id="2:33">
-        <FormulaTokenFunction functionType="1"/>
         <FormulaTokenFunction functionType="0"/>
         <FormulaTokenValue operationValue="1"/>
         <FormulaTokenArgumentSeparator/>
@@ -186,17 +157,9 @@
         <FormulaTokenOperation operationType="1"/>
         <FormulaTokenValue operationValue="1"/>
         <FormulaTokenParenthesisClose/>
-        <FormulaTokenParenthesisClose/>
-        <FormulaTokenArgumentSeparator/>
-        <FormulaTokenValue>
-            <DataBindContext sourcePathIds="1:1-1:23" propertyKey="777"/>
-        </FormulaTokenValue>
-        <FormulaTokenOperation operationType="4"/>
-        <FormulaTokenValue operationValue="2"/>
         <FormulaTokenParenthesisClose/>
     </DataConverterFormula>
     <DataConverterFormula name="Urgent Right" id="2:34">
-        <FormulaTokenFunction functionType="1"/>
         <FormulaTokenFunction functionType="0"/>
         <FormulaTokenValue operationValue="1"/>
         <FormulaTokenArgumentSeparator/>
@@ -206,15 +169,6 @@
         <FormulaTokenInput/>
         <FormulaTokenOperation operationType="1"/>
         <FormulaTokenValue operationValue="1"/>
-        <FormulaTokenParenthesisClose/>
-        <FormulaTokenParenthesisClose/>
-        <FormulaTokenArgumentSeparator/>
-        <FormulaTokenFunction functionType="4"/>
-        <FormulaTokenValue>
-            <DataBindContext sourcePathIds="1:1-1:23" propertyKey="777"/>
-        </FormulaTokenValue>
-        <FormulaTokenOperation operationType="3"/>
-        <FormulaTokenValue operationValue="2"/>
         <FormulaTokenParenthesisClose/>
         <FormulaTokenParenthesisClose/>
     </DataConverterFormula>

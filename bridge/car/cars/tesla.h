@@ -76,8 +76,6 @@ static inline void updatePartyBus(const CANParsers& cp, CarState& cs) {
     cs.stopLineDist = cp.get(2, "DAS_road", "DAS_stopLineDist");
     cs.leftBlinker = cp.get(2, "UI_warning", "leftBlinkerBlinking");
     cs.rightBlinker = cp.get(2, "UI_warning", "rightBlinkerBlinking");
-    cs.laneDepartureWarning = cp.get(2, "DAS_status", "DAS_laneDepartureWarning");
-    cs.sideCollisionWarning = cp.get(2, "DAS_status", "DAS_sideCollisionWarning");
     cs.anyDoorOpen = cp.get(2, "UI_warning", "anyDoorOpen");
     cs.buckleStatus = cp.get(2, "UI_warning", "buckleStatus");
     cs.accSetSpeed = cp.get(2, "DI_state", "DI_digitalSpeed");
@@ -156,8 +154,6 @@ public:
         cs.rightBlinker = rightBlinkerHold_.update(
             cp.get(1, "VCRIGHT_lightStatus", "VCRIGHT_turnSignalStatus"));
 
-        cs.laneDepartureWarning = cp.get(0, "DAS_status", "DAS_laneDepartureWarning");
-        cs.sideCollisionWarning = cp.get(0, "DAS_status", "DAS_sideCollisionWarning");
 
         // VCFRONT_status is multiplexed: VCFRONT_anyDoorOpen lives on mux 0
         if (static_cast<int>(cp.get(1, "VCFRONT_status", "VCFRONT_statusIndex")) == 0) {
