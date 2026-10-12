@@ -10,22 +10,9 @@ Currently only Teslas are supported, but we're looking for adding support to oth
 
 ## Project structure
 
-`/adasviz`:  
-
-Contains the Bevy rendering engine used in `/dashpilot-android` that is capable of rendering vehicles, lanes, traffic lights and many more.  
-We don't visualize everything the renderer is capable of, because the data we receive from the car is limited.  
-When connecting through a Comma device, we are connected to the CAN 2 (Party bus), so we have the following information relevant for adasviz:
-- stop line distance
-- traffic light state
-- blind spot left, right
-- lane departure left, right
-- ACC ON/OFF
-
-When connecting through our kit, we connect to CAN 0 and 1 (chassis, and vehicle bus, respectively), so we als have information about the lane, so we can visualize that as well.
-
 `/dash-apps`:  
 
-These are the example apps running in the [dashpilot-android](./dashpilot-android/) sandbox app. They fall into two main categories: web apps, and [Rive](https://rive.app) apps. See the [dash-apps](./dash-apps/) readme for more.
+These are the example apps running in the [dashpilot-android](./dashpilot-android/) sandbox app. They fall into two main categories: web apps, and [Rive](https://rive.app) apps. `web-vanilla` includes a prebuilt Bevy (WebAssembly) renderer for its 3D ADAS view. See the [dash-apps](./dash-apps/) readme for more.
 
 `/dashpilot-android`:  
 
@@ -36,7 +23,7 @@ The `app` module contains the code for the various data sources, rive / web dash
 
 `/simulator`:  
 
-A python based websocket server and simulator. It can generate dynamic scenarios for `adasviz`, and can also replay pre-recorded `routes`.
+A python based websocket server and simulator. It can generate dynamic scenarios for the dash apps, and can also replay pre-recorded `routes`.
 
 `python3 server.py --route '/path/to/a/route.jsonl'`
 
