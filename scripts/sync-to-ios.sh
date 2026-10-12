@@ -17,6 +17,7 @@ XCASSETS_DIR="$REPO_ROOT/dashpilot-ios/dashpilot/Assets.xcassets"
 
 # Default folders (override by passing arguments)
 DEFAULT_FOLDERS=(web-vanilla web-retro web-ambient web-analog web-compose)
+PREVIEW_FOLDERS=("${DEFAULT_FOLDERS[@]}" rive)
 
 if [ $# -gt 0 ]; then
   FOLDERS=("$@")
@@ -24,7 +25,7 @@ else
   FOLDERS=("${DEFAULT_FOLDERS[@]}")
 fi
 
-for folder in "${DEFAULT_FOLDERS[@]}"; do
+for folder in "${PREVIEW_FOLDERS[@]}"; do
   name="${folder#web-}"
   cp -f "$APPS_DIR/$folder/preview.jpg" "$XCASSETS_DIR/preview_$name.imageset/preview_$name.jpg"
   echo "Copied preview $folder -> $XCASSETS_DIR/preview_$name.imageset/preview_$name.jpg"
@@ -48,5 +49,10 @@ for name in "${FOLDERS[@]}"; do
     echo "Prepared $name (run from Xcode to copy into bundle)"
   fi
 done
+
+if [ -n "${BUILT_PRODUCTS_DIR:-}" ] && [ -n "${CONTENTS_FOLDER_PATH:-}" ]; then
+  cp -f "$APPS_DIR"/rive/*.riv "${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/"
+  echo "Copied rive dashboards -> app bundle"
+fi
 
 echo "Done."

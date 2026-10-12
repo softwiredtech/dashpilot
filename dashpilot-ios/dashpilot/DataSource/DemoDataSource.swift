@@ -1,9 +1,5 @@
 import Foundation
 
-/// Generates believable `CarState` values without any hardware or network
-/// connection, so the dashboards can be demoed anywhere (Settings > Start
-/// Demo Mode). Field encodings (gear, traffic light color, etc.) follow
-/// `dash-apps/README.md`.
 final class DemoDataSource: IDataSource {
 
     private var continuation: AsyncStream<CarState>.Continuation?
@@ -90,7 +86,7 @@ final class DemoDataSource: IDataSource {
             let direction: Float = turningLeft ? -1 : 1
             s.egoSteeringAngle = direction * Float(ease) * 28
             s.egoSpeed = cruiseSpeed(at: t) * Float(1 - 0.5 * ease)
-            let blink: Float = phase.truncatingRemainder(dividingBy: 1.0) < 0.5 ? 1 : 0
+            let blink: Float = phase.truncatingRemainder(dividingBy: 1.0) < 0.5 ? 2 : 1
             s.leftBlinker = turningLeft ? blink : 0
             s.rightBlinker = turningLeft ? 0 : blink
             s.trafficLightColor = 0
@@ -151,8 +147,10 @@ final class DemoDataSource: IDataSource {
         s.maxRegenPower = 60
         s.maxDischargePower = 300
         s.packVoltage = Float(380 + sin(t * 0.2) * 5)
-        s.packCurrent = s.egoSpeed * 0.4
-        s.powerLevel = min(s.packVoltage * s.packCurrent / 1000 / s.maxDischargePower, 1) * 100
+        let braking = phase >= cruise2End && phase < approachEnd
+        s.packCurrent = braking ? -s.egoSpeed * 1.2 : s.egoSpeed * 0.4
+        let kw = s.packVoltage * s.packCurrent / 1000
+        s.powerLevel = max(-1, min(kw / (kw >= 0 ? s.maxDischargePower : s.maxRegenPower), 1)) * 100
         s.packTMin = 22
         s.packTMax = 28
         s.acTemp = 22

@@ -1,7 +1,6 @@
 package com.softwiredtech.dashpilot.datamodel.dash
 
 import androidx.annotation.StringRes
-import com.softwiredtech.dashpilot.BuildConfig
 import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.ui.LOCAL_ASSET_BASE_URL
 import kotlinx.serialization.Serializable
@@ -64,17 +63,24 @@ val availableDashboards = buildList {
             screenshotRes = R.drawable.preview_retro
         )
     )
-
-    if (BuildConfig.DEBUG) {
-        add(
-            DashboardConfig(
-                id = "dev_rive",
-                nameRes = R.string.dashboard_name_dev_rive,
-                url = "",
-                type = DashboardType.DEV_RIVE
-            )
+    add(
+        DashboardConfig(
+            id = "rive",
+            nameRes = R.string.dashboard_name_rive,
+            url = "dash_demo",
+            type = DashboardType.RIVE,
+            screenshotRes = R.drawable.preview_rive
         )
-    }
+    )
+
+    add(
+        DashboardConfig(
+            id = "dev_rive",
+            nameRes = R.string.dashboard_name_dev_rive,
+            url = "",
+            type = DashboardType.DEV_RIVE
+        )
+    )
 }
 
 // Mutable, written once at app startup by MainActivity via setLoadedManifests().

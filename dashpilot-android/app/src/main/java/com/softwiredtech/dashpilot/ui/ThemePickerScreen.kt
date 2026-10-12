@@ -1,5 +1,6 @@
 package com.softwiredtech.dashpilot.ui
 
+import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -67,6 +68,9 @@ fun ThemePickerScreen(onBack: () -> Unit) {
         contract = ActivityResultContracts.OpenDocument()
     ) { uri ->
         if (uri != null) {
+            runCatching {
+                context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
             saveDevRiveFileUri(context, uri.toString())
             selectedDashboardId.value = "dev_rive"
             saveSelectedDashboard(context, dashboardById("dev_rive")!!)

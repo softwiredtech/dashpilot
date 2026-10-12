@@ -225,9 +225,6 @@ final class ConnectionViewModel {
 
     // MARK: - Demo mode
 
-    /// Starts a local, hardware-free session with mocked `CarState` values
-    /// (Settings > Start Demo Mode). Leaves `bleManager` nil, same as a comma
-    /// session, so control buttons stay in their existing no-op/simulate mode.
     func connectDemo() {
         guard canStartConnection else { return }
         if case .error = connectionStatus { disconnect() }  // drop failed-session remnants

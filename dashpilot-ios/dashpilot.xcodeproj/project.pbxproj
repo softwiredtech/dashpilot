@@ -31,6 +31,7 @@
 		809087C62FA89FA500D10891 /* car.capnp.c++ in Sources */ = {isa = PBXBuildFile; fileRef = 809087BC2FA89FA500D10891 /* car.capnp.c++ */; };
 		809088AB2FA8A61600D10891 /* dbc.cc in Sources */ = {isa = PBXBuildFile; fileRef = 809088A72FA8A61600D10891 /* dbc.cc */; };
 		809088AC2FA8A61600D10891 /* dbcfile.cc in Sources */ = {isa = PBXBuildFile; fileRef = 809088A92FA8A61600D10891 /* dbcfile.cc */; };
+		A1B2C3D4E5F6071829304052 /* RiveRuntime in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3D4E5F6071829304051 /* RiveRuntime */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -108,6 +109,7 @@
 				809087A32FA8983F00D10891 /* libcapnp.xcframework in Frameworks */,
 				809087262FA61F2500D10891 /* libzmq.xcframework in Frameworks */,
 				809087AB2FA8985A00D10891 /* libkj.xcframework in Frameworks */,
+				A1B2C3D4E5F6071829304052 /* RiveRuntime in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -276,6 +278,7 @@
 			);
 			name = dashpilot;
 			packageProductDependencies = (
+				A1B2C3D4E5F6071829304051 /* RiveRuntime */,
 			);
 			productName = dashpilot;
 			productReference = 29FF823E2F72C9C400D48E9A /* dashpilot.app */;
@@ -307,6 +310,9 @@
 			);
 			mainGroup = 29FF82352F72C9C400D48E9A;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				A1B2C3D4E5F6071829304050 /* XCRemoteSwiftPackageReference "rive-ios" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 29FF823F2F72C9C400D48E9A /* Products */;
 			projectDirPath = "";
@@ -592,6 +598,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A1B2C3D4E5F6071829304050 /* XCRemoteSwiftPackageReference "rive-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/rive-app/rive-ios";
+			requirement = {
+				kind = exactVersion;
+				version = 6.28.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A1B2C3D4E5F6071829304051 /* RiveRuntime */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A1B2C3D4E5F6071829304050 /* XCRemoteSwiftPackageReference "rive-ios" */;
+			productName = RiveRuntime;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 29FF82362F72C9C400D48E9A /* Project object */;
 }

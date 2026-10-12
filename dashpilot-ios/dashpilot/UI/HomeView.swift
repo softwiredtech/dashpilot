@@ -253,6 +253,7 @@ private struct DataSourceMenu: View {
                 if isIdle {
                     Button("comma") { navigationPath.append(AppRoute.setup) }
                     Button("DashKit") { connectionVM.connectDashKit() }
+                    Button("Demo") { connectionVM.connectDemo() }
                 } else {
                     Button("Disconnect") { connectionVM.disconnect() }
                 }

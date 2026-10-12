@@ -5,7 +5,7 @@ Dashboards that run inside the Dashpilot app, fed live car data.
 | folder | |
 |---|---|
 | `web-*/` | web dashboards: `index.html`, `manifest.json`, `preview.jpg` |
-| `rive/` | Rive dashboards (`.riv`) |
+| `rive/` | Rive dashboards: built `.riv` files and their sources |
 
 ## Getting data
 
@@ -15,7 +15,7 @@ The app sends a new state about 25 times a second.
 |---|---|
 | Web, Android | calls `window.onCarStateUpdate()`; read values with `window.NativeCarState.getX()` / `isX()` |
 | Web, iOS | calls `window.receiveMessage(state)` with a plain object |
-| Rive (Android only) | writes numbers into the `MainViewModel` view model, see [Rive](#rive) |
+| Rive | writes the same keys into the `DashViewModel` view model, see [Rive](#rive) |
 
 A web app should handle both:
 
@@ -100,20 +100,15 @@ The app's CarState also has climate fields and the VIN; dash apps don't receive 
 
 ## Rive
 
-The file needs a view model named `MainViewModel` with a default instance and these **number** properties. Missing ones are skipped.
+A Rive dashboard gets the same [DashState](#dashstate) and [CarState](#carstate) keys as a web app, through a view model named `DashViewModel` (default instance) on the main artboard. Numbers are number properties, bools are boolean properties, `dataSourceType` is a string. Declare only the ones you use; the rest are skipped.
 
-| property | value |
-|---|---|
-| `speed` | `egoSpeed` |
-| `speedLimit` | `fusedSpeedLimit` |
-| `gear` | `gear` |
-| `steeringAngle` | `egoSteeringAngle` |
-| `blinkerLeft`, `blinkerRight` | `leftBlinker`, `rightBlinker` |
-| `leftBlindspot`, `rightBlindspot` | `leftBlindSpot`, `rightBlindSpot` |
-| `trafficLightColor` | `trafficLightColor` |
-| `stopDist`, `trafficLightDist` | `stopLineDist` |
+One difference: Rive numbers are 32-bit, so `currentTime` is **seconds since local midnight** (0–86399) instead of epoch milliseconds.
 
-The Android runtime is rive-android 11.7. Debug builds can load any `.riv` from the dashboard picker.
+The app plays the file's default state machine and resizes the artboard to the screen (Fit = Layout): it is always **1080 units tall**, and its width follows the screen, from 1440 (4:3 tablet) to about 2340 (19.5:9 phone). Build the main artboard from layouts so it stretches.
+
+[`rive/dash-demo/`](rive/dash-demo/) is a demo dashboard written in Rive markup. It declares every property, so it's a good starting point. `rive dash-apps/rive/dash-demo --once` with the [Rive CLI](https://rive.app) rebuilds `rive/dash_demo.riv`.
+
+To try your own `.riv` on a phone, pick **Load Rive File** in the dashboard theme picker.
 
 ## Saving settings
 

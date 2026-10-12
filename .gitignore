@@ -3,6 +3,7 @@ __pycache__
 venv
 dashpilot-android/app/src/main/assets/web-*
 dashpilot-android/app/src/main/res/drawable/preview_*
+dashpilot-android/app/src/main/res/raw/*.riv
 dashpilot-android/app/release/
 dashpilot-ios/dashpilot/Assets.xcassets/preview_*.imageset/preview_*
 *.xcuserstate

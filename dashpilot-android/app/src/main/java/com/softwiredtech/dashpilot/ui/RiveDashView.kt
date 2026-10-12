@@ -1,16 +1,19 @@
 package com.softwiredtech.dashpilot.ui
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.net.toUri
+import app.rive.Fit
 import app.rive.Result
 import app.rive.Rive
 import app.rive.RiveFile
@@ -19,40 +22,39 @@ import app.rive.ViewModelSource
 import app.rive.rememberRiveFile
 import app.rive.rememberRiveWorkerOrNull
 import app.rive.rememberViewModelInstance
+import app.rive.runtime.kotlin.core.ViewModel.PropertyDataType
 import com.softwiredtech.dashpilot.datamodel.dash.DashState
-import kotlinx.coroutines.CoroutineScope
+import com.softwiredtech.dashpilot.datamodel.dash.dashValues
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
-import androidx.core.net.toUri
 
+private const val DASH_VIEW_MODEL = "DashViewModel"
+private const val ARTBOARD_HEIGHT = 1080f
 
 @Composable
 fun RiveDashView(
     assetName: String,
     dashStateFlow: Flow<DashState>,
-    scope: CoroutineScope,
     onError: ((message: String) -> Unit),
     fileUri: String? = null
 ) {
-    Box(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
     ) {
+        val fit = Fit.Layout(constraints.maxHeight / ARTBOARD_HEIGHT)
         val context = LocalContext.current
         val errorState = remember { mutableStateOf<Throwable?>(null) }
         val riveWorker = rememberRiveWorkerOrNull(errorState)
         if (riveWorker == null) {
             onError(errorState.value.toString())
-            return
+            return@BoxWithConstraints
         }
-        val myFile: MutableState<RiveFile?> = remember { mutableStateOf(null) }
 
         val riveSource = remember(assetName, fileUri) {
             if (!fileUri.isNullOrEmpty()) {
                 try {
-                    val uri = fileUri.toUri()
-                    val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                    val bytes = context.contentResolver.openInputStream(fileUri.toUri())?.use { it.readBytes() }
                     if (bytes != null) RiveFileSource.Bytes(bytes) else null
                 } catch (e: Exception) {
                     null
@@ -65,45 +67,54 @@ fun RiveDashView(
 
         if (riveSource == null) {
             onError("Failed to read rive file from: $fileUri")
-            return
+            return@BoxWithConstraints
         }
 
         when (val riveFile = rememberRiveFile(riveSource, riveWorker)) {
-            is Result.Loading -> {
-            }
-
-            is Result.Error -> {
-                onError(riveFile.throwable.toString())
-            }
-
+            is Result.Loading -> {}
+            is Result.Error -> onError(riveFile.throwable.toString())
             is Result.Success -> {
                 val file = riveFile.value
-                val vmiSource = ViewModelSource.Named("MainViewModel").defaultInstance()
-                val vmi = rememberViewModelInstance(file, vmiSource)
-                Rive(
-                    riveFile.value,
-                    viewModelInstance = vmi
-                )
-                myFile.value = riveFile.value
-                vmi.setNumber("speed", 90f)
-
-                LaunchedEffect(Unit) {
-                    scope.launch {
-                        dashStateFlow.collect { dashState ->
-                            val message = dashState.carState
-                            vmi.setNumber("speed", message.egoSpeed)
-                            vmi.setNumber("speedLimit", message.fusedSpeedLimit)
-                            vmi.setNumber("gear", message.gear)
-                            vmi.setNumber("steeringAngle", message.egoSteeringAngle)
-                            vmi.setNumber("blinkerLeft", message.leftBlinker)
-                            vmi.setNumber("blinkerRight", message.rightBlinker)
-                            vmi.setNumber("leftBlindspot", message.leftBlindSpot)
-                            vmi.setNumber("rightBlindspot", message.rightBlindSpot)
-                            vmi.setNumber("stopDist", message.stopLineDist)
-                            vmi.setNumber("trafficLightColor", message.trafficLightColor)
-                            vmi.setNumber("trafficLightDist", message.stopLineDist)
+                val properties by produceState<Map<String, PropertyDataType>?>(null, file) {
+                    value = runCatching {
+                        if (DASH_VIEW_MODEL in file.getViewModelNames()) {
+                            file.getViewModelProperties(DASH_VIEW_MODEL).associate { it.name to it.type }
+                        } else {
+                            emptyMap()
                         }
+                    }.getOrDefault(emptyMap())
+                }
+                when {
+                    properties == null -> {}
+                    properties!!.isEmpty() -> {
+                        onError("No $DASH_VIEW_MODEL in this file")
+                        Rive(file, fit = fit)
                     }
+                    else -> BoundRive(file, properties!!, dashStateFlow, fit)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun BoundRive(
+    file: RiveFile,
+    properties: Map<String, PropertyDataType>,
+    dashStateFlow: Flow<DashState>,
+    fit: Fit,
+) {
+    val vmi = rememberViewModelInstance(file, ViewModelSource.Named(DASH_VIEW_MODEL).defaultInstance())
+    Rive(file, viewModelInstance = vmi, fit = fit)
+
+    LaunchedEffect(vmi, properties) {
+        dashStateFlow.collect { state ->
+            for ((name, value) in state.dashValues()) {
+                when (properties[name]) {
+                    PropertyDataType.NUMBER -> (value as? Float)?.let { vmi.setNumber(name, it) }
+                    PropertyDataType.BOOLEAN -> (value as? Boolean)?.let { vmi.setBoolean(name, it) }
+                    PropertyDataType.STRING -> vmi.setString(name, value.toString())
+                    else -> {}
                 }
             }
         }
