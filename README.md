@@ -1,6 +1,6 @@
 # DashPilot
 
-![Dashpilot header](./assets/dashpilot-header.png)
+![DashPilot running on a phone in a Tesla](./banner.jpg)
 
 Turn your phone into a real-time dashboard for your car.  
 DashPilot connects to your car, and provides a real-time dashboard right on your phone. It serves as a speedometer, shows the ACC speed you set, speed limit, blinkers, blind spots, and many more.
