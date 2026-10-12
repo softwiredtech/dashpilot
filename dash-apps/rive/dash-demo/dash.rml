@@ -386,6 +386,19 @@
                         <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:261"/>
                         <Node x="65" y="65" name="Wheel" id="3:262">
                             <DataBindContext sourcePathIds="1:1-1:12" propertyKey="15" converterId="2:15"/>
+                            <Node name="Lit Assist">
+                                <DataBindContext sourcePathIds="1:1-1:50" propertyKey="18" converterId="2:41"/>
+                                <Shape name="Rim">
+                                    <Ellipse width="106" height="106" name="P"/>
+                                    <Stroke thickness="11" name="S"><SolidColor colorValue="FF3D8BFF" name="C"/></Stroke>
+                                </Shape>
+                                <Shape name="Spokes">
+                                    <Rectangle width="100" height="11" originX="0.5" originY="0.5" name="Bar"/>
+                                    <Rectangle y="26" width="11" height="50" originX="0.5" originY="0.5" name="Stem"/>
+                                    <Ellipse width="28" height="28" name="Hub"/>
+                                    <Fill name="F"><SolidColor colorValue="FF3D8BFF" name="C"/></Fill>
+                                </Shape>
+                            </Node>
                             <Node name="Lit Selfdrive">
                                 <DataBindContext sourcePathIds="1:1-1:54" propertyKey="18" converterId="2:41"/>
                                 <Shape name="Rim">

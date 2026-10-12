@@ -73,15 +73,15 @@ Values not received yet are `0` / `false`. For speed limit, stop line and energy
 
 | key | type | meaning |
 |---|---|---|
-| `adasOn` | bool | cruise / lane keeping engaged |
+| `adasOn` | bool | cruise / lane keeping engaged. Use this for "assist on": it works with every data source |
 | `accSetSpeed` | number | cruise set speed, same unit as `egoSpeed` |
 | `fusedSpeedLimit` | number | posted limit, in the user's unit |
 | `leftBlindSpot`, `rightBlindSpot` | 0–2 | 0 clear, 1 vehicle, 2 vehicle + urgent |
 | `trafficLightColor` | 0–3 | 0 none, 1 red, 2 green, 3 yellow |
 | `stopLineDist` | meters | distance to the stop line |
 | `changingLane` | bool | lane change in progress |
-| `madsActive`, `experimentalMode` | bool | openpilot states |
-| `selfdriveActive` | bool | openpilot engaged. **iOS only** |
+| `madsActive`, `experimentalMode` | bool | openpilot states, comma only |
+| `selfdriveActive` | bool | openpilot engaged, comma only. **iOS only** for web apps |
 
 **Battery**
 
