@@ -6,6 +6,7 @@ Dashboards that run inside the Dashpilot app, fed live car data.
 |---|---|
 | `web-*/` | web dashboards: `index.html`, `manifest.json`, `preview.jpg` |
 | `rive/` | Rive dashboards: built `.riv` files and their sources |
+| `contest/` | [dash app contest](contest/README.md) rules and entries |
 
 ## Getting data
 
