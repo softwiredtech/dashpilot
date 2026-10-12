@@ -1,8 +1,0 @@
-{
-  "$schema": "./dashapp-manifest.schema.json",
-  "manifestVersion": 1,
-  "id": "your-dashboard-id",
-  "settings": [
-    "useImperial"
-  ]
-}

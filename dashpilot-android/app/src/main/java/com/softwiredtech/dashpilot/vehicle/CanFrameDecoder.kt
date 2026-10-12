@@ -9,17 +9,19 @@ class CanFrameDecoder(
     private val bridge: VehicleBridge,
     profile: VehicleProfile
 ) {
-    val decoderHandle: Long = bridge.nativeCreateVehicleDecoder(
+    var decoderHandle: Long = bridge.nativeCreateVehicleDecoder(
         profile.dbcContents, profile.busIndices, profile.type
     )
 
-    fun decodeFrame(bus: Int, address: Int, data: ByteArray): CarState {
+    @Synchronized fun decodeFrame(bus: Int, address: Int, data: ByteArray): CarState? {
+        if (decoderHandle == 0L) return null
         val values = bridge.nativeDecodeCanFrame(decoderHandle, bus, address, data)
         return arrayToCarState(values)
     }
 
-    fun destroy() {
+    @Synchronized fun destroy() {
         bridge.nativeDestroyVehicleDecoder(decoderHandle)
+        decoderHandle = 0
     }
 
     companion object {

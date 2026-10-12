@@ -37,6 +37,7 @@ class DashKitDataSource(
 
     override fun disconnect() {
         manager.removeGattListener(this)
+        decoder.destroy()
     }
 
     override fun onServicesReady(gatt: BluetoothGatt) {
@@ -66,7 +67,7 @@ class DashKitDataSource(
     private fun parseAndEmit(payload: ByteArray) {
         if (payload.isEmpty()) return
         for (frame in parseCanPacket(payload)) {
-            currentState = decoder.decodeFrame(frame.bus, frame.address, frame.data)
+            currentState = decoder.decodeFrame(frame.bus, frame.address, frame.data) ?: return
         }
         _incoming.tryEmit(currentState)
     }
