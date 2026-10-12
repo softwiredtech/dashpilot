@@ -2,21 +2,14 @@
 const fs = require("node:fs");
 const path = require("node:path");
 
+const SCHEMA_PATH = path.join(__dirname, "..", "dash-apps", "manifest.schema.json");
 const APPS_DIR = path.join(__dirname, "..", "dash-apps");
 
-const ROOT_KEYS = new Set(["manifestVersion", "id", "settings"]);
-const MANIFEST_VERSION = 1;
-const ID_RE = /^[a-z0-9-]+$/;
-const VALID_SETTINGS = new Set([
-  "showPhoneBattery",
-  "showCarBattery",
-  "showOdometer",
-  "alwaysOnBlindSpotMonitor",
-  "useImperial",
-  "darkMode",
-  "renderQuality",
-  "darkModeBackgroundGray",
-]);
+const ROOT_KEYS = new Set(["$schema", "manifestVersion", "id", "settings"]);
+
+const schema = JSON.parse(fs.readFileSync(SCHEMA_PATH, "utf8"));
+const validSettings = new Set(schema.properties.settings.items.enum);
+const idRe = new RegExp(schema.properties.id.pattern);
 
 const dirs = fs.readdirSync(APPS_DIR).filter((name) => name.startsWith("web-"));
 if (dirs.length === 0) {
@@ -37,18 +30,19 @@ for (const folder of dirs) {
   for (const key of Object.keys(m)) {
     if (!ROOT_KEYS.has(key)) errors.push(`${folder}: unknown property "${key}"`);
   }
-  if (m.manifestVersion !== MANIFEST_VERSION) {
-    errors.push(`${folder}: manifestVersion must be ${MANIFEST_VERSION}`);
+  const expectedVersion = schema.properties.manifestVersion.const;
+  if (!Number.isInteger(m.manifestVersion) || m.manifestVersion !== expectedVersion) {
+    errors.push(`${folder}: manifestVersion must be ${expectedVersion}`);
   }
-  if (typeof m.id !== "string" || !ID_RE.test(m.id)) {
-    errors.push(`${folder}: id must match ${ID_RE}`);
+  if (typeof m.id !== "string" || !idRe.test(m.id)) {
+    errors.push(`${folder}: id must match ${schema.properties.id.pattern}`);
   }
   if (!Array.isArray(m.settings)) {
     errors.push(`${folder}: settings must be an array`);
   } else {
     const seen = new Set();
     for (const s of m.settings) {
-      if (!VALID_SETTINGS.has(s)) errors.push(`${folder}/settings: "${s}" is not a valid setting`);
+      if (!validSettings.has(s)) errors.push(`${folder}/settings: "${s}" is not a valid setting`);
       if (seen.has(s)) errors.push(`${folder}/settings: "${s}" is duplicated`);
       seen.add(s);
     }

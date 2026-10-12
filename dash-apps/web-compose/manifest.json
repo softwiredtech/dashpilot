@@ -1,4 +1,5 @@
 {
+  "$schema": "../manifest.schema.json",
   "manifestVersion": 1,
   "id": "compose",
   "settings": ["useImperial", "darkMode"]

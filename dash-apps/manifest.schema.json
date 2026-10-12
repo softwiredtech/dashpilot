@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DashPilot dash-app manifest",
+  "description": "Per-app declaration of honored native display settings.",
+  "type": "object",
+  "required": ["manifestVersion", "id", "settings"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": { "type": "string" },
+    "manifestVersion": { "type": "integer", "const": 1 },
+    "id": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "settings": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "showPhoneBattery",
+          "showCarBattery",
+          "showOdometer",
+          "alwaysOnBlindSpotMonitor",
+          "useImperial",
+          "darkMode",
+          "renderQuality",
+          "darkModeBackgroundGray"
+        ]
+      }
+    }
+  }
+}

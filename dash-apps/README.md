@@ -129,7 +129,7 @@ Web apps get one string of storage, usually JSON.
 
 1. `dash-apps/web-<id>/` with `index.html`, `preview.jpg` (landscape, ~2:1) and a `manifest.json`:
    ```json
-   { "manifestVersion": 1, "id": "<id>", "settings": ["useImperial", "darkMode"] }
+   { "$schema": "../manifest.schema.json", "manifestVersion": 1, "id": "<id>", "settings": ["useImperial", "darkMode"] }
    ```
    `id` is lowercase letters, digits and hyphens, matching the folder name. `settings` lists the display settings your app uses, so the app only offers those: `showPhoneBattery`, `showCarBattery`, `showOdometer`, `alwaysOnBlindSpotMonitor`, `useImperial`, `darkMode`, `renderQuality`, `darkModeBackgroundGray`.
 2. Add `web-<id>` to `DEFAULT_FOLDERS` in `scripts/sync-to-android.sh` and `scripts/sync-to-ios.sh`.
