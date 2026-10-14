@@ -2,6 +2,7 @@ package com.softwiredtech.dashpilot.api
 
 import android.util.Log
 import com.google.gson.Gson
+import com.softwiredtech.dashpilot.datamodel.dash.CarModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -24,9 +25,8 @@ data class FirmwareManifest(
 /**
  * Fetches the firmware update manifest and downloads firmware binaries.
  *
- * TODO(server): set [MANIFEST_URL] to the URL that serves the update manifest
- * JSON. This is the ONLY thing that needs to be filled in to enable OTA update
- * checks. The manifest must be a JSON object of the shape:
+ * Each car has its own manifest ([manifestUrl]). The manifest must be a JSON
+ * object of the shape:
  *
  *   {
  *     "version": "1.2.3",
@@ -39,8 +39,16 @@ data class FirmwareManifest(
 object FirmwareUpdateRepository {
     private const val TAG = "FirmwareUpdateRepo"
 
-    const val MANIFEST_URL =
-        "https://firebasestorage.googleapis.com/v0/b/dashkit-connect.firebasestorage.app/o/dashkit%2Fmanifest.json?alt=media&token=68bcc03a-3951-454d-8f35-f5ab06c0ed0a"
+    // One release track (storage folder) per car; must match tools/publish_ota.sh
+    // in the firmware repo. Legacy keeps the original folder older apps read.
+    fun manifestUrl(model: CarModel): String {
+        val folder = when (model) {
+            CarModel.TESLA_LEGACY -> "dashkit"
+            CarModel.TESLA_JUNIPER -> "dashkit-juniper"
+        }
+        return "https://firebasestorage.googleapis.com/v0/b/dashkit-connect.firebasestorage.app/o/" +
+            "$folder%2Fmanifest.json?alt=media&token=68bcc03a-3951-454d-8f35-f5ab06c0ed0a"
+    }
 
     private val client: OkHttpClient by lazy {
         OkHttpClient.Builder()
@@ -51,14 +59,10 @@ object FirmwareUpdateRepository {
 
     private val gson = Gson()
 
-    /** Download and parse the update manifest. Returns null on any failure. */
-    suspend fun fetchManifest(): FirmwareManifest? = withContext(Dispatchers.IO) {
-        if (MANIFEST_URL.contains("EXAMPLE.com")) {
-            Log.w(TAG, "MANIFEST_URL not configured; skipping update check")
-            return@withContext null
-        }
+    /** Download and parse [model]'s update manifest. Returns null on any failure. */
+    suspend fun fetchManifest(model: CarModel): FirmwareManifest? = withContext(Dispatchers.IO) {
         try {
-            val request = Request.Builder().url(MANIFEST_URL).get().build()
+            val request = Request.Builder().url(manifestUrl(model)).get().build()
             client.newCall(request).execute().use { response ->
                 if (!response.isSuccessful) {
                     Log.e(TAG, "Manifest fetch failed: HTTP ${response.code}")

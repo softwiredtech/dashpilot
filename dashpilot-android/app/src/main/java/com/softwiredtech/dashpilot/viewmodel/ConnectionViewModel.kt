@@ -23,7 +23,9 @@ import com.softwiredtech.dashpilot.datamodel.dash.PREF_DARK_MODE
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_DARK_MODE_BACKGROUND_GRAY
 import com.softwiredtech.dashpilot.BuildConfig
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_EXTRA_VEHICLE_BUS
-import com.softwiredtech.dashpilot.datamodel.dash.PREF_JUNIPER
+import com.softwiredtech.dashpilot.datamodel.dash.CarModel
+import com.softwiredtech.dashpilot.datamodel.dash.getCarModel
+import com.softwiredtech.dashpilot.datamodel.dash.setCarModel
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_RENDER_QUALITY
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_SHOW_CAR_BATTERY
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_SHOW_ODOMETER
@@ -33,7 +35,6 @@ import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_ALWAYS_ON_BLIND_SPOT_M
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_DARK_MODE
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_DARK_MODE_BACKGROUND_GRAY
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_EXTRA_VEHICLE_BUS
-import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_JUNIPER
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_RENDER_QUALITY
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_CAR_BATTERY
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_ODOMETER
@@ -42,11 +43,11 @@ import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_USE_IMPERIAL
 import com.softwiredtech.dashpilot.datamodel.dash.getPinnedControl
 import com.softwiredtech.dashpilot.datamodel.dash.setPinnedControl
 import com.softwiredtech.dashpilot.datamodel.dash.getFingerActions
-import com.softwiredtech.dashpilot.datamodel.dash.getChimeMuteAutomation
-import com.softwiredtech.dashpilot.datamodel.dash.setChimeMuteAutomation
 import com.softwiredtech.dashpilot.datamodel.dash.setFingerActions
 import com.softwiredtech.dashpilot.datamodel.dash.getWiperOffAutomation
 import com.softwiredtech.dashpilot.datamodel.dash.setWiperOffAutomation
+import com.softwiredtech.dashpilot.datamodel.dash.getChimeMuteAutomation
+import com.softwiredtech.dashpilot.datamodel.dash.setChimeMuteAutomation
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_CLIMATE_KEEP_MINUTES
 import com.softwiredtech.dashpilot.datamodel.dash.getClimateKeepAutomation
 import com.softwiredtech.dashpilot.datamodel.dash.setClimateKeepAutomation
@@ -148,7 +149,11 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     private val _fingerActions = MutableStateFlow<Map<Int, String>>(emptyMap())
     val fingerActions = _fingerActions.asStateFlow()
 
+    private val _carModel = MutableStateFlow(CarModel.TESLA_LEGACY)
+    val carModel = _carModel.asStateFlow()
+
     fun loadAutomations(context: Context) {
+        _carModel.value = getCarModel(context)
         _wiperOffAutomation.value = getWiperOffAutomation(context)
         _chimeMuteAutomation.value = getChimeMuteAutomation(context)
         _climateKeepAutomation.value = getClimateKeepAutomation(context)
@@ -157,6 +162,15 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         _sportKickdownPercent.value = getSportKickdownPercent(context)
         _acSwing.value = getAcSwing(context)
         _fingerActions.value = getFingerActions(context)
+    }
+
+    /** Switch cars. The DBC/mapper is picked in connect(), so a live session is restarted. */
+    fun updateCarModel(context: Context, model: CarModel) {
+        if (getCarModel(context) == model) return
+        setCarModel(context, model)
+        _carModel.value = model
+        val type = lastDataSourceType ?: return
+        if (_connectionStatus.value !is ConnectionStatus.Disconnected) reconnect(context, type)
     }
 
     fun updateWiperOffAutomation(context: Context, value: Boolean) {
@@ -404,9 +418,10 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
             val vehicleName = "tesla" // TODO: make configurable via UI
             val prefs = context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
             val extraBus = BuildConfig.DEBUG && prefs.getBoolean(PREF_EXTRA_VEHICLE_BUS, DEFAULT_EXTRA_VEHICLE_BUS)
-            val juniper = prefs.getBoolean(PREF_JUNIPER, DEFAULT_JUNIPER)
+            val carModel = getCarModel(context)
+            _carModel.value = carModel
             val configFile = when {
-                juniper -> "config_juniper.json"
+                carModel == CarModel.TESLA_JUNIPER -> "config_juniper.json"
                 dataSourceType == DataSourceType.DASHKIT -> "config_dashkit.json"
                 extraBus -> "config_comma_extra_bus.json"
                 else -> "config_comma_normal.json"

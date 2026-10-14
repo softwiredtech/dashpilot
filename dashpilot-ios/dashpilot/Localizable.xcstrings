@@ -172,18 +172,98 @@
         }
       }
     },
-    "New-gen Model Y (Juniper)" : {
+    "Car" : {
       "localizations" : {
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Neues Model Y (Juniper)"
+            "value" : "Auto"
           }
         },
         "hu" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Új Model Y (Juniper)"
+            "value" : "Autó"
+          }
+        }
+      }
+    },
+    "Keeps the speed-limit warning chime silenced." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hält den Warnton des Tempolimits stumm."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Némán tartja a sebességkorlát figyelmeztető hangját."
+          }
+        }
+      }
+    },
+    "Model" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modell"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modell"
+          }
+        }
+      }
+    },
+    "Model 3 / Y" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model 3 / Y"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model 3 / Y"
+          }
+        }
+      }
+    },
+    "Model Y Juniper" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model Y Juniper"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model Y Juniper"
+          }
+        }
+      }
+    },
+    "Mute speed-limit chime" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tempolimit-Ton stummschalten"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sebességkorlát-hang némítása"
           }
         }
       }

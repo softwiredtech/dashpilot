@@ -14,7 +14,7 @@ struct SettingsView: View {
     @State private var selectedTab = 0
 
     @AppStorage(DisplaySettings.keyExtraVehicleBus)           private var extraVehicleBus = false
-    @AppStorage(DisplaySettings.keyJuniper)                   private var juniper = true
+    @AppStorage(DisplaySettings.keyCarModel)                  private var carModelRaw = DisplaySettings.carModel.rawValue
     @AppStorage(DisplaySettings.keyShowCarBattery)            private var showCarBattery = true
     @AppStorage(DisplaySettings.keyShowOdometer)              private var showOdometer = true
     @AppStorage(DisplaySettings.keyUseImperial)               private var useImperial = false
@@ -64,6 +64,7 @@ struct SettingsView: View {
                     VStack(alignment: .leading, spacing: 0) {
                         if selectedTab == 0 {
                             dashboardSection
+                            carSection
                             #if DEBUG
                             configurationSection
                             #endif
@@ -213,10 +214,39 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 8) {
             sectionTitle("Configuration")
             SettingsToggleRow(label: "Extra Vehicle Bus", isOn: $extraVehicleBus)
-            SettingsToggleRow(label: "New-gen Model Y (Juniper)", isOn: $juniper)
             Spacer().frame(height: 8)
         }
         .padding(.horizontal, 24)
+    }
+
+    // MARK: - Car Section
+
+    private var juniper: Bool { carModelRaw == CarModel.teslaJuniper.rawValue }
+
+    private var carSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            sectionTitle("Car")
+            HStack {
+                Text("Model")
+                    .foregroundColor(.white)
+                    .font(.system(size: 16))
+                Spacer(minLength: 12)
+                SegmentedPicker(
+                    selected: $carModelRaw,
+                    options: [
+                        (CarModel.teslaLegacy.rawValue, "Model 3 / Y"),
+                        (CarModel.teslaJuniper.rawValue, "Model Y Juniper"),
+                    ]
+                )
+                .layoutPriority(1)
+            }
+            .padding(.vertical, 4)
+            Spacer().frame(height: 8)
+        }
+        .padding(.horizontal, 24)
+        .onChange(of: carModelRaw) { _, _ in
+            connectionVM.carModelChanged()
+        }
     }
 
     // MARK: - Display Section
@@ -266,7 +296,7 @@ struct SettingsView: View {
                 .foregroundColor(.white)
                 .font(.system(size: 16))
             Spacer(minLength: 12)
-            RenderQualityPicker(selected: $renderQuality)
+            SegmentedPicker(selected: $renderQuality, options: [(1, "Low"), (2, "Med"), (3, "High")])
                 .layoutPriority(1)
         }
         .padding(.vertical, 4)
@@ -368,12 +398,12 @@ private struct SettingsToggleRow: View {
     }
 }
 
-// MARK: - Render Quality Picker
+// MARK: - Segmented Picker
 
-private struct RenderQualityPicker: View {
+private struct SegmentedPicker: View {
     @Binding var selected: Int
+    let options: [(Int, LocalizedStringKey)]
 
-    private let options: [(Int, LocalizedStringKey)] = [(1, "Low"), (2, "Med"), (3, "High")]
     private let accent = Color(red: 0x5C / 255.0, green: 0xBD / 255.0, blue: 0x68 / 255.0)
 
     var body: some View {

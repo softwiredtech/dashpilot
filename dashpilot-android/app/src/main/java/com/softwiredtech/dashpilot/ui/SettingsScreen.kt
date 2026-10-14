@@ -90,7 +90,7 @@ import com.softwiredtech.dashpilot.datamodel.dash.PREF_ALWAYS_ON_BLIND_SPOT_MONI
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_DARK_MODE
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_DARK_MODE_BACKGROUND_GRAY
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_EXTRA_VEHICLE_BUS
-import com.softwiredtech.dashpilot.datamodel.dash.PREF_JUNIPER
+import com.softwiredtech.dashpilot.datamodel.dash.CarModel
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_RENDER_QUALITY
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_SHOW_CAR_BATTERY
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_SHOW_ODOMETER
@@ -100,7 +100,6 @@ import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_ALWAYS_ON_BLIND_SPOT_M
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_DARK_MODE
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_DARK_MODE_BACKGROUND_GRAY
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_EXTRA_VEHICLE_BUS
-import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_JUNIPER
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_RENDER_QUALITY
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_CAR_BATTERY
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_ODOMETER
@@ -139,7 +138,9 @@ fun SettingsScreen(
     onRemoveTesla: () -> Boolean = { false },
     onEnrollTesla: () -> Unit = {},
     onReplayOnboarding: () -> Unit = {},
-    onThemeClick: () -> Unit = {}
+    onThemeClick: () -> Unit = {},
+    carModel: CarModel = CarModel.TESLA_LEGACY,
+    onCarModelChanged: (CarModel) -> Unit = {}
 ) {
     val context = LocalContext.current
     val sharedPrefs = remember { context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE) }
@@ -147,9 +148,7 @@ fun SettingsScreen(
     val extraBusState = remember {
         mutableStateOf(BuildConfig.DEBUG && sharedPrefs.getBoolean(PREF_EXTRA_VEHICLE_BUS, DEFAULT_EXTRA_VEHICLE_BUS))
     }
-    val juniperState = remember {
-        mutableStateOf(sharedPrefs.getBoolean(PREF_JUNIPER, DEFAULT_JUNIPER))
-    }
+    val juniper = carModel == CarModel.TESLA_JUNIPER
 
     val showPhoneBatteryState = remember {
         mutableStateOf(sharedPrefs.getBoolean(PREF_SHOW_PHONE_BATTERY, DEFAULT_SHOW_PHONE_BATTERY))
@@ -326,6 +325,11 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            SectionHeader(stringResource(R.string.settings_section_car))
+            Spacer(modifier = Modifier.height(8.dp))
+            CarModelSelector(carModel, onCarModelChanged)
+            Spacer(modifier = Modifier.height(16.dp))
+
             if (BuildConfig.DEBUG) {
                 Text(stringResource(R.string.settings_section_configuration), color = DarkColors.TextMuted, fontSize = 16.sp)
 
@@ -333,16 +337,12 @@ fun SettingsScreen(
                     extraBusState.value = enabled
                     sharedPrefs.edit { putBoolean(PREF_EXTRA_VEHICLE_BUS, enabled) }
                 }
-                SettingsToggle(stringResource(R.string.settings_toggle_juniper), juniperState.value) { enabled ->
-                    juniperState.value = enabled
-                    sharedPrefs.edit { putBoolean(PREF_JUNIPER, enabled) }
-                }
             }
 
             Text(stringResource(R.string.settings_section_display), color = DarkColors.TextMuted, fontSize = 16.sp)
             Spacer(modifier = Modifier.height(8.dp))
 
-            if ((extraBusState.value || juniperState.value) && showCarBatteryToggle) {
+            if ((extraBusState.value || juniper) && showCarBatteryToggle) {
                 val key = PREF_SHOW_CAR_BATTERY
                 val state = vehicleBusToggleStates.getValue(key)
                 SettingsToggle(stringResource(R.string.settings_toggle_show_car_battery), state.value) { enabled ->
@@ -351,7 +351,7 @@ fun SettingsScreen(
                     onDisplaySettingsChanged(buildDisplaySettings())
                 }
             }
-            if ((extraBusState.value || juniperState.value) && showOdometerToggle) {
+            if ((extraBusState.value || juniper) && showOdometerToggle) {
                 val key = PREF_SHOW_ODOMETER
                 val state = vehicleBusToggleStates.getValue(key)
                 SettingsToggle(stringResource(R.string.settings_toggle_show_odometer), state.value) { enabled ->
@@ -515,15 +515,29 @@ private fun SectionHeader(title: String) {
 }
 
 @Composable
+private fun CarModelSelector(selected: CarModel, onSelected: (CarModel) -> Unit) {
+    val options = listOf(
+        CarModel.TESLA_LEGACY to stringResource(R.string.settings_car_model_legacy),
+        CarModel.TESLA_JUNIPER to stringResource(R.string.settings_car_model_juniper),
+    )
+    SegmentedSelector(stringResource(R.string.settings_car_model_title), options, selected, onSelected)
+}
+
+@Composable
 private fun RenderQualitySelector(selected: Int, onSelected: (Int) -> Unit) {
     val options = listOf(1 to stringResource(R.string.settings_render_low), 2 to stringResource(R.string.settings_render_med), 3 to stringResource(R.string.settings_render_high))
+    SegmentedSelector(stringResource(R.string.settings_render_quality_title), options, selected, onSelected)
+}
+
+@Composable
+private fun <T> SegmentedSelector(title: String, options: List<Pair<T, String>>, selected: T, onSelected: (T) -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = stringResource(R.string.settings_render_quality_title),
+            text = title,
             color = Color.White,
             fontSize = 16.sp,
             modifier = Modifier

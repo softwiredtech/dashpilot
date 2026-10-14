@@ -140,7 +140,7 @@ final class ConnectionViewModel {
             }
         }
 
-        let ds = DisplaySettings.juniper
+        let ds = DisplaySettings.carModel == .teslaJuniper
             ? DashKitDataSource(manager: manager, vehicleType: "tesla_juniper", dbcResource: "new_gen_juniper")
             : DashKitDataSource(manager: manager)
         dataSource = ds
@@ -164,6 +164,8 @@ final class ConnectionViewModel {
         }
         let wiperOff = UserDefaults.standard.bool(forKey: "wiper_off_automation")
         VehicleControl.sendWiperOff(manager, enabled: wiperOff)
+        let chimeMute = UserDefaults.standard.bool(forKey: "chime_mute_automation")
+        VehicleControl.sendChimeMute(manager, enabled: chimeMute)
         let climateKeep = UserDefaults.standard.bool(forKey: "climate_keep_automation")
         VehicleControl.sendClimateKeep(manager, enabled: climateKeep)
         let climateKeepMinutes = UserDefaults.standard.integer(forKey: "climate_keep_minutes")
@@ -244,6 +246,21 @@ final class ConnectionViewModel {
         startStreaming(ds, resyncDashKit: false)
     }
 
+    /// The DBC/mapper is picked when a session starts, so restart a live one.
+    func carModelChanged() {
+        switch activeSourceType {
+        case .dashkit:
+            disconnect()
+            connectDashKit()
+        case .comma:
+            let address = discoveredAddress
+            disconnect()
+            if let address { connect(serverAddress: address) }
+        case .websocket, .demo, nil:
+            return
+        }
+    }
+
     func disconnect() {
         connectTask?.cancel()
         connectTask = nil
@@ -270,7 +287,7 @@ final class ConnectionViewModel {
         let extraBus = false
         #endif
         let ds: CommaDataSource
-        if DisplaySettings.juniper {
+        if DisplaySettings.carModel == .teslaJuniper {
             ds = CommaDataSource(
                 vehicleType: "tesla_juniper",
                 dbcFiles: [

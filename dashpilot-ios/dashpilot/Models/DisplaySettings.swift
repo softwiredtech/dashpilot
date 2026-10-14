@@ -10,14 +10,33 @@ struct DisplaySettings {
     static let keyRenderQuality = "render_quality"
     static let keyDarkModeBackgroundGray = "dark_mode_background_gray"
     static let keyExtraVehicleBus = "extra_vehicle_bus"
+    static let keyCarModel = "car_model"
+    // Legacy boolean Juniper toggle, migrated into keyCarModel.
     static let keyJuniper = "juniper"
     static let keySelectedDashboardId = "selected_dashboard_id"
 }
 
+/// The car the DashKit is installed in. Selects the app's DBC/mapper and the
+/// firmware release track. The raw value is persisted: never renumber.
+enum CarModel: Int, CaseIterable {
+    case teslaLegacy = 0
+    case teslaJuniper = 1
+
+    var supportsChimeMute: Bool { self == .teslaJuniper }
+}
+
 extension DisplaySettings {
-    static var juniper: Bool {
+    static var carModel: CarModel {
         let ud = UserDefaults.standard
-        return ud.object(forKey: keyJuniper) == nil || ud.bool(forKey: keyJuniper)
+        if ud.object(forKey: keyCarModel) != nil {
+            return CarModel(rawValue: ud.integer(forKey: keyCarModel)) ?? .teslaLegacy
+        }
+        // Only an explicitly stored Juniper toggle carries over; an unset one is a new install.
+        guard ud.object(forKey: keyJuniper) != nil else { return .teslaLegacy }
+        let model: CarModel = ud.bool(forKey: keyJuniper) ? .teslaJuniper : .teslaLegacy
+        ud.set(model.rawValue, forKey: keyCarModel)
+        ud.removeObject(forKey: keyJuniper)
+        return model
     }
 }
 

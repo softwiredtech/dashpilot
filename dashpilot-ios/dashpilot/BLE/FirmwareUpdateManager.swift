@@ -16,12 +16,21 @@ struct FirmwareManifest: Codable, Equatable {
 /// (port of the Android `FirmwareUpdateRepository`).
 enum FirmwareUpdateRepository {
 
-    static let manifestURL =
-        "https://firebasestorage.googleapis.com/v0/b/dashkit-connect.firebasestorage.app/o/dashkit%2Fmanifest.json?alt=media&token=68bcc03a-3951-454d-8f35-f5ab06c0ed0a"
+    /// One release track (storage folder) per car; must match tools/publish_ota.sh
+    /// in the firmware repo. Legacy keeps the original folder older apps read.
+    static func manifestURL(for model: CarModel) -> String {
+        let folder: String
+        switch model {
+        case .teslaLegacy: folder = "dashkit"
+        case .teslaJuniper: folder = "dashkit-juniper"
+        }
+        return "https://firebasestorage.googleapis.com/v0/b/dashkit-connect.firebasestorage.app/o/"
+            + "\(folder)%2Fmanifest.json?alt=media&token=68bcc03a-3951-454d-8f35-f5ab06c0ed0a"
+    }
 
-    /// Download and parse the update manifest. Returns nil on any failure.
-    static func fetchManifest() async -> FirmwareManifest? {
-        guard let url = URL(string: manifestURL) else { return nil }
+    /// Download and parse `model`'s update manifest. Returns nil on any failure.
+    static func fetchManifest(for model: CarModel) async -> FirmwareManifest? {
+        guard let url = URL(string: manifestURL(for: model)) else { return nil }
         do {
             let (data, response) = try await URLSession.shared.data(from: url)
             guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
@@ -124,7 +133,7 @@ final class FirmwareUpdateManager {
     @MainActor
     private func runCheck() async {
         check = .checking
-        guard let manifest = await FirmwareUpdateRepository.fetchManifest() else {
+        guard let manifest = await FirmwareUpdateRepository.fetchManifest(for: DisplaySettings.carModel) else {
             check = .error(String(localized: "Could not reach update server"))
             return
         }
