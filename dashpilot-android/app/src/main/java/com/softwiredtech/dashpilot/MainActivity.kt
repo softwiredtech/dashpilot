@@ -166,6 +166,7 @@ class MainActivity : ComponentActivity() {
                 val connectionStatus by connectionVM.connectionStatus.collectAsState()
                 val pinnedControl by connectionVM.pinnedControl.collectAsState()
                 val wiperOffAutomation by connectionVM.wiperOffAutomation.collectAsState()
+                val chimeMuteAutomation by connectionVM.chimeMuteAutomation.collectAsState()
                 val climateKeepAutomation by connectionVM.climateKeepAutomation.collectAsState()
                 val climateKeepMinutes by connectionVM.climateKeepMinutes.collectAsState()
                 val sportKickdownAutomation by connectionVM.sportKickdownAutomation.collectAsState()
@@ -337,6 +338,10 @@ class MainActivity : ComponentActivity() {
                                 wiperOffEnabled = wiperOffAutomation,
                                 onWiperOffChange = {
                                     connectionVM.updateWiperOffAutomation(context, it)
+                                },
+                                chimeMuteEnabled = chimeMuteAutomation,
+                                onChimeMuteChange = {
+                                    connectionVM.updateChimeMuteAutomation(context, it)
                                 },
                                 climateKeepEnabled = climateKeepAutomation,
                                 onClimateKeepChange = {

@@ -240,6 +240,8 @@
     <string name="automations_section_wipers">Wipers</string>
     <string name="automations_wiper_off_title">Wiper Off</string>
     <string name="automations_wiper_off_subtitle">Keep wipers disabled automatically</string>
+    <string name="automations_chime_mute_title">Mute speed-limit chime</string>
+    <string name="automations_chime_mute_subtitle">Keeps the speed-limit warning chime silenced.</string>
     <string name="automations_section_climate">Climate</string>
     <string name="automations_keep_climate_title">Keep climate on</string>
     <string name="automations_keep_climate_subtitle">Keep the climate on when you leave the car. The automation stops after the set time, or when you return to the car.</string>

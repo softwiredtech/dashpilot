@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AcUnit
 import androidx.compose.material.icons.rounded.Air
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.VolumeOff
 import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Speed
@@ -80,6 +81,8 @@ private const val SPORT_KICKDOWN_PERCENT_STEP = 5
 fun AutomationsScreen(
     wiperOffEnabled: Boolean,
     onWiperOffChange: (Boolean) -> Unit,
+    chimeMuteEnabled: Boolean,
+    onChimeMuteChange: (Boolean) -> Unit,
     climateKeepEnabled: Boolean,
     onClimateKeepChange: (Boolean) -> Unit,
     climateKeepMinutes: Int,
@@ -169,6 +172,14 @@ fun AutomationsScreen(
                         )
                     }
                 } else null
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            AutomationRow(
+                icon = Icons.Rounded.VolumeOff,
+                title = stringResource(R.string.automations_chime_mute_title),
+                subtitle = stringResource(R.string.automations_chime_mute_subtitle),
+                checked = chimeMuteEnabled,
+                onToggle = { onChimeMuteChange(!chimeMuteEnabled) }
             )
 
             Spacer(modifier = Modifier.height(28.dp))
