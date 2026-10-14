@@ -10,6 +10,7 @@ import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,6 +34,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -501,27 +504,49 @@ private fun SectionHeader(title: String) {
 @Composable
 private fun CarModelSelector(selected: CarModel, onSelected: (CarModel) -> Unit) {
     val options = listOf(
-        CarModel.TESLA_LEGACY to stringResource(R.string.settings_car_model_legacy),
-        CarModel.TESLA_JUNIPER to stringResource(R.string.settings_car_model_juniper),
+        Triple(CarModel.TESLA_LEGACY, R.string.settings_car_model_legacy, R.string.settings_car_model_legacy_years),
+        Triple(CarModel.TESLA_JUNIPER, R.string.settings_car_model_juniper, R.string.settings_car_model_juniper_years),
     )
-    SegmentedSelector(stringResource(R.string.settings_car_model_title), options, selected, onSelected)
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        options.forEach { (model, nameRes, yearsRes) ->
+            val isSelected = model == selected
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(DarkColors.Surface)
+                    .border(1.dp, if (isSelected) AccentColor else Color.Transparent, RoundedCornerShape(12.dp))
+                    .clickable { onSelected(model) }
+                    .padding(start = 16.dp, top = 12.dp, bottom = 12.dp, end = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(text = stringResource(nameRes), color = Color.White, fontSize = 16.sp)
+                    Text(text = stringResource(yearsRes), color = DarkColors.TextMuted, fontSize = 13.sp)
+                }
+                RadioButton(
+                    selected = isSelected,
+                    onClick = { onSelected(model) },
+                    colors = RadioButtonDefaults.colors(
+                        selectedColor = AccentColor,
+                        unselectedColor = DarkColors.TextMuted
+                    )
+                )
+            }
+        }
+    }
 }
 
 @Composable
 private fun RenderQualitySelector(selected: Int, onSelected: (Int) -> Unit) {
     val options = listOf(1 to stringResource(R.string.settings_render_low), 2 to stringResource(R.string.settings_render_med), 3 to stringResource(R.string.settings_render_high))
-    SegmentedSelector(stringResource(R.string.settings_render_quality_title), options, selected, onSelected)
-}
-
-@Composable
-private fun <T> SegmentedSelector(title: String, options: List<Pair<T, String>>, selected: T, onSelected: (T) -> Unit) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = title,
+            text = stringResource(R.string.settings_render_quality_title),
             color = Color.White,
             fontSize = 16.sp,
             modifier = Modifier

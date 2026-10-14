@@ -37,9 +37,10 @@
     <string name="settings_render_med">Mittel</string>
     <string name="settings_render_high">Hoch</string>
     <string name="settings_section_car">Auto</string>
-    <string name="settings_car_model_title">Modell</string>
-    <string name="settings_car_model_legacy">Model 3 / Y</string>
+    <string name="settings_car_model_legacy">Model 3 / Model Y</string>
+    <string name="settings_car_model_legacy_years">Modelljahre 2019–2024</string>
     <string name="settings_car_model_juniper">Model Y Juniper</string>
+    <string name="settings_car_model_juniper_years">Modelljahr 2025 und neuer</string>
     <string name="settings_toggle_always_on_blind_spot_monitor">Toter-Winkel-Warner immer an</string>
     <string name="settings_toggle_dark_mode">Dunkelmodus</string>
     <string name="settings_dark_mode_background_brightness">Hintergrundhelligkeit</string>

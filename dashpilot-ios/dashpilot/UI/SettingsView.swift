@@ -200,27 +200,45 @@ struct SettingsView: View {
     private var carSection: some View {
         VStack(alignment: .leading, spacing: 8) {
             sectionTitle("Car")
-            HStack {
-                Text("Model")
-                    .foregroundColor(.white)
-                    .font(.system(size: 16))
-                Spacer(minLength: 12)
-                SegmentedPicker(
-                    selected: $carModelRaw,
-                    options: [
-                        (CarModel.teslaLegacy.rawValue, "Model 3 / Y"),
-                        (CarModel.teslaJuniper.rawValue, "Model Y Juniper"),
-                    ]
-                )
-                .layoutPriority(1)
-            }
-            .padding(.vertical, 4)
+            carModelOption(.teslaLegacy, name: "Model 3 / Model Y", years: "Model years 2019–2024")
+            carModelOption(.teslaJuniper, name: "Model Y Juniper", years: "Model year 2025 and newer")
             Spacer().frame(height: 8)
         }
         .padding(.horizontal, 24)
         .onChange(of: carModelRaw) { _, _ in
             connectionVM.carModelChanged()
         }
+    }
+
+    private func carModelOption(_ model: CarModel, name: LocalizedStringKey, years: LocalizedStringKey) -> some View {
+        let selected = carModelRaw == model.rawValue
+        return Button {
+            carModelRaw = model.rawValue
+        } label: {
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(name)
+                        .foregroundColor(.white)
+                        .font(.system(size: 16))
+                    Text(years)
+                        .foregroundColor(mutedText)
+                        .font(.system(size: 13))
+                }
+                Spacer()
+                Image(systemName: selected ? "checkmark.circle.fill" : "circle")
+                    .foregroundColor(selected ? dashGreen : mutedText)
+                    .font(.system(size: 20))
+            }
+            .padding(12)
+            .background(Color(white: 0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(selected ? dashGreen : Color.clear, lineWidth: 1)
+            )
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Display Section
@@ -270,7 +288,7 @@ struct SettingsView: View {
                 .foregroundColor(.white)
                 .font(.system(size: 16))
             Spacer(minLength: 12)
-            SegmentedPicker(selected: $renderQuality, options: [(1, "Low"), (2, "Med"), (3, "High")])
+            RenderQualityPicker(selected: $renderQuality)
                 .layoutPriority(1)
         }
         .padding(.vertical, 4)
@@ -349,12 +367,12 @@ private struct SettingsToggleRow: View {
     }
 }
 
-// MARK: - Segmented Picker
+// MARK: - Render Quality Picker
 
-private struct SegmentedPicker: View {
+private struct RenderQualityPicker: View {
     @Binding var selected: Int
-    let options: [(Int, LocalizedStringKey)]
 
+    private let options: [(Int, LocalizedStringKey)] = [(1, "Low"), (2, "Med"), (3, "High")]
     private let accent = Color(red: 0x5C / 255.0, green: 0xBD / 255.0, blue: 0x68 / 255.0)
 
     var body: some View {

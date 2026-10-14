@@ -1,6 +1,54 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Model 3 / Model Y" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model 3 / Model Y"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model 3 / Model Y"
+          }
+        }
+      }
+    },
+    "Model year 2025 and newer" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelljahr 2025 und neuer"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2025-ös és újabb modellév"
+          }
+        }
+      }
+    },
+    "Model years 2019–2024" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelljahre 2019–2024"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2019–2024-es modellévek"
+          }
+        }
+      }
+    },
     "Car" : {
       "localizations" : {
         "de" : {
@@ -29,38 +77,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Némán tartja a sebességkorlát figyelmeztető hangját."
-          }
-        }
-      }
-    },
-    "Model" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modell"
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modell"
-          }
-        }
-      }
-    },
-    "Model 3 / Y" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Model 3 / Y"
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Model 3 / Y"
           }
         }
       }
