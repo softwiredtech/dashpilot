@@ -18,7 +18,6 @@ const val PREF_DARK_MODE = "dark_mode"
 const val PREF_ALWAYS_ON_BLIND_SPOT_MONITOR = "always_on_blind_spot_monitor"
 const val PREF_RENDER_QUALITY = "render_quality"
 const val PREF_DARK_MODE_BACKGROUND_GRAY = "dark_mode_background_gray"
-const val PREF_EXTRA_VEHICLE_BUS = "extra_vehicle_bus"
 const val PREF_CAR_MODEL = "car_model"
 // Legacy boolean Juniper toggle, migrated into PREF_CAR_MODEL.
 private const val PREF_JUNIPER = "juniper"
@@ -54,7 +53,6 @@ const val DEFAULT_DARK_MODE = false
 const val DEFAULT_ALWAYS_ON_BLIND_SPOT_MONITOR = true
 const val DEFAULT_RENDER_QUALITY = 3
 const val DEFAULT_DARK_MODE_BACKGROUND_GRAY = 0
-const val DEFAULT_EXTRA_VEHICLE_BUS = false
 const val DEFAULT_ONBOARDING_COMPLETED = false
 
 private const val DEFAULT_DASHBOARD_ID = "vanilla"
@@ -123,9 +121,9 @@ fun setPinnedControl(context: Context, id: String?) {
  * The car the DashKit is installed in. Selects the app's DBC/mapper and the
  * firmware release track. [id] is persisted: never renumber.
  */
-enum class CarModel(val id: Int, val supportsChimeMute: Boolean) {
-    TESLA_LEGACY(0, supportsChimeMute = false),
-    TESLA_JUNIPER(1, supportsChimeMute = true);
+enum class CarModel(val id: Int) {
+    TESLA_LEGACY(0),
+    TESLA_JUNIPER(1);
 
     companion object {
         fun fromId(id: Int): CarModel = entries.firstOrNull { it.id == id } ?: DEFAULT_CAR_MODEL

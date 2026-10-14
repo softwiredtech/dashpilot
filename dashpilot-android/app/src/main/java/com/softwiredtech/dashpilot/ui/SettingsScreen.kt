@@ -89,7 +89,6 @@ import com.softwiredtech.dashpilot.datamodel.dash.ManifestDisplaySetting
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_ALWAYS_ON_BLIND_SPOT_MONITOR
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_DARK_MODE
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_DARK_MODE_BACKGROUND_GRAY
-import com.softwiredtech.dashpilot.datamodel.dash.PREF_EXTRA_VEHICLE_BUS
 import com.softwiredtech.dashpilot.datamodel.dash.CarModel
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_RENDER_QUALITY
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_SHOW_CAR_BATTERY
@@ -99,7 +98,6 @@ import com.softwiredtech.dashpilot.datamodel.dash.PREF_USE_IMPERIAL
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_ALWAYS_ON_BLIND_SPOT_MONITOR
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_DARK_MODE
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_DARK_MODE_BACKGROUND_GRAY
-import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_EXTRA_VEHICLE_BUS
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_RENDER_QUALITY
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_CAR_BATTERY
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_ODOMETER
@@ -144,11 +142,6 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
     val sharedPrefs = remember { context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE) }
-
-    val extraBusState = remember {
-        mutableStateOf(BuildConfig.DEBUG && sharedPrefs.getBoolean(PREF_EXTRA_VEHICLE_BUS, DEFAULT_EXTRA_VEHICLE_BUS))
-    }
-    val juniper = carModel == CarModel.TESLA_JUNIPER
 
     val showPhoneBatteryState = remember {
         mutableStateOf(sharedPrefs.getBoolean(PREF_SHOW_PHONE_BATTERY, DEFAULT_SHOW_PHONE_BATTERY))
@@ -330,19 +323,10 @@ fun SettingsScreen(
             CarModelSelector(carModel, onCarModelChanged)
             Spacer(modifier = Modifier.height(16.dp))
 
-            if (BuildConfig.DEBUG) {
-                Text(stringResource(R.string.settings_section_configuration), color = DarkColors.TextMuted, fontSize = 16.sp)
-
-                SettingsToggle(stringResource(R.string.settings_toggle_extra_vehicle_bus), extraBusState.value) { enabled ->
-                    extraBusState.value = enabled
-                    sharedPrefs.edit { putBoolean(PREF_EXTRA_VEHICLE_BUS, enabled) }
-                }
-            }
-
             Text(stringResource(R.string.settings_section_display), color = DarkColors.TextMuted, fontSize = 16.sp)
             Spacer(modifier = Modifier.height(8.dp))
 
-            if ((extraBusState.value || juniper) && showCarBatteryToggle) {
+            if (showCarBatteryToggle) {
                 val key = PREF_SHOW_CAR_BATTERY
                 val state = vehicleBusToggleStates.getValue(key)
                 SettingsToggle(stringResource(R.string.settings_toggle_show_car_battery), state.value) { enabled ->
@@ -351,7 +335,7 @@ fun SettingsScreen(
                     onDisplaySettingsChanged(buildDisplaySettings())
                 }
             }
-            if ((extraBusState.value || juniper) && showOdometerToggle) {
+            if (showOdometerToggle) {
                 val key = PREF_SHOW_ODOMETER
                 val state = vehicleBusToggleStates.getValue(key)
                 SettingsToggle(stringResource(R.string.settings_toggle_show_odometer), state.value) { enabled ->

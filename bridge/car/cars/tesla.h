@@ -143,18 +143,6 @@ public:
     }
 };
 
-class TeslaCommaExtraMapper : public CarStateMapper {
-public:
-    void update(const CANParsers& cp, CarState& cs) override {
-        updatePartyBus(cp, cs);
-        updateVehicleBus(cp, cs);
-        vin_.update(cp, cs);
-    }
-
-private:
-    TeslaVinUpdater vin_;
-};
-
 class TeslaDashKitMapper : public CarStateMapper {
 public:
     void update(const CANParsers &cp, CarState &cs) override {

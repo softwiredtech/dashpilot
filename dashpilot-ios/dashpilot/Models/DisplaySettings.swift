@@ -9,7 +9,6 @@ struct DisplaySettings {
     static let keyAlwaysOnBlindSpotMonitor = "always_on_blind_spot_monitor"
     static let keyRenderQuality = "render_quality"
     static let keyDarkModeBackgroundGray = "dark_mode_background_gray"
-    static let keyExtraVehicleBus = "extra_vehicle_bus"
     static let keyCarModel = "car_model"
     // Legacy boolean Juniper toggle, migrated into keyCarModel.
     static let keyJuniper = "juniper"
@@ -21,8 +20,6 @@ struct DisplaySettings {
 enum CarModel: Int, CaseIterable {
     case teslaLegacy = 0
     case teslaJuniper = 1
-
-    var supportsChimeMute: Bool { self == .teslaJuniper }
 }
 
 extension DisplaySettings {

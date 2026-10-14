@@ -13,7 +13,6 @@ struct SettingsView: View {
     /// 0 = General, 1 = DashKit (mirrors the Android settings tabs).
     @State private var selectedTab = 0
 
-    @AppStorage(DisplaySettings.keyExtraVehicleBus)           private var extraVehicleBus = false
     @AppStorage(DisplaySettings.keyCarModel)                  private var carModelRaw = DisplaySettings.carModel.rawValue
     @AppStorage(DisplaySettings.keyShowCarBattery)            private var showCarBattery = true
     @AppStorage(DisplaySettings.keyShowOdometer)              private var showOdometer = true
@@ -65,9 +64,6 @@ struct SettingsView: View {
                         if selectedTab == 0 {
                             dashboardSection
                             carSection
-                            #if DEBUG
-                            configurationSection
-                            #endif
                             displaySection
                             if showVisualizerSettings {
                                 visualizerSection
@@ -200,28 +196,7 @@ struct SettingsView: View {
             .clipped()
     }
 
-    private var extraVehicleBusEnabled: Bool {
-        #if DEBUG
-        return extraVehicleBus
-        #else
-        return false
-        #endif
-    }
-
-    // MARK: - Configuration Section
-
-    private var configurationSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            sectionTitle("Configuration")
-            SettingsToggleRow(label: "Extra Vehicle Bus", isOn: $extraVehicleBus)
-            Spacer().frame(height: 8)
-        }
-        .padding(.horizontal, 24)
-    }
-
     // MARK: - Car Section
-
-    private var juniper: Bool { carModelRaw == CarModel.teslaJuniper.rawValue }
 
     private var carSection: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -254,10 +229,10 @@ struct SettingsView: View {
     private var displaySection: some View {
         VStack(alignment: .leading, spacing: 8) {
             sectionTitle("Display")
-            if (extraVehicleBusEnabled || juniper) && showCarBatteryToggle {
+            if showCarBatteryToggle {
                 SettingsToggleRow(label: "Show Car Battery", isOn: $showCarBattery)
             }
-            if (extraVehicleBusEnabled || juniper) && showOdometerToggle {
+            if showOdometerToggle {
                 SettingsToggleRow(label: "Show Odometer", isOn: $showOdometer)
             }
             if showUseImperialToggle {

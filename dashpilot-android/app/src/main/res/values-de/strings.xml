@@ -22,7 +22,6 @@
     <string name="dashboard_name_rive">Rive</string>
     <string name="dashboard_name_dev_rive">Rive-Datei laden</string>
     <string name="settings_section_display">Anzeige</string>
-    <string name="settings_section_configuration">Konfiguration</string>
     <string name="settings_theme_availability_note">Einige Einstellungen hängen vom gewählten Design ab</string>
     <string name="settings_theme_picker_title">Dashboard-Design</string>
     <string name="settings_section_3d_visualizer">3D-Visualisierung</string>
@@ -37,12 +36,10 @@
     <string name="settings_render_low">Niedrig</string>
     <string name="settings_render_med">Mittel</string>
     <string name="settings_render_high">Hoch</string>
-    <string name="settings_toggle_extra_vehicle_bus">Zusätzlicher Fahrzeugbus</string>
     <string name="settings_section_car">Auto</string>
     <string name="settings_car_model_title">Modell</string>
     <string name="settings_car_model_legacy">Model 3 / Y</string>
     <string name="settings_car_model_juniper">Model Y Juniper</string>
-    <string name="settings_vehicle_bus_requires_extra">Aktiviere den zusätzlichen Fahrzeugbus, um diese zu bearbeiten.</string>
     <string name="settings_toggle_always_on_blind_spot_monitor">Toter-Winkel-Warner immer an</string>
     <string name="settings_toggle_dark_mode">Dunkelmodus</string>
     <string name="settings_dark_mode_background_brightness">Hintergrundhelligkeit</string>

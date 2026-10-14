@@ -281,11 +281,6 @@ final class ConnectionViewModel {
     // MARK: - Private
 
     private func startCommaDataSource(address: String) {
-        #if DEBUG
-        let extraBus = UserDefaults.standard.bool(forKey: DisplaySettings.keyExtraVehicleBus)
-        #else
-        let extraBus = false
-        #endif
         let ds: CommaDataSource
         if DisplaySettings.carModel == .teslaJuniper {
             ds = CommaDataSource(
@@ -293,14 +288,6 @@ final class ConnectionViewModel {
                 dbcFiles: [
                     (0, "new_gen_juniper"),
                     (1, "new_gen_juniper")
-                ]
-            )
-        } else if extraBus {
-            ds = CommaDataSource(
-                vehicleType: "tesla_extra",
-                dbcFiles: [
-                    (1, "bus_1_tesla_vehicle"),
-                    (2, "bus_2_tesla_party")
                 ]
             )
         } else {

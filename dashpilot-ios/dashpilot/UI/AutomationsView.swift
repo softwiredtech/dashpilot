@@ -109,15 +109,13 @@ struct AutomationsView: View {
                         }
                     }
 
-                    if DisplaySettings.carModel.supportsChimeMute {
-                        Spacer().frame(height: 12)
-                        AutomationRow(
-                            icon: "speaker.slash.fill",
-                            title: "Mute speed-limit chime",
-                            subtitle: "Keeps the speed-limit warning chime silenced.",
-                            isOn: $chimeMute
-                        )
-                    }
+                    Spacer().frame(height: 12)
+                    AutomationRow(
+                        icon: "speaker.slash.fill",
+                        title: "Mute speed-limit chime",
+                        subtitle: "Keeps the speed-limit warning chime silenced.",
+                        isOn: $chimeMute
+                    )
 
                     Spacer().frame(height: 28)
 

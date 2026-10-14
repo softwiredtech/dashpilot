@@ -340,7 +340,6 @@ class MainActivity : ComponentActivity() {
                                 onWiperOffChange = {
                                     connectionVM.updateWiperOffAutomation(context, it)
                                 },
-                                chimeMuteSupported = carModel.supportsChimeMute,
                                 chimeMuteEnabled = chimeMuteAutomation,
                                 onChimeMuteChange = {
                                     connectionVM.updateChimeMuteAutomation(context, it)

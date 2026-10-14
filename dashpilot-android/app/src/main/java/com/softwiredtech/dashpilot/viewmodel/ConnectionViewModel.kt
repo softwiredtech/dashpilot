@@ -21,8 +21,6 @@ import com.softwiredtech.dashpilot.datamodel.dash.DisplaySettings
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_ALWAYS_ON_BLIND_SPOT_MONITOR
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_DARK_MODE
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_DARK_MODE_BACKGROUND_GRAY
-import com.softwiredtech.dashpilot.BuildConfig
-import com.softwiredtech.dashpilot.datamodel.dash.PREF_EXTRA_VEHICLE_BUS
 import com.softwiredtech.dashpilot.datamodel.dash.CarModel
 import com.softwiredtech.dashpilot.datamodel.dash.getCarModel
 import com.softwiredtech.dashpilot.datamodel.dash.setCarModel
@@ -34,7 +32,6 @@ import com.softwiredtech.dashpilot.datamodel.dash.PREF_USE_IMPERIAL
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_ALWAYS_ON_BLIND_SPOT_MONITOR
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_DARK_MODE
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_DARK_MODE_BACKGROUND_GRAY
-import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_EXTRA_VEHICLE_BUS
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_RENDER_QUALITY
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_CAR_BATTERY
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_SHOW_ODOMETER
@@ -417,13 +414,11 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         connectionJob = viewModelScope.launch(Dispatchers.IO) {
             val vehicleName = "tesla" // TODO: make configurable via UI
             val prefs = context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
-            val extraBus = BuildConfig.DEBUG && prefs.getBoolean(PREF_EXTRA_VEHICLE_BUS, DEFAULT_EXTRA_VEHICLE_BUS)
             val carModel = getCarModel(context)
             _carModel.value = carModel
             val configFile = when {
                 carModel == CarModel.TESLA_JUNIPER -> "config_juniper.json"
                 dataSourceType == DataSourceType.DASHKIT -> "config_dashkit.json"
-                extraBus -> "config_comma_extra_bus.json"
                 else -> "config_comma_normal.json"
             }
             val profile = VehicleProfileLoader.loadProfile(context, vehicleName, configFile)
