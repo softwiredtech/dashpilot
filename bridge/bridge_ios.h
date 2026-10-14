@@ -21,8 +21,6 @@ typedef struct {
     double fusedSpeedLimit;
     double stopLineDist;
     double trafficLightColor;
-    double laneDepartureWarning;
-    double sideCollisionWarning;
     double anyDoorOpen;
     double buckleStatus;
     double accSetSpeed;

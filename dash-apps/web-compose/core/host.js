@@ -22,8 +22,6 @@
     fusedSpeedLimit: "getFusedSpeedLimit",
     stopLineDist: "getStopLineDist",
     trafficLightColor: "getTrafficLightColor",
-    laneDepartureWarning: "getLaneDepartureWarning",
-    sideCollisionWarning: "getSideCollisionWarning",
     anyDoorOpen: "getAnyDoorOpen",
     buckleStatus: "getBuckleStatus",
     accSetSpeed: "getAccSetSpeed",

@@ -13,8 +13,6 @@ struct CarState: Codable {
     var fusedSpeedLimit: Float = 0
     var stopLineDist: Float = 0
     var trafficLightColor: Float = 0
-    var laneDepartureWarning: Float = 0
-    var sideCollisionWarning: Float = 0
     var anyDoorOpen: Float = 0
     var buckleStatus: Float = 0
     var accSetSpeed: Float = 0
@@ -59,8 +57,6 @@ struct CarState: Codable {
         fusedSpeedLimit = Float(bridge.fusedSpeedLimit)
         stopLineDist = Float(bridge.stopLineDist)
         trafficLightColor = Float(bridge.trafficLightColor)
-        laneDepartureWarning = Float(bridge.laneDepartureWarning)
-        sideCollisionWarning = Float(bridge.sideCollisionWarning)
         anyDoorOpen = Float(bridge.anyDoorOpen)
         buckleStatus = Float(bridge.buckleStatus)
         accSetSpeed = Float(bridge.accSetSpeed)
@@ -123,8 +119,6 @@ struct CarState: Codable {
         fusedSpeedLimit      = try c.decodeIfPresent(Float.self, forKey: .fusedSpeedLimit)      ?? 0
         stopLineDist         = try c.decodeIfPresent(Float.self, forKey: .stopLineDist)         ?? 0
         trafficLightColor    = try c.decodeIfPresent(Float.self, forKey: .trafficLightColor)    ?? 0
-        laneDepartureWarning = try c.decodeIfPresent(Float.self, forKey: .laneDepartureWarning) ?? 0
-        sideCollisionWarning = try c.decodeIfPresent(Float.self, forKey: .sideCollisionWarning) ?? 0
         anyDoorOpen          = try c.decodeIfPresent(Float.self, forKey: .anyDoorOpen)          ?? 0
         buckleStatus         = try c.decodeIfPresent(Float.self, forKey: .buckleStatus)         ?? 0
         accSetSpeed          = try c.decodeIfPresent(Float.self, forKey: .accSetSpeed)          ?? 0

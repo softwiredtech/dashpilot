@@ -547,13 +547,6 @@
       return "off";
     }
 
-    function mapLaneDeparture(value) {
-      const ldw = Number(value) || 0;
-      if (ldw === 1 || ldw === 3) return "left";
-      if (ldw === 2 || ldw === 4) return "right";
-      return null;
-    }
-
     function setBlinker(el, state) {
       const s = Number(state) || 0;
       if (s === 2) el.style.opacity = "1";
@@ -666,18 +659,15 @@
 
       drawWarningChips(car);
 
-      const laneDeparture = mapLaneDeparture(car.laneDepartureWarning);
       const leftBlind = (Number(car.leftBlindSpot) || 0) > 0;
       const rightBlind = (Number(car.rightBlindSpot) || 0) > 0;
       const leftBlinkerOn = (Number(car.leftBlinker) || 0) > 0;
       const rightBlinkerOn = (Number(car.rightBlinker) || 0) > 0;
-      const leftLaneDep = laneDeparture === "left";
-      const rightLaneDep = laneDeparture === "right";
 
-      const leftUrgent = (leftBlind && leftBlinkerOn) || leftLaneDep;
-      const rightUrgent = (rightBlind && rightBlinkerOn) || rightLaneDep;
-      const leftPassive = leftBlind && !leftBlinkerOn && !leftLaneDep;
-      const rightPassive = rightBlind && !rightBlinkerOn && !rightLaneDep;
+      const leftUrgent = leftBlind && leftBlinkerOn;
+      const rightUrgent = rightBlind && rightBlinkerOn;
+      const leftPassive = leftBlind && !leftBlinkerOn;
+      const rightPassive = rightBlind && !rightBlinkerOn;
 
       const leftActive = leftUrgent || leftPassive;
       const rightActive = rightUrgent || rightPassive;
@@ -732,7 +722,6 @@
         dataSourceType: readNative("getDataSourceType", ""),
         leftBlindSpot: readNative("getLeftBlindSpot", 0),
         rightBlindSpot: readNative("getRightBlindSpot", 0),
-        laneDepartureWarning: readNative("getLaneDepartureWarning", 0),
         anyDoorOpen: readNative("getAnyDoorOpen", 0),
         buckleStatus: readNative("getBuckleStatus", 1),
         accSetSpeed: readNative("getAccSetSpeed", 0),
@@ -752,7 +741,6 @@
       madsActive: false,
       leftBlindSpot: 0,
       rightBlindSpot: 0,
-      laneDepartureWarning: 0,
       anyDoorOpen: 0,
       buckleStatus: 1,
       accSetSpeed: 0,

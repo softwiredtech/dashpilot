@@ -1,5 +1,5 @@
 {
-  "$schema": "../../docs/dashapp-manifest.schema.json",
+  "$schema": "../manifest.schema.json",
   "manifestVersion": 1,
   "id": "ambient",
   "settings": ["useImperial", "darkMode"]

@@ -54,6 +54,10 @@ every signal of an accepted kind, grouped by category, and each prop becomes the
 control its type implies. A new widget folder is fully editable with no editor
 changes.
 
+Every widget can have a border, set in its settings (color and 1-6 px). It is
+stored on the item as `"border": { "color", "width" }`, outside `props`, so it
+works for every widget and older layouts and app versions ignore it.
+
 Each orientation has its own layout: editing landscape leaves portrait alone.
 
 ## Adding a widget
@@ -78,8 +82,7 @@ not `index.html`, not the registry, not the native apps.
 - `t(key)`: UI strings
 
 `update(values)` receives `{ <bindKey>: value }`, `undefined` meaning no data.
-Write to the DOM only when the visible result changes: the perf gate fails
-per-tick loops over siblings.
+Write to the DOM only when the visible result changes.
 
 Descriptor rules the build script enforces:
 
@@ -105,7 +108,7 @@ and appending a migration step. Never edit an existing step.
 Data in: the same as every other web dash-app (`NativeCarState` +
 `onCarStateUpdate()` on Android, `receiveMessage(json)` on iOS).
 
-It uses the generic host capabilities in [`../README.md`](../README.md#host-capabilities):
+It uses the save/editing calls in [`../README.md`](../README.md#saving-settings):
 its saved data is the layout document, and the editing flag is raised while the
 editor is open. Fallbacks: `localStorage` for the layout (browsers only), and
 `navigator.language` for the language.
@@ -125,7 +128,6 @@ converts odometer / temperatures / speed limit itself. The app only labels them.
 
 ```
 node scripts/build-compose-widgets.js --check          # descriptors valid, generated files current
-cd dash-apps/_perf-gate && npm ci && node gate.js ../web-compose
 ```
 
-Both run in CI (`.github/workflows/dashapp-perf.yml`).
+Runs in CI (`.github/workflows/android-build.yml`).

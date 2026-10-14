@@ -16,8 +16,6 @@ struct CarState {
     double fusedSpeedLimit = 0;
     double stopLineDist = 0;
     double trafficLightColor = 0;
-    double laneDepartureWarning = 0;
-    double sideCollisionWarning = 0;
     double anyDoorOpen = 0;
     double buckleStatus = 0;
     double accSetSpeed = 0;
@@ -53,7 +51,7 @@ struct CarState {
     char vin[VIN_LENGTH + 1] = {};
 
     static constexpr size_t VIN_DOUBLE_COUNT = 3;
-    static constexpr size_t VIN_OFFSET = 38;
+    static constexpr size_t VIN_OFFSET = 36;
     static constexpr size_t FIELD_COUNT = VIN_OFFSET + VIN_DOUBLE_COUNT;
 
     void toArray(double* out) const {
@@ -69,38 +67,36 @@ struct CarState {
         out[8] = fusedSpeedLimit;
         out[9] = stopLineDist;
         out[10] = trafficLightColor;
-        out[11] = laneDepartureWarning;
-        out[12] = sideCollisionWarning;
-        out[13] = anyDoorOpen;
-        out[14] = buckleStatus;
-        out[15] = accSetSpeed;
+        out[11] = anyDoorOpen;
+        out[12] = buckleStatus;
+        out[13] = accSetSpeed;
 
         // Vehicle bus
-        out[16] = fullPackEnergy;
-        out[17] = nominalEnergyRemaining;
-        out[18] = energyBuffer;
-        out[19] = maxRegenPower;
-        out[20] = maxDischargePower;
-        out[21] = packVoltage;
-        out[22] = packCurrent;
-        out[23] = packTMin;
-        out[24] = packTMax;
-        out[25] = odometer;
+        out[14] = fullPackEnergy;
+        out[15] = nominalEnergyRemaining;
+        out[16] = energyBuffer;
+        out[17] = maxRegenPower;
+        out[18] = maxDischargePower;
+        out[19] = packVoltage;
+        out[20] = packCurrent;
+        out[21] = packTMin;
+        out[22] = packTMax;
+        out[23] = odometer;
 
         // Openpilot
-        out[26] = selfdriveActive;
-        out[27] = experimentalMode;
-        out[28] = madsActive;
-        out[29] = changingLane;
+        out[24] = selfdriveActive;
+        out[25] = experimentalMode;
+        out[26] = madsActive;
+        out[27] = changingLane;
 
-        out[30] = acTemp;
-        out[31] = acTempRight;
-        out[32] = hvacFanLevel;
-        out[33] = hvacPowerState;
-        out[34] = hvacAcMode;
-        out[35] = hvacRecirc;
-        out[36] = hvacKeepClimateOn;
-        out[37] = powerLevel;
+        out[28] = acTemp;
+        out[29] = acTempRight;
+        out[30] = hvacFanLevel;
+        out[31] = hvacPowerState;
+        out[32] = hvacAcMode;
+        out[33] = hvacRecirc;
+        out[34] = hvacKeepClimateOn;
+        out[35] = powerLevel;
 
         // VIN chars ride the double array as raw bit patterns, 8 bytes per
         // double; decoded by CanFrameDecoder.arrayToCarState.

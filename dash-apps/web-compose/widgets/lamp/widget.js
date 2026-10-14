@@ -29,13 +29,25 @@ function create(ctx) {
     el.appendChild(label);
   }
 
+  const steers = props.icon === "wheel";
+  if (steers) {
+    el.dataset.steer = "1";
+    icon.style.transform = "rotate(0deg)";
+  }
   let last = "0";
+  let lastAngle = 0;
   return {
     update(values) {
       const next = values.value ? "1" : "0";
-      if (next === last) return;
-      last = next;
-      el.dataset.on = next;
+      if (next !== last) {
+        last = next;
+        el.dataset.on = next;
+      }
+      if (!steers) return;
+      const angle = values.steering === undefined ? 0 : Math.round(values.steering);
+      if (angle === lastAngle) return;
+      lastAngle = angle;
+      icon.style.transform = "rotate(" + angle + "deg)";
     },
   };
 }

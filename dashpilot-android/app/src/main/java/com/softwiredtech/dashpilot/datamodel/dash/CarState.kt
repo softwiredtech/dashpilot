@@ -14,8 +14,6 @@ data class CarState(
     val fusedSpeedLimit: Float = 0f,
     val stopLineDist: Float = 0f,
     val trafficLightColor: Float = 0f,
-    val laneDepartureWarning: Float = 0f,
-    val sideCollisionWarning: Float = 0f,
     val anyDoorOpen: Float = 0f,
     val buckleStatus: Float = 0f,
     val accSetSpeed: Float = 0f,
@@ -58,7 +56,7 @@ data class CarState(
     )
 
     companion object {
-        const val FIELD_COUNT = 41
+        const val FIELD_COUNT = 39
         private const val KM_TO_MILES = 0.621371f
 
         private val MILES_COUNTRIES = setOf("US", "GB", "MM", "LR")

@@ -115,8 +115,6 @@
     { id: "rightBlinker", kind: "bool", unit: "none", category: "signals", bus: "any", read: (r) => flag(r.rightBlinker) },
     { id: "leftBlindSpot", kind: "bool", unit: "none", category: "signals", bus: "any", read: (r) => flag(r.leftBlindSpot) },
     { id: "rightBlindSpot", kind: "bool", unit: "none", category: "signals", bus: "any", read: (r) => flag(r.rightBlindSpot) },
-    { id: "laneDepartureWarning", kind: "bool", unit: "none", category: "warnings", bus: "any", read: (r) => flag(r.laneDepartureWarning) },
-    { id: "sideCollisionWarning", kind: "bool", unit: "none", category: "warnings", bus: "any", read: (r) => flag(r.sideCollisionWarning) },
     { id: "anyDoorOpen", kind: "bool", unit: "none", category: "warnings", bus: "any", read: (r) => flag(r.anyDoorOpen) },
     { id: "seatbeltUnbuckled", kind: "bool", unit: "none", category: "warnings", bus: "any",
       read: (r) => (r.buckleStatus === undefined ? undefined : Number(r.buckleStatus) === 0) },

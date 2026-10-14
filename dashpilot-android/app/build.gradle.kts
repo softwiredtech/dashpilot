@@ -19,8 +19,8 @@ android {
         applicationId = "com.softwiredtech.dashpilot"
         minSdk = 29
         targetSdk = 36
-        versionCode = 17
-        versionName = "0.9.1"
+        versionCode = 18
+        versionName = "0.9.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -79,7 +79,7 @@ tasks.named("preBuild") {
 
 dependencies {
     implementation(project(":bridge"))
-    implementation("app.rive:rive-android:11.7.0")
+    implementation("app.rive:rive-android:11.14.1")
     implementation("androidx.startup:startup-runtime:1.1.1")
     implementation("androidx.webkit:webkit:1.12.1")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")

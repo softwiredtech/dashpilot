@@ -72,11 +72,6 @@ import kotlin.math.roundToInt
 import androidx.compose.ui.res.stringResource
 import com.softwiredtech.dashpilot.R
 
-/**
- * Landing screen. DashKit is the default source and shows the connected home
- * content (vehicle info widgets + primary actions) regardless of connection
- * state. Selecting any other source switches to the data-source setup flow.
- */
 @Composable
 fun HomeScreen(
     connectionStatus: ConnectionStatus,
@@ -171,6 +166,7 @@ private fun ConnectedHomeContent(
     val idleReset = remember { MutableStateFlow(false) }
     val resetPending by (teslaResetPending ?: idleReset).collectAsState()
     val pinned = controlById(pinnedControlId)
+    val driveEnabled = connectionStatus == ConnectionStatus.Connected
 
     BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
         val landscape = maxWidth > maxHeight
@@ -208,7 +204,8 @@ private fun ConnectedHomeContent(
                     onClimate = onClimate,
                     onAutomations = onAutomations,
                     onControls = onControls,
-                    onDrive = onDrive
+                    onDrive = onDrive,
+                    driveEnabled = driveEnabled
                 )
             } else {
                 PortraitContent(
@@ -228,7 +225,8 @@ private fun ConnectedHomeContent(
                     onClimate = onClimate,
                     onAutomations = onAutomations,
                     onControls = onControls,
-                    onDrive = onDrive
+                    onDrive = onDrive,
+                    driveEnabled = driveEnabled
                 )
             }
         }
@@ -250,8 +248,7 @@ private fun Header(
             .fillMaxWidth()
             .height(HeaderHeight)
     ) {
-        // Offset by the IconButton's built-in content inset so the gear
-        // glyph lines up with the tiles' left edge below.
+        // Offset cancels IconButton's inset so the gear aligns with the tiles.
         IconButton(
             onClick = onSettingsClick,
             modifier = Modifier
@@ -302,7 +299,8 @@ private fun PortraitContent(
     onClimate: () -> Unit,
     onAutomations: () -> Unit,
     onControls: () -> Unit,
-    onDrive: () -> Unit
+    onDrive: () -> Unit,
+    driveEnabled: Boolean
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         WidgetGrid(car = car, useImperial = useImperial, fillHeight = false, onBattery = onBattery, onClimate = onClimate)
@@ -339,7 +337,7 @@ private fun PortraitContent(
             onClick = onControls
         )
         Spacer(modifier = Modifier.height(12.dp))
-        DriveButton(onDrive)
+        DriveButton(onDrive, driveEnabled)
         Spacer(modifier = Modifier.height(12.dp))
         Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
             DebugDataSourceMenu(connectionStatus, activeSourceType, onSelectDataSource, onConnect, onDisconnect)
@@ -347,9 +345,6 @@ private fun PortraitContent(
     }
 }
 
-// Mirrors HomeView.swift: widget grid on the left, action tiles and the
-// primary buttons on the right, both stretched to the viewport height so the
-// screen fills without scrolling unless the content is genuinely taller.
 @Composable
 private fun LandscapeContent(
     minHeight: Dp,
@@ -364,7 +359,8 @@ private fun LandscapeContent(
     onClimate: () -> Unit,
     onAutomations: () -> Unit,
     onControls: () -> Unit,
-    onDrive: () -> Unit
+    onDrive: () -> Unit,
+    driveEnabled: Boolean
 ) {
     Row(
         modifier = Modifier
@@ -425,7 +421,7 @@ private fun LandscapeContent(
                     PinnedButton(action = action, bleManager = bleManager)
                     Spacer(modifier = Modifier.height(12.dp))
                 }
-                DriveButton(onDrive)
+                DriveButton(onDrive, driveEnabled)
             }
         }
     }
@@ -501,12 +497,13 @@ private fun PinnedButton(action: ControlAction, bleManager: DashKitBleManager?) 
 }
 
 @Composable
-private fun DriveButton(onDrive: () -> Unit) {
+private fun DriveButton(onDrive: () -> Unit, enabled: Boolean) {
     ActionButton(
         label = stringResource(R.string.home_drive),
         icon = Icons.Rounded.DirectionsCar,
         accent = true,
-        onClick = onDrive
+        onClick = onDrive,
+        enabled = enabled
     )
 }
 
@@ -545,8 +542,6 @@ private fun InfoWidget(
     }
 }
 
-// Landscape counterpart of ActionButton: icon at the top, label at the
-// bottom, sized to match the stat tiles beside it.
 @Composable
 private fun ActionTile(
     label: String,
@@ -594,14 +589,19 @@ private fun ActionButton(
     label: String,
     icon: ImageVector,
     accent: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    enabled: Boolean = true
 ) {
+    val containerColor = if (accent) AccentColor else DarkColors.Surface
     Button(
         onClick = onClick,
+        enabled = enabled,
         shape = RoundedCornerShape(16.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (accent) AccentColor else DarkColors.Surface,
-            contentColor = Color.White
+            containerColor = containerColor,
+            contentColor = Color.White,
+            disabledContainerColor = containerColor.copy(alpha = 0.5f),
+            disabledContentColor = Color.White.copy(alpha = 0.5f)
         ),
         modifier = Modifier
             .fillMaxWidth()

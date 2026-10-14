@@ -52,10 +52,10 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlin.math.abs
 
-// Only web dashboards participate in the swipe carousel.
-private val swipeableDashboards = availableDashboards.filter { it.type == DashboardType.WEB }
+private val swipeableDashboards = availableDashboards.filter { it.type == DashboardType.WEB || it.type == DashboardType.RIVE }
 
 private const val WEB_TYPE = "web"
+private const val DEV_RIVE_TYPE = "dev_rive"
 
 @Composable
 fun DashboardScreen(
@@ -101,12 +101,9 @@ fun DashboardScreen(
     val currentType = swipedDashboard?.type?.name?.lowercase() ?: dashboardType
     val currentUrl = swipedDashboard?.url ?: dashboardUrl
 
-    // Moves step (+1 next, -1 previous) through the web dashboards, wrapping at
-    // both ends. Non-web screens (e.g. the Rive dev view) are not part of the
-    // cycle and cannot be swiped away from.
     val switchDashboard by rememberUpdatedState(fun(step: Int) {
         val dashboards = swipeableDashboards
-        if (dashboards.size < 2 || currentType != WEB_TYPE) return
+        if (dashboards.size < 2 || currentType == DEV_RIVE_TYPE) return
         val currentIndex = dashboards.indexOfFirst { it.url == currentUrl }
         if (currentIndex < 0) return
         val next = dashboards[(currentIndex + step + dashboards.size) % dashboards.size]
@@ -169,13 +166,12 @@ fun DashboardScreen(
                         onEditingChange = { editing -> dashAppEditing = editing }
                     )
                 }
-                "rive", "dev_rive" -> {
+                "rive", DEV_RIVE_TYPE -> {
                     RiveDashView(
-                        assetName = if (currentType == "dev_rive") "" else currentUrl,
+                        assetName = if (currentType == DEV_RIVE_TYPE) "" else currentUrl,
                         dashStateFlow = dashStateFlow,
-                        scope = scope,
                         onError = { message -> Log.d("Rive", message) },
-                        fileUri = if (currentType == "dev_rive") currentUrl else null
+                        fileUri = if (currentType == DEV_RIVE_TYPE) currentUrl else null
                     )
                 }
             }

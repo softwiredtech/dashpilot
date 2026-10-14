@@ -1,0 +1,270 @@
+<Rive version="1" kind="fragment">
+    <FontAsset file="fonts/inter-400.ttf" name="Inter Regular" id="2:900"/>
+    <FontAsset file="fonts/inter-600.ttf" name="Inter SemiBold" id="2:901"/>
+
+    <!-- Formula tokens: operationType 0 + 1 - 2 * 3 / 4 %; functionType 0 min 1 max 4 floor 5 sqrt 6 pow -->
+
+    <DataConverterToString decimals="0" round="true" name="Integer" id="2:1"/>
+    <!-- Booleans: ToString gives "0"/"1", ToNumber turns that into a number that can drive opacity. -->
+    <DataConverterToString name="Bool To Text" id="2:40"/>
+    <DataConverterToNumber name="Text To Number" id="2:42"/>
+    <DataConverterGroup name="Bool As Number" id="2:41">
+        <DataConverterGroupItem converterId="2:40"/>
+        <DataConverterGroupItem converterId="2:42"/>
+    </DataConverterGroup>
+    <DataConverterGroup name="Not Bool As Number" id="2:43">
+        <DataConverterGroupItem converterId="2:40"/>
+        <DataConverterGroupItem converterId="2:42"/>
+        <DataConverterGroupItem converterId="2:7"/>
+    </DataConverterGroup>
+    <DataConverterGroup name="Cruise Marker Opacity" id="2:44">
+        <DataConverterGroupItem converterId="2:40"/>
+        <DataConverterGroupItem converterId="2:42"/>
+        <DataConverterGroupItem converterId="2:45"/>
+    </DataConverterGroup>
+    <DataConverterRangeMapper minInput="0" maxInput="1" minOutput="0.35" maxOutput="1"
+                              clampLower="true" clampUpper="true" name="Dim Unless On" id="2:45"/>
+    <DataConverterStringPad length="2" text="0" padType="start" name="Pad 2" id="2:27"/>
+
+    <DataConverterRangeMapper minInput="0" maxInput="1" minOutput="0" maxOutput="1"
+                              clampLower="true" clampUpper="true" name="Clamp 0..1" id="2:5"/>
+    <DataConverterRangeMapper minInput="0" maxInput="1" minOutput="1" maxOutput="0"
+                              clampLower="true" clampUpper="true" name="1 - Clamp 0..1" id="2:7"/>
+    <DataConverterRangeMapper minInput="1" maxInput="2" minOutput="0" maxOutput="1"
+                              clampLower="true" clampUpper="true" name="Is 2" id="2:6"/>
+    <DataConverterRangeMapper minInput="0" maxInput="100" minOutput="100" maxOutput="0"
+                              clampLower="true" clampUpper="true" name="100 - Percent" id="2:18"/>
+    <DataConverterRangeMapper minInput="0" maxInput="100" minOutput="0" maxOutput="100"
+                              clampLower="true" clampUpper="true" name="Percent" id="2:22"/>
+
+    <DataConverterRangeMapper minInput="0" maxInput="160" minOutput="0" maxOutput="0.75"
+                              clampLower="true" clampUpper="true" name="Speed To Arc" id="2:2"/>
+    <DataConverterRangeMapper minInput="0" maxInput="160" minOutput="3.9269908" maxOutput="8.6393798"
+                              clampLower="true" clampUpper="true" name="Speed To Angle" id="2:3"/>
+    <DataConverterSystemDegsToRads operationType="2" operationValue="0.017453292"
+                                   name="Degrees to Radians" id="2:15"/>
+
+    <DataConverterFormula name="Over Limit" id="2:4">
+        <FormulaTokenFunction functionType="0"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenFunction functionType="1"/>
+        <FormulaTokenValue operationValue="0"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenParenthesisOpen/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue>
+            <DataBindContext sourcePathIds="1:1-1:19" propertyKey="777"/>
+        </FormulaTokenValue>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue operationValue="2"/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenOperation operationType="3"/>
+        <FormulaTokenValue operationValue="3"/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenOperation operationType="2"/>
+        <FormulaTokenFunction functionType="0"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenValue>
+            <DataBindContext sourcePathIds="1:1-1:19" propertyKey="777"/>
+        </FormulaTokenValue>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+
+
+
+    <!-- 1 - min(1, |input - k|): 1 when input == k -->
+    <DataConverterFormula name="Equals 1" id="2:11">
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenFunction functionType="0"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenFunction functionType="5"/>
+        <FormulaTokenFunction functionType="6"/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenValue operationValue="2"/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+    <DataConverterFormula name="Equals 2" id="2:12">
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenFunction functionType="0"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenFunction functionType="5"/>
+        <FormulaTokenFunction functionType="6"/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue operationValue="2"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenValue operationValue="2"/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+    <DataConverterFormula name="Equals 3" id="2:13">
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenFunction functionType="0"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenFunction functionType="5"/>
+        <FormulaTokenFunction functionType="6"/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue operationValue="3"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenValue operationValue="2"/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+    <DataConverterFormula name="Equals 4" id="2:14">
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenFunction functionType="0"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenFunction functionType="5"/>
+        <FormulaTokenFunction functionType="6"/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue operationValue="4"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenValue operationValue="2"/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+
+    <DataConverterFormula name="Urgent Left" id="2:33">
+        <FormulaTokenFunction functionType="0"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenFunction functionType="1"/>
+        <FormulaTokenValue operationValue="0"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+    <DataConverterFormula name="Urgent Right" id="2:34">
+        <FormulaTokenFunction functionType="0"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenFunction functionType="1"/>
+        <FormulaTokenValue operationValue="0"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue operationValue="1"/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+
+    <!-- state of charge: (remaining - buffer) / (full - buffer) * 100 -->
+    <DataConverterFormula name="State Of Charge" id="2:16">
+        <FormulaTokenFunction functionType="1"/>
+        <FormulaTokenValue operationValue="0"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenFunction functionType="0"/>
+        <FormulaTokenValue operationValue="100"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenParenthesisOpen/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue>
+            <DataBindContext sourcePathIds="1:1-1:28" propertyKey="777"/>
+        </FormulaTokenValue>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenOperation operationType="3"/>
+        <FormulaTokenFunction functionType="1"/>
+        <FormulaTokenValue operationValue="0.01"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenValue>
+            <DataBindContext sourcePathIds="1:1-1:27" propertyKey="777"/>
+        </FormulaTokenValue>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue>
+            <DataBindContext sourcePathIds="1:1-1:28" propertyKey="777"/>
+        </FormulaTokenValue>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenOperation operationType="2"/>
+        <FormulaTokenValue operationValue="100"/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+    <DataConverterGroup name="State Of Charge Text" id="2:17">
+        <DataConverterGroupItem converterId="2:16"/>
+        <DataConverterGroupItem converterId="2:1"/>
+    </DataConverterGroup>
+    <DataConverterGroup name="State Of Charge Rest" id="2:19">
+        <DataConverterGroupItem converterId="2:16"/>
+        <DataConverterGroupItem converterId="2:18"/>
+    </DataConverterGroup>
+
+    <DataConverterRangeMapper minInput="-100" maxInput="0" minOutput="100" maxOutput="0"
+                              clampLower="true" clampUpper="true" name="Regen" id="2:20"/>
+    <DataConverterRangeMapper minInput="-100" maxInput="0" minOutput="0" maxOutput="100"
+                              clampLower="true" clampUpper="true" name="Regen Rest" id="2:21"/>
+
+    <!-- packCurrent * packVoltage / 1000 -->
+    <DataConverterFormula name="Kilowatts" id="2:24">
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="2"/>
+        <FormulaTokenValue>
+            <DataBindContext sourcePathIds="1:1-1:30" propertyKey="777"/>
+        </FormulaTokenValue>
+        <FormulaTokenOperation operationType="3"/>
+        <FormulaTokenValue operationValue="1000"/>
+    </DataConverterFormula>
+    <DataConverterGroup name="Kilowatts Text" id="2:25">
+        <DataConverterGroupItem converterId="2:24"/>
+        <DataConverterGroupItem converterId="2:1"/>
+    </DataConverterGroup>
+
+    <DataConverterFormula name="Hours" id="2:26">
+        <FormulaTokenFunction functionType="4"/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="3"/>
+        <FormulaTokenValue operationValue="3600"/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+    <DataConverterGroup name="Hours Text" id="2:28">
+        <DataConverterGroupItem converterId="2:26"/>
+        <DataConverterGroupItem converterId="2:1"/>
+        <DataConverterGroupItem converterId="2:27"/>
+    </DataConverterGroup>
+    <DataConverterFormula name="Minutes" id="2:29">
+        <FormulaTokenFunction functionType="4"/>
+        <FormulaTokenParenthesisOpen/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="4"/>
+        <FormulaTokenValue operationValue="3600"/>
+        <FormulaTokenParenthesisClose/>
+        <FormulaTokenOperation operationType="3"/>
+        <FormulaTokenValue operationValue="60"/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+    <DataConverterGroup name="Minutes Text" id="2:30">
+        <DataConverterGroupItem converterId="2:29"/>
+        <DataConverterGroupItem converterId="2:1"/>
+        <DataConverterGroupItem converterId="2:27"/>
+    </DataConverterGroup>
+
+    <DataConverterRangeMapper minInput="0" maxInput="100" minOutput="0" maxOutput="34"
+                              clampLower="true" clampUpper="true" name="Phone Level Width" id="2:31"/>
+    <DataConverterRangeMapper minInput="-1" maxInput="0" minOutput="0" maxOutput="1"
+                              clampLower="true" clampUpper="true" name="Phone Known" id="2:32"/>
+</Rive>

@@ -59,6 +59,15 @@ html, body {
   border-radius: var(--radius);
   overflow: hidden;
 }
+/* Drawn above the widget so a widget's own background can't hide it. */
+.cell[data-border]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 var(--border-width) var(--border-color);
+  pointer-events: none;
+}
 .cell__body { position: absolute; inset: 0; container-type: size; }
 .widget { position: absolute; inset: 0; }
 

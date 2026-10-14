@@ -17,6 +17,7 @@ XCASSETS_DIR="$REPO_ROOT/dashpilot-ios/dashpilot/Assets.xcassets"
 
 # Default folders (override by passing arguments)
 DEFAULT_FOLDERS=(web-vanilla web-retro web-ambient web-analog web-compose)
+PREVIEW_FOLDERS=("${DEFAULT_FOLDERS[@]}" rive)
 
 if [ $# -gt 0 ]; then
   FOLDERS=("$@")
@@ -24,9 +25,7 @@ else
   FOLDERS=("${DEFAULT_FOLDERS[@]}")
 fi
 
-ADASVIZ_DIR="$REPO_ROOT/adasviz"
-
-for folder in "${DEFAULT_FOLDERS[@]}"; do
+for folder in "${PREVIEW_FOLDERS[@]}"; do
   name="${folder#web-}"
   cp -f "$APPS_DIR/$folder/preview.jpg" "$XCASSETS_DIR/preview_$name.imageset/preview_$name.jpg"
   echo "Copied preview $folder -> $XCASSETS_DIR/preview_$name.imageset/preview_$name.jpg"
@@ -34,13 +33,6 @@ done
 
 for name in "${FOLDERS[@]}"; do
   src="$APPS_DIR/$name"
-
-  # web-vanilla depends on adasviz assets (wasm, js, 3D models)
-  if [ "$name" = "web-vanilla" ]; then
-    echo "Copying adasviz into $src..."
-    cp -rf "$ADASVIZ_DIR"/* "$src/"
-    rm -f "$src/README.md"
-  fi
 
   if [ ! -d "$src" ]; then
     echo "Error: source not found at $src" >&2
@@ -51,11 +43,16 @@ for name in "${FOLDERS[@]}"; do
   if [ -n "${BUILT_PRODUCTS_DIR:-}" ] && [ -n "${CONTENTS_FOLDER_PATH:-}" ]; then
     dst="${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/${name}"
     cp -R "$src/" "$dst/"
-    rm -f "$dst"/preview.*
+    rm -f "$dst"/preview.* "$dst"/README.md
     echo "Copied $name -> app bundle"
   else
     echo "Prepared $name (run from Xcode to copy into bundle)"
   fi
 done
+
+if [ -n "${BUILT_PRODUCTS_DIR:-}" ] && [ -n "${CONTENTS_FOLDER_PATH:-}" ]; then
+  cp -f "$APPS_DIR"/rive/*.riv "${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/"
+  echo "Copied rive dashboards -> app bundle"
+fi
 
 echo "Done."

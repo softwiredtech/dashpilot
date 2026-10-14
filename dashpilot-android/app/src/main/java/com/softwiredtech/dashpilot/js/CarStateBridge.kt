@@ -25,7 +25,6 @@ class CarStateBridge(
     @Volatile private var trafficLightColor: Float = 0f
     @Volatile private var buckleStatus: Float = 0f
     @Volatile private var anyDoorOpen: Float = 0f
-    @Volatile private var laneDepartureWarning: Float = 0f
     @Volatile private var accSetSpeed: Float = 0f
     @Volatile private var fullPackEnergy: Float = 0f
     @Volatile private var nominalEnergyRemaining: Float = 0f
@@ -68,7 +67,6 @@ class CarStateBridge(
         trafficLightColor = state.trafficLightColor
         buckleStatus = state.buckleStatus
         anyDoorOpen = state.anyDoorOpen
-        laneDepartureWarning = state.laneDepartureWarning
         accSetSpeed = state.accSetSpeed
         fullPackEnergy = state.fullPackEnergy
         nominalEnergyRemaining = state.nominalEnergyRemaining
@@ -99,7 +97,6 @@ class CarStateBridge(
     @JavascriptInterface fun getTrafficLightColor(): Float = trafficLightColor
     @JavascriptInterface fun getBuckleStatus(): Float = buckleStatus
     @JavascriptInterface fun getAnyDoorOpen(): Float = anyDoorOpen
-    @JavascriptInterface fun getLaneDepartureWarning(): Float = laneDepartureWarning
     @JavascriptInterface fun getAccSetSpeed(): Float = accSetSpeed
     @JavascriptInterface fun getFullPackEnergy(): Float = fullPackEnergy
     @JavascriptInterface fun getNominalEnergyRemaining(): Float = nominalEnergyRemaining

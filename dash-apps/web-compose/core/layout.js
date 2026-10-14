@@ -8,7 +8,8 @@
 //     "portrait":  { "cols": 6, "rows": 12, "items": [ item, ... ] }
 //   }
 // }
-// item: { "uid", "type", "x", "y", "w", "h", "bind": { key: signalId }, "props": {} }
+// item: { "uid", "type", "x", "y", "w", "h", "bind": { key: signalId }, "props": {},
+//          "border": { "color": "#rrggbb", "width": 1-6 } (optional) }
 //
 // Compatibility rules (the document outlives app versions in both directions):
 // - unknown widget type  -> kept, rendered as a placeholder

@@ -1,0 +1,1020 @@
+<Rive version="1" kind="fragment">
+    <!-- Each Text sits in its own fixed LayoutComponent; the runtime sizes the text to that box. -->
+    <Artboard defaultStateMachineId="5:1" viewModelId="1:1" viewModelInstanceId="1:2" styleId="3:2"
+              clip="true" width="2280" height="1080" name="Dash" id="3:1">
+        <LayoutComponentStyle name="Dash Style" id="3:2"/>
+        <Fill name="Background"><SolidColor colorValue="FF000000" name="C"/></Fill>
+
+        <!-- Declared first so they draw on top; taller than any screen, the artboard clips them. -->
+        <LayoutComponent width="72" height="2400" styleId="3:11" name="Blind Spot Left Urgent" id="3:10">
+            <DataBindContext sourcePathIds="1:1-1:20" propertyKey="18" converterId="2:33"/>
+            <LayoutComponentStyle positionTypeValue="absolute" layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                  positionLeft="0" positionLeftUnitsValue="points"
+                                  positionTop="0" positionTopUnitsValue="points"
+                                  name="S" id="3:11"/>
+            <Fill name="F">
+                <LinearGradient startX="0" startY="0" endX="72" endY="0" name="G">
+                    <GradientStop colorValue="FFFF453A" position="0"/>
+                    <GradientStop colorValue="00FF453A" position="1"/>
+                </LinearGradient>
+            </Fill>
+        </LayoutComponent>
+        <LayoutComponent width="40" height="2400" styleId="3:13" name="Blind Spot Left" id="3:12">
+            <DataBindContext sourcePathIds="1:1-1:20" propertyKey="18" converterId="2:5"/>
+            <LayoutComponentStyle positionTypeValue="absolute" layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                  positionLeft="0" positionLeftUnitsValue="points"
+                                  positionTop="0" positionTopUnitsValue="points"
+                                  name="S" id="3:13"/>
+            <Fill name="F">
+                <LinearGradient startX="0" startY="0" endX="40" endY="0" name="G">
+                    <GradientStop colorValue="FFFFB020" position="0"/>
+                    <GradientStop colorValue="00FFB020" position="1"/>
+                </LinearGradient>
+            </Fill>
+        </LayoutComponent>
+        <LayoutComponent width="72" height="2400" styleId="3:15" name="Blind Spot Right Urgent" id="3:14">
+            <DataBindContext sourcePathIds="1:1-1:21" propertyKey="18" converterId="2:34"/>
+            <LayoutComponentStyle positionTypeValue="absolute" layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                  positionRight="0" positionRightUnitsValue="points"
+                                  positionTop="0" positionTopUnitsValue="points"
+                                  name="S" id="3:15"/>
+            <Fill name="F">
+                <LinearGradient startX="0" startY="0" endX="72" endY="0" name="G">
+                    <GradientStop colorValue="00FF453A" position="0"/>
+                    <GradientStop colorValue="FFFF453A" position="1"/>
+                </LinearGradient>
+            </Fill>
+        </LayoutComponent>
+        <LayoutComponent width="40" height="2400" styleId="3:17" name="Blind Spot Right" id="3:16">
+            <DataBindContext sourcePathIds="1:1-1:21" propertyKey="18" converterId="2:5"/>
+            <LayoutComponentStyle positionTypeValue="absolute" layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                  positionRight="0" positionRightUnitsValue="points"
+                                  positionTop="0" positionTopUnitsValue="points"
+                                  name="S" id="3:17"/>
+            <Fill name="F">
+                <LinearGradient startX="0" startY="0" endX="40" endY="0" name="G">
+                    <GradientStop colorValue="00FFB020" position="0"/>
+                    <GradientStop colorValue="FFFFB020" position="1"/>
+                </LinearGradient>
+            </Fill>
+        </LayoutComponent>
+
+        <LayoutComponent styleId="3:31" name="Root" id="3:30">
+            <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill"
+                                  flexDirectionValue="column"
+                                  paddingLeft="56" paddingLeftUnitsValue="points"
+                                  paddingRight="56" paddingRightUnitsValue="points"
+                                  paddingTop="36" paddingTopUnitsValue="points"
+                                  paddingBottom="32" paddingBottomUnitsValue="points"
+                                  name="Root Style" id="3:31"/>
+
+            <LayoutComponent height="72" styleId="3:101" name="Top Bar" id="3:100">
+                <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed"
+                                      flexDirectionValue="row" layoutAlignmentType="spaceBetweenCenter"
+                                      name="S" id="3:101"/>
+
+                <LayoutComponent width="240" height="72" styleId="3:111" name="Clock" id="3:110">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:111"/>
+                    <Text sizingValue="fixed" width="240" height="72" alignValue="left" verticalAlignValue="middle"
+                          wrapValue="noWrap" name="Clock Text" id="3:112">
+                        <TextStylePaint fontSize="54" fontAssetId="2:901" name="Time" id="3:113">
+                            <Fill name="F"><SolidColor colorValue="FFF2F4F7" name="C"/></Fill>
+                            <TextStyleFeature tag="1953396077" featureValue="1" name="tnum"/>
+                        </TextStylePaint>
+                        <TextValueRun styleId="3:113" text="07" name="Hours">
+                            <DataBindContext sourcePathIds="1:1-1:36" propertyKey="268" converterId="2:28"/>
+                        </TextValueRun>
+                        <TextValueRun styleId="3:113" text=":" name="Colon"/>
+                        <TextValueRun styleId="3:113" text="25" name="Minutes">
+                            <DataBindContext sourcePathIds="1:1-1:36" propertyKey="268" converterId="2:30"/>
+                        </TextValueRun>
+                    </Text>
+                </LayoutComponent>
+
+                <LayoutComponent styleId="3:121" name="Warnings" id="3:120">
+                    <LayoutComponentStyle layoutWidthScaleType="hug" layoutHeightScaleType="hug"
+                                          flexDirectionValue="row" layoutAlignmentType="center"
+                                          gapHorizontal="16" gapHorizontalUnitsValue="points"
+                                          name="S" id="3:121"/>
+
+                    <LayoutComponent width="230" height="56" styleId="3:131" name="Door Chip" id="3:130">
+                        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                              cornerRadiusTL="28" cornerRadiusTR="28" cornerRadiusBL="28" cornerRadiusBR="28"
+                                              name="S" id="3:131">
+                            <DataBindContext sourcePathIds="1:1-1:15" propertyKey="596" converterId="2:7"/>
+                        </LayoutComponentStyle>
+                        <Fill name="F"><SolidColor colorValue="FF33270A" name="C"/></Fill>
+                        <Text sizingValue="fixed" width="230" height="56" alignValue="center" verticalAlignValue="middle"
+                              wrapValue="noWrap" name="Door Text" id="3:132">
+                            <TextStylePaint fontSize="24" letterSpacing="1.5" fontAssetId="2:901" name="S" id="3:133">
+                                <Fill name="F"><SolidColor colorValue="FFFFB020" name="C"/></Fill>
+                            </TextStylePaint>
+                            <TextValueRun styleId="3:133" text="DOOR OPEN" name="Run"/>
+                        </Text>
+                    </LayoutComponent>
+
+                    <LayoutComponent width="300" height="56" styleId="3:136" name="Seatbelt Chip" id="3:135">
+                        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                              cornerRadiusTL="28" cornerRadiusTR="28" cornerRadiusBL="28" cornerRadiusBR="28"
+                                              name="S" id="3:136">
+                            <DataBindContext sourcePathIds="1:1-1:16" propertyKey="596" converterId="2:5"/>
+                        </LayoutComponentStyle>
+                        <Fill name="F"><SolidColor colorValue="FF3A1210" name="C"/></Fill>
+                        <Text sizingValue="fixed" width="300" height="56" alignValue="center" verticalAlignValue="middle"
+                              wrapValue="noWrap" name="Seatbelt Text" id="3:137">
+                            <TextStylePaint fontSize="24" letterSpacing="1.5" fontAssetId="2:901" name="S" id="3:138">
+                                <Fill name="F"><SolidColor colorValue="FFFF453A" name="C"/></Fill>
+                            </TextStylePaint>
+                            <TextValueRun styleId="3:138" text="FASTEN SEATBELT" name="Run"/>
+                        </Text>
+                    </LayoutComponent>
+
+                    <LayoutComponent width="300" height="56" styleId="3:151" name="Camera Chip" id="3:150">
+                        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                              cornerRadiusTL="28" cornerRadiusTR="28" cornerRadiusBL="28" cornerRadiusBR="28"
+                                              name="S" id="3:151">
+                            <DataBindContext sourcePathIds="1:1-1:40" propertyKey="596" converterId="2:7"/>
+                        </LayoutComponentStyle>
+                        <Fill name="F"><SolidColor colorValue="FF33270A" name="C"/></Fill>
+                        <Text sizingValue="fixed" width="300" height="56" alignValue="center" verticalAlignValue="middle"
+                              wrapValue="noWrap" name="Camera Text" id="3:152">
+                            <TextStylePaint fontSize="24" letterSpacing="1.5" fontAssetId="2:901" name="Label" id="3:153">
+                                <Fill name="F"><SolidColor colorValue="FFFFB020" name="C"/></Fill>
+                            </TextStylePaint>
+                            <TextStylePaint fontSize="26" fontAssetId="2:901" name="Value" id="3:154">
+                                <Fill name="F"><SolidColor colorValue="FFF2F4F7" name="C"/></Fill>
+                            </TextStylePaint>
+                            <TextValueRun styleId="3:153" text="CAMERA  " name="Label"/>
+                            <TextValueRun styleId="3:154" text="350" name="Distance">
+                                <DataBindContext sourcePathIds="1:1-1:40" propertyKey="268" converterId="2:1"/>
+                            </TextValueRun>
+                            <TextValueRun styleId="3:154" text=" m" name="Unit"/>
+                        </Text>
+                    </LayoutComponent>
+                </LayoutComponent>
+
+                <LayoutComponent width="240" height="72" styleId="3:161" name="Phone Battery" id="3:160">
+                    <DataBindContext sourcePathIds="1:1-1:57" propertyKey="18" converterId="2:41"/>
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:161"/>
+                    <LayoutComponent width="240" height="72" styleId="3:163" name="Phone Battery Known" id="3:162">
+                        <DataBindContext sourcePathIds="1:1-1:37" propertyKey="18" converterId="2:32"/>
+                        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                              flexDirectionValue="row" layoutAlignmentType="centerRight"
+                                              gapHorizontal="14" gapHorizontalUnitsValue="points"
+                                              name="S" id="3:163"/>
+                        <LayoutComponent width="110" height="72" styleId="3:165" name="Phone Percent" id="3:164">
+                            <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:165"/>
+                            <Text sizingValue="fixed" width="110" height="72" alignValue="right" verticalAlignValue="middle"
+                                  wrapValue="noWrap" name="Phone Text" id="3:166">
+                                <TextStylePaint fontSize="30" fontAssetId="2:901" name="Value" id="3:167">
+                                    <Fill name="F"><SolidColor colorValue="FFF2F4F7" name="C"/></Fill>
+                                </TextStylePaint>
+                                <TextStylePaint fontSize="22" fontAssetId="2:900" name="Unit" id="3:168">
+                                    <Fill name="F"><SolidColor colorValue="FF8B919A" name="C"/></Fill>
+                                </TextStylePaint>
+                                <TextValueRun styleId="3:167" text="82" name="Value">
+                                    <DataBindContext sourcePathIds="1:1-1:37" propertyKey="268" converterId="2:1"/>
+                                </TextValueRun>
+                                <TextValueRun styleId="3:168" text="%" name="Unit"/>
+                            </Text>
+                        </LayoutComponent>
+                        <LayoutComponent width="52" height="28" styleId="3:171" name="Phone Icon" id="3:170">
+                            <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:171"/>
+                            <Node x="24" y="14" name="Art">
+                                <Shape x="-17" name="Level">
+                                    <Rectangle width="28" height="15" originX="0" originY="0.5"
+                                               cornerRadiusTL="2.5" name="P">
+                                        <DataBindContext sourcePathIds="1:1-1:37" propertyKey="20" converterId="2:31"/>
+                                    </Rectangle>
+                                    <Fill name="F"><SolidColor colorValue="FFF2F4F7" name="C"/></Fill>
+                                </Shape>
+                                <Shape name="Case">
+                                    <Rectangle width="44" height="25" originX="0.5" originY="0.5" cornerRadiusTL="6" name="P"/>
+                                    <Stroke thickness="2.5" name="S"><SolidColor colorValue="FF8B919A" name="C"/></Stroke>
+                                </Shape>
+                                <Shape x="25" name="Nub">
+                                    <Rectangle width="3" height="9" originX="0" originY="0.5" cornerRadiusTL="1.5" name="P"/>
+                                    <Fill name="F"><SolidColor colorValue="FF8B919A" name="C"/></Fill>
+                                </Shape>
+                            </Node>
+                        </LayoutComponent>
+                    </LayoutComponent>
+                </LayoutComponent>
+            </LayoutComponent>
+
+            <LayoutComponent styleId="3:191" name="Main" id="3:190">
+                <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill"
+                                      flexBasis="0" flexBasisUnitsValue="points"
+                                      flexDirectionValue="row" layoutAlignmentType="center"
+                                      name="S" id="3:191"/>
+
+                <LayoutComponent styleId="3:201" name="Left Panel" id="3:200">
+                    <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill"
+                                          flexBasis="0" flexBasisUnitsValue="points"
+                                          flexDirectionValue="column" layoutAlignmentType="topCenter"
+                                          gapVertical="36" gapVerticalUnitsValue="points"
+                                          paddingTop="20" paddingTopUnitsValue="points"
+                                          name="S" id="3:201"/>
+
+                    <LayoutComponent width="120" height="96" styleId="3:211" name="Blinker Left" id="3:210">
+                        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:211"/>
+                        <Node x="60" y="48" name="Art">
+                            <Shape name="Lit">
+                                <DataBindContext sourcePathIds="1:1-1:13" propertyKey="18" converterId="2:6"/>
+                                <PointsPath isClosed="true" name="Arrow">
+                                    <StraightVertex x="-52" y="0" radius="4"/>
+                                    <StraightVertex x="-4" y="-44" radius="4"/>
+                                    <StraightVertex x="-4" y="-18" radius="2"/>
+                                    <StraightVertex x="52" y="-18" radius="6"/>
+                                    <StraightVertex x="52" y="18" radius="6"/>
+                                    <StraightVertex x="-4" y="18" radius="2"/>
+                                    <StraightVertex x="-4" y="44" radius="4"/>
+                                </PointsPath>
+                                <Fill name="F"><SolidColor colorValue="FF30D158" name="C"/></Fill>
+                            </Shape>
+                            <Shape name="Dim">
+                                <PointsPath isClosed="true" name="Arrow">
+                                    <StraightVertex x="-52" y="0" radius="4"/>
+                                    <StraightVertex x="-4" y="-44" radius="4"/>
+                                    <StraightVertex x="-4" y="-18" radius="2"/>
+                                    <StraightVertex x="52" y="-18" radius="6"/>
+                                    <StraightVertex x="52" y="18" radius="6"/>
+                                    <StraightVertex x="-4" y="18" radius="2"/>
+                                    <StraightVertex x="-4" y="44" radius="4"/>
+                                </PointsPath>
+                                <Fill name="F"><SolidColor colorValue="FF17191D" name="C"/></Fill>
+                            </Shape>
+                        </Node>
+                    </LayoutComponent>
+
+                    <LayoutComponent width="170" height="170" styleId="3:221" name="Speed Limit" id="3:220">
+                        <DataBindContext sourcePathIds="1:1-1:19" propertyKey="18" converterId="2:5"/>
+                        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:221"/>
+
+                        <LayoutComponent width="170" height="170" styleId="3:223" name="Limit Metric" id="3:222">
+                            <DataBindContext sourcePathIds="1:1-1:55" propertyKey="18" converterId="2:43"/>
+                            <LayoutComponentStyle positionTypeValue="absolute" layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                                  positionLeft="0" positionLeftUnitsValue="points"
+                                                  positionTop="0" positionTopUnitsValue="points"
+                                                  name="S" id="3:223"/>
+                            <Text sizingValue="fixed" width="170" height="170" alignValue="center" verticalAlignValue="middle"
+                                  wrapValue="noWrap" name="Limit Text" id="3:224">
+                                <TextStylePaint fontSize="62" letterSpacing="-2" fontAssetId="2:901" name="S" id="3:225">
+                                    <Fill name="F"><SolidColor colorValue="FF111111" name="C"/></Fill>
+                                </TextStylePaint>
+                                <TextValueRun styleId="3:225" text="80" name="Run">
+                                    <DataBindContext sourcePathIds="1:1-1:19" propertyKey="268" converterId="2:1"/>
+                                </TextValueRun>
+                            </Text>
+                            <Node x="85" y="85" name="Art">
+                                <Shape name="Sign">
+                                    <Ellipse width="150" height="150" name="P"/>
+                                    <Fill name="F"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                                    <Stroke thickness="16" name="S"><SolidColor colorValue="FFE5251B" name="C"/></Stroke>
+                                </Shape>
+                            </Node>
+                        </LayoutComponent>
+
+                        <LayoutComponent opacity="0" width="170" height="170" styleId="3:231" name="Limit Imperial" id="3:230">
+                            <DataBindContext sourcePathIds="1:1-1:55" propertyKey="18" converterId="2:41"/>
+                            <LayoutComponentStyle positionTypeValue="absolute" layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                                  positionLeft="0" positionLeftUnitsValue="points"
+                                                  positionTop="0" positionTopUnitsValue="points"
+                                                  flexDirectionValue="column" layoutAlignmentType="topCenter"
+                                                  paddingTop="14" paddingTopUnitsValue="points"
+                                                  name="S" id="3:231"/>
+                            <LayoutComponent width="130" height="26" styleId="3:233" name="Caption Speed" id="3:232">
+                                <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:233"/>
+                                <Text sizingValue="fixed" width="130" height="26" alignValue="center" verticalAlignValue="middle"
+                                      wrapValue="noWrap" name="Caption Text" id="3:234">
+                                    <TextStylePaint fontSize="21" fontAssetId="2:901" name="S" id="3:235">
+                                        <Fill name="F"><SolidColor colorValue="FF111111" name="C"/></Fill>
+                                    </TextStylePaint>
+                                    <TextValueRun styleId="3:235" text="SPEED" name="Run"/>
+                                </Text>
+                            </LayoutComponent>
+                            <LayoutComponent width="130" height="26" styleId="3:227" name="Caption Limit" id="3:226">
+                                <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:227"/>
+                                <Text sizingValue="fixed" width="130" height="26" alignValue="center" verticalAlignValue="middle"
+                                      wrapValue="noWrap" name="Caption Text" id="3:228">
+                                    <TextStylePaint fontSize="21" fontAssetId="2:901" name="S" id="3:229">
+                                        <Fill name="F"><SolidColor colorValue="FF111111" name="C"/></Fill>
+                                    </TextStylePaint>
+                                    <TextValueRun styleId="3:229" text="LIMIT" name="Run"/>
+                                </Text>
+                            </LayoutComponent>
+                            <LayoutComponent width="130" height="82" styleId="3:237" name="Value" id="3:236">
+                                <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:237"/>
+                                <Text sizingValue="fixed" width="130" height="82" alignValue="center" verticalAlignValue="middle"
+                                      wrapValue="noWrap" name="Limit Text" id="3:238">
+                                    <TextStylePaint fontSize="64" letterSpacing="-2" fontAssetId="2:901" name="S" id="3:239">
+                                        <Fill name="F"><SolidColor colorValue="FF111111" name="C"/></Fill>
+                                    </TextStylePaint>
+                                    <TextValueRun styleId="3:239" text="50" name="Run">
+                                        <DataBindContext sourcePathIds="1:1-1:19" propertyKey="268" converterId="2:1"/>
+                                    </TextValueRun>
+                                </Text>
+                            </LayoutComponent>
+                            <Node x="85" y="85" name="Art">
+                                <Shape name="Inner">
+                                    <Rectangle width="118" height="154" originX="0.5" originY="0.5" cornerRadiusTL="9" name="P"/>
+                                    <Stroke thickness="3.5" name="S"><SolidColor colorValue="FF111111" name="C"/></Stroke>
+                                </Shape>
+                                <Shape name="Sign">
+                                    <Rectangle width="130" height="166" originX="0.5" originY="0.5" cornerRadiusTL="14" name="P"/>
+                                    <Fill name="F"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                                </Shape>
+                            </Node>
+                        </LayoutComponent>
+                    </LayoutComponent>
+
+                    <LayoutComponent width="220" height="128" styleId="3:241" name="Traffic Light" id="3:240">
+                        <DataBindContext sourcePathIds="1:1-1:24" propertyKey="18" converterId="2:5"/>
+                        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                              flexDirectionValue="column" layoutAlignmentType="topCenter"
+                                              gapVertical="8" gapVerticalUnitsValue="points"
+                                              name="S" id="3:241"/>
+                        <LayoutComponent width="200" height="72" styleId="3:243" name="Housing" id="3:242">
+                            <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                                  cornerRadiusTL="36" cornerRadiusTR="36" cornerRadiusBL="36" cornerRadiusBR="36"
+                                                  name="S" id="3:243"/>
+                            <Fill name="F"><SolidColor colorValue="FF14161A" name="C"/></Fill>
+                            <Node x="0" y="36" name="Lamps">
+                                <Shape x="40" name="Red Lit">
+                                    <DataBindContext sourcePathIds="1:1-1:24" propertyKey="18" converterId="2:11"/>
+                                    <Ellipse width="48" height="48" name="P"/>
+                                    <Fill name="F"><SolidColor colorValue="FFFF453A" name="C"/></Fill>
+                                </Shape>
+                                <Shape x="100" name="Yellow Lit">
+                                    <DataBindContext sourcePathIds="1:1-1:24" propertyKey="18" converterId="2:13"/>
+                                    <Ellipse width="48" height="48" name="P"/>
+                                    <Fill name="F"><SolidColor colorValue="FFFFB020" name="C"/></Fill>
+                                </Shape>
+                                <Shape x="160" name="Green Lit">
+                                    <DataBindContext sourcePathIds="1:1-1:24" propertyKey="18" converterId="2:12"/>
+                                    <Ellipse width="48" height="48" name="P"/>
+                                    <Fill name="F"><SolidColor colorValue="FF30D158" name="C"/></Fill>
+                                </Shape>
+                                <Shape name="Off">
+                                    <Ellipse x="40" width="48" height="48" name="P"/>
+                                    <Ellipse x="100" width="48" height="48" name="P"/>
+                                    <Ellipse x="160" width="48" height="48" name="P"/>
+                                    <Fill name="F"><SolidColor colorValue="FF262A31" name="C"/></Fill>
+                                </Shape>
+                            </Node>
+                        </LayoutComponent>
+                        <LayoutComponent width="220" height="48" styleId="3:251" name="Stop Line" id="3:250">
+                            <DataBindContext sourcePathIds="1:1-1:25" propertyKey="18" converterId="2:5"/>
+                            <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:251"/>
+                            <Text sizingValue="fixed" width="220" height="48" alignValue="center" verticalAlignValue="middle"
+                                  wrapValue="noWrap" name="Stop Line Text" id="3:252">
+                                <TextStylePaint fontSize="36" fontAssetId="2:901" name="Value" id="3:253">
+                                    <Fill name="F"><SolidColor colorValue="FFF2F4F7" name="C"/></Fill>
+                                </TextStylePaint>
+                                <TextStylePaint fontSize="26" fontAssetId="2:900" name="Unit" id="3:254">
+                                    <Fill name="F"><SolidColor colorValue="FF8B919A" name="C"/></Fill>
+                                </TextStylePaint>
+                                <TextValueRun styleId="3:253" text="30" name="Value">
+                                    <DataBindContext sourcePathIds="1:1-1:25" propertyKey="268" converterId="2:1"/>
+                                </TextValueRun>
+                                <TextValueRun styleId="3:254" text=" m" name="Unit"/>
+                            </Text>
+                        </LayoutComponent>
+                    </LayoutComponent>
+
+                    <LayoutComponent width="130" height="130" styleId="3:261" name="Steering Wheel" id="3:260">
+                        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:261"/>
+                        <Node x="65" y="65" name="Wheel" id="3:262">
+                            <DataBindContext sourcePathIds="1:1-1:12" propertyKey="15" converterId="2:15"/>
+                            <Node name="Lit Assist">
+                                <DataBindContext sourcePathIds="1:1-1:50" propertyKey="18" converterId="2:41"/>
+                                <Shape name="Rim">
+                                    <Ellipse width="106" height="106" name="P"/>
+                                    <Stroke thickness="11" name="S"><SolidColor colorValue="FF3D8BFF" name="C"/></Stroke>
+                                </Shape>
+                                <Shape name="Spokes">
+                                    <Rectangle width="100" height="11" originX="0.5" originY="0.5" name="Bar"/>
+                                    <Rectangle y="26" width="11" height="50" originX="0.5" originY="0.5" name="Stem"/>
+                                    <Ellipse width="28" height="28" name="Hub"/>
+                                    <Fill name="F"><SolidColor colorValue="FF3D8BFF" name="C"/></Fill>
+                                </Shape>
+                            </Node>
+                            <Node name="Lit Selfdrive">
+                                <DataBindContext sourcePathIds="1:1-1:54" propertyKey="18" converterId="2:41"/>
+                                <Shape name="Rim">
+                                    <Ellipse width="106" height="106" name="P"/>
+                                    <Stroke thickness="11" name="S"><SolidColor colorValue="FF3D8BFF" name="C"/></Stroke>
+                                </Shape>
+                                <Shape name="Spokes">
+                                    <Rectangle width="100" height="11" originX="0.5" originY="0.5" name="Bar"/>
+                                    <Rectangle y="26" width="11" height="50" originX="0.5" originY="0.5" name="Stem"/>
+                                    <Ellipse width="28" height="28" name="Hub"/>
+                                    <Fill name="F"><SolidColor colorValue="FF3D8BFF" name="C"/></Fill>
+                                </Shape>
+                            </Node>
+                            <Node name="Lit MADS">
+                                <DataBindContext sourcePathIds="1:1-1:52" propertyKey="18" converterId="2:41"/>
+                                <Shape name="Rim">
+                                    <Ellipse width="106" height="106" name="P"/>
+                                    <Stroke thickness="11" name="S"><SolidColor colorValue="FF3D8BFF" name="C"/></Stroke>
+                                </Shape>
+                                <Shape name="Spokes">
+                                    <Rectangle width="100" height="11" originX="0.5" originY="0.5" name="Bar"/>
+                                    <Rectangle y="26" width="11" height="50" originX="0.5" originY="0.5" name="Stem"/>
+                                    <Ellipse width="28" height="28" name="Hub"/>
+                                    <Fill name="F"><SolidColor colorValue="FF3D8BFF" name="C"/></Fill>
+                                </Shape>
+                            </Node>
+                            <Shape name="Rim">
+                                <Ellipse width="106" height="106" name="P"/>
+                                <Stroke thickness="11" name="S"><SolidColor colorValue="FF4A5059" name="C"/></Stroke>
+                            </Shape>
+                            <Shape name="Spokes">
+                                <Rectangle width="100" height="11" originX="0.5" originY="0.5" name="Bar"/>
+                                <Rectangle y="26" width="11" height="50" originX="0.5" originY="0.5" name="Stem"/>
+                                <Ellipse width="28" height="28" name="Hub"/>
+                                <Fill name="F"><SolidColor colorValue="FF4A5059" name="C"/></Fill>
+                            </Shape>
+                        </Node>
+                    </LayoutComponent>
+                </LayoutComponent>
+
+                <LayoutComponent width="760" styleId="3:301" name="Center" id="3:300">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fill"
+                                          flexDirectionValue="column" layoutAlignmentType="center"
+                                          name="S" id="3:301"/>
+                    <LayoutComponent width="720" height="720" styleId="3:311" name="Gauge" id="3:310">
+                        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:311"/>
+                        <LayoutComponent width="220" height="64" styleId="3:331" name="Set Speed" id="3:330">
+                            <DataBindContext sourcePathIds="1:1-1:18" propertyKey="18" converterId="2:5"/>
+                            <LayoutComponentStyle positionTypeValue="absolute" layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                                  positionLeft="250" positionLeftUnitsValue="points"
+                                                  positionTop="150" positionTopUnitsValue="points"
+                                                  cornerRadiusTL="32" cornerRadiusTR="32" cornerRadiusBL="32" cornerRadiusBR="32"
+                                                  name="S" id="3:331"/>
+                            <Fill name="F"><SolidColor colorValue="FF262A31" name="C"/></Fill>
+                            <Text sizingValue="fixed" width="220" height="64" alignValue="center" verticalAlignValue="middle"
+                                  wrapValue="noWrap" name="Set Speed Text" id="3:333">
+                                <TextStylePaint fontSize="22" letterSpacing="2" fontAssetId="2:901" name="Label" id="3:334">
+                                    <Fill name="F"><SolidColor colorValue="B3FFFFFF" name="C"/></Fill>
+                                </TextStylePaint>
+                                <TextStylePaint fontSize="36" fontAssetId="2:901" name="Value" id="3:335">
+                                    <Fill name="F"><SolidColor colorValue="FFFFFFFF" name="C"/></Fill>
+                                </TextStylePaint>
+                                <TextValueRun styleId="3:334" text="SET  " name="Label"/>
+                                <TextValueRun styleId="3:335" text="75" name="Value">
+                                    <DataBindContext sourcePathIds="1:1-1:18" propertyKey="268" converterId="2:1"/>
+                                </TextValueRun>
+                            </Text>
+                            <LayoutComponent width="220" height="64" styleId="3:337" name="Cruise On" id="3:336">
+                                <DataBindContext sourcePathIds="1:1-1:50" propertyKey="18" converterId="2:41"/>
+                                <LayoutComponentStyle positionTypeValue="absolute" layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                                      positionLeft="0" positionLeftUnitsValue="points"
+                                                      positionTop="0" positionTopUnitsValue="points"
+                                                      cornerRadiusTL="32" cornerRadiusTR="32" cornerRadiusBL="32" cornerRadiusBR="32"
+                                                      name="S" id="3:337"/>
+                                <Fill name="F"><SolidColor colorValue="FF3D8BFF" name="C"/></Fill>
+                            </LayoutComponent>
+                        </LayoutComponent>
+
+                        <LayoutComponent width="640" height="250" styleId="3:341" name="Speed Over Limit" id="3:340">
+                            <DataBindContext sourcePathIds="1:1-1:10" propertyKey="18" converterId="2:4"/>
+                            <LayoutComponentStyle positionTypeValue="absolute" layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                                  positionLeft="40" positionLeftUnitsValue="points"
+                                                  positionTop="236" positionTopUnitsValue="points"
+                                                  name="S" id="3:341"/>
+                            <Text sizingValue="fixed" width="640" height="250" alignValue="center" verticalAlignValue="middle"
+                                  wrapValue="noWrap" name="Speed Text" id="3:342">
+                                <TextStylePaint fontSize="236" letterSpacing="-6" fontAssetId="2:901" name="S" id="3:343">
+                                    <Fill name="F"><SolidColor colorValue="FFFF453A" name="C"/></Fill>
+                                    <TextStyleFeature tag="1953396077" featureValue="1" name="tnum"/>
+                                </TextStylePaint>
+                                <TextValueRun styleId="3:343" text="72" name="Run">
+                                    <DataBindContext sourcePathIds="1:1-1:10" propertyKey="268" converterId="2:1"/>
+                                </TextValueRun>
+                            </Text>
+                        </LayoutComponent>
+                        <LayoutComponent width="640" height="250" styleId="3:345" name="Speed" id="3:344">
+                            <LayoutComponentStyle positionTypeValue="absolute" layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                                  positionLeft="40" positionLeftUnitsValue="points"
+                                                  positionTop="236" positionTopUnitsValue="points"
+                                                  name="S" id="3:345"/>
+                            <Text sizingValue="fixed" width="640" height="250" alignValue="center" verticalAlignValue="middle"
+                                  wrapValue="noWrap" name="Speed Text" id="3:346">
+                                <TextStylePaint fontSize="236" letterSpacing="-6" fontAssetId="2:901" name="S" id="3:347">
+                                    <Fill name="F"><SolidColor colorValue="FFF2F4F7" name="C"/></Fill>
+                                    <TextStyleFeature tag="1953396077" featureValue="1" name="tnum"/>
+                                </TextStylePaint>
+                                <TextValueRun styleId="3:347" text="72" name="Run">
+                                    <DataBindContext sourcePathIds="1:1-1:10" propertyKey="268" converterId="2:1"/>
+                                </TextValueRun>
+                            </Text>
+                        </LayoutComponent>
+
+                        <LayoutComponent width="400" height="52" styleId="3:351" name="Speed Unit" id="3:350">
+                            <LayoutComponentStyle positionTypeValue="absolute" layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                                  positionLeft="160" positionLeftUnitsValue="points"
+                                                  positionTop="478" positionTopUnitsValue="points"
+                                                  name="S" id="3:351"/>
+                            <Text sizingValue="fixed" width="400" height="52" alignValue="center" verticalAlignValue="middle"
+                                  wrapValue="noWrap" name="Unit Metric" id="3:352">
+                                <DataBindContext sourcePathIds="1:1-1:55" propertyKey="18" converterId="2:43"/>
+                                <TextStylePaint fontSize="36" letterSpacing="1" fontAssetId="2:900" name="S" id="3:353">
+                                    <Fill name="F"><SolidColor colorValue="FF8B919A" name="C"/></Fill>
+                                </TextStylePaint>
+                                <TextValueRun styleId="3:353" text="km/h" name="Run"/>
+                            </Text>
+                            <Text sizingValue="fixed" width="400" height="52" alignValue="center" verticalAlignValue="middle"
+                                  wrapValue="noWrap" name="Unit Imperial" id="3:355">
+                                <DataBindContext sourcePathIds="1:1-1:55" propertyKey="18" converterId="2:41"/>
+                                <TextStylePaint fontSize="36" letterSpacing="1" fontAssetId="2:900" name="S" id="3:356">
+                                    <Fill name="F"><SolidColor colorValue="FF8B919A" name="C"/></Fill>
+                                </TextStylePaint>
+                                <TextValueRun styleId="3:356" text="mph" name="Run"/>
+                            </Text>
+                        </LayoutComponent>
+
+                        <LayoutComponent width="316" height="64" styleId="3:361" name="Gears" id="3:360">
+                            <LayoutComponentStyle positionTypeValue="absolute" layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                                  positionLeft="202" positionLeftUnitsValue="points"
+                                                  positionTop="610" positionTopUnitsValue="points"
+                                                  flexDirectionValue="row" layoutAlignmentType="center"
+                                                  gapHorizontal="20" gapHorizontalUnitsValue="points"
+                                                  name="S" id="3:361"/>
+
+                            <LayoutComponent width="64" height="64" styleId="3:363" name="Gear P" id="3:362">
+                                <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:363"/>
+                                <LayoutComponent width="64" height="64" styleId="3:365" name="Active" id="3:364">
+                                    <DataBindContext sourcePathIds="1:1-1:11" propertyKey="18" converterId="2:11"/>
+                                    <LayoutComponentStyle positionTypeValue="absolute" layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                                          positionLeft="0" positionLeftUnitsValue="points"
+                                                          positionTop="0" positionTopUnitsValue="points"
+                                                          cornerRadiusTL="18" cornerRadiusTR="18" cornerRadiusBL="18" cornerRadiusBR="18"
+                                                          name="S" id="3:365"/>
+                                    <Fill name="F"><SolidColor colorValue="FFF2F4F7" name="C"/></Fill>
+                                    <Text sizingValue="fixed" width="64" height="64" alignValue="center" verticalAlignValue="middle"
+                                          wrapValue="noWrap" name="Letter" id="3:366">
+                                        <TextStylePaint fontSize="38" fontAssetId="2:901" name="S" id="3:367">
+                                            <Fill name="F"><SolidColor colorValue="FF000000" name="C"/></Fill>
+                                        </TextStylePaint>
+                                        <TextValueRun styleId="3:367" text="P" name="Run"/>
+                                    </Text>
+                                </LayoutComponent>
+                                <Text sizingValue="fixed" width="64" height="64" alignValue="center" verticalAlignValue="middle"
+                                      wrapValue="noWrap" name="Letter" id="3:368">
+                                    <TextStylePaint fontSize="38" fontAssetId="2:901" name="S" id="3:369">
+                                        <Fill name="F"><SolidColor colorValue="FF4A5059" name="C"/></Fill>
+                                    </TextStylePaint>
+                                    <TextValueRun styleId="3:369" text="P" name="Run"/>
+                                </Text>
+                            </LayoutComponent>
+
+                            <LayoutComponent width="64" height="64" styleId="3:371" name="Gear R" id="3:370">
+                                <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:371"/>
+                                <LayoutComponent width="64" height="64" styleId="3:373" name="Active" id="3:372">
+                                    <DataBindContext sourcePathIds="1:1-1:11" propertyKey="18" converterId="2:12"/>
+                                    <LayoutComponentStyle positionTypeValue="absolute" layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                                          positionLeft="0" positionLeftUnitsValue="points"
+                                                          positionTop="0" positionTopUnitsValue="points"
+                                                          cornerRadiusTL="18" cornerRadiusTR="18" cornerRadiusBL="18" cornerRadiusBR="18"
+                                                          name="S" id="3:373"/>
+                                    <Fill name="F"><SolidColor colorValue="FFF2F4F7" name="C"/></Fill>
+                                    <Text sizingValue="fixed" width="64" height="64" alignValue="center" verticalAlignValue="middle"
+                                          wrapValue="noWrap" name="Letter" id="3:374">
+                                        <TextStylePaint fontSize="38" fontAssetId="2:901" name="S" id="3:375">
+                                            <Fill name="F"><SolidColor colorValue="FF000000" name="C"/></Fill>
+                                        </TextStylePaint>
+                                        <TextValueRun styleId="3:375" text="R" name="Run"/>
+                                    </Text>
+                                </LayoutComponent>
+                                <Text sizingValue="fixed" width="64" height="64" alignValue="center" verticalAlignValue="middle"
+                                      wrapValue="noWrap" name="Letter" id="3:376">
+                                    <TextStylePaint fontSize="38" fontAssetId="2:901" name="S" id="3:377">
+                                        <Fill name="F"><SolidColor colorValue="FF4A5059" name="C"/></Fill>
+                                    </TextStylePaint>
+                                    <TextValueRun styleId="3:377" text="R" name="Run"/>
+                                </Text>
+                            </LayoutComponent>
+
+                            <LayoutComponent width="64" height="64" styleId="3:381" name="Gear N" id="3:380">
+                                <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:381"/>
+                                <LayoutComponent width="64" height="64" styleId="3:383" name="Active" id="3:382">
+                                    <DataBindContext sourcePathIds="1:1-1:11" propertyKey="18" converterId="2:13"/>
+                                    <LayoutComponentStyle positionTypeValue="absolute" layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                                          positionLeft="0" positionLeftUnitsValue="points"
+                                                          positionTop="0" positionTopUnitsValue="points"
+                                                          cornerRadiusTL="18" cornerRadiusTR="18" cornerRadiusBL="18" cornerRadiusBR="18"
+                                                          name="S" id="3:383"/>
+                                    <Fill name="F"><SolidColor colorValue="FFF2F4F7" name="C"/></Fill>
+                                    <Text sizingValue="fixed" width="64" height="64" alignValue="center" verticalAlignValue="middle"
+                                          wrapValue="noWrap" name="Letter" id="3:384">
+                                        <TextStylePaint fontSize="38" fontAssetId="2:901" name="S" id="3:385">
+                                            <Fill name="F"><SolidColor colorValue="FF000000" name="C"/></Fill>
+                                        </TextStylePaint>
+                                        <TextValueRun styleId="3:385" text="N" name="Run"/>
+                                    </Text>
+                                </LayoutComponent>
+                                <Text sizingValue="fixed" width="64" height="64" alignValue="center" verticalAlignValue="middle"
+                                      wrapValue="noWrap" name="Letter" id="3:386">
+                                    <TextStylePaint fontSize="38" fontAssetId="2:901" name="S" id="3:387">
+                                        <Fill name="F"><SolidColor colorValue="FF4A5059" name="C"/></Fill>
+                                    </TextStylePaint>
+                                    <TextValueRun styleId="3:387" text="N" name="Run"/>
+                                </Text>
+                            </LayoutComponent>
+
+                            <LayoutComponent width="64" height="64" styleId="3:391" name="Gear D" id="3:390">
+                                <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:391"/>
+                                <LayoutComponent width="64" height="64" styleId="3:393" name="Active" id="3:392">
+                                    <DataBindContext sourcePathIds="1:1-1:11" propertyKey="18" converterId="2:14"/>
+                                    <LayoutComponentStyle positionTypeValue="absolute" layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                                          positionLeft="0" positionLeftUnitsValue="points"
+                                                          positionTop="0" positionTopUnitsValue="points"
+                                                          cornerRadiusTL="18" cornerRadiusTR="18" cornerRadiusBL="18" cornerRadiusBR="18"
+                                                          name="S" id="3:393"/>
+                                    <Fill name="F"><SolidColor colorValue="FFF2F4F7" name="C"/></Fill>
+                                    <Text sizingValue="fixed" width="64" height="64" alignValue="center" verticalAlignValue="middle"
+                                          wrapValue="noWrap" name="Letter" id="3:394">
+                                        <TextStylePaint fontSize="38" fontAssetId="2:901" name="S" id="3:395">
+                                            <Fill name="F"><SolidColor colorValue="FF000000" name="C"/></Fill>
+                                        </TextStylePaint>
+                                        <TextValueRun styleId="3:395" text="D" name="Run"/>
+                                    </Text>
+                                </LayoutComponent>
+                                <Text sizingValue="fixed" width="64" height="64" alignValue="center" verticalAlignValue="middle"
+                                      wrapValue="noWrap" name="Letter" id="3:396">
+                                    <TextStylePaint fontSize="38" fontAssetId="2:901" name="S" id="3:397">
+                                        <Fill name="F"><SolidColor colorValue="FF4A5059" name="C"/></Fill>
+                                    </TextStylePaint>
+                                    <TextValueRun styleId="3:397" text="D" name="Run"/>
+                                </Text>
+                            </LayoutComponent>
+                        </LayoutComponent>
+                        <Node x="360" y="360" name="Dial">
+                            <Node name="Set Speed Marker" id="3:320">
+                                <DataBindContext sourcePathIds="1:1-1:50" propertyKey="18" converterId="2:44"/>
+                                <DataBindContext sourcePathIds="1:1-1:18" propertyKey="15" converterId="2:3"/>
+                                <Shape y="-330" name="Dot">
+                                    <DataBindContext sourcePathIds="1:1-1:18" propertyKey="18" converterId="2:5"/>
+                                    <Ellipse width="30" height="30" name="P"/>
+                                    <Fill name="F"><SolidColor colorValue="FF000000" name="C"/></Fill>
+                                    <Stroke thickness="6" name="S"><SolidColor colorValue="FFF2F4F7" name="C"/></Stroke>
+                                </Shape>
+                            </Node>
+                            <!-- Ellipse paths start at 12 o'clock and run clockwise; rotating 225 deg starts the arc at 7:30. -->
+                            <Shape rotation="3.9269908" name="Over Limit Arc">
+                                <DataBindContext sourcePathIds="1:1-1:10" propertyKey="18" converterId="2:4"/>
+                                <Ellipse width="660" height="660" name="P"/>
+                                <Stroke thickness="18" cap="round" name="S">
+                                    <SolidColor colorValue="FFFF453A" name="C"/>
+                                    <TrimPath start="0" end="0.34" name="Trim">
+                                        <DataBindContext sourcePathIds="1:1-1:10" propertyKey="115" converterId="2:2"/>
+                                    </TrimPath>
+                                </Stroke>
+                            </Shape>
+                            <Shape rotation="3.9269908" name="Speed Arc Cruise">
+                                <DataBindContext sourcePathIds="1:1-1:50" propertyKey="18" converterId="2:41"/>
+                                <Ellipse width="660" height="660" name="P"/>
+                                <Stroke thickness="18" cap="round" name="S">
+                                    <SolidColor colorValue="FF3D8BFF" name="C"/>
+                                    <TrimPath start="0" end="0.34" name="Trim">
+                                        <DataBindContext sourcePathIds="1:1-1:10" propertyKey="115" converterId="2:2"/>
+                                    </TrimPath>
+                                </Stroke>
+                            </Shape>
+                            <Shape rotation="3.9269908" name="Speed Arc">
+                                <Ellipse width="660" height="660" name="P"/>
+                                <Stroke thickness="18" cap="round" name="S">
+                                    <SolidColor colorValue="FFE6E9EE" name="C"/>
+                                    <TrimPath start="0" end="0.34" name="Trim">
+                                        <DataBindContext sourcePathIds="1:1-1:10" propertyKey="115" converterId="2:2"/>
+                                    </TrimPath>
+                                </Stroke>
+                            </Shape>
+                            <Shape rotation="3.9269908" name="Track">
+                                <Ellipse width="660" height="660" name="P"/>
+                                <Stroke thickness="18" cap="round" name="S">
+                                    <SolidColor colorValue="FF1A1D22" name="C"/>
+                                    <TrimPath start="0" end="0.75" name="Trim"/>
+                                </Stroke>
+                            </Shape>
+                            <Shape name="Glow">
+                                <Ellipse width="720" height="720" name="P"/>
+                                <Fill name="F">
+                                    <RadialGradient startX="0" startY="0" endX="360" endY="0" name="G">
+                                        <GradientStop colorValue="FF0D1626" position="0"/>
+                                        <GradientStop colorValue="000D1626" position="1"/>
+                                    </RadialGradient>
+                                </Fill>
+                            </Shape>
+                        </Node>
+                    </LayoutComponent>
+                </LayoutComponent>
+
+                <LayoutComponent styleId="3:401" name="Right Panel" id="3:400">
+                    <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill"
+                                          flexBasis="0" flexBasisUnitsValue="points"
+                                          flexDirectionValue="column" layoutAlignmentType="topCenter"
+                                          gapVertical="36" gapVerticalUnitsValue="points"
+                                          paddingTop="20" paddingTopUnitsValue="points"
+                                          name="S" id="3:401"/>
+
+                    <LayoutComponent width="120" height="96" styleId="3:411" name="Blinker Right" id="3:410">
+                        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:411"/>
+                        <Node x="60" y="48" scaleX="-1" name="Art">
+                            <Shape name="Lit">
+                                <DataBindContext sourcePathIds="1:1-1:14" propertyKey="18" converterId="2:6"/>
+                                <PointsPath isClosed="true" name="Arrow">
+                                    <StraightVertex x="-52" y="0" radius="4"/>
+                                    <StraightVertex x="-4" y="-44" radius="4"/>
+                                    <StraightVertex x="-4" y="-18" radius="2"/>
+                                    <StraightVertex x="52" y="-18" radius="6"/>
+                                    <StraightVertex x="52" y="18" radius="6"/>
+                                    <StraightVertex x="-4" y="18" radius="2"/>
+                                    <StraightVertex x="-4" y="44" radius="4"/>
+                                </PointsPath>
+                                <Fill name="F"><SolidColor colorValue="FF30D158" name="C"/></Fill>
+                            </Shape>
+                            <Shape name="Dim">
+                                <PointsPath isClosed="true" name="Arrow">
+                                    <StraightVertex x="-52" y="0" radius="4"/>
+                                    <StraightVertex x="-4" y="-44" radius="4"/>
+                                    <StraightVertex x="-4" y="-18" radius="2"/>
+                                    <StraightVertex x="52" y="-18" radius="6"/>
+                                    <StraightVertex x="52" y="18" radius="6"/>
+                                    <StraightVertex x="-4" y="18" radius="2"/>
+                                    <StraightVertex x="-4" y="44" radius="4"/>
+                                </PointsPath>
+                                <Fill name="F"><SolidColor colorValue="FF17191D" name="C"/></Fill>
+                            </Shape>
+                        </Node>
+                    </LayoutComponent>
+
+                    <LayoutComponent width="300" height="150" styleId="3:421" name="Battery" id="3:420">
+                        <DataBindContext sourcePathIds="1:1-1:58" propertyKey="18" converterId="2:41"/>
+                        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                              flexDirectionValue="column" layoutAlignmentType="topCenter"
+                                              gapVertical="12" gapVerticalUnitsValue="points"
+                                              name="S" id="3:421"/>
+                        <LayoutComponent width="300" height="86" styleId="3:423" name="Percent" id="3:422">
+                            <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:423"/>
+                            <Text sizingValue="fixed" width="300" height="86" alignValue="center" verticalAlignValue="middle"
+                                  wrapValue="noWrap" name="Percent Text" id="3:424">
+                                <TextStylePaint fontSize="76" letterSpacing="-2" fontAssetId="2:901" name="Value" id="3:425">
+                                    <Fill name="F"><SolidColor colorValue="FFF2F4F7" name="C"/></Fill>
+                                    <TextStyleFeature tag="1953396077" featureValue="1" name="tnum"/>
+                                </TextStylePaint>
+                                <TextStylePaint fontSize="40" fontAssetId="2:900" name="Unit" id="3:426">
+                                    <Fill name="F"><SolidColor colorValue="FF8B919A" name="C"/></Fill>
+                                </TextStylePaint>
+                                <TextValueRun styleId="3:425" text="68" name="Value">
+                                    <DataBindContext sourcePathIds="1:1-1:26" propertyKey="268" converterId="2:17"/>
+                                </TextValueRun>
+                                <TextValueRun styleId="3:426" text="%" name="Unit"/>
+                            </Text>
+                        </LayoutComponent>
+                        <LayoutComponent width="300" height="18" clip="true" styleId="3:428" name="Charge Bar" id="3:427">
+                            <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" flexDirectionValue="row"
+                                                  cornerRadiusTL="9" cornerRadiusTR="9" cornerRadiusBL="9" cornerRadiusBR="9"
+                                                  name="S" id="3:428"/>
+                            <Fill name="F"><SolidColor colorValue="FF1A1D22" name="C"/></Fill>
+                            <LayoutComponent fractionalWidth="68" styleId="3:430" name="Charge" id="3:429">
+                                <DataBindContext sourcePathIds="1:1-1:26" propertyKey="706" converterId="2:16"/>
+                                <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill"
+                                                      flexBasis="0" flexBasisUnitsValue="points"
+                                                      cornerRadiusTL="9" cornerRadiusTR="9" cornerRadiusBL="9" cornerRadiusBR="9"
+                                                      name="S" id="3:430"/>
+                                <Fill name="F"><SolidColor colorValue="FF30D158" name="C"/></Fill>
+                            </LayoutComponent>
+                            <LayoutComponent fractionalWidth="32" styleId="3:432" name="Empty" id="3:431">
+                                <DataBindContext sourcePathIds="1:1-1:26" propertyKey="706" converterId="2:19"/>
+                                <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill"
+                                                      flexBasis="0" flexBasisUnitsValue="points" name="S" id="3:432"/>
+                            </LayoutComponent>
+                        </LayoutComponent>
+                        <LayoutComponent width="300" height="28" styleId="3:434" name="Label" id="3:433">
+                            <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:434"/>
+                            <Text sizingValue="fixed" width="300" height="28" alignValue="center" verticalAlignValue="middle"
+                                  wrapValue="noWrap" name="Label Text" id="3:435">
+                                <TextStylePaint fontSize="20" letterSpacing="3" fontAssetId="2:901" name="S" id="3:436">
+                                    <Fill name="F"><SolidColor colorValue="FF5E646D" name="C"/></Fill>
+                                </TextStylePaint>
+                                <TextValueRun styleId="3:436" text="BATTERY" name="Run"/>
+                            </Text>
+                        </LayoutComponent>
+                    </LayoutComponent>
+
+                    <LayoutComponent width="300" height="130" styleId="3:441" name="Power" id="3:440">
+                        <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                              flexDirectionValue="column" layoutAlignmentType="topCenter"
+                                              gapVertical="12" gapVerticalUnitsValue="points"
+                                              name="S" id="3:441"/>
+                        <LayoutComponent width="300" height="58" styleId="3:443" name="Kilowatts" id="3:442">
+                            <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:443"/>
+                            <Text sizingValue="fixed" width="300" height="58" alignValue="center" verticalAlignValue="middle"
+                                  wrapValue="noWrap" name="Kilowatts Text" id="3:444">
+                                <TextStylePaint fontSize="46" fontAssetId="2:901" name="Value" id="3:445">
+                                    <Fill name="F"><SolidColor colorValue="FFF2F4F7" name="C"/></Fill>
+                                    <TextStyleFeature tag="1953396077" featureValue="1" name="tnum"/>
+                                </TextStylePaint>
+                                <TextStylePaint fontSize="28" fontAssetId="2:900" name="Unit" id="3:446">
+                                    <Fill name="F"><SolidColor colorValue="FF8B919A" name="C"/></Fill>
+                                </TextStylePaint>
+                                <TextValueRun styleId="3:445" text="31" name="Value">
+                                    <DataBindContext sourcePathIds="1:1-1:31" propertyKey="268" converterId="2:25"/>
+                                </TextValueRun>
+                                <TextValueRun styleId="3:446" text=" kW" name="Unit"/>
+                            </Text>
+                        </LayoutComponent>
+                        <LayoutComponent width="300" height="14" clip="true" styleId="3:448" name="Power Bar" id="3:447">
+                            <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" flexDirectionValue="row"
+                                                  cornerRadiusTL="7" cornerRadiusTR="7" cornerRadiusBL="7" cornerRadiusBR="7"
+                                                  name="S" id="3:448"/>
+                            <Fill name="F"><SolidColor colorValue="FF1A1D22" name="C"/></Fill>
+                            <LayoutComponent styleId="3:450" name="Regen Half" id="3:449">
+                                <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill"
+                                                      flexBasis="0" flexBasisUnitsValue="points" flexDirectionValue="row"
+                                                      name="S" id="3:450"/>
+                                <LayoutComponent fractionalWidth="100" styleId="3:452" name="Rest" id="3:451">
+                                    <DataBindContext sourcePathIds="1:1-1:29" propertyKey="706" converterId="2:21"/>
+                                    <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill"
+                                                          flexBasis="0" flexBasisUnitsValue="points" name="S" id="3:452"/>
+                                </LayoutComponent>
+                                <LayoutComponent fractionalWidth="0" styleId="3:454" name="Regen" id="3:453">
+                                    <DataBindContext sourcePathIds="1:1-1:29" propertyKey="706" converterId="2:20"/>
+                                    <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill"
+                                                          flexBasis="0" flexBasisUnitsValue="points" name="S" id="3:454"/>
+                                    <Fill name="F"><SolidColor colorValue="FF30D158" name="C"/></Fill>
+                                </LayoutComponent>
+                            </LayoutComponent>
+                            <LayoutComponent width="4" styleId="3:456" name="Zero" id="3:455">
+                                <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fill" name="S" id="3:456"/>
+                                <Fill name="F"><SolidColor colorValue="FF6A707A" name="C"/></Fill>
+                            </LayoutComponent>
+                            <LayoutComponent styleId="3:458" name="Discharge Half" id="3:457">
+                                <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill"
+                                                      flexBasis="0" flexBasisUnitsValue="points" flexDirectionValue="row"
+                                                      name="S" id="3:458"/>
+                                <LayoutComponent fractionalWidth="28" styleId="3:460" name="Discharge" id="3:459">
+                                    <DataBindContext sourcePathIds="1:1-1:29" propertyKey="706" converterId="2:22"/>
+                                    <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill"
+                                                          flexBasis="0" flexBasisUnitsValue="points" name="S" id="3:460"/>
+                                    <Fill name="F"><SolidColor colorValue="FF3D8BFF" name="C"/></Fill>
+                                </LayoutComponent>
+                                <LayoutComponent fractionalWidth="72" styleId="3:462" name="Rest" id="3:461">
+                                    <DataBindContext sourcePathIds="1:1-1:29" propertyKey="706" converterId="2:18"/>
+                                    <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fill"
+                                                          flexBasis="0" flexBasisUnitsValue="points" name="S" id="3:462"/>
+                                </LayoutComponent>
+                            </LayoutComponent>
+                        </LayoutComponent>
+                        <LayoutComponent width="300" height="28" styleId="3:464" name="Labels" id="3:463">
+                            <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed"
+                                                  flexDirectionValue="row" name="S" id="3:464"/>
+                            <LayoutComponent width="150" height="28" styleId="3:466" name="Regen Label" id="3:465">
+                                <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:466"/>
+                                <Text sizingValue="fixed" width="150" height="28" alignValue="left" verticalAlignValue="middle"
+                                      wrapValue="noWrap" name="Text" id="3:467">
+                                    <TextStylePaint fontSize="20" letterSpacing="3" fontAssetId="2:901" name="S" id="3:468">
+                                        <Fill name="F"><SolidColor colorValue="FF5E646D" name="C"/></Fill>
+                                    </TextStylePaint>
+                                    <TextValueRun styleId="3:468" text="REGEN" name="Run"/>
+                                </Text>
+                            </LayoutComponent>
+                            <LayoutComponent width="150" height="28" styleId="3:470" name="Power Label" id="3:469">
+                                <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:470"/>
+                                <Text sizingValue="fixed" width="150" height="28" alignValue="right" verticalAlignValue="middle"
+                                      wrapValue="noWrap" name="Text" id="3:471">
+                                    <TextStylePaint fontSize="20" letterSpacing="3" fontAssetId="2:901" name="S" id="3:472">
+                                        <Fill name="F"><SolidColor colorValue="FF5E646D" name="C"/></Fill>
+                                    </TextStylePaint>
+                                    <TextValueRun styleId="3:472" text="POWER" name="Run"/>
+                                </Text>
+                            </LayoutComponent>
+                        </LayoutComponent>
+                    </LayoutComponent>
+                </LayoutComponent>
+            </LayoutComponent>
+
+            <LayoutComponent height="56" styleId="3:501" name="Bottom Bar" id="3:500">
+                <LayoutComponentStyle layoutWidthScaleType="fill" layoutHeightScaleType="fixed"
+                                      flexDirectionValue="row" layoutAlignmentType="spaceBetweenCenter"
+                                      name="S" id="3:501"/>
+
+                <LayoutComponent width="460" height="56" styleId="3:511" name="Odometer" id="3:510">
+                    <DataBindContext sourcePathIds="1:1-1:59" propertyKey="18" converterId="2:41"/>
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:511"/>
+                    <Text sizingValue="fixed" width="460" height="56" alignValue="left" verticalAlignValue="middle"
+                          wrapValue="noWrap" name="Odometer Text Metric" id="3:512">
+                        <DataBindContext sourcePathIds="1:1-1:55" propertyKey="18" converterId="2:43"/>
+                        <TextStylePaint fontSize="20" letterSpacing="3" fontAssetId="2:901" name="Label" id="3:513">
+                            <Fill name="F"><SolidColor colorValue="FF5E646D" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextStylePaint fontSize="30" fontAssetId="2:901" name="Value" id="3:514">
+                            <Fill name="F"><SolidColor colorValue="FFC9CED6" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextStylePaint fontSize="24" fontAssetId="2:900" name="Unit" id="3:515">
+                            <Fill name="F"><SolidColor colorValue="FF8B919A" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="3:513" text="ODO   " name="Label"/>
+                        <TextValueRun styleId="3:514" text="42180" name="Value">
+                            <DataBindContext sourcePathIds="1:1-1:17" propertyKey="268" converterId="2:1"/>
+                        </TextValueRun>
+                        <TextValueRun styleId="3:515" text=" km" name="Unit"/>
+                    </Text>
+                    <Text sizingValue="fixed" width="460" height="56" alignValue="left" verticalAlignValue="middle"
+                          wrapValue="noWrap" name="Odometer Text Imperial" id="3:517">
+                        <DataBindContext sourcePathIds="1:1-1:55" propertyKey="18" converterId="2:41"/>
+                        <TextStylePaint fontSize="20" letterSpacing="3" fontAssetId="2:901" name="Label" id="3:518">
+                            <Fill name="F"><SolidColor colorValue="FF5E646D" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextStylePaint fontSize="30" fontAssetId="2:901" name="Value" id="3:519">
+                            <Fill name="F"><SolidColor colorValue="FFC9CED6" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextStylePaint fontSize="24" fontAssetId="2:900" name="Unit" id="3:524">
+                            <Fill name="F"><SolidColor colorValue="FF8B919A" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="3:518" text="ODO   " name="Label"/>
+                        <TextValueRun styleId="3:519" text="42180" name="Value">
+                            <DataBindContext sourcePathIds="1:1-1:17" propertyKey="268" converterId="2:1"/>
+                        </TextValueRun>
+                        <TextValueRun styleId="3:524" text=" mi" name="Unit"/>
+                    </Text>
+                </LayoutComponent>
+
+                <LayoutComponent width="300" height="56" styleId="3:521" name="Data Source" id="3:520">
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:521"/>
+                    <Text sizingValue="fixed" width="300" height="56" alignValue="center" verticalAlignValue="middle"
+                          wrapValue="noWrap" name="Data Source Text" id="3:522">
+                        <TextStylePaint fontSize="20" letterSpacing="3" fontAssetId="2:901" name="S" id="3:523">
+                            <Fill name="F"><SolidColor colorValue="FF3A3F47" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="3:523" text="demo" name="Run">
+                            <DataBindContext sourcePathIds="1:1-1:70" propertyKey="268"/>
+                        </TextValueRun>
+                    </Text>
+                </LayoutComponent>
+
+                <LayoutComponent width="460" height="56" styleId="3:531" name="Pack" id="3:530">
+                    <DataBindContext sourcePathIds="1:1-1:58" propertyKey="18" converterId="2:41"/>
+                    <LayoutComponentStyle layoutWidthScaleType="fixed" layoutHeightScaleType="fixed" name="S" id="3:531"/>
+                    <Text sizingValue="fixed" width="460" height="56" alignValue="right" verticalAlignValue="middle"
+                          wrapValue="noWrap" name="Pack Text Metric" id="3:532">
+                        <DataBindContext sourcePathIds="1:1-1:55" propertyKey="18" converterId="2:43"/>
+                        <TextStylePaint fontSize="30" fontAssetId="2:901" name="Value" id="3:533">
+                            <Fill name="F"><SolidColor colorValue="FFC9CED6" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextStylePaint fontSize="24" fontAssetId="2:900" name="Unit" id="3:534">
+                            <Fill name="F"><SolidColor colorValue="FF8B919A" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="3:533" text="396" name="Voltage">
+                            <DataBindContext sourcePathIds="1:1-1:30" propertyKey="268" converterId="2:1"/>
+                        </TextValueRun>
+                        <TextValueRun styleId="3:534" text=" V     " name="Volt Unit"/>
+                        <TextValueRun styleId="3:533" text="24" name="Min Temp">
+                            <DataBindContext sourcePathIds="1:1-1:34" propertyKey="268" converterId="2:1"/>
+                        </TextValueRun>
+                        <TextValueRun styleId="3:534" text=" – " name="Dash"/>
+                        <TextValueRun styleId="3:533" text="31" name="Max Temp">
+                            <DataBindContext sourcePathIds="1:1-1:35" propertyKey="268" converterId="2:1"/>
+                        </TextValueRun>
+                        <TextValueRun styleId="3:534" text=" °C" name="Temp Unit"/>
+                    </Text>
+                    <Text sizingValue="fixed" width="460" height="56" alignValue="right" verticalAlignValue="middle"
+                          wrapValue="noWrap" name="Pack Text Imperial" id="3:536">
+                        <DataBindContext sourcePathIds="1:1-1:55" propertyKey="18" converterId="2:41"/>
+                        <TextStylePaint fontSize="30" fontAssetId="2:901" name="Value" id="3:537">
+                            <Fill name="F"><SolidColor colorValue="FFC9CED6" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextStylePaint fontSize="24" fontAssetId="2:900" name="Unit" id="3:538">
+                            <Fill name="F"><SolidColor colorValue="FF8B919A" name="C"/></Fill>
+                        </TextStylePaint>
+                        <TextValueRun styleId="3:537" text="396" name="Voltage">
+                            <DataBindContext sourcePathIds="1:1-1:30" propertyKey="268" converterId="2:1"/>
+                        </TextValueRun>
+                        <TextValueRun styleId="3:538" text=" V     " name="Volt Unit"/>
+                        <TextValueRun styleId="3:537" text="24" name="Min Temp">
+                            <DataBindContext sourcePathIds="1:1-1:34" propertyKey="268" converterId="2:1"/>
+                        </TextValueRun>
+                        <TextValueRun styleId="3:538" text=" – " name="Dash"/>
+                        <TextValueRun styleId="3:537" text="31" name="Max Temp">
+                            <DataBindContext sourcePathIds="1:1-1:35" propertyKey="268" converterId="2:1"/>
+                        </TextValueRun>
+                        <TextValueRun styleId="3:538" text=" °F" name="Temp Unit"/>
+                    </Text>
+                </LayoutComponent>
+            </LayoutComponent>
+        </LayoutComponent>
+
+        <!-- Binds only run while a state machine plays. Booleans are bound directly (see "Bool As Number"), not via transition conditions. -->
+        <LinearAnimation duration="1" name="Idle" id="4:1"/>
+        <StateMachine name="Dash" id="5:1">
+            <StateMachineLayer name="Idle" id="5:10">
+                <EntryState x="0" y="0"><StateTransition stateToId="5:11"/></EntryState>
+                <AnimationState x="200" y="0" animationId="4:1" id="5:11"/>
+                <AnyState x="400" y="0"/>
+                <ExitState x="500" y="0"/>
+            </StateMachineLayer>
+        </StateMachine>
+    </Artboard>
+</Rive>

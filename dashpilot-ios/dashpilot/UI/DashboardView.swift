@@ -18,8 +18,7 @@ struct DashboardView: View {
     @State private var dashAppEditing = false
     @State private var nameOverlayDismiss: Task<Void, Never>?
 
-    /// Only web dashboards participate in the swipe carousel.
-    private static let swipeableDashboards = availableDashboards.filter { $0.type == .web }
+    private static let swipeableDashboards = availableDashboards.filter { $0.type == .web || $0.type == .rive }
 
     private var currentType: String { swipedDashboard?.type.rawValue ?? dashboardType }
     private var currentUrl: String { swipedDashboard?.url ?? dashboardUrl }
@@ -33,6 +32,12 @@ struct DashboardView: View {
                         WebDashView(url: currentUrl, incomingMessages: dashStream,
                                     onEditingChange: { dashAppEditing = $0 })
                             .id(currentUrl)
+                    case DashboardType.rive.rawValue:
+                        RiveDashView(source: Bundle.main.url(forResource: currentUrl, withExtension: "riv"),
+                                     incomingMessages: dashStream)
+                            .id(currentUrl)
+                    case DashboardType.devRive.rawValue:
+                        RiveDashView(source: DevRiveFile.url, incomingMessages: dashStream)
                     default:
                         Text("Unsupported dashboard type: \(currentType)")
                             .foregroundColor(.white)
@@ -93,18 +98,13 @@ struct DashboardView: View {
         .onDisappear { UIApplication.shared.isIdleTimerDisabled = false }
     }
 
-    /// Moves `step` (+1 next, -1 previous) through the web dashboards,
-    /// wrapping at both ends. Non-web screens (e.g. the Rive dev view)
-    /// are not part of the cycle and cannot be swiped away from.
     private func switchDashboard(step: Int) {
         let dashboards = Self.swipeableDashboards
-        guard dashboards.count > 1, currentType == DashboardType.web.rawValue else { return }
+        guard dashboards.count > 1, currentType != DashboardType.devRive.rawValue else { return }
         guard let currentIndex = dashboards.firstIndex(where: { $0.url == currentUrl }) else { return }
 
         let next = dashboards[(currentIndex + step + dashboards.count) % dashboards.count]
         swipedDashboard = next
-        // Fresh subscription for the new web view; the old coordinator cancels
-        // its own on teardown.
         dashStream = connectionVM.dashStateStream()
         UserDefaults.standard.set(next.id, forKey: DisplaySettings.keySelectedDashboardId)
 

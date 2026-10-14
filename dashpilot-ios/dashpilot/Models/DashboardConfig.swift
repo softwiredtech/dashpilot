@@ -52,6 +52,13 @@ let availableDashboards: [DashboardConfig] = [
         screenshotName: "preview_retro"
     ),
     DashboardConfig(
+        id: "rive",
+        name: String(localized: "Rive"),
+        url: "dash_demo",
+        type: .rive,
+        screenshotName: "preview_rive"
+    ),
+    DashboardConfig(
         id: "dev_rive",
         name: String(localized: "Load Rive File"),
         url: "",

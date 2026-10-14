@@ -27,6 +27,14 @@
         "de": "Bedingung"
       },
       "default": "adasOn"
+    },
+    {
+      "key": "steering",
+      "kinds": [
+        "number"
+      ],
+      "default": "egoSteeringAngle",
+      "hidden": true
     }
   ],
   "props": [

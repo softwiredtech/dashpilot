@@ -1,11 +1,5 @@
 import Foundation
 
-/// Generates believable `CarState` values without any hardware or network
-/// connection, so the dashboards can be demoed anywhere (Settings > Start
-/// Demo Mode). Field encodings (gear, traffic light color, etc.) mirror the
-/// ones the dash-apps already expect — see `gearMap`/`TL_COLOR_MAP` in
-/// `dash-apps/web-vanilla/index.html` and the demo generator in
-/// `dash-apps/web-expo/hooks/useCarState.ts`.
 final class DemoDataSource: IDataSource {
 
     private var continuation: AsyncStream<CarState>.Continuation?
@@ -50,12 +44,6 @@ final class DemoDataSource: IDataSource {
     private static let goEnd: TimeInterval = 78
     // cycleLength is the end of the accelerate-back-to-cruise phase.
 
-    #if DEBUG
-    private static let parked = true
-    #else
-    private static let parked = false
-    #endif
-
     /// Slowly drifting base speed, continuous across cycle boundaries so
     /// cruise phases never jump.
     private static func cruiseSpeed(at t: TimeInterval) -> Float {
@@ -86,7 +74,7 @@ final class DemoDataSource: IDataSource {
         case ..<turnStart:
             // Cruise.
             s.egoSpeed = cruiseSpeed(at: t)
-            s.egoSteeringAngle = Float(sin(t * 0.3) * 3) // gentle lane-keeping wiggle
+            s.egoSteeringAngle = Float(sin(t * 0.3) * 15) // lane-keeping wiggle, big enough to see
             s.trafficLightColor = 0
             s.stopLineDist = 0
 
@@ -98,7 +86,7 @@ final class DemoDataSource: IDataSource {
             let direction: Float = turningLeft ? -1 : 1
             s.egoSteeringAngle = direction * Float(ease) * 28
             s.egoSpeed = cruiseSpeed(at: t) * Float(1 - 0.5 * ease)
-            let blink: Float = phase.truncatingRemainder(dividingBy: 1.0) < 0.5 ? 1 : 0
+            let blink: Float = phase.truncatingRemainder(dividingBy: 1.0) < 0.5 ? 2 : 1
             s.leftBlinker = turningLeft ? blink : 0
             s.rightBlinker = turningLeft ? 0 : blink
             s.trafficLightColor = 0
@@ -106,7 +94,7 @@ final class DemoDataSource: IDataSource {
 
         case ..<cruise2End:
             s.egoSpeed = cruiseSpeed(at: t)
-            s.egoSteeringAngle = Float(sin(t * 0.3) * 3)
+            s.egoSteeringAngle = Float(sin(t * 0.3) * 15)
             s.trafficLightColor = 0
             s.stopLineDist = 0
 
@@ -145,22 +133,10 @@ final class DemoDataSource: IDataSource {
             s.stopLineDist = 0
         }
 
-        if parked {
-            s.gear = 1 // Park
-            s.egoSpeed = 0
-            s.egoSteeringAngle = 0
-            s.leftBlinker = 0
-            s.rightBlinker = 0
-            s.trafficLightColor = 0
-            s.stopLineDist = 0
-        }
-
         s.accSetSpeed = cruiseSpeed(at: t) + 5
 
         s.leftBlindSpot = t.truncatingRemainder(dividingBy: 23) < 3 ? 1 : 0
         s.rightBlindSpot = t.truncatingRemainder(dividingBy: 29) < 3 ? 1 : 0
-        s.laneDepartureWarning = 0
-        s.sideCollisionWarning = 0
 
         // BMS / power — Tesla-ish pack, slowly discharging.
         s.fullPackEnergy = 75
@@ -169,8 +145,10 @@ final class DemoDataSource: IDataSource {
         s.maxRegenPower = 60
         s.maxDischargePower = 300
         s.packVoltage = Float(380 + sin(t * 0.2) * 5)
-        s.packCurrent = s.egoSpeed * 0.4
-        s.powerLevel = min(s.packVoltage * s.packCurrent / 1000 / s.maxDischargePower, 1) * 100
+        let braking = phase >= cruise2End && phase < approachEnd
+        s.packCurrent = braking ? -s.egoSpeed * 1.2 : s.egoSpeed * 0.4
+        let kw = s.packVoltage * s.packCurrent / 1000
+        s.powerLevel = max(-1, min(kw / (kw >= 0 ? s.maxDischargePower : s.maxRegenPower), 1)) * 100
         s.packTMin = 22
         s.packTMax = 28
         s.acTemp = 22

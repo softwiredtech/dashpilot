@@ -65,6 +65,7 @@ import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.IDataSource
 import com.softwiredtech.dashpilot.datasource.DashKitBleManager
 import com.softwiredtech.dashpilot.datasource.DashKitDataSource
+import com.softwiredtech.dashpilot.datasource.DemoDataSource
 import com.softwiredtech.dashpilot.datasource.WebsocketDataSource
 import com.softwiredtech.dashpilot.ble.VehicleControl
 import com.softwiredtech.dashpilot.jni.VehicleBridge
@@ -440,6 +441,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
                     DashKitDataSource(manager, decoder)
                 }
                 DataSourceType.WEBSOCKET -> WebsocketDataSource()
+                DataSourceType.DEMO -> DemoDataSource()
                 else -> CommaDataSource(bridge, profile)
             }
 
