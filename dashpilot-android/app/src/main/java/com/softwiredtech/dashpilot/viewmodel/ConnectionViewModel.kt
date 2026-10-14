@@ -43,8 +43,6 @@ import com.softwiredtech.dashpilot.datamodel.dash.getFingerActions
 import com.softwiredtech.dashpilot.datamodel.dash.setFingerActions
 import com.softwiredtech.dashpilot.datamodel.dash.getWiperOffAutomation
 import com.softwiredtech.dashpilot.datamodel.dash.setWiperOffAutomation
-import com.softwiredtech.dashpilot.datamodel.dash.getChimeMuteAutomation
-import com.softwiredtech.dashpilot.datamodel.dash.setChimeMuteAutomation
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_CLIMATE_KEEP_MINUTES
 import com.softwiredtech.dashpilot.datamodel.dash.getClimateKeepAutomation
 import com.softwiredtech.dashpilot.datamodel.dash.setClimateKeepAutomation
@@ -126,9 +124,6 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     private val _wiperOffAutomation = MutableStateFlow(false)
     val wiperOffAutomation = _wiperOffAutomation.asStateFlow()
 
-    private val _chimeMuteAutomation = MutableStateFlow(false)
-    val chimeMuteAutomation = _chimeMuteAutomation.asStateFlow()
-
     private val _climateKeepAutomation = MutableStateFlow(false)
     val climateKeepAutomation = _climateKeepAutomation.asStateFlow()
 
@@ -153,7 +148,6 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     fun loadAutomations(context: Context) {
         _carModel.value = getCarModel(context)
         _wiperOffAutomation.value = getWiperOffAutomation(context)
-        _chimeMuteAutomation.value = getChimeMuteAutomation(context)
         _climateKeepAutomation.value = getClimateKeepAutomation(context)
         _climateKeepMinutes.value = getClimateKeepMinutes(context)
         _sportKickdownAutomation.value = getSportKickdownAutomation(context)
@@ -179,16 +173,6 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
 
     private fun pushWiperOff(enabled: Boolean) {
         _bleManager.value?.let { VehicleControl.sendWiperOff(it, enabled) }
-    }
-
-    fun updateChimeMuteAutomation(context: Context, value: Boolean) {
-        setChimeMuteAutomation(context, value)
-        _chimeMuteAutomation.value = value
-        pushChimeMute(value)
-    }
-
-    private fun pushChimeMute(enabled: Boolean) {
-        _bleManager.value?.let { VehicleControl.sendChimeMute(it, enabled) }
     }
 
     fun updateClimateKeepAutomation(context: Context, value: Boolean) {
@@ -515,10 +499,6 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
                 val wiperOff = getWiperOffAutomation(context)
                 _wiperOffAutomation.value = wiperOff
                 VehicleControl.sendWiperOff(mgr, wiperOff)
-
-                val chimeMute = getChimeMuteAutomation(context)
-                _chimeMuteAutomation.value = chimeMute
-                VehicleControl.sendChimeMute(mgr, chimeMute)
 
                 // Re-sync the climate-keep automation the same way.
                 val climateKeep = getClimateKeepAutomation(context)

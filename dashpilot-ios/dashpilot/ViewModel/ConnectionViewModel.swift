@@ -164,8 +164,6 @@ final class ConnectionViewModel {
         }
         let wiperOff = UserDefaults.standard.bool(forKey: "wiper_off_automation")
         VehicleControl.sendWiperOff(manager, enabled: wiperOff)
-        let chimeMute = UserDefaults.standard.bool(forKey: "chime_mute_automation")
-        VehicleControl.sendChimeMute(manager, enabled: chimeMute)
         let climateKeep = UserDefaults.standard.bool(forKey: "climate_keep_automation")
         VehicleControl.sendClimateKeep(manager, enabled: climateKeep)
         let climateKeepMinutes = UserDefaults.standard.integer(forKey: "climate_keep_minutes")

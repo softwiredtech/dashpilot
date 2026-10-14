@@ -65,22 +65,6 @@
         }
       }
     },
-    "Keeps the speed-limit warning chime silenced." : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hält den Warnton des Tempolimits stumm."
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Némán tartja a sebességkorlát figyelmeztető hangját."
-          }
-        }
-      }
-    },
     "Model Y Juniper" : {
       "localizations" : {
         "de" : {
@@ -93,22 +77,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Model Y Juniper"
-          }
-        }
-      }
-    },
-    "Mute speed-limit chime" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tempolimit-Ton stummschalten"
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sebességkorlát-hang némítása"
           }
         }
       }

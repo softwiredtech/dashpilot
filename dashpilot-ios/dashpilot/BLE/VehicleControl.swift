@@ -90,9 +90,6 @@ enum VehicleControl {
     static let cmdAcSwingIntensity = 0x4D
     static let cmdAcSwingToggle = 0x4E
 
-    // Keep the speed-limit chime muted while enabled. Persisted in NVS.
-    static let cmdChimeMute = 0x4F
-
     /// Bind (or clear, with actionValue 0) an N-finger tap to a control action.
     @discardableResult
     static func sendFingerAction(_ manager: DashKitBleManager, fingers: Int, actionValue: Int) -> Bool {
@@ -175,11 +172,6 @@ enum VehicleControl {
     @discardableResult
     static func sendAcSwingIntensity(_ manager: DashKitBleManager, intensity: Int) -> Bool {
         send(manager, opcode: cmdAcSwingIntensity, value: intensity)
-    }
-
-    @discardableResult
-    static func sendChimeMute(_ manager: DashKitBleManager, enabled: Bool) -> Bool {
-        send(manager, opcode: cmdChimeMute, value: enabled ? 1 : 0)
     }
 
     /// Write a control command to the DashKit. Returns true if the write was

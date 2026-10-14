@@ -11,7 +11,6 @@ struct AutomationsView: View {
     @Environment(ConnectionViewModel.self) private var connectionVM
 
     @AppStorage("wiper_off_automation") private var wiperOff: Bool = false
-    @AppStorage("chime_mute_automation") private var chimeMute: Bool = false
     @AppStorage("climate_keep_automation") private var climateKeep: Bool = false
     @AppStorage("climate_keep_minutes") private var climateKeepMinutes: Int = 5
     @AppStorage("sport_kickdown_automation") private var sportKickdown: Bool = false
@@ -84,15 +83,6 @@ struct AutomationsView: View {
                             )
                         }
                     }
-
-                    Spacer().frame(height: 12)
-                    AutomationRow(
-                        icon: "speaker.slash.fill",
-                        title: "Mute speed-limit chime",
-                        subtitle: "Keeps the speed-limit warning chime silenced.",
-                        isOn: $chimeMute
-                    )
-
                 }
                 .padding(DashMetrics.screenPadding)
             }
@@ -109,11 +99,6 @@ struct AutomationsView: View {
         .onChange(of: wiperOff) { _, newValue in
             if let manager = connectionVM.bleManager {
                 VehicleControl.sendWiperOff(manager, enabled: newValue)
-            }
-        }
-        .onChange(of: chimeMute) { _, newValue in
-            if let manager = connectionVM.bleManager {
-                VehicleControl.sendChimeMute(manager, enabled: newValue)
             }
         }
         .onChange(of: climateKeep) { _, newValue in

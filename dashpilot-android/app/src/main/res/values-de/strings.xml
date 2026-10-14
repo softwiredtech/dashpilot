@@ -243,8 +243,6 @@
     <string name="automations_section_wipers">Scheibenwischer</string>
     <string name="automations_wiper_off_title">Wischer aus</string>
     <string name="automations_wiper_off_subtitle">Scheibenwischer automatisch deaktiviert halten, solange Autopilot aktiv ist.</string>
-    <string name="automations_chime_mute_title">Tempolimit-Ton stummschalten</string>
-    <string name="automations_chime_mute_subtitle">Hält den Warnton des Tempolimits stumm.</string>
     <string name="automations_section_climate">Klima</string>
     <string name="automations_keep_climate_title">Klima anlassen</string>
     <string name="automations_keep_climate_subtitle">Lässt die Klimaanlage an, wenn du das Auto verlässt. Die Automatisierung endet nach der eingestellten Zeit oder wenn du zum Auto zurückkehrst.</string>

@@ -26,7 +26,6 @@ const val PREF_PINNED_CONTROL = "pinned_control"
 
 // Automations
 const val PREF_WIPER_OFF_AUTOMATION = "wiper_off_automation"
-const val PREF_CHIME_MUTE_AUTOMATION = "chime_mute_automation"
 const val PREF_CLIMATE_KEEP_AUTOMATION = "climate_keep_automation"
 const val PREF_CLIMATE_KEEP_MINUTES = "climate_keep_minutes"
 const val PREF_SPORT_KICKDOWN_AUTOMATION = "sport_kickdown_automation"
@@ -38,7 +37,6 @@ const val PREF_FINGER_ACTIONS = "finger_actions"
 // Legacy single three-finger binding, migrated into PREF_FINGER_ACTIONS.
 const val PREF_THREE_FINGER_ACTION = "three_finger_action"
 const val DEFAULT_WIPER_OFF_AUTOMATION = false
-const val DEFAULT_CHIME_MUTE_AUTOMATION = false
 const val DEFAULT_CLIMATE_KEEP_AUTOMATION = false
 const val DEFAULT_CLIMATE_KEEP_MINUTES = 5
 const val DEFAULT_SPORT_KICKDOWN_AUTOMATION = false
@@ -162,15 +160,6 @@ fun getWiperOffAutomation(context: Context): Boolean =
 fun setWiperOffAutomation(context: Context, value: Boolean) {
     context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
         .edit { putBoolean(PREF_WIPER_OFF_AUTOMATION, value) }
-}
-
-fun getChimeMuteAutomation(context: Context): Boolean =
-    context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
-        .getBoolean(PREF_CHIME_MUTE_AUTOMATION, DEFAULT_CHIME_MUTE_AUTOMATION)
-
-fun setChimeMuteAutomation(context: Context, value: Boolean) {
-    context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
-        .edit { putBoolean(PREF_CHIME_MUTE_AUTOMATION, value) }
 }
 
 fun getClimateKeepAutomation(context: Context): Boolean =
