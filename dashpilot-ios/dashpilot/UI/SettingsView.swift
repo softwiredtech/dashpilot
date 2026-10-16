@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 private let dashGreen = Color(red: 0x5C / 255.0, green: 0xBD / 255.0, blue: 0x68 / 255.0)
 private let bgColor = Color(red: 0x0D / 255.0, green: 0x0D / 255.0, blue: 0x0D / 255.0)
@@ -13,7 +14,7 @@ struct SettingsView: View {
     /// 0 = General, 1 = DashKit (mirrors the Android settings tabs).
     @State private var selectedTab = 0
 
-    @AppStorage(DisplaySettings.keyExtraVehicleBus)           private var extraVehicleBus = false
+    @AppStorage(DisplaySettings.keyCarModel)                  private var carModelRaw = DisplaySettings.carModel.rawValue
     @AppStorage(DisplaySettings.keyShowCarBattery)            private var showCarBattery = true
     @AppStorage(DisplaySettings.keyShowOdometer)              private var showOdometer = true
     @AppStorage(DisplaySettings.keyUseImperial)               private var useImperial = false
@@ -23,6 +24,16 @@ struct SettingsView: View {
     @AppStorage(DisplaySettings.keyRenderQuality)             private var renderQuality = 3
     @AppStorage(DisplaySettings.keySelectedDashboardId)       private var selectedDashboardId = ""
     @AppStorage(ConnectionViewModel.onboardingCompletedKey)   private var onboardingCompleted = false
+    @AppStorage(devDashboardUrlKey)                           private var devDashboardUrl = ""
+    @AppStorage("devUrlHintShown")                            private var devUrlHintShown = false
+
+    @State private var pickingRiveFile = false
+    @State private var devUrlDraft = ""
+    @State private var devUrlInvalid = false
+    @State private var loadedDevUrl: String?
+    @State private var loadedRiveFile = false
+    @State private var showingDevUrlHint = false
+    @FocusState private var devUrlFocused: Bool
 
     private var currentDashboard: DashboardConfig {
         dashboardById(selectedDashboardId) ?? selectedDashboard()
@@ -63,13 +74,12 @@ struct SettingsView: View {
                     VStack(alignment: .leading, spacing: 0) {
                         if selectedTab == 0 {
                             dashboardSection
-                            #if DEBUG
-                            configurationSection
-                            #endif
+                            carSection
                             displaySection
                             if showVisualizerSettings {
                                 visualizerSection
                             }
+                            developerSection
                             #if DEBUG
                             replayOnboardingRow
                             #endif
@@ -84,6 +94,19 @@ struct SettingsView: View {
             }
         }
         .navigationBarHidden(true)
+        .fileImporter(isPresented: $pickingRiveFile,
+                      allowedContentTypes: [.item]) { result in
+            guard case .success(let url) = result, (try? DevRiveFile.save(from: url)) != nil else { return }
+            selectedDashboardId = devRiveDashboardId
+            loadedRiveFile = true
+            showDevHintOnce()
+        }
+        .onAppear { devUrlDraft = devDashboardUrl }
+        .alert("Dash app loaded", isPresented: $showingDevUrlHint) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Tap Drive to open it. Not in your car? Pick Demo as the data source on the home screen.")
+        }
     }
 
     // MARK: - Header
@@ -197,23 +220,50 @@ struct SettingsView: View {
             .clipped()
     }
 
-    private var extraVehicleBusEnabled: Bool {
-        #if DEBUG
-        return extraVehicleBus
-        #else
-        return false
-        #endif
-    }
+    // MARK: - Car Section
 
-    // MARK: - Configuration Section
-
-    private var configurationSection: some View {
+    private var carSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            sectionTitle("Configuration")
-            SettingsToggleRow(label: "Extra Vehicle Bus", isOn: $extraVehicleBus)
+            sectionTitle("Car")
+            carModelOption(.teslaLegacy, name: "Model 3 / Model Y", years: "Model years 2019–2024")
+            carModelOption(.teslaJuniper, name: "Model Y Juniper", years: "Model year 2025 and newer")
             Spacer().frame(height: 8)
         }
         .padding(.horizontal, 24)
+        .onChange(of: carModelRaw) { _, _ in
+            connectionVM.carModelChanged()
+        }
+    }
+
+    private func carModelOption(_ model: CarModel, name: LocalizedStringKey, years: LocalizedStringKey) -> some View {
+        let selected = carModelRaw == model.rawValue
+        return Button {
+            carModelRaw = model.rawValue
+        } label: {
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(name)
+                        .foregroundColor(.white)
+                        .font(.system(size: 16))
+                    Text(years)
+                        .foregroundColor(mutedText)
+                        .font(.system(size: 13))
+                }
+                Spacer()
+                Image(systemName: selected ? "checkmark.circle.fill" : "circle")
+                    .foregroundColor(selected ? dashGreen : mutedText)
+                    .font(.system(size: 20))
+            }
+            .padding(12)
+            .background(Color(white: 0.1))
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(selected ? dashGreen : Color.clear, lineWidth: 1)
+            )
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Display Section
@@ -221,10 +271,10 @@ struct SettingsView: View {
     private var displaySection: some View {
         VStack(alignment: .leading, spacing: 8) {
             sectionTitle("Display")
-            if extraVehicleBusEnabled && showCarBatteryToggle {
+            if showCarBatteryToggle {
                 SettingsToggleRow(label: "Show Car Battery", isOn: $showCarBattery)
             }
-            if extraVehicleBusEnabled && showOdometerToggle {
+            if showOdometerToggle {
                 SettingsToggleRow(label: "Show Odometer", isOn: $showOdometer)
             }
             if showUseImperialToggle {
@@ -267,6 +317,101 @@ struct SettingsView: View {
                 .layoutPriority(1)
         }
         .padding(.vertical, 4)
+    }
+
+    // MARK: - Developer Section
+
+    private var developerSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            sectionTitle("Developer")
+
+            Button {
+                pickingRiveFile = true
+            } label: {
+                HStack {
+                    Text("Load Rive File")
+                        .foregroundColor(.white)
+                        .font(.system(size: 16))
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .foregroundColor(mutedText)
+                        .font(.system(size: 14, weight: .medium))
+                }
+                .padding(.vertical, 4)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            if loadedRiveFile && selectedDashboardId == devRiveDashboardId {
+                loadedLabel
+            }
+
+            Text("Load dash app from URL")
+                .foregroundColor(.white)
+                .font(.system(size: 16))
+                .padding(.top, 8)
+            HStack(spacing: 8) {
+                TextField("", text: $devUrlDraft,
+                          prompt: Text(verbatim: "http://192.168.1.10:5173").foregroundColor(mutedText))
+                    .foregroundColor(.white)
+                    .font(.system(size: 15))
+                    .keyboardType(.URL)
+                    .textContentType(.URL)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .submitLabel(.go)
+                    .focused($devUrlFocused)
+                    .onSubmit(loadDevUrl)
+                    .padding(.horizontal, 12)
+                    .frame(height: 40)
+                    .background(Color(white: 0.1))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                Button("Load", action: loadDevUrl)
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 16)
+                    .frame(height: 40)
+                    .background(dashGreen)
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+            }
+            if devUrlInvalid {
+                Text("Enter a valid http(s) URL")
+                    .foregroundColor(.red)
+                    .font(.system(size: 13))
+            } else if loadedDevUrl == devUrlDraft && selectedDashboardId == devUrlDashboardId {
+                loadedLabel
+            }
+            Spacer().frame(height: 8)
+        }
+        .padding(.horizontal, 24)
+    }
+
+    private var loadedLabel: some View {
+        Label("Loaded. Tap Drive to open it.", systemImage: "checkmark.circle.fill")
+            .foregroundColor(dashGreen)
+            .font(.system(size: 13))
+    }
+
+    private func showDevHintOnce() {
+        guard !devUrlHintShown else { return }
+        devUrlHintShown = true
+        showingDevUrlHint = true
+    }
+
+    private func loadDevUrl() {
+        var raw = devUrlDraft.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !raw.contains("://") { raw = "http://" + raw }
+        guard let url = URL(string: raw), ["http", "https"].contains(url.scheme?.lowercased()),
+              url.host?.isEmpty == false else {
+            devUrlInvalid = true
+            return
+        }
+        devUrlInvalid = false
+        devUrlFocused = false
+        devUrlDraft = raw
+        devDashboardUrl = raw
+        selectedDashboardId = devUrlDashboardId
+        loadedDevUrl = raw
+        showDevHintOnce()
     }
 
     // MARK: - Replay onboarding

@@ -17,16 +17,16 @@
       "comment" : "Privacy - Bluetooth Always Usage Description",
       "extractionState" : "extracted_with_value",
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "DashPilot connects to your DashKit over Bluetooth to show live vehicle data and send vehicle commands."
-          }
-        },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "DashPilot verbindet sich über Bluetooth mit deinem DashKit, um Live-Fahrzeugdaten anzuzeigen und Fahrzeugbefehle zu senden."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "DashPilot connects to your DashKit over Bluetooth to show live vehicle data and send vehicle commands."
           }
         },
         "hu" : {
@@ -36,6 +36,9 @@
           }
         }
       }
+    },
+    "Rive File" : {
+
     }
   },
   "version" : "1.0"

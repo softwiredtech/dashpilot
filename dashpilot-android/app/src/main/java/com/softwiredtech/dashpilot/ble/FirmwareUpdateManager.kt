@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.softwiredtech.dashpilot.api.FirmwareManifest
 import com.softwiredtech.dashpilot.api.FirmwareUpdateRepository
+import com.softwiredtech.dashpilot.datamodel.dash.getCarModel
 import com.softwiredtech.dashpilot.datasource.DashKitBleManager
 import com.softwiredtech.dashpilot.util.SemVer
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -75,7 +76,7 @@ class FirmwareUpdateManager(
      */
     suspend fun checkForUpdate() {
         _check.value = Check.Checking
-        val manifest = FirmwareUpdateRepository.fetchManifest()
+        val manifest = FirmwareUpdateRepository.fetchManifest(getCarModel(manager.context))
         if (manifest == null) {
             _check.value = Check.Error(manager.context.getString(R.string.fw_error_unreachable))
             return

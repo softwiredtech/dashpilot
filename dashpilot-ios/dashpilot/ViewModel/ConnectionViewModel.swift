@@ -140,7 +140,9 @@ final class ConnectionViewModel {
             }
         }
 
-        let ds = DashKitDataSource(manager: manager)
+        let ds = DisplaySettings.carModel == .teslaJuniper
+            ? DashKitDataSource(manager: manager, vehicleType: "tesla_juniper", dbcResource: "new_gen_juniper")
+            : DashKitDataSource(manager: manager)
         dataSource = ds
         ds.connect(address: "")
         startStreaming(ds, resyncDashKit: true)
@@ -239,6 +241,21 @@ final class ConnectionViewModel {
         startStreaming(ds, resyncDashKit: false)
     }
 
+    /// The DBC/mapper is picked when a session starts, so restart a live one.
+    func carModelChanged() {
+        switch activeSourceType {
+        case .dashkit:
+            disconnect()
+            connectDashKit()
+        case .comma:
+            let address = discoveredAddress
+            disconnect()
+            if let address { connect(serverAddress: address) }
+        case .websocket, .demo, nil:
+            return
+        }
+    }
+
     func disconnect() {
         connectTask?.cancel()
         connectTask = nil
@@ -259,18 +276,13 @@ final class ConnectionViewModel {
     // MARK: - Private
 
     private func startCommaDataSource(address: String) {
-        #if DEBUG
-        let extraBus = UserDefaults.standard.bool(forKey: DisplaySettings.keyExtraVehicleBus)
-        #else
-        let extraBus = false
-        #endif
         let ds: CommaDataSource
-        if extraBus {
+        if DisplaySettings.carModel == .teslaJuniper {
             ds = CommaDataSource(
-                vehicleType: "tesla_extra",
+                vehicleType: "tesla_juniper",
                 dbcFiles: [
-                    (1, "bus_1_tesla_vehicle"),
-                    (2, "bus_2_tesla_party")
+                    (0, "new_gen_juniper"),
+                    (1, "new_gen_juniper")
                 ]
             )
         } else {

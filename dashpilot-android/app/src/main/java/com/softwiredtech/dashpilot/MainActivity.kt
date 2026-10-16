@@ -166,6 +166,7 @@ class MainActivity : ComponentActivity() {
                 val connectionStatus by connectionVM.connectionStatus.collectAsState()
                 val pinnedControl by connectionVM.pinnedControl.collectAsState()
                 val wiperOffAutomation by connectionVM.wiperOffAutomation.collectAsState()
+                val carModel by connectionVM.carModel.collectAsState()
                 val climateKeepAutomation by connectionVM.climateKeepAutomation.collectAsState()
                 val climateKeepMinutes by connectionVM.climateKeepMinutes.collectAsState()
                 val sportKickdownAutomation by connectionVM.sportKickdownAutomation.collectAsState()
@@ -389,7 +390,9 @@ class MainActivity : ComponentActivity() {
                                 },
                                 onThemeClick = {
                                     navController.navigate(ThemePickerRoute)
-                                }
+                                },
+                                carModel = carModel,
+                                onCarModelChanged = { connectionVM.updateCarModel(context, it) }
                             )
                         }
                         composable<TeslaEnrollRoute> {
