@@ -112,12 +112,12 @@ struct WebDashView: UIViewRepresentable {
     func makeUIView(context: Context) -> WKWebView {
         let config = WKWebViewConfiguration()
         config.userContentController.add(context.coordinator, name: "log")
+        config.userContentController.add(context.coordinator, name: DashAppDataStore.editingMessageName)
 
         if Self.localApps.contains(url) {
             let appId = "web-\(url)"
             context.coordinator.appId = appId
             config.userContentController.add(context.coordinator, name: DashAppDataStore.messageName)
-            config.userContentController.add(context.coordinator, name: DashAppDataStore.editingMessageName)
             if let script = DashAppDataStore.injectionScript(for: appId) {
                 config.userContentController.addUserScript(script)
             }
@@ -134,8 +134,8 @@ struct WebDashView: UIViewRepresentable {
         context.coordinator.incomingMessages = incomingMessages
         context.coordinator.onEditingChange = onEditingChange
 
-        if url.hasPrefix("http") || url.hasPrefix("https") {
-            webView.load(URLRequest(url: URL(string: url)!))
+        if url.hasPrefix("http"), let remote = URL(string: url) {
+            webView.load(URLRequest(url: remote))
         } else if Self.localApps.contains(url) {
             webView.load(URLRequest(url: URL(string: "app://localhost/index.html")!))
         }

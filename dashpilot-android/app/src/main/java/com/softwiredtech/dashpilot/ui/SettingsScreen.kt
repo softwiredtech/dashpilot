@@ -1,6 +1,23 @@
 package com.softwiredtech.dashpilot.ui
 
 import android.content.Context
+import com.softwiredtech.dashpilot.datamodel.dash.setDevUrlHintShown
+import com.softwiredtech.dashpilot.datamodel.dash.isDevUrlHintShown
+import androidx.compose.ui.platform.LocalFocusManager
+import android.content.Intent
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import com.softwiredtech.dashpilot.datamodel.dash.DEV_RIVE_DASHBOARD_ID
+import com.softwiredtech.dashpilot.datamodel.dash.DEV_URL_DASHBOARD_ID
+import com.softwiredtech.dashpilot.datamodel.dash.getDevDashboardUrl
+import com.softwiredtech.dashpilot.datamodel.dash.saveDevDashboardUrl
+import com.softwiredtech.dashpilot.datamodel.dash.saveDevRiveFileUri
+import com.softwiredtech.dashpilot.datamodel.dash.saveSelectedDashboard
 import android.net.Uri
 import android.provider.OpenableColumns
 import android.text.format.Formatter
@@ -439,6 +456,11 @@ fun SettingsScreen(
                 Spacer(modifier = Modifier.height(24.dp))
             }
 
+            DeveloperSection(
+                selectedDashboardId = selectedDashboardId.value,
+                onDashboardSelected = { id -> selectedDashboardId.value = id }
+            )
+
             if (BuildConfig.DEBUG) {
                 Row(
                     modifier = Modifier
@@ -490,6 +512,128 @@ fun SettingsScreen(
             } // end scrollable content column
         }
     }
+}
+
+@Composable
+private fun DeveloperSection(selectedDashboardId: String, onDashboardSelected: (String) -> Unit) {
+    val context = LocalContext.current
+    var urlDraft by remember { mutableStateOf(getDevDashboardUrl(context)) }
+    var urlInvalid by remember { mutableStateOf(false) }
+    var loadedUrl by remember { mutableStateOf<String?>(null) }
+    var loadedRiveFile by remember { mutableStateOf(false) }
+    var showUrlHint by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
+
+    fun select(id: String) {
+        val dashboard = dashboardById(id) ?: return
+        saveSelectedDashboard(context, dashboard)
+        onDashboardSelected(id)
+        if (!isDevUrlHintShown(context)) {
+            setDevUrlHintShown(context)
+            showUrlHint = true
+        }
+    }
+
+    val riveLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri == null) return@rememberLauncherForActivityResult
+        runCatching {
+            context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        saveDevRiveFileUri(context, uri.toString())
+        loadedRiveFile = true
+        select(DEV_RIVE_DASHBOARD_ID)
+    }
+
+    fun loadUrl() {
+        val raw = urlDraft.trim().let { if ("://" in it) it else "http://$it" }
+        val uri = Uri.parse(raw)
+        if (uri.scheme?.lowercase() !in setOf("http", "https") || uri.host.isNullOrEmpty()) {
+            urlInvalid = true
+            return
+        }
+        urlInvalid = false
+        focusManager.clearFocus()
+        urlDraft = raw
+        saveDevDashboardUrl(context, raw)
+        select(DEV_URL_DASHBOARD_ID)
+        loadedUrl = raw
+    }
+
+    SectionHeader(stringResource(R.string.settings_section_developer))
+    Spacer(modifier = Modifier.height(4.dp))
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { riveLauncher.launch(arrayOf("*/*")) }
+            .padding(vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(text = stringResource(R.string.settings_developer_load_rive), color = Color.White, fontSize = 16.sp)
+        Text(text = "›", color = DarkColors.TextMuted, fontSize = 20.sp)
+    }
+    if (loadedRiveFile && selectedDashboardId == DEV_RIVE_DASHBOARD_ID) {
+        LoadedConfirmation()
+        Spacer(modifier = Modifier.height(8.dp))
+    }
+    Spacer(modifier = Modifier.height(4.dp))
+    Text(text = stringResource(R.string.settings_developer_url_label), color = Color.White, fontSize = 16.sp)
+    Spacer(modifier = Modifier.height(8.dp))
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        OutlinedTextField(
+            value = urlDraft,
+            onValueChange = {
+                urlDraft = it
+                urlInvalid = false
+            },
+            placeholder = { Text("http://192.168.1.10:5173", color = DarkColors.TextSubtle) },
+            singleLine = true,
+            isError = urlInvalid,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Go),
+            keyboardActions = KeyboardActions(onGo = { loadUrl() }),
+            shape = RoundedCornerShape(12.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                unfocusedTextColor = Color.White,
+                focusedTextColor = Color.White,
+                unfocusedBorderColor = DarkColors.Border,
+                focusedBorderColor = Color.White,
+                cursorColor = Color.White,
+            ),
+            modifier = Modifier.weight(1f)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Button(
+            onClick = { loadUrl() },
+            colors = ButtonDefaults.buttonColors(containerColor = AccentColor, contentColor = Color.White)
+        ) {
+            Text(stringResource(R.string.settings_developer_url_load), fontSize = 15.sp)
+        }
+    }
+    if (urlInvalid) {
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(text = stringResource(R.string.settings_developer_url_invalid), color = DarkColors.Error, fontSize = 13.sp)
+    } else if (loadedUrl == urlDraft && selectedDashboardId == DEV_URL_DASHBOARD_ID) {
+        Spacer(modifier = Modifier.height(4.dp))
+        LoadedConfirmation()
+    }
+    if (showUrlHint) {
+        AlertDialog(
+            onDismissRequest = { showUrlHint = false },
+            title = { Text(stringResource(R.string.settings_developer_url_hint_title)) },
+            text = { Text(stringResource(R.string.settings_developer_url_hint_body)) },
+            confirmButton = {
+                TextButton(onClick = { showUrlHint = false }) {
+                    Text(stringResource(R.string.common_ok))
+                }
+            }
+        )
+    }
+    Spacer(modifier = Modifier.height(24.dp))
+}
+
+@Composable
+private fun LoadedConfirmation() {
+    Text(text = "✓ " + stringResource(R.string.settings_developer_url_loaded), color = AccentColor, fontSize = 13.sp)
 }
 
 @Composable

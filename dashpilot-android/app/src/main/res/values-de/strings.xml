@@ -20,7 +20,16 @@
     <string name="dashboard_name_analog">Analog</string>
     <string name="dashboard_name_compose">Eigenes</string>
     <string name="dashboard_name_rive">Rive</string>
-    <string name="dashboard_name_dev_rive">Rive-Datei laden</string>
+    <string name="dashboard_name_dev_rive">Rive-Datei</string>
+    <string name="dashboard_name_dev_url">Dash-App-URL</string>
+    <string name="settings_section_developer">Entwickler</string>
+    <string name="settings_developer_load_rive">Rive-Datei laden</string>
+    <string name="settings_developer_url_label">Dash-App von URL laden</string>
+    <string name="settings_developer_url_load">Laden</string>
+    <string name="settings_developer_url_invalid">Gib eine gültige http(s)-URL ein</string>
+    <string name="settings_developer_url_loaded">Geladen. Tippe auf Fahren, um sie zu öffnen.</string>
+    <string name="settings_developer_url_hint_title">Dash-App geladen</string>
+    <string name="settings_developer_url_hint_body">Tippe auf Fahren, um sie zu öffnen. Nicht im Auto? Wähle Demo als Datenquelle auf dem Startbildschirm.</string>
     <string name="settings_section_display">Anzeige</string>
     <string name="settings_theme_availability_note">Einige Einstellungen hängen vom gewählten Design ab</string>
     <string name="settings_theme_picker_title">Dashboard-Design</string>

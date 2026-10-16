@@ -1,5 +1,4 @@
 import SwiftUI
-import UniformTypeIdentifiers
 
 private let dashGreen = Color(red: 0x5C / 255.0, green: 0xBD / 255.0, blue: 0x68 / 255.0)
 private let bgColor = Color(red: 0x0D / 255.0, green: 0x0D / 255.0, blue: 0x0D / 255.0)
@@ -11,7 +10,6 @@ struct ThemePickerView: View {
     @Environment(\.dismiss) private var dismiss
 
     @AppStorage(DisplaySettings.keySelectedDashboardId) private var selectedDashboardId = ""
-    @State private var pickingRiveFile = false
 
     private let columns = [GridItem(.adaptive(minimum: 160), spacing: 12)]
 
@@ -46,12 +44,6 @@ struct ThemePickerView: View {
             }
         }
         .navigationBarHidden(true)
-        .fileImporter(isPresented: $pickingRiveFile,
-                      allowedContentTypes: [UTType(filenameExtension: "riv") ?? .data]) { result in
-            guard case .success(let url) = result, (try? DevRiveFile.save(from: url)) != nil else { return }
-            selectedDashboardId = "dev_rive"
-            dismiss()
-        }
     }
 
     // MARK: - Header
@@ -104,12 +96,8 @@ struct ThemePickerView: View {
                 .stroke(isSelected ? dashGreen : Color.clear, lineWidth: 2)
         )
         .onTapGesture {
-            if dashboard.type == .devRive {
-                pickingRiveFile = true
-            } else {
-                selectedDashboardId = dashboard.id
-                dismiss()
-            }
+            selectedDashboardId = dashboard.id
+            dismiss()
         }
     }
 

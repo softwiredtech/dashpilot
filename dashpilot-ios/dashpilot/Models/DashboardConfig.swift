@@ -58,14 +58,24 @@ let availableDashboards: [DashboardConfig] = [
         type: .rive,
         screenshotName: "preview_rive"
     ),
-    DashboardConfig(
-        id: "dev_rive",
-        name: String(localized: "Load Rive File"),
-        url: "",
-        type: .devRive,
-        screenshotName: nil
-    ),
 ]
+
+let devRiveDashboardId = "dev_rive"
+let devUrlDashboardId = "dev_url"
+let devDashboardUrlKey = "devDashboardUrl"
+
+private func developerDashboard(_ id: String) -> DashboardConfig? {
+    switch id {
+    case devRiveDashboardId:
+        guard FileManager.default.fileExists(atPath: DevRiveFile.url.path) else { return nil }
+        return DashboardConfig(id: id, name: String(localized: "Rive File"), url: "", type: .devRive, screenshotName: nil)
+    case devUrlDashboardId:
+        guard let url = UserDefaults.standard.string(forKey: devDashboardUrlKey), !url.isEmpty else { return nil }
+        return DashboardConfig(id: id, name: String(localized: "Dash App URL"), url: url, type: .web, screenshotName: nil)
+    default:
+        return nil
+    }
+}
 
 // Written once at app startup by dashpilotApp.init() via setLoadedManifests().
 // Reads happen via dashboardById() — always use that to get a hydrated config.
@@ -79,6 +89,7 @@ private let defaultDashboardId = "vanilla"
 
 func dashboardById(_ id: String?) -> DashboardConfig? {
     guard let id = id?.trimmingCharacters(in: .whitespaces), !id.isEmpty else { return nil }
+    if let dev = developerDashboard(id) { return dev }
     guard var config = availableDashboards.first(where: { $0.id == id }) else { return nil }
     if config.type == .web {
         config.manifest = loadedManifests[id]

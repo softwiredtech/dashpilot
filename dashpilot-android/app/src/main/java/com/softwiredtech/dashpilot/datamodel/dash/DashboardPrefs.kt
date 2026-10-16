@@ -6,6 +6,8 @@ import androidx.core.content.edit
 const val DASH_PREFS_NAME = "dash_prefs"
 const val PREF_SELECTED_DASHBOARD_ID = "selected_dashboard_id"
 const val PREF_DEV_RIVE_FILE_URI = "dev_rive_file_uri"
+const val PREF_DEV_DASHBOARD_URL = "dev_dashboard_url"
+const val PREF_DEV_URL_HINT_SHOWN = "dev_url_hint_shown"
 
 const val PREF_DASH_APP_DATA_PREFIX = "dash_app_data."
 
@@ -61,20 +63,20 @@ fun defaultDashboard(): DashboardConfig {
 
 fun dashboardById(id: String?): DashboardConfig? {
     val normalizedId = id?.trim()?.takeIf { it.isNotEmpty() } ?: return null
-    return availableDashboards.firstOrNull { it.id == normalizedId }?.withManifest()
+    return (availableDashboards + developerDashboards).firstOrNull { it.id == normalizedId }?.withManifest()
 }
 
 fun getSelectedDashboard(context: Context): DashboardConfig {
     val prefs = context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
     val savedId = prefs.getString(PREF_SELECTED_DASHBOARD_ID, null)
     val dashboard = dashboardById(savedId) ?: defaultDashboard()
-    if (dashboard.type == DashboardType.DEV_RIVE) {
-        val savedUri = prefs.getString(PREF_DEV_RIVE_FILE_URI, null)
-        if (!savedUri.isNullOrEmpty()) {
-            return dashboard.copy(url = savedUri)
-        }
+    val devUrlPref = when (dashboard.id) {
+        DEV_RIVE_DASHBOARD_ID -> PREF_DEV_RIVE_FILE_URI
+        DEV_URL_DASHBOARD_ID -> PREF_DEV_DASHBOARD_URL
+        else -> return dashboard
     }
-    return dashboard
+    val savedUrl = prefs.getString(devUrlPref, null)
+    return if (savedUrl.isNullOrEmpty()) defaultDashboard() else dashboard.copy(url = savedUrl)
 }
 
 fun saveSelectedDashboard(context: Context, dashboard: DashboardConfig) {
@@ -89,6 +91,26 @@ fun saveDevRiveFileUri(context: Context, uri: String) {
         .edit {
             putString(PREF_DEV_RIVE_FILE_URI, uri)
         }
+}
+
+fun getDevDashboardUrl(context: Context): String =
+    context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
+        .getString(PREF_DEV_DASHBOARD_URL, null).orEmpty()
+
+fun saveDevDashboardUrl(context: Context, url: String) {
+    context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
+        .edit {
+            putString(PREF_DEV_DASHBOARD_URL, url)
+        }
+}
+
+fun isDevUrlHintShown(context: Context): Boolean =
+    context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
+        .getBoolean(PREF_DEV_URL_HINT_SHOWN, false)
+
+fun setDevUrlHintShown(context: Context) {
+    context.getSharedPreferences(DASH_PREFS_NAME, Context.MODE_PRIVATE)
+        .edit { putBoolean(PREF_DEV_URL_HINT_SHOWN, true) }
 }
 
 fun isOnboardingCompleted(context: Context): Boolean =

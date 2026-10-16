@@ -72,16 +72,26 @@ val availableDashboards = buildList {
             screenshotRes = R.drawable.preview_rive
         )
     )
-
-    add(
-        DashboardConfig(
-            id = "dev_rive",
-            nameRes = R.string.dashboard_name_dev_rive,
-            url = "",
-            type = DashboardType.DEV_RIVE
-        )
-    )
 }
+
+const val DEV_RIVE_DASHBOARD_ID = "dev_rive"
+const val DEV_URL_DASHBOARD_ID = "dev_url"
+
+// Selectable only from the Developer settings; their url is filled in from prefs.
+val developerDashboards = listOf(
+    DashboardConfig(
+        id = DEV_RIVE_DASHBOARD_ID,
+        nameRes = R.string.dashboard_name_dev_rive,
+        url = "",
+        type = DashboardType.DEV_RIVE
+    ),
+    DashboardConfig(
+        id = DEV_URL_DASHBOARD_ID,
+        nameRes = R.string.dashboard_name_dev_url,
+        url = "",
+        type = DashboardType.WEB
+    ),
+)
 
 // Mutable, written once at app startup by MainActivity via setLoadedManifests().
 // Reads happen via DashboardConfig.withManifest() and dashboardById().

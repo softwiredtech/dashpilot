@@ -1,8 +1,5 @@
 package com.softwiredtech.dashpilot.ui
 
-import android.content.Intent
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -47,11 +44,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.datamodel.dash.DashboardConfig
-import com.softwiredtech.dashpilot.datamodel.dash.DashboardType
 import com.softwiredtech.dashpilot.datamodel.dash.availableDashboards
-import com.softwiredtech.dashpilot.datamodel.dash.dashboardById
 import com.softwiredtech.dashpilot.datamodel.dash.getSelectedDashboard
-import com.softwiredtech.dashpilot.datamodel.dash.saveDevRiveFileUri
 import com.softwiredtech.dashpilot.datamodel.dash.saveSelectedDashboard
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
 import com.softwiredtech.dashpilot.ui.theme.DarkColors
@@ -62,20 +56,6 @@ fun ThemePickerScreen(onBack: () -> Unit) {
     val context = LocalContext.current
     val selectedDashboardId = remember {
         mutableStateOf(getSelectedDashboard(context).id)
-    }
-
-    val filePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument()
-    ) { uri ->
-        if (uri != null) {
-            runCatching {
-                context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            }
-            saveDevRiveFileUri(context, uri.toString())
-            selectedDashboardId.value = "dev_rive"
-            saveSelectedDashboard(context, dashboardById("dev_rive")!!)
-            onBack()
-        }
     }
 
     Scaffold(
@@ -120,13 +100,9 @@ fun ThemePickerScreen(onBack: () -> Unit) {
                     dashboard = dashboard,
                     isSelected = dashboard.id == selectedDashboardId.value,
                     onClick = {
-                        if (dashboard.type == DashboardType.DEV_RIVE) {
-                            filePickerLauncher.launch(arrayOf("*/*"))
-                        } else {
-                            selectedDashboardId.value = dashboard.id
-                            saveSelectedDashboard(context, dashboard)
-                            onBack()
-                        }
+                        selectedDashboardId.value = dashboard.id
+                        saveSelectedDashboard(context, dashboard)
+                        onBack()
                     }
                 )
             }

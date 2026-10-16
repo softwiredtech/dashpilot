@@ -1,86 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "Model 3 / Model Y" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Model 3 / Model Y"
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Model 3 / Model Y"
-          }
-        }
-      }
-    },
-    "Model year 2025 and newer" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modelljahr 2025 und neuer"
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "2025-ös és újabb modellév"
-          }
-        }
-      }
-    },
-    "Model years 2019–2024" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modelljahre 2019–2024"
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "2019–2024-es modellévek"
-          }
-        }
-      }
-    },
-    "Car" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auto"
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Autó"
-          }
-        }
-      }
-    },
-    "Model Y Juniper" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Model Y Juniper"
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Model Y Juniper"
-          }
-        }
-      }
-    },
     "" : {
 
     },
@@ -232,22 +152,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Klíma legyező mód"
-          }
-        }
-      }
-    },
-    "Demo" : {
-      "localizations" : {
-        "de" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Demo"
-          }
-        },
-        "hu" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Demó"
           }
         }
       }
@@ -552,6 +456,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mégse"
+          }
+        }
+      }
+    },
+    "Car" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Auto"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autó"
           }
         }
       }
@@ -1012,6 +932,38 @@
         }
       }
     },
+    "Dash app loaded" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dash-App geladen"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dash app betöltve"
+          }
+        }
+      }
+    },
+    "Dash App URL" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dash-App-URL"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dash app URL"
+          }
+        }
+      }
+    },
     "Dashboard" : {
       "localizations" : {
         "de" : {
@@ -1196,6 +1148,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Adatforrás"
+          }
+        }
+      }
+    },
+    "Demo" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demo"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Demó"
+          }
+        }
+      }
+    },
+    "Developer" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entwickler"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fejlesztő"
           }
         }
       }
@@ -1436,6 +1420,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Energia"
+          }
+        }
+      }
+    },
+    "Enter a valid http(s) URL" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gib eine gültige http(s)-URL ein"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adj meg egy érvényes http(s) URL-t"
           }
         }
       }
@@ -1926,6 +1926,38 @@
         }
       }
     },
+    "Load" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laden"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Betöltés"
+          }
+        }
+      }
+    },
+    "Load dash app from URL" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dash-App von URL laden"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dash app betöltése URL-ről"
+          }
+        }
+      }
+    },
     "Load Rive File" : {
       "localizations" : {
         "de" : {
@@ -1938,6 +1970,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rive fájl betöltése"
+          }
+        }
+      }
+    },
+    "Loaded. Tap Drive to open it." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geladen. Tippe auf Fahren, um sie zu öffnen."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Betöltve. Koppints a Vezetés gombra a megnyitáshoz."
           }
         }
       }
@@ -2102,6 +2150,70 @@
         }
       }
     },
+    "Model 3 / Model Y" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model 3 / Model Y"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model 3 / Model Y"
+          }
+        }
+      }
+    },
+    "Model Y Juniper" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model Y Juniper"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model Y Juniper"
+          }
+        }
+      }
+    },
+    "Model year 2025 and newer" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelljahr 2025 und neuer"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2025-ös és újabb modellév"
+          }
+        }
+      }
+    },
+    "Model years 2019–2024" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modelljahre 2019–2024"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2019–2024-es modellévek"
+          }
+        }
+      }
+    },
     "Multi-touch" : {
       "localizations" : {
         "de" : {
@@ -2181,6 +2293,10 @@
           }
         }
       }
+    },
+    "OK" : {
+      "comment" : "The label of a button that dismisses an alert.",
+      "isCommentAutoGenerated" : true
     },
     "On" : {
       "localizations" : {
@@ -2778,6 +2894,22 @@
       "comment" : "Name of the Rive dashboard type.",
       "isCommentAutoGenerated" : true
     },
+    "Rive File" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rive-Datei"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rive fájl"
+          }
+        }
+      }
+    },
     "Searching for device..." : {
       "localizations" : {
         "de" : {
@@ -3030,6 +3162,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chill módról Standardra vált, amíg a gázpedál a küszöbérték fölött van lenyomva. Visszaáll Chill-re, amikor felengeded a pedált."
+          }
+        }
+      }
+    },
+    "Tap Drive to open it. Not in your car? Pick Demo as the data source on the home screen." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tippe auf Fahren, um sie zu öffnen. Nicht im Auto? Wähle Demo als Datenquelle auf dem Startbildschirm."
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Koppints a Vezetés gombra a megnyitáshoz. Nem vagy az autóban? Válaszd a Demo adatforrást a kezdőképernyőn."
           }
         }
       }

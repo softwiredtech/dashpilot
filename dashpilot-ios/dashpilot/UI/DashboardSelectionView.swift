@@ -24,21 +24,16 @@ struct DashboardSelectionView: View {
 
                 LazyVGrid(columns: columns, spacing: 16) {
                     ForEach(availableDashboards) { dashboard in
-                        if dashboard.type == .devRive {
+                        NavigationLink(value: AppRoute.dashboard(
+                            type: dashboard.type.rawValue,
+                            url: dashboard.url
+                        )) {
                             DashboardCard(dashboard: dashboard)
-                                .onTapGesture {}
-                        } else {
-                            NavigationLink(value: AppRoute.dashboard(
-                                type: dashboard.type.rawValue,
-                                url: dashboard.url
-                            )) {
-                                DashboardCard(dashboard: dashboard)
-                            }
-                            .buttonStyle(.plain)
-                            .simultaneousGesture(TapGesture().onEnded {
-                                UserDefaults.standard.set(dashboard.id, forKey: DisplaySettings.keySelectedDashboardId)
-                            })
                         }
+                        .buttonStyle(.plain)
+                        .simultaneousGesture(TapGesture().onEnded {
+                            UserDefaults.standard.set(dashboard.id, forKey: DisplaySettings.keySelectedDashboardId)
+                        })
                     }
                 }
                 .padding(.horizontal, 4)
@@ -61,8 +56,7 @@ private struct DashboardCard: View {
             Color(white: 0.16)
                 .aspectRatio(16.0 / 9.0, contentMode: .fit)
                 .overlay {
-                    if dashboard.type != .devRive,
-                       let name = dashboard.screenshotName, UIImage(named: name) != nil {
+                    if let name = dashboard.screenshotName, UIImage(named: name) != nil {
                         Image(name)
                             .resizable()
                             .scaledToFill()
