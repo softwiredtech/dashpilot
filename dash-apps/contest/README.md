@@ -43,8 +43,9 @@ One entry per person. You can push fixes to your PR until the deadline.
 
 - Landscape, readable at a glance while driving: the speed is the most legible thing on screen.
 - Works offline: no network requests, everything ships in your folder.
-- Web: 10 MB max, and works on both Android and iOS. The README explains the difference.
-- Rive: 5 MB max, built on the `DashViewModel` described in the README.
+- 5 MB max per entry: the web folder or the `.riv` file, not counting `preview.jpg` and Rive source files.
+- Web: works on both Android and iOS. The README explains the difference.
+- Rive: built on the `DashViewModel` described in the README.
 - Your own work. Entries are contributed under this repo's [MIT license](../../LICENSE) so we can ship them.
 - **Assets are your responsibility.** Every font, image, icon and sound must be yours or licensed for redistribution in an MIT project. List each one with its source and license in your README. Entries with unlicensed assets are disqualified.
 
