@@ -7,8 +7,8 @@ Build the dashboard people look at while they drive. Two categories, one winner 
 
 | | |
 |---|---|
-| Submissions open | TBD |
-| Deadline | October 30, midnight (Budapest time) |
+| Submissions open | October 16 |
+| Deadline | October 30, 23:00 GMT |
 | Winners announced | November 12, on the [DashKit Discord](https://discord.gg/naTZgwVqvA) and [@softwiredtech](https://x.com/softwiredtech) on X |
 
 ## Getting started
