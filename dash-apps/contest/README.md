@@ -37,12 +37,11 @@ dash-apps/contest/<github-username>-<app-name>/
 
 Make a **screen recording** (30–60 s) of your dashboard running in DashPilot with the Demo data source. Attach it to the PR description, and post it with a link to your PR in **#hmi-challenge** on the [DashKit Discord](https://discord.gg/naTZgwVqvA).
 
-One entry per category per person. You can push fixes to your PR until the deadline.
+One entry per person. You can push fixes to your PR until the deadline.
 
 ## Rules
 
 - Landscape, readable at a glance while driving: the speed is the most legible thing on screen.
-- No large flashing areas.
 - Works offline: no network requests, everything ships in your folder.
 - Web: 10 MB max, and works on both Android and iOS. The README explains the difference.
 - Rive: 5 MB max, built on the `DashViewModel` described in the README.
@@ -51,6 +50,11 @@ One entry per category per person. You can push fixes to your PR until the deadl
 
 ## Judging
 
-Winners are picked by the DashPilot team. The popularity of your dash app also counts (social media shares, etc.).
+Winners are picked by the DashPilot team. We look at:
 
-Winners and runners-up are merged and shipped in DashPilot with credit. We'll contact winners through GitHub to arrange payment.
+- **Readability:** can the driver read the speed and other key info with a quick glance, without taking their eyes off the road for long?
+- **Creativity:** does it look and feel different from the dashboards DashPilot already has?
+- **Use of car data:** does it show more than the speed? Think blinkers, blind spots, gear, driver assist and battery. See the [CarState](../README.md#carstate) for everything you get.
+- **Popularity:** social media shares, likes, etc.
+
+Winners and runners-up are merged and shipped in DashPilot with credit. We'll contact winners by email to arrange payment.

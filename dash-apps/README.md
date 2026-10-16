@@ -107,7 +107,7 @@ The app plays the file's default state machine and resizes the artboard to the s
 
 [`rive/dash-demo/`](rive/dash-demo/) is a demo dashboard written in Rive markup. It declares every property, so it's a good starting point. `rive dash-apps/rive/dash-demo --once` with the [Rive CLI](https://rive.app) rebuilds `rive/dash_demo.riv`.
 
-To try your own `.riv` on a phone, pick **Load Rive File** in the dashboard theme picker.
+To try your own `.riv` on a phone, go to Settings → Developer → **Load Rive File**.
 
 ## Saving settings
 

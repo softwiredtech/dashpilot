@@ -2,76 +2,50 @@
 
 ![DashPilot dash apps running in a Tesla](./banner.jpg)
 
-Turn your phone into a real-time dashboard for your car.  
-DashPilot connects to your car, and provides a real-time dashboard right on your phone. It serves as a speedometer, shows the ACC speed you set, speed limit, blinkers, blind spots, and many more.
-The good part is you can write your own dashboard as a [Rive](https://rive.app) or a web app.  
-Check out the [dash-apps](./dash-apps) folder for examples.
-Currently only Teslas are supported, but we're looking for adding support to other brands as well.
+A companion app for [DashKit](https://github.com/softwiredtech/dashkit-firmware), an open-source controller for Teslas.
 
-## Project structure
+DashKit plugs into the car and streams live car data to your phone over Bluetooth Low Energy. DashPilot turns it into a real-time dashboard: speed, gear, blinkers, blind spots, cruise set speed, speed limit, battery and more. Through DashKit it can also control the car (frunk, trunk, charge port, mirrors, climate) and run automations like keeping the climate on after you leave.
 
-`/dash-apps`:  
+Supported cars: Tesla Model 3 / Model Y (2019–2024) and Model Y Juniper (2025+).
 
-These are the example apps running in the [dashpilot-android](./dashpilot-android/) sandbox app. They fall into two main categories: web apps, and [Rive](https://rive.app) apps. `web-vanilla` includes a prebuilt Bevy (WebAssembly) renderer for its 3D ADAS view. See the [dash-apps](./dash-apps/) readme for more.
+Get it on [Google Play](https://play.google.com/store/apps/details?id=com.softwiredtech.dashpilot) or [TestFlight](https://testflight.apple.com/join/hXTwZmh5), and join us on [Discord](https://discord.gg/naTZgwVqvA).
 
-`/dashpilot-android`:  
+## Dash apps
 
-The android app that handles the connection to the vehicle, and running the `/dash-apps`.
-It has two main parts: the `bridge` and the `app` module.  
-The `bridge` module contains the code that establishes connection to the car, and handles CAN message, signal decoding.
-The `app` module contains the code for the various data sources, rive / web dash views, navigation, UI, settings, etc. 
+The dashboards are dash apps: a web app (HTML, CSS, JavaScript) or a [Rive](https://rive.app) file. You can write your own. The [dash-apps README](./dash-apps/README.md) describes the data they receive, and the built-in dashboards are working examples.
 
-`/simulator`:  
+To try yours on a phone, open Settings → Developer: **Load Rive File**, or **Load dash app from URL** for a web app served from your computer. Set the data source to **Demo** on the home screen to get simulated driving data without a car.
 
-A python based websocket server and simulator. It can generate dynamic scenarios for the dash apps, and can also replay pre-recorded `routes`.
+🏆 **[Dash App Contest](./dash-apps/contest/README.md)**: build a dashboard and win $250. Submissions are open until October 30.
 
-`python3 server.py --route '/path/to/a/route.jsonl'`
+## Data sources
 
-The server will print the ip, which you can enter in the DashPilot app start screen after selecting the WebSocket datasource.
+- **DashKit**: the main one, over Bluetooth Low Energy.
+- **Demo**: a loop of simulated driving, built into the app.
+- **comma**: reads the car through a [comma](https://comma.ai) device running openpilot. It works, but it isn't actively maintained.
+- **WebSocket**: connects to the [simulator](./simulator/), which can generate scenarios or replay recorded routes. Android debug builds only.
 
-NOTE:  
-If you have [openpilot](https://github.com/commaai/openpilot) tools installed you can use the [replay](https://github.com/commaai/openpilot/tree/master/tools/replay) tool, or [cabana](https://github.com/commaai/openpilot/tree/master/tools/cabana) to stream a route, that `dashpilot-android` can receive.  
+## Repo structure
 
-To do this, follow these steps inside your cloned openpilot folder:
+| folder | |
+|---|---|
+| [`dashpilot-android/`](./dashpilot-android/) | Android app (Kotlin, Jetpack Compose) |
+| [`dashpilot-ios/`](./dashpilot-ios/) | iOS app (SwiftUI) |
+| [`dash-apps/`](./dash-apps/) | the built-in dashboards, and the contest |
+| [`bridge/`](./bridge/) | C++ car connection and CAN decoding used by the comma data source, see its [README](./bridge/README.md) |
+| [`simulator/`](./simulator/) | Python WebSocket server that simulates or replays drives |
+| [`scripts/`](./scripts/) | copy the dash apps into the Android and iOS builds |
 
-- `cd tools/replay`
-- `./replay 'segment-name' --data_dir="/path/to/the/folder/your/route/is/in" -a "can"`
-- `cd cereal/messaging && ./bridge "can"`
+## Building
 
-This will start replaying the route, and starts the bridge, so that you can connect to it in `dashpilot-android` as if you were connecting to a real comma device. It uses the same `zmq` code path, and `dbc` handling as the real comma connection.
-
-## How to run
-
-1. 
-
-You have two options:  
-
-- Start a simulator (either our websocket server, or the openpilot replay tool)
-- SSH into your comma, and start the bridge: `cd cereal/messaging` then `./bridge "can"`
-
-2. run `./scripts/sync-vanilla-to-android` to sync `dash-apps/web-vanilla` into the android assets folder, so the our current main dash app works offline
-
-3. Build and run the DashPilot android app in Android Studio  
-
-4. Open the app and select a datasource: either Comma or WebSocket for now (remember: if you use openpilot replay tool, you have to select the comma data source, in the same way as if you were connecting to an actual comma device)
-
-5. Enter the ip of the device your connecting to (the device in case of websocket is the websocket server's ip, and in case of openpilot replay tool, the ip of the device the replay tool is running on. For comma, you can find the ip of the device in the network settings)
-
-6. Tap on "Connect" and select a dashboard
-
-7. Enjoy
-
+- **Android:** open `dashpilot-android` in Android Studio and run. The dash apps are copied into the app automatically before each build.
+- **iOS:** open `dashpilot-ios/dashpilot.xcodeproj` in Xcode and run. An Xcode build phase copies the dash apps.
 
 ## Contributing
 
-We're looking for:
-- bug fixes
-- performance improvements
-- good tests
-- ports to other brands
+We're looking for bug fixes, performance improvements, good tests, and new dash apps.
 
-The guideline you should follow:
-- Your first PR should be a small bugfix or improvement. Don't submit a big change if you haven't yet contributed.
-- Keep the PRs as small and isolated as possible: never submit conceptually different changes in the same PR. If there are a lot of changes and they are conceptually the same, you should still break them up, and submit them separetely, then you can write it in the PR comment which PRs depend on that PR.
-- Using AI tools is obviously fine *as long as you understand every line you're submitting*. If during the PR discussion it is clear that you're not understanding the change, the PR will be closed.
-- The commit message should contain which part(s) of the stack that change is affecting, for exmaple starting with "[bridge]" if it is a change affecting the bridge module, or "[dashpilot-android]" if it is touching the DashPilot android app, etc.
+- Make your first PR a small bugfix or improvement. Don't submit a big change if you haven't contributed yet.
+- Keep PRs small and isolated: never mix conceptually different changes in one PR. If a large change is conceptually one thing, still split it up and note in each PR which ones it depends on.
+- Using AI tools is fine *as long as you understand every line you submit*. If it's clear during review that you don't understand the change, the PR will be closed.
+- Start the PR title with the part of the stack it touches, e.g. `[android]`, `[ios]`, `[dash-apps]` or `[bridge]`.
