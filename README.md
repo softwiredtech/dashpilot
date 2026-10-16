@@ -36,6 +36,8 @@ To try yours on a phone, open Settings → Developer: **Load Rive File**, or **L
 | [`simulator/`](./simulator/) | Python WebSocket server that simulates or replays drives |
 | [`scripts/`](./scripts/) | copy the dash apps into the Android and iOS builds |
 
+The DashKit firmware lives in its own repo: [softwiredtech/dashkit-firmware](https://github.com/softwiredtech/dashkit-firmware).
+
 ## Building
 
 - **Android:** open `dashpilot-android` in Android Studio and run. The dash apps are copied into the app automatically before each build.
