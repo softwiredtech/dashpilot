@@ -23,7 +23,15 @@ To try yours on a phone, open Settings → Developer: **Load Rive File**, or **L
 - **DashKit**: the main one, over Bluetooth Low Energy.
 - **Demo**: a loop of simulated driving, built into the app.
 - **comma**: reads the car through a [comma](https://comma.ai) device running openpilot. It works, but it isn't actively maintained.
-- **WebSocket**: connects to the [simulator](./simulator/), which can generate scenarios or replay recorded routes. Android debug builds only.
+- **WebSocket**: reads car data from your own server, handy for feeding recorded or generated drives. Android debug builds only.
+
+### WebSocket data source
+
+The app connects as a client to `ws://<ip>:8080`, where `<ip>` is the address you enter in the app. The port is fixed. Your server sends one JSON object per message, as often as it likes, each one a full snapshot of the car state using the [CarState](./dash-apps/README.md#carstate) keys. Keys you leave out read as `0` / `false`. Send metric values (odometer in km, temperatures in °C, speed limit in km/h): the app converts them when the user picks imperial units. `egoSpeed` and `accSetSpeed` are shown as-is.
+
+```json
+{ "egoSpeed": 87, "gear": 4, "leftBlinker": 2, "adasOn": true, "accSetSpeed": 90, "fusedSpeedLimit": 90 }
+```
 
 ## Repo structure
 
@@ -33,7 +41,6 @@ To try yours on a phone, open Settings → Developer: **Load Rive File**, or **L
 | [`dashpilot-ios/`](./dashpilot-ios/) | iOS app (SwiftUI) |
 | [`dash-apps/`](./dash-apps/) | the built-in dashboards, and the contest |
 | [`bridge/`](./bridge/) | C++ car connection and CAN decoding used by the comma data source, see its [README](./bridge/README.md) |
-| [`simulator/`](./simulator/) | Python WebSocket server that simulates or replays drives |
 | [`scripts/`](./scripts/) | copy the dash apps into the Android and iOS builds |
 
 The DashKit firmware lives in its own repo: [softwiredtech/dashkit-firmware](https://github.com/softwiredtech/dashkit-firmware).
