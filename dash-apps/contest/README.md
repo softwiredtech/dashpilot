@@ -1,6 +1,6 @@
 # Dash App Contest
 
-Build the dashboard people look at while they drive. Two categories, one winner each, **$300 per winner**:
+Build the dashboard people look at while they drive. Two categories, one winner each, **$250 per winner**, paid out by Softwired Technologies Ltd.:
 
 - **Web**: HTML, CSS and JavaScript
 - **Rive**: a `.riv` file
@@ -8,8 +8,8 @@ Build the dashboard people look at while they drive. Two categories, one winner 
 | | |
 |---|---|
 | Submissions open | TBD |
-| Deadline | TBD |
-| Winners announced | TBD |
+| Deadline | October 30, midnight (Budapest time) |
+| Winners announced | November 12, on the [DashKit Discord](https://discord.gg/naTZgwVqvA) and [@softwiredtech](https://x.com/softwiredtech) on X |
 
 ## Getting started
 
@@ -19,8 +19,8 @@ Part of the challenge is finding your way around this repo. Start with the [dash
 
 Install DashPilot from [Google Play](https://play.google.com/store/apps/details?id=com.softwiredtech.dashpilot) or [TestFlight](https://testflight.apple.com/join/hXTwZmh5). On the home screen, set the data source to **Demo**: it plays a loop of simulated driving, so you don't need a car.
 
-- **Rive:** Dashboard Theme → **Load Rive File**.
-- **Web:** Dashboard Theme → **Load Web Dash**, then enter the address of your page served from your computer (e.g. `http://192.168.1.20:8000`).
+- **Rive:** Settings → Developer → **Load Rive File**.
+- **Web:** Settings → Developer → **Load dash app from URL**, then enter the address of your page served from your computer (e.g. `http://192.168.1.20:8000`).
 
 Test both on a phone in landscape before you submit.
 
@@ -51,11 +51,6 @@ One entry per category per person. You can push fixes to your PR until the deadl
 
 ## Judging
 
-| | |
-|---|---|
-| Readable at a glance while driving | 30% |
-| Design and originality | 30% |
-| Uses the data well (warnings, assist, battery) | 20% |
-| Smooth and polished in the app | 20% |
+Winners are picked by the DashPilot team. The popularity of your dash app also counts (social media shares, etc.).
 
 Winners and runners-up are merged and shipped in DashPilot with credit. We'll contact winners through GitHub to arrange payment.
