@@ -1,0 +1,9 @@
+name: horizon
+main: Horizon
+artboard:
+  background: "#000000"
+output:
+  dir: ..
+logs:
+  file: build/rive.log
+  problems: build/problems.log
