@@ -7,21 +7,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
+import app.rive.ExperimentalDeferredRendering
 import app.rive.Fit
 import app.rive.Result
 import app.rive.Rive
 import app.rive.RiveFile
 import app.rive.RiveFileSource
 import app.rive.ViewModelSource
+import app.rive.rememberDeferredRiveWorker
 import app.rive.rememberRiveFile
-import app.rive.rememberRiveWorkerOrNull
 import app.rive.rememberViewModelInstance
 import app.rive.runtime.kotlin.core.ViewModel.PropertyDataType
 import com.softwiredtech.dashpilot.datamodel.dash.DashState
@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.Flow
 private const val DASH_VIEW_MODEL = "DashViewModel"
 private const val ARTBOARD_HEIGHT = 1080f
 
+@OptIn(ExperimentalDeferredRendering::class)
 @Composable
 fun RiveDashView(
     assetName: String,
@@ -46,12 +47,9 @@ fun RiveDashView(
     ) {
         val fit = Fit.Layout(constraints.maxHeight / ARTBOARD_HEIGHT)
         val context = LocalContext.current
-        val errorState = remember { mutableStateOf<Throwable?>(null) }
-        val riveWorker = rememberRiveWorkerOrNull(errorState)
-        if (riveWorker == null) {
-            onError(errorState.value.toString())
-            return@BoxWithConstraints
-        }
+        // GPU Canvas content (WGSL shaders over a script-drawn canvas) only renders on a deferred
+        // worker. Dashboards that do not use GPU Canvas simply do not exercise it.
+        val riveWorker = rememberDeferredRiveWorker()
 
         val riveSource = remember(assetName, fileUri) {
             if (!fileUri.isNullOrEmpty()) {

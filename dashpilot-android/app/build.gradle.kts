@@ -79,7 +79,7 @@ tasks.named("preBuild") {
 
 dependencies {
     implementation(project(":bridge"))
-    implementation("app.rive:rive-android:11.14.1")
+    implementation("app.rive:rive-android:11.14.3")
     implementation("androidx.startup:startup-runtime:1.1.1")
     implementation("androidx.webkit:webkit:1.12.1")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
