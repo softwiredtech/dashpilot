@@ -1,0 +1,124 @@
+<Rive version="1" kind="fragment">
+    <!-- The host writes these by name every frame. Keep every name and type exactly as is. -->
+    <ViewModel defaultInstanceId="1:2" name="DashViewModel" id="1:1">
+        <ViewModelPropertyNumber name="egoSpeed" id="1:10"/>
+        <ViewModelPropertyNumber name="gear" id="1:11"/>
+        <ViewModelPropertyNumber name="egoSteeringAngle" id="1:12"/>
+        <ViewModelPropertyNumber name="leftBlinker" id="1:13"/>
+        <ViewModelPropertyNumber name="rightBlinker" id="1:14"/>
+        <ViewModelPropertyNumber name="anyDoorOpen" id="1:15"/>
+        <ViewModelPropertyNumber name="buckleStatus" id="1:16"/>
+        <ViewModelPropertyNumber name="odometer" id="1:17"/>
+        <ViewModelPropertyNumber name="accSetSpeed" id="1:18"/>
+        <ViewModelPropertyNumber name="fusedSpeedLimit" id="1:19"/>
+        <ViewModelPropertyNumber name="leftBlindSpot" id="1:20"/>
+        <ViewModelPropertyNumber name="rightBlindSpot" id="1:21"/>
+        <ViewModelPropertyNumber name="trafficLightColor" id="1:24"/>
+        <ViewModelPropertyNumber name="stopLineDist" id="1:25"/>
+        <ViewModelPropertyNumber name="nominalEnergyRemaining" id="1:26"/>
+        <ViewModelPropertyNumber name="fullPackEnergy" id="1:27"/>
+        <ViewModelPropertyNumber name="energyBuffer" id="1:28"/>
+        <ViewModelPropertyNumber name="powerLevel" id="1:29"/>
+        <ViewModelPropertyNumber name="packVoltage" id="1:30"/>
+        <ViewModelPropertyNumber name="packCurrent" id="1:31"/>
+        <ViewModelPropertyNumber name="maxRegenPower" id="1:32"/>
+        <ViewModelPropertyNumber name="maxDischargePower" id="1:33"/>
+        <ViewModelPropertyNumber name="packTMin" id="1:34"/>
+        <ViewModelPropertyNumber name="packTMax" id="1:35"/>
+        <ViewModelPropertyNumber name="currentTime" id="1:36"/>
+        <ViewModelPropertyNumber name="phoneBattery" id="1:37"/>
+        <ViewModelPropertyNumber name="darkModeBackgroundGray" id="1:38"/>
+        <ViewModelPropertyNumber name="renderQuality" id="1:39"/>
+        <ViewModelPropertyNumber name="speedCameraDistance" id="1:40"/>
+
+        <ViewModelPropertyBoolean name="adasOn" id="1:50"/>
+        <ViewModelPropertyBoolean name="changingLane" id="1:51"/>
+        <ViewModelPropertyBoolean name="madsActive" id="1:52"/>
+        <ViewModelPropertyBoolean name="experimentalMode" id="1:53"/>
+        <ViewModelPropertyBoolean name="selfdriveActive" id="1:54"/>
+        <ViewModelPropertyBoolean name="isImperial" id="1:55"/>
+        <ViewModelPropertyBoolean name="darkMode" id="1:56"/>
+        <ViewModelPropertyBoolean name="showPhoneBattery" id="1:57"/>
+        <ViewModelPropertyBoolean name="showCarBattery" id="1:58"/>
+        <ViewModelPropertyBoolean name="showOdometer" id="1:59"/>
+        <ViewModelPropertyBoolean name="alwaysOnBlindSpotMonitor" id="1:60"/>
+
+        <ViewModelPropertyString name="dataSourceType" id="1:70"/>
+
+        <!-- ours, not DashPilot's: the GPU layer sets it so the native copy underneath stops drawing -->
+        <ViewModelPropertyBoolean name="fxActive" id="1:80"/>
+        <!-- ours: the GPU script scrolls the lane marks with the speed (stays 0 without scripts) -->
+        <ViewModelPropertyNumber name="laneScroll" id="1:81"/>
+        <!-- ours: the start-up, written by the GPU script; the defaults are the finished dash -->
+        <ViewModelPropertyNumber name="introMain" id="1:82"/>
+        <ViewModelPropertyNumber name="introSide" id="1:83"/>
+        <ViewModelPropertyNumber name="introBars" id="1:84"/>
+        <ViewModelPropertyNumber name="introCount" id="1:85"/>
+        <ViewModelPropertyNumber name="introSweep" id="1:86"/>
+        <!-- ours: punch and glow on the big numbers, written by the GPU script. Hot/cool fade a tinted copy in over the white number, punch is its scale (the defaults are the calm, still number) -->
+        <ViewModelPropertyNumber name="spdHot" id="1:90"/>
+        <ViewModelPropertyNumber name="spdCool" id="1:91"/>
+        <ViewModelPropertyNumber name="spdPunch" id="1:92"/>
+        <ViewModelPropertyNumber name="kwHot" id="1:93"/>
+        <ViewModelPropertyNumber name="kwCool" id="1:94"/>
+        <ViewModelPropertyNumber name="kwPunch" id="1:95"/>
+
+        <ViewModelInstance exports="true" name="Default" id="1:2">
+            <ViewModelInstanceNumber propertyValue="72" viewModelPropertyId="1:10" id="0:4992"/>
+            <ViewModelInstanceNumber propertyValue="4" viewModelPropertyId="1:11" id="0:4993"/>
+            <ViewModelInstanceNumber propertyValue="-12" viewModelPropertyId="1:12" id="0:4994"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="1:13" id="0:4995"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="1:14" id="0:4996"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="1:15" id="0:4997"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="1:16" id="0:4998"/>
+            <ViewModelInstanceNumber propertyValue="42180" viewModelPropertyId="1:17" id="0:4999"/>
+            <ViewModelInstanceNumber propertyValue="75" viewModelPropertyId="1:18" id="0:5000"/>
+            <ViewModelInstanceNumber propertyValue="80" viewModelPropertyId="1:19" id="0:5001"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="1:20" id="0:5002"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="1:21" id="0:5003"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="1:24" id="0:5004"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="1:25" id="0:5005"/>
+            <ViewModelInstanceNumber propertyValue="52" viewModelPropertyId="1:26" id="0:5006"/>
+            <ViewModelInstanceNumber propertyValue="75" viewModelPropertyId="1:27" id="0:5007"/>
+            <ViewModelInstanceNumber propertyValue="1.5" viewModelPropertyId="1:28" id="0:5008"/>
+            <ViewModelInstanceNumber propertyValue="28" viewModelPropertyId="1:29" id="0:5009"/>
+            <ViewModelInstanceNumber propertyValue="396" viewModelPropertyId="1:30" id="0:5010"/>
+            <ViewModelInstanceNumber propertyValue="78" viewModelPropertyId="1:31" id="0:5011"/>
+            <ViewModelInstanceNumber propertyValue="60" viewModelPropertyId="1:32" id="0:5012"/>
+            <ViewModelInstanceNumber propertyValue="250" viewModelPropertyId="1:33" id="0:5013"/>
+            <ViewModelInstanceNumber propertyValue="24" viewModelPropertyId="1:34" id="0:5014"/>
+            <ViewModelInstanceNumber propertyValue="31" viewModelPropertyId="1:35" id="0:5015"/>
+            <ViewModelInstanceNumber propertyValue="26700" viewModelPropertyId="1:36" id="0:5016"/>
+            <ViewModelInstanceNumber propertyValue="82" viewModelPropertyId="1:37" id="0:5017"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="1:38" id="0:5018"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="1:39" id="0:5019"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="1:40" id="0:5020"/>
+
+            <ViewModelInstanceBoolean propertyValue="true" viewModelPropertyId="1:50" id="0:5021"/>
+            <ViewModelInstanceBoolean propertyValue="false" viewModelPropertyId="1:51" id="0:5022"/>
+            <ViewModelInstanceBoolean propertyValue="false" viewModelPropertyId="1:52" id="0:5023"/>
+            <ViewModelInstanceBoolean propertyValue="false" viewModelPropertyId="1:53" id="0:5024"/>
+            <ViewModelInstanceBoolean propertyValue="true" viewModelPropertyId="1:54" id="0:5025"/>
+            <ViewModelInstanceBoolean propertyValue="false" viewModelPropertyId="1:55" id="0:5026"/>
+            <ViewModelInstanceBoolean propertyValue="true" viewModelPropertyId="1:56" id="0:5027"/>
+            <ViewModelInstanceBoolean propertyValue="true" viewModelPropertyId="1:57" id="0:5028"/>
+            <ViewModelInstanceBoolean propertyValue="true" viewModelPropertyId="1:58" id="0:5029"/>
+            <ViewModelInstanceBoolean propertyValue="true" viewModelPropertyId="1:59" id="0:5030"/>
+            <ViewModelInstanceBoolean propertyValue="false" viewModelPropertyId="1:60" id="0:5031"/>
+
+            <ViewModelInstanceString propertyValue="demo" viewModelPropertyId="1:70" id="0:5032"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="1:81" id="0:5033"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="1:82" id="0:5034"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="1:83" id="0:5035"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="1:84" id="0:5036"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="1:85" id="0:5037"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="1:86" id="0:5038"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="1:90" id="0:5040"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="1:91" id="0:5041"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="1:92" id="0:5042"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="1:93" id="0:5043"/>
+            <ViewModelInstanceNumber propertyValue="0" viewModelPropertyId="1:94" id="0:5044"/>
+            <ViewModelInstanceNumber propertyValue="1" viewModelPropertyId="1:95" id="0:5045"/>
+        </ViewModelInstance>
+    </ViewModel>
+</Rive>

@@ -1,0 +1,172 @@
+<Rive version="1" kind="fragment">
+    <!-- speed minus the posted limit, for the "+8 over" readout -->
+    <DataConverterFormula name="Over By" id="8:20">
+        <FormulaTokenInput id="0:1077"/>
+        <FormulaTokenOperation operationType="1" id="0:1078"/>
+        <FormulaTokenValue id="0:1079"><DataBindContext sourcePathIds="1:1-1:19" propertyKey="777" id="0:1080"/></FormulaTokenValue>
+    </DataConverterFormula>
+    <DataConverterGroup name="Over By Text" id="8:21">
+        <DataConverterGroupItem converterId="8:20" id="0:1081"/>
+        <DataConverterGroupItem converterId="2:1" id="0:1082"/>
+    </DataConverterGroup>
+    <!-- stop line: 0..150 m as a bar that shrinks to the line -->
+    <DataConverterRangeMapper minInput="0" maxInput="150" minOutput="0" maxOutput="100"
+                              clampLower="true" clampUpper="true" name="Stop Fill" id="8:22"/>
+    <DataConverterRangeMapper minInput="0" maxInput="150" minOutput="100" maxOutput="0"
+                              clampLower="true" clampUpper="true" name="Stop Rest" id="8:23"/>
+    <DataConverterGroup name="Metres Text" id="8:24">
+        <DataConverterGroupItem converterId="2:1" id="0:1083"/>
+    </DataConverterGroup>
+    <DataConverterRangeMapper minInput="-180" maxInput="180" minOutput="-0.2" maxOutput="0.2"
+                              clampLower="true" clampUpper="true" name="Steer Yaw" id="8:4"/>
+    <!-- gauges -->
+    <DataConverterRangeMapper minInput="0" maxInput="100" minOutput="0" maxOutput="0.5"
+                              clampLower="true" clampUpper="true" name="Percent To Half Arc" id="8:31"/>
+    <DataConverterGroup name="Charge Half Arc" id="8:30">
+        <DataConverterGroupItem converterId="2:16" id="0:1084"/>
+        <DataConverterGroupItem converterId="8:31" id="0:1085"/>
+    </DataConverterGroup>
+    <DataConverterRangeMapper minInput="0" maxInput="100" minOutput="-1.5707963" maxOutput="1.5707963"
+                              clampLower="true" clampUpper="true" name="Percent To Half Angle" id="8:33"/>
+    <DataConverterGroup name="Charge Knob Angle" id="8:32">
+        <DataConverterGroupItem converterId="2:16" id="0:1086"/>
+        <DataConverterGroupItem converterId="8:33" id="0:1087"/>
+    </DataConverterGroup>
+    <DataConverterRangeMapper minInput="-100" maxInput="100" minOutput="70" maxOutput="470"
+                              clampLower="true" clampUpper="true" name="Power Needle X" id="8:34"/>
+    <DataConverterRangeMapper minInput="0" maxInput="150" minOutput="470" maxOutput="110"
+                              clampLower="true" clampUpper="true" name="Stop Marker X" id="8:35"/>
+    <!-- motion: interpolators chase the 25 Hz values -->
+    <DataConverterInterpolator interpolationType="linear" duration="0.12" name="Glide 120ms" id="8:50"/>
+    <DataConverterInterpolator interpolationType="linear" duration="0.2" name="Glide 200ms" id="8:51"/>
+    <DataConverterInterpolator interpolationType="linear" duration="0.05" name="Attack 50ms" id="8:52"/>
+    <DataConverterInterpolator interpolationType="linear" duration="0.3" name="Afterglow 300ms" id="8:53"/>
+    <DataConverterInterpolator interpolationType="linear" duration="0.25" name="Wash 250ms" id="8:54"/>
+    <DataConverterInterpolator interpolationType="linear" duration="0.25" name="Fade 250ms" id="8:55"/>
+    <DataConverterInterpolator interpolationType="linear" duration="0.25" name="Fade 500ms" id="8:56"/>
+    <DataConverterGroup name="Speed Angle Smooth" id="8:60">
+        <DataConverterGroupItem converterId="2:3" id="0:1088"/>
+        <DataConverterGroupItem converterId="8:50" id="0:1089"/>
+    </DataConverterGroup>
+    <DataConverterGroup name="Speed Arc Smooth" id="8:61">
+        <DataConverterGroupItem converterId="2:2" id="0:1090"/>
+        <DataConverterGroupItem converterId="8:51" id="0:1091"/>
+    </DataConverterGroup>
+    <DataConverterGroup name="Set Angle Smooth" id="8:62">
+        <DataConverterGroupItem converterId="2:3" id="0:1092"/>
+        <DataConverterGroupItem converterId="8:51" id="0:1093"/>
+    </DataConverterGroup>
+    <DataConverterGroup name="Charge Arc Smooth" id="8:63">
+        <DataConverterGroupItem converterId="8:30" id="0:1094"/>
+        <DataConverterGroupItem converterId="8:51" id="0:1095"/>
+    </DataConverterGroup>
+    <DataConverterGroup name="Charge Knob Smooth" id="8:64">
+        <DataConverterGroupItem converterId="8:32" id="0:1096"/>
+        <DataConverterGroupItem converterId="8:51" id="0:1097"/>
+    </DataConverterGroup>
+    <DataConverterGroup name="Power Needle Smooth" id="8:65">
+        <DataConverterGroupItem converterId="8:34" id="0:1098"/>
+        <DataConverterGroupItem converterId="8:50" id="0:1099"/>
+    </DataConverterGroup>
+    <DataConverterGroup name="Stop Marker Smooth" id="8:66">
+        <DataConverterGroupItem converterId="8:35" id="0:1100"/>
+        <DataConverterGroupItem converterId="8:50" id="0:1101"/>
+    </DataConverterGroup>
+    <DataConverterGroup name="Steer Smooth" id="8:67">
+        <DataConverterGroupItem converterId="8:4" id="0:1102"/>
+        <DataConverterGroupItem converterId="8:50" id="0:1103"/>
+    </DataConverterGroup>
+    <DataConverterGroup name="Blink Attack" id="8:68">
+        <DataConverterGroupItem converterId="2:6" id="0:1104"/>
+        <DataConverterGroupItem converterId="8:52" id="0:1105"/>
+    </DataConverterGroup>
+    <DataConverterGroup name="Blink Afterglow" id="8:69">
+        <DataConverterGroupItem converterId="2:6" id="0:1106"/>
+        <DataConverterGroupItem converterId="8:53" id="0:1107"/>
+    </DataConverterGroup>
+    <DataConverterGroup name="Red Wash" id="8:70">
+        <DataConverterGroupItem converterId="2:11" id="0:1108"/>
+        <DataConverterGroupItem converterId="8:54" id="0:1109"/>
+    </DataConverterGroup>
+    <DataConverterGroup name="Green Wash" id="8:71">
+        <DataConverterGroupItem converterId="2:12" id="0:1110"/>
+        <DataConverterGroupItem converterId="8:55" id="0:1111"/>
+    </DataConverterGroup>
+    <DataConverterGroup name="Assist Glow" id="8:72">
+        <DataConverterGroupItem converterId="2:41" id="0:1112"/>
+        <DataConverterGroupItem converterId="8:56" id="0:1113"/>
+    </DataConverterGroup>
+    <DataConverterGroup name="Over Smooth" id="8:73">
+        <DataConverterGroupItem converterId="2:4" id="0:1114"/>
+        <DataConverterGroupItem converterId="8:55" id="0:1115"/>
+    </DataConverterGroup>
+    <DataConverterRangeMapper minInput="-100" maxInput="0" minOutput="1" maxOutput="0" clampLower="true" clampUpper="true" name="Regen Amount" id="8:74"/>
+    <DataConverterGroup name="Regen Glow" id="8:75">
+        <DataConverterGroupItem converterId="8:74" id="0:1116"/>
+        <DataConverterGroupItem converterId="8:51" id="0:1117"/>
+    </DataConverterGroup>
+    <DataConverterRangeMapper minInput="-100" maxInput="100" minOutput="180" maxOutput="420"
+                              clampLower="true" clampUpper="true" name="Power Needle X Sat" id="8:80"/>
+    <DataConverterGroup name="Power Needle Sat Smooth" id="8:81">
+        <DataConverterGroupItem converterId="8:80"/>
+        <DataConverterGroupItem converterId="8:50"/>
+    </DataConverterGroup>
+    <!-- left satellite: battery top half, power bottom half (150 degrees each) -->
+    <DataConverterRangeMapper minInput="0" maxInput="100" minOutput="0" maxOutput="0.4166667" clampLower="true" clampUpper="true" name="Charge Half" id="8:90"/>
+    <DataConverterGroup name="Charge Half Smooth" id="8:91"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="8:90"/><DataConverterGroupItem converterId="8:51"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="0" maxInput="100" minOutput="-1.3089969" maxOutput="1.3089969" clampLower="true" clampUpper="true" name="Charge Knob Half" id="8:92"/>
+    <DataConverterGroup name="Charge Knob Half Smooth" id="8:93"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="8:92"/><DataConverterGroupItem converterId="8:51"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="0" maxInput="100" minOutput="0" maxOutput="0.2083333" clampLower="true" clampUpper="true" name="Power Fill" id="8:94"/>
+    <DataConverterGroup name="Power Fill Smooth" id="8:95"><DataConverterGroupItem converterId="8:94"/><DataConverterGroupItem converterId="8:51"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="-100" maxInput="0" minOutput="0.2083333" maxOutput="0" clampLower="true" clampUpper="true" name="Regen Fill" id="8:96"/>
+    <DataConverterGroup name="Regen Fill Smooth" id="8:97"><DataConverterGroupItem converterId="8:96"/><DataConverterGroupItem converterId="8:51"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="-100" maxInput="100" minOutput="4.4505896" maxOutput="1.8325957" clampLower="true" clampUpper="true" name="Power Needle Angle" id="8:98"/>
+    <DataConverterGroup name="Power Needle Smooth" id="8:99"><DataConverterGroupItem converterId="8:98"/><DataConverterGroupItem converterId="8:50"/></DataConverterGroup>
+    <!-- park and reverse -->
+    <DataConverterGroup name="Is Park" id="8:100"><DataConverterGroupItem converterId="2:11"/><DataConverterGroupItem converterId="8:55"/></DataConverterGroup>
+    <DataConverterGroup name="Not Park" id="8:101"><DataConverterGroupItem converterId="2:11"/><DataConverterGroupItem converterId="2:7"/><DataConverterGroupItem converterId="8:55"/></DataConverterGroup>
+    <DataConverterGroup name="Is Reverse" id="8:102"><DataConverterGroupItem converterId="2:12"/><DataConverterGroupItem converterId="8:55"/></DataConverterGroup>
+    <!-- blind-spot cars: slide up from behind and fade, never pop -->
+    <DataConverterInterpolator interpolationType="linear" duration="0.35" name="Slide 350ms" id="8:57"/>
+    <DataConverterRangeMapper minInput="0" maxInput="1" minOutput="70" maxOutput="0" clampLower="true" clampUpper="true" name="Behind To Beside" id="8:103"/>
+    <DataConverterGroup name="Blind Slide" id="8:104"><DataConverterGroupItem converterId="8:103"/><DataConverterGroupItem converterId="8:57"/></DataConverterGroup>
+    <DataConverterGroup name="Blind Fade" id="8:105"><DataConverterGroupItem converterId="2:5"/><DataConverterGroupItem converterId="8:57"/></DataConverterGroup>
+    <DataConverterGroup name="Urgent L Fade" id="8:106"><DataConverterGroupItem converterId="2:33"/><DataConverterGroupItem converterId="8:55"/></DataConverterGroup>
+    <DataConverterGroup name="Urgent R Fade" id="8:107"><DataConverterGroupItem converterId="2:34"/><DataConverterGroupItem converterId="8:55"/></DataConverterGroup>
+    <!-- lane marks: each mark fades by where it is, so the 18 px wrap is seamless -->
+    <DataConverterRangeMapper minInput="0" maxInput="18" minOutput="0.000" maxOutput="0.250" clampLower="true" clampUpper="true" name="Lane Mark 0" id="8:110"/>
+    <DataConverterRangeMapper minInput="0" maxInput="18" minOutput="0.250" maxOutput="0.500" clampLower="true" clampUpper="true" name="Lane Mark 1" id="8:111"/>
+    <DataConverterRangeMapper minInput="0" maxInput="18" minOutput="0.500" maxOutput="0.750" clampLower="true" clampUpper="true" name="Lane Mark 2" id="8:112"/>
+    <DataConverterRangeMapper minInput="0" maxInput="18" minOutput="0.750" maxOutput="1.000" clampLower="true" clampUpper="true" name="Lane Mark 3" id="8:113"/>
+    <DataConverterRangeMapper minInput="0" maxInput="18" minOutput="1.000" maxOutput="1.000" clampLower="true" clampUpper="true" name="Lane Mark 4" id="8:114"/>
+    <DataConverterRangeMapper minInput="0" maxInput="18" minOutput="1.000" maxOutput="1.000" clampLower="true" clampUpper="true" name="Lane Mark 5" id="8:115"/>
+    <DataConverterRangeMapper minInput="0" maxInput="18" minOutput="1.000" maxOutput="1.000" clampLower="true" clampUpper="true" name="Lane Mark 6" id="8:116"/>
+    <DataConverterRangeMapper minInput="0" maxInput="18" minOutput="1.000" maxOutput="1.000" clampLower="true" clampUpper="true" name="Lane Mark 7" id="8:117"/>
+    <DataConverterRangeMapper minInput="0" maxInput="18" minOutput="1.000" maxOutput="1.000" clampLower="true" clampUpper="true" name="Lane Mark 8" id="8:118"/>
+    <DataConverterRangeMapper minInput="0" maxInput="18" minOutput="1.000" maxOutput="1.000" clampLower="true" clampUpper="true" name="Lane Mark 9" id="8:119"/>
+    <DataConverterRangeMapper minInput="0" maxInput="18" minOutput="1.000" maxOutput="1.000" clampLower="true" clampUpper="true" name="Lane Mark 10" id="8:120"/>
+    <DataConverterRangeMapper minInput="0" maxInput="18" minOutput="1.000" maxOutput="1.000" clampLower="true" clampUpper="true" name="Lane Mark 11" id="8:121"/>
+    <DataConverterRangeMapper minInput="0" maxInput="18" minOutput="1.000" maxOutput="1.000" clampLower="true" clampUpper="true" name="Lane Mark 12" id="8:122"/>
+    <DataConverterRangeMapper minInput="0" maxInput="18" minOutput="1.000" maxOutput="0.750" clampLower="true" clampUpper="true" name="Lane Mark 13" id="8:123"/>
+    <DataConverterRangeMapper minInput="0" maxInput="18" minOutput="0.750" maxOutput="0.500" clampLower="true" clampUpper="true" name="Lane Mark 14" id="8:124"/>
+    <DataConverterRangeMapper minInput="0" maxInput="18" minOutput="0.500" maxOutput="0.250" clampLower="true" clampUpper="true" name="Lane Mark 15" id="8:125"/>
+    <DataConverterRangeMapper minInput="0" maxInput="18" minOutput="0.250" maxOutput="0.000" clampLower="true" clampUpper="true" name="Lane Mark 16" id="8:126"/>
+    <DataConverterRangeMapper minInput="0" maxInput="18" minOutput="0.000" maxOutput="0.000" clampLower="true" clampUpper="true" name="Lane Mark 17" id="8:127"/>
+    <!-- start-up: dials push in from 93%, readouts count up from zero, the needle sweeps the scale -->
+    <DataConverterRangeMapper minInput="0" maxInput="1" minOutput="0.93" maxOutput="1" clampLower="true" clampUpper="true" name="Push In Scale" id="8:130"/>
+    <DataConverterFormula name="Times Intro Count" id="8:131">
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="2"/>
+        <FormulaTokenValue><DataBindContext sourcePathIds="1:1-1:85" propertyKey="777"/></FormulaTokenValue>
+    </DataConverterFormula>
+    <DataConverterFormula name="Plus Intro Sweep" id="8:132">
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="0"/>
+        <FormulaTokenValue><DataBindContext sourcePathIds="1:1-1:86" propertyKey="777"/></FormulaTokenValue>
+    </DataConverterFormula>
+    <DataConverterGroup name="Charge Text Counted" id="8:133"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="8:131"/><DataConverterGroupItem converterId="2:1"/></DataConverterGroup>
+    <DataConverterGroup name="Charge Half Counted" id="8:134"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="8:131"/><DataConverterGroupItem converterId="8:90"/><DataConverterGroupItem converterId="8:51"/></DataConverterGroup>
+    <DataConverterGroup name="Charge Knob Counted" id="8:135"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="8:131"/><DataConverterGroupItem converterId="8:92"/><DataConverterGroupItem converterId="8:51"/></DataConverterGroup>
+    <DataConverterGroup name="Kilowatts Counted" id="8:136"><DataConverterGroupItem converterId="2:24"/><DataConverterGroupItem converterId="8:131"/><DataConverterGroupItem converterId="2:1"/></DataConverterGroup>
+    <DataConverterGroup name="Needle With Sweep" id="8:137"><DataConverterGroupItem converterId="2:3"/><DataConverterGroupItem converterId="8:132"/><DataConverterGroupItem converterId="8:50"/></DataConverterGroup>
+</Rive>
