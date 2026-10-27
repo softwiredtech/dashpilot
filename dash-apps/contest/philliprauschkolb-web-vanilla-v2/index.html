@@ -1,0 +1,2641 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      @font-face {
+        font-family: "Inter";
+        font-style: normal;
+        font-weight: 300;
+        font-display: swap;
+        src: url("fonts/inter-300.ttf") format("truetype");
+      }
+      @font-face {
+        font-family: "Inter";
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url("fonts/inter-400.ttf") format("truetype");
+      }
+      @font-face {
+        font-family: "Inter";
+        font-style: normal;
+        font-weight: 500;
+        font-display: swap;
+        src: url("fonts/inter-500.ttf") format("truetype");
+      }
+      @font-face {
+        font-family: "Inter";
+        font-style: normal;
+        font-weight: 600;
+        font-display: swap;
+        src: url("fonts/inter-600.ttf") format("truetype");
+      }
+    </style>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
+    />
+
+    <title>Dashpilot Vanilla v2</title>
+    <style>
+      html,
+      body {
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none; /* no iOS long-press menu */
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+        background: #b8bcc0;
+        font-family:
+          "Inter",
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        color: #111;
+      }
+
+      body.dark-mode {
+        background: #000;
+      }
+
+      #scene {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        display: block;
+        z-index: 1;
+      }
+
+      /* Light haze behind the HUD so dark text reads over the sky and road */
+      #hudScrim {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 2;
+        /* left side, so the speed and gear read cleanly */
+        background:
+          linear-gradient(
+            to right,
+            rgba(255, 255, 255, 0.55),
+            rgba(255, 255, 255, 0) 32%
+          );
+        transition: opacity 1s ease;
+      }
+
+      body.dark-mode #hudScrim {
+        background:
+          linear-gradient(to right, rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0) 32%),
+          linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0) 30%);
+      }
+
+      /* Soft patch behind the turn-signal arrows at the top center. It fades out as a traffic light
+         gets close, so the light (which sits in the same spot) comes in front of it */
+      #blinkerFog {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 2;
+        background: radial-gradient(
+          ellipse 280px 110px at 50% 47px,
+          rgba(255, 255, 255, 0.97),
+          rgba(255, 255, 255, 0.75) 50%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        transition: opacity 0.4s linear;
+      }
+
+      body.dark-mode #blinkerFog {
+        background: radial-gradient(
+          ellipse 240px 95px at 50% 47px,
+          rgba(0, 0, 0, 0.85),
+          rgba(0, 0, 0, 0.5) 45%,
+          rgba(0, 0, 0, 0) 100%
+        );
+      }
+
+      [hidden] {
+        display: none !important;
+      }
+
+      #sceneStatus {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        z-index: 3;
+        font-size: 16px;
+        color: #555;
+        pointer-events: none;
+      }
+
+      /* Vehicle picker, opened with a long press anywhere */
+      #carPicker {
+        position: fixed;
+        inset: 0;
+        z-index: 4000;
+        display: grid;
+        place-items: center;
+        background: rgba(0, 0, 0, 0.25);
+      }
+
+      .picker-card {
+        background: #fff;
+        color: #111;
+        border-radius: 16px;
+        padding: 18px 20px 20px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        min-width: 260px;
+      }
+
+      .picker-title {
+        font-size: 14px;
+        font-weight: 500;
+        color: #777;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      #carOptions {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* legacy cars on the first row, 2025 cars on the second */
+        gap: 10px;
+      }
+
+      #carOptions button {
+        font:
+          500 18px "Inter",
+          system-ui,
+          sans-serif;
+        padding: 14px 22px;
+        border-radius: 10px;
+        border: 2px solid #ddd;
+        background: transparent;
+        color: inherit;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+
+      #carOptions button[aria-pressed="true"] {
+        border-color: #5cbd68;
+        background: #5cbd68;
+        color: #fff;
+      }
+
+      @media (max-width: 480px) {
+        .picker-card {
+          max-width: calc(100vw - 32px);
+          box-sizing: border-box;
+          padding: 16px;
+        }
+
+        #carOptions button {
+          font-size: 15px;
+          padding: 12px 8px;
+        }
+      }
+
+      body.dark-mode .picker-card {
+        background: #1c1c1e;
+        color: #f2f2f2;
+      }
+
+      body.dark-mode #carOptions button {
+        border-color: #3a3a3c;
+      }
+
+      body.dark-mode #carOptions button[aria-pressed="true"] {
+        border-color: #5cbd68;
+      }
+
+      #paintToast {
+        position: fixed;
+        bottom: 84px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.6);
+        color: #fff;
+        padding: 6px 18px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 500;
+        z-index: 3000;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+      }
+
+      #speedSignRow {
+        position: fixed;
+        top: 70px;
+        right: 40px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        z-index: 2000;
+      }
+
+      #accSetSpeed {
+        font-family: "Inter", sans-serif;
+        font-size: 36px;
+        font-weight: 400;
+        color: #d3d3d3;
+        user-select: none;
+        display: flex;
+        align-items: baseline;
+        gap: 4px;
+      }
+
+      #accMax {
+        font-size: 14px;
+        color: inherit;
+      }
+
+      #speedLimitSign {
+        width: 80px;
+        height: 80px;
+        border: 8px solid red;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        font-family: "Inter", sans-serif;
+        color: black;
+        font-size: 32px;
+        font-weight: 600;
+        user-select: none;
+        box-sizing: border-box;
+      }
+
+      #leftBlindSpot {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 150px;
+        height: 100vh;
+        pointer-events: none;
+        background: linear-gradient(
+          to right,
+          rgba(255, 0, 0, 0.5),
+          rgba(255, 0, 0, 0)
+        );
+        z-index: 1000;
+        display: none;
+      }
+
+      #rightBlindSpot {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 150px;
+        height: 100vh;
+        pointer-events: none;
+        background: linear-gradient(
+          to left,
+          rgba(255, 0, 0, 0.5),
+          rgba(255, 0, 0, 0)
+        );
+        z-index: 1000;
+        display: none;
+      }
+
+      #leftArea {
+        position: fixed;
+        top: 30px;
+        left: 50px;
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        z-index: 2000;
+      }
+
+      #powerBar {
+        display: none;
+        flex-direction: column;
+        align-items: center;
+        width: 8px;
+        height: 220px;
+        margin-top: 50px;
+      }
+
+      #powerBarTrack {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background: #eee;
+        border-radius: 6px;
+        overflow: hidden;
+      }
+
+      #powerBarCenter {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 50%;
+        height: 1px;
+        background: #999;
+      }
+
+      #powerBarFill {
+        position: absolute;
+        left: 0;
+        right: 0;
+        background: #5cbd68;
+        transition:
+          top 0.1s ease,
+          height 0.1s ease;
+      }
+
+      #leftColumn {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        margin-top: 20px;
+      }
+
+      #speedRow {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+      }
+
+      #speedText {
+        font-size: 84px;
+        font-weight: 300;
+        line-height: 1;
+      }
+
+      #speedUnit {
+        font-size: 18px;
+        color: #555;
+      }
+
+      #gearText {
+        font-size: 18px;
+        font-weight: 500;
+        padding: 4px 24px;
+        border-radius: 6px;
+        background: rgb(173, 179, 179);
+        color: #fff;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 50px;
+        height: 32px;
+        box-sizing: border-box;
+      }
+
+      #steeringContainer {
+        position: relative;
+        width: 55px;
+        height: 55px;
+        margin-top: 12px;
+        color: rgb(94, 95, 97);
+      }
+
+      #steeringWheel {
+        width: 100%;
+        height: 100%;
+        transition: transform 0.1s linear;
+      }
+
+      #blinkerRow {
+        position: fixed;
+        top: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        z-index: 2000;
+      }
+
+      #leftBlinkerIcon,
+      #rightBlinkerIcon {
+        width: 34px;
+      }
+
+      #warningIcons {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      #seatbeltIcon {
+        width: 32px;
+        height: 32px;
+        filter: brightness(0) saturate(100%) invert(19%) sepia(97%)
+          saturate(7482%) hue-rotate(358deg) brightness(102%) contrast(113%);
+        display: none;
+      }
+
+      #doorIcon {
+        width: 32px;
+        height: 32px;
+        filter: brightness(0) saturate(100%) invert(19%) sepia(97%)
+          saturate(7482%) hue-rotate(358deg) brightness(102%) contrast(113%);
+        display: none;
+      }
+
+      #driverAlert {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.72);
+        color: #ffffff;
+        padding: 8px 22px;
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: bold;
+        z-index: 3000;
+        display: none;
+      }
+
+      #bottomLeft {
+        position: fixed;
+        bottom: 30px;
+        left: 50px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-family: "Inter", sans-serif;
+        font-size: 16px;
+        font-weight: 400;
+        color: #333;
+        z-index: 2000;
+        user-select: none;
+      }
+
+      #statusBar {
+        position: fixed;
+        top: 30px;
+        right: 40px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        z-index: 2000;
+        user-select: none;
+        font-family: "Inter", sans-serif;
+        font-size: 13px;
+      }
+
+      .battery-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .battery-label {
+        font-weight: 500;
+        color: #444;
+        font-size: 12px;
+      }
+
+      .battery-shell {
+        position: relative;
+        width: 28px;
+        height: 14px;
+        border: 2px solid #666;
+        border-radius: 3px;
+        background: transparent;
+      }
+
+      .battery-shell::after {
+        content: "";
+        position: absolute;
+        right: -4px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 2px;
+        height: 7px;
+        background: #666;
+        border-radius: 0 1px 1px 0;
+      }
+
+      .battery-fill {
+        position: absolute;
+        left: 2px;
+        top: 2px;
+        bottom: 2px;
+        width: 0%;
+        max-width: calc(100% - 4px);
+        border-radius: 1px;
+        transition: width 0.3s ease;
+      }
+
+      .battery-percent {
+        font-weight: 500;
+        color: #222;
+        font-size: 13px;
+      }
+
+      .status-separator {
+        width: 1px;
+        height: 16px;
+        background: #888;
+      }
+
+      #batteryTempText {
+        font-weight: 400;
+        color: #333;
+        font-size: 13px;
+      }
+
+      /* Dark mode overrides: brighten text so it stands out on the night scene */
+      body.dark-mode {
+        color: #f2f2f2;
+      }
+
+      body.dark-mode #speedText {
+        color: #ffffff;
+      }
+
+      body.dark-mode #speedUnit,
+      body.dark-mode #bottomLeft,
+      body.dark-mode .battery-label,
+      body.dark-mode #batteryTempText {
+        color: #cfcfcf;
+      }
+
+      body.dark-mode .battery-percent {
+        color: #ffffff;
+      }
+
+      body.dark-mode .battery-shell {
+        border-color: #bbb;
+      }
+
+      body.dark-mode .battery-shell::after {
+        background: #bbb;
+      }
+
+      body.dark-mode #steeringWheel {
+        filter: invert(85%);
+      }
+
+      #experimentalIcon {
+        position: fixed;
+        bottom: 30px;
+        right: 40px;
+        width: 48px;
+        height: 48px;
+        z-index: 2000;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="scene"></canvas>
+    <div id="hudScrim"></div>
+    <div id="blinkerFog"></div>
+    <div id="sceneStatus">Loading model…</div>
+    <div id="paintToast"></div>
+    <div id="carPicker" hidden>
+      <div class="picker-card" role="dialog" aria-label="Choose vehicle">
+        <div class="picker-title">Vehicle</div>
+        <div id="carOptions"></div>
+      </div>
+    </div>
+
+    <div id="driverAlert"></div>
+
+    <div id="leftBlindSpot"></div>
+    <div id="rightBlindSpot"></div>
+
+    <div id="speedSignRow">
+      <span id="accSetSpeed">
+        <span id="accValue"></span>
+        <span id="accMax"></span>
+      </span>
+      <div id="speedLimitSign">
+        <span id="speedLimitText">50</span>
+      </div>
+    </div>
+
+    <div id="blinkerRow">
+      <img id="leftBlinkerIcon" src="left.png" style="opacity: 0" />
+      <img id="rightBlinkerIcon" src="right.png" style="opacity: 0" />
+    </div>
+
+    <div id="statusBar">
+      <div class="battery-group" id="phoneBatteryGroup">
+        <span class="battery-label">Phone</span>
+        <div class="battery-shell">
+          <div
+            class="battery-fill"
+            id="phoneBatteryFill"
+            style="width: 0%; background: #4a90d9"
+          ></div>
+        </div>
+        <span class="battery-percent" id="phoneBatteryPercent"></span>
+      </div>
+      <div class="status-separator" id="statusSeparator"></div>
+      <div class="battery-group" id="carBatteryGroup" style="display: none">
+        <span class="battery-label" id="carBatteryLabel">Car</span>
+        <div class="battery-shell" id="carBatteryShell">
+          <div class="battery-fill" id="carBatteryFill"></div>
+        </div>
+        <span class="battery-percent" id="carBatteryPercent"></span>
+        <span id="batteryTempText"></span>
+      </div>
+    </div>
+
+    <div id="leftArea">
+      <div id="powerBar">
+        <div id="powerBarTrack">
+          <div id="powerBarCenter"></div>
+          <div id="powerBarFill"></div>
+        </div>
+      </div>
+      <div id="leftColumn">
+        <div id="warningIcons">
+          <img id="seatbeltIcon" src="seat-belt.png" alt="Seatbelt unbuckled" />
+          <img id="doorIcon" src="car-door.svg" alt="Door open" />
+        </div>
+
+        <div id="speedRow">
+          <div id="speedText">0</div>
+          <div id="speedUnit">km/h</div>
+        </div>
+
+        <div id="gearText">-</div>
+
+        <div id="steeringContainer">
+          <img id="steeringWheel" src="steering-wheel.svg" />
+        </div>
+      </div>
+    </div>
+
+    <div id="bottomLeft">
+      <div id="odometer"></div>
+    </div>
+
+    <img id="experimentalIcon" src="experimental.png" alt="Experimental mode" />
+
+    <!-- 3D scene: Model Y on a road that bends with the steering (from model_y_road_view), plain WebGL 2 -->
+    <script>
+      (() => {
+        "use strict";
+        // ---------- configuration ----------
+        const STEER_LOCK = 450; // steering wheel degrees each way (about 2.5 turns lock to lock)
+        const STEER_RATIO = 12; // steering wheel degrees per road-wheel degree
+        const YAW_GAIN = 0.3; // how far the car body angles into the curve, relative to the front wheels
+        const MAX_YAW = 10; // body angle limit in degrees
+        const WHEEL_GAIN = 1.8; // front wheels turn this much more than real, so steering is easy to see
+        const MAX_WHEEL = 35; // front wheel angle limit in degrees
+        const MIN_RADIUS = 55; // road curve radius in meters at full steering lock, before ROAD_SHAPE's shares
+        // How the road bends along its length. bend: [from (meters along the road from our car), share of the
+        // MIN_RADIUS curvature] for each stretch; ease: how quickly the road follows the steering (per second).
+        // "near" bends hardest right in front of the car and straightens out further on, so turning the wheel
+        // shows at once; "arc" is the original even arc all the way out. Set ROAD_SHAPE to ROAD_SHAPES.arc to go back.
+        const ROAD_SHAPES = {
+          near: { bend: [[-40, 2.5], [20, 0.6], [45, 0.1]], ease: 6 },
+          arc: { bend: [[-40, 1], [15, 1], [35, 1]], ease: 2.5 },
+        };
+        const ROAD_SHAPE = ROAD_SHAPES.near;
+        const CURVE_EASE = ROAD_SHAPE.ease;
+        const CAR_SCALE = 1.25; // car size on the road (1 = true size); bigger reads more easily in the lane
+        const TRAFFIC_SCALE = 0.88; // blind-spot cars' size relative to ours, so they don't overpower it
+        // The cars: the legacy and 2025 (Highland / Juniper) Model 3 and Model Y can be the main car
+        // (long-press the screen to switch); all of them show up at random as the cars in the blind spots.
+        const CARS = {
+          modelY: { file: "model_y.glb", name: "Legacy Model Y" },
+          model3: {
+            file: "model_3.glb",
+            name: "Legacy Model 3",
+            // the file has no floor (you can see into the cabin from below, and in the Park reflection),
+            // so close it with flat black panels just above the sills: [half width, front z, rear z, height],
+            // narrower around the wheels so they don't cut into the tires, and tucked up under the
+            // rear bumper so no edge shows from behind
+            underbody: [[0.58, 2.15, 1.2, 0.17], [0.8, 1.2, -0.95, 0.17], [0.58, -0.95, -2.0, 0.25]],
+          },
+          cybertruck: { file: "cybertruck.glb", name: "Cybertruck" },
+          model32025: { file: "model_3_2025.glb", name: "Highland Model 3" },
+          modelY2025: { file: "model_y_2025.glb", name: "Juniper Model Y" },
+        };
+        const MAIN_CARS = ["model3", "modelY", "model32025", "modelY2025"]; // picker order
+        const TRAFFIC_CARS = ["modelY", "model3", "cybertruck", "modelY2025", "model32025"];
+        const LANE = 3.7; // lane width in meters (matches the road shader)
+        // Park "studio" floor near the car, as a share of the background brightness on screen
+        // (light mode), and its on-screen gray in dark mode
+        const STUDIO_FLOOR = 0.86,
+          STUDIO_FLOOR_DARK = 0.16;
+        // Park floor reflection: strength right under the car (0 = none), and how far below
+        // the floor it fades out (meters, true car size)
+        const REFLECT = 0.22,
+          REFLECT_FADE = 0.9;
+        const BS_S = -2.5; // blind-spot car position along the road, relative to ours (meters)
+        const PAINTS = [
+          ["Pearl White", "#eceae4", 0.05, 0.28],
+          ["Midnight Grey", "#3b3f45", 0.35, 0.3],
+          ["Deep Blue", "#1f3a68", 0.4, 0.28],
+          ["Ultra Red", "#9e1b22", 0.25, 0.28],
+          ["Quicksilver", "#a9adb2", 0.7, 0.3],
+          ["Solid Black", "#0c0c0d", 0.1, 0.25],
+        ];
+        // Camera per gear: azimuth (0 = behind, -PI/2 = left side), elevation, distance, look-at point
+        const VIEWS = {
+          D: { az: 0, el: 0.33, dist: 19.0, target: [0, 0.6, 4.5] },
+          N: { az: 0, el: 0.33, dist: 17.0, target: [0, 0.6, 4.0] },
+          // front-left three-quarter, low, like the Tesla's own screen; the target sits off to the side of the car
+          // so it lands centered in the space right of the gauges (landscape phone)
+          P: { az: -2.48, el: 0.07, dist: 7.4, target: [-1.1, 0.95, 0.85] },
+          R: { az: 0, el: 1.3, dist: 13.0, target: [0, 0.6, 0] }, // top-down, car centered
+        };
+
+        const state = {
+          steer: 0,
+          steerShown: 0,
+          curv: 0,
+          v: 0,
+          vTarget: 0,
+          travel: 0, // meters driven, turns into each car's wheel spin
+          road: 0,
+          car: "modelY",
+          time: 0,
+          paint: 0,
+          night: 0,
+          nightTarget: 0,
+          gray: 0,
+          adas: 0,
+          adasTarget: 0,
+          studio: 0, // 0 = road, 1 = studio floor (Park)
+          studioTarget: 0,
+          bs: [
+            { on: false, p: 0, urgent: false, u: 0, car: null },
+            { on: false, p: 0, urgent: false, u: 0, car: null },
+          ],
+          stopDist: -1,
+          tlColor: null,
+          dprCap: 2,
+        };
+        const cam = { ...VIEWS.D, target: VIEWS.D.target.slice() };
+        let view = VIEWS.D;
+
+        const canvas = document.getElementById("scene"),
+          statusEl = document.getElementById("sceneStatus");
+        const gl = canvas.getContext("webgl2", { antialias: true });
+        if (!gl) {
+          statusEl.textContent =
+            "This device does not support WebGL 2, so the 3D view cannot be shown.";
+          window.CarScene = { update() {} };
+          return;
+        }
+
+        // ---------- math (column-major mat4) ----------
+        const M = {
+          mul(a, b) {
+            const o = new Array(16).fill(0);
+            for (let c = 0; c < 4; c++)
+              for (let r = 0; r < 4; r++) {
+                let s = 0;
+                for (let k = 0; k < 4; k++) s += a[k * 4 + r] * b[c * 4 + k];
+                o[c * 4 + r] = s;
+              }
+            return o;
+          },
+          tr: (x, y, z) => [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, x, y, z, 1],
+          sc: (x, y, z) => [x, 0, 0, 0, 0, y, 0, 0, 0, 0, z, 0, 0, 0, 0, 1],
+          ry(a) {
+            const c = Math.cos(a),
+              s = Math.sin(a);
+            return [c, 0, -s, 0, 0, 1, 0, 0, s, 0, c, 0, 0, 0, 0, 1];
+          },
+          rx(a) {
+            const c = Math.cos(a),
+              s = Math.sin(a);
+            return [1, 0, 0, 0, 0, c, s, 0, 0, -s, c, 0, 0, 0, 0, 1];
+          },
+          persp(f, asp, n, fa) {
+            const t = 1 / Math.tan(f / 2);
+            return [
+              t / asp,
+              0,
+              0,
+              0,
+              0,
+              t,
+              0,
+              0,
+              0,
+              0,
+              (fa + n) / (n - fa),
+              -1,
+              0,
+              0,
+              (2 * fa * n) / (n - fa),
+              0,
+            ];
+          },
+          xf(m, p) {
+            const o = [0, 0, 0, 0];
+            for (let r = 0; r < 4; r++)
+              o[r] =
+                m[r] * p[0] + m[4 + r] * p[1] + m[8 + r] * p[2] + m[12 + r];
+            return o;
+          },
+        };
+        const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+        const norm = (a) => {
+          const l = Math.hypot(a[0], a[1], a[2]);
+          return [a[0] / l, a[1] / l, a[2] / l];
+        };
+        const cross = (a, b) => [
+          a[1] * b[2] - a[2] * b[1],
+          a[2] * b[0] - a[0] * b[2],
+          a[0] * b[1] - a[1] * b[0],
+        ];
+        const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+        const lerp = (a, b, t) => a + (b - a) * t;
+        const lerp3 = (a, b, t) => [
+          lerp(a[0], b[0], t),
+          lerp(a[1], b[1], t),
+          lerp(a[2], b[2], t),
+        ];
+        const srgbToLin = (hex) =>
+          [1, 3, 5].map((i) => {
+            const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+            return c <= 0.04045
+              ? c / 12.92
+              : Math.pow((c + 0.055) / 1.055, 2.4);
+          });
+        const ease = (dt, rate) => 1 - Math.exp(-dt * rate);
+
+        // ---------- day / night lighting ----------
+        // Same tone curve as the shaders, so the night horizon can match the dark-mode background gray exactly.
+        const tonemap1 = (x) => {
+          x *= 0.85;
+          x = (x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14);
+          return Math.pow(Math.min(Math.max(x, 0), 1), 1 / 2.2);
+        };
+        function untonemap(t) {
+          let lo = 0,
+            hi = 16;
+          for (let i = 0; i < 40; i++) {
+            const mid = (lo + hi) / 2;
+            if (tonemap1(mid) < t) lo = mid;
+            else hi = mid;
+          }
+          return lo;
+        }
+        // A color as it should look on screen ('#rrggbb'), converted to the scene's light values
+        const fogHex = (hex) =>
+          [1, 3, 5].map((i) =>
+            untonemap(parseInt(hex.slice(i, i + 2), 16) / 255),
+          );
+        const DAY = {
+          zen: [0.2, 0.3, 0.46],
+          hor: [0.78, 0.8, 0.82],
+          gnd: [0.11, 0.105, 0.1],
+          fog: fogHex("#ffffff"),
+          sunC: [3.2, 3.2, 3.2],
+          ambLo: [0.17, 0.16, 0.15],
+          ambHi: [0.62, 0.66, 0.72],
+        };
+        function nightEnv(gray) {
+          const h = untonemap(gray / 255),
+            hor = [h, h, h * 1.08];
+          return {
+            zen: [h * 0.35 + 0.004, h * 0.35 + 0.006, h * 0.4 + 0.014],
+            hor,
+            gnd: [0.008, 0.008, 0.008],
+            fog: hor,
+            sunC: [0.22, 0.27, 0.38],
+            ambLo: [0.012, 0.012, 0.015],
+            ambHi: [0.07, 0.08, 0.11],
+          };
+        }
+
+        // ---------- shaders ----------
+        const COMMON = `
+  const float PI = 3.14159265;
+  uniform vec3 uSun, uSunC, uZen, uHor, uGnd, uFog, uAmbLo, uAmbHi;
+  uniform float uDay;
+  vec3 sky(vec3 d) {
+    float t = d.y;
+    vec3 c = t > 0.0 ? mix(uHor, uZen, pow(t, 0.55)) : mix(uHor * 0.30, uGnd, pow(-t, 0.35));
+    c += vec3(0.55) * uDay * smoothstep(0.10, 0.18, t) * smoothstep(0.42, 0.28, t);   // soft horizon band (studio-like reflection)
+    c += uSunC * vec3(1.0, 0.92, 0.80) * pow(max(dot(d, uSun), 0.0), mix(2000.0, 300.0, uDay)) * mix(4.0, 1.875, uDay); // sun / moon disc
+    return c;
+  }
+  vec3 irr(vec3 n) { return mix(uAmbLo, uAmbHi, n.y * 0.5 + 0.5); }
+  vec3 tonemap(vec3 x) { x *= 0.85; x = (x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14); return pow(clamp(x, 0.0, 1.0), vec3(1.0 / 2.2)); }
+  // distance fog, blended on screen colors so a very light fog (e.g. white) doesn't wash out nearby things
+  vec3 fogged(vec3 c, float d) { float f = 1.0 - exp(-d * 0.010); return mix(tonemap(c), tonemap(uFog), f * f); }
+  `;
+        const CAR_VS = `#version 300 es
+  in vec3 aP; in vec3 aN; in vec2 aUV; uniform mat4 uVP, uM; out vec3 vP, vN; out vec2 vUV;
+  void main(){ vec4 w = uM * vec4(aP, 1.0); vP = w.xyz; vN = mat3(uM) * aN; vUV = aUV; gl_Position = uVP * w; }`;
+        const CAR_FS = `#version 300 es
+  precision highp float; ${COMMON}
+  in vec3 vP, vN; in vec2 vUV; out vec4 o;
+  uniform vec3 uCam, uBase, uEmit; uniform float uMetal, uRough, uCC;
+  uniform float uAlpha, uMode, uHasTex, uHasEm;   // uMode: 0 opaque, 1 cut-out (MASK), 2 see-through (BLEND)
+  uniform float uReflect, uReflectFade;   // > 0 while drawing the car's mirror image under the studio floor
+  uniform float uTint;   // 0..1: turns the whole car red (urgent blind-spot warning)
+  uniform sampler2D uTex, uEmTex;
+  void main(){
+    vec4 tx = uHasTex > 0.5 ? texture(uTex, vUV) : vec4(1.0);
+    float alpha = uAlpha * tx.a;
+    if (uMode > 0.5 && uMode < 1.5 && alpha < 0.5) discard;
+    vec3 N = normalize(vN); if (!gl_FrontFacing) N = -N;
+    vec3 baseC = uBase * tx.rgb, emit = uEmit * (uHasEm > 0.5 ? texture(uEmTex, vUV).rgb : vec3(1.0));
+    float metal = uMetal, rough = uRough, cc = uCC;
+    vec3 V = normalize(uCam - vP), L = normalize(uSun), H = normalize(L + V), R = reflect(-V, N);
+    float NV = max(dot(N, V), 1e-3), NL = max(dot(N, L), 0.0), NH = max(dot(N, H), 0.0), HV = max(dot(H, V), 0.0);
+    float r = max(rough, 0.04), a = r * r, a2 = a * a;
+    float D = a2 / (PI * pow(NH * NH * (a2 - 1.0) + 1.0, 2.0));
+    float k = (r + 1.0) * (r + 1.0) / 8.0, G = (NL / (NL * (1.0 - k) + k)) * (NV / (NV * (1.0 - k) + k));
+    vec3 F0 = mix(vec3(0.04), baseC, metal), F = F0 + (1.0 - F0) * pow(1.0 - HV, 5.0);
+    vec3 diff = (1.0 - metal) * baseC * (irr(N) + uSunC * NL / PI);
+    vec3 spec = D * G * F / (4.0 * NL * NV + 1e-4) * NL * uSunC;
+    vec3 envR = mix(sky(R), irr(R) * 1.1, smoothstep(0.05, 0.7, r));
+    vec3 Fr = F0 + (max(vec3(1.0 - r), F0) - F0) * pow(1.0 - NV, 5.0);
+    vec3 col = diff * (1.0 - Fr * 0.5) + spec + envR * Fr * mix(1.0, 0.45, r);
+    // clear coat
+    float Fc = 0.04 + 0.96 * pow(1.0 - NV, 5.0);
+    float ac = 0.0036, Dc = ac / (PI * pow(NH * NH * (ac - 1.0) + 1.0, 2.0));
+    col = col * (1.0 - Fc * cc) + cc * (Fc * sky(R) + Dc * 0.04 * NL * uSunC * 0.25);
+    // cheap ambient occlusion: underside and lower body get less sky
+    float ao = mix(0.45, 1.0, smoothstep(0.0, 0.55, vP.y)) * mix(0.6, 1.0, smoothstep(-0.7, 0.1, N.y));
+    col = col * ao + emit;
+    o = vec4(fogged(col, length(uCam - vP)), uMode > 1.5 ? alpha : 1.0);
+    // reflection: strongest where the car meets the floor, fading out further below it
+    if (uReflect > 0.0) o.a = uReflect * (1.0 - smoothstep(0.0, uReflectFade, -vP.y));
+    if (uTint > 0.0) {
+      float lum = dot(o.rgb, vec3(0.299, 0.587, 0.114));
+      o.rgb = mix(o.rgb, vec3(0.9, 0.12, 0.1) * (0.35 + 0.85 * lum), uTint);
+    }
+  }`;
+        const SKY_VS = `#version 300 es
+  out vec2 vU; void main(){ vec2 p = vec2((gl_VertexID << 1) & 2, gl_VertexID & 2); vU = p * 2.0 - 1.0; gl_Position = vec4(vU, 0.9999, 1.0); }`;
+        const SKY_FS = `#version 300 es
+  precision highp float; ${COMMON}
+  in vec2 vU; out vec4 o; uniform vec3 uRt, uUp, uFw; uniform vec2 uTan;
+  // The background is the plain fog color (white by day, the dark-mode gray at night), so the sky and the
+  // distance blend into one; the car still reflects the full sky() for its shading.
+  void main(){ o = vec4(tonemap(uFog), 1.0); }`;
+        const GROUND_VS = `#version 300 es
+  in vec2 aP; uniform mat4 uVP; uniform vec3 uCam; out vec3 vP;
+  void main(){ vec3 w = vec3(aP.x * 700.0 + uCam.x, 0.0, aP.y * 700.0 + uCam.z); vP = w; gl_Position = uVP * vec4(w, 1.0); }`;
+        const GROUND_FS = `#version 300 es
+  precision highp float; ${COMMON}
+  in vec3 vP; out vec4 o;
+  uniform vec3 uCam, uAdasC; uniform float uRoad, uAdas, uTime, uStop, uHead;
+  uniform vec4 uSeg[3];      // the road's center line, arcs end to end: start x, start z, start heading, curvature
+  uniform float uSegS[3];    // where each arc starts, meters along the road from our car
+  uniform float uCarScale;   // CAR_SCALE
+  uniform vec4 uCars[3];     // contact shadows: x, z, yaw, strength (0 = none); [0] is our car
+  uniform vec4 uCarDims[3];  // each car at true size: half width (outer tire edge), half length, front axle z, rear axle z
+  uniform float uNose;       // our car's nose, meters ahead of its center (true size)
+  uniform float uStudio;     // 0 = road, 1 = plain studio floor (in Park)
+  uniform vec3 uFloor;       // studio floor color near the car (set from STUDIO_FLOOR)
+  float hash(vec2 p){ p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
+  float band(float x, float c, float w){ float f = fwidth(x) * 1.2; return smoothstep(c - w - f, c - w + f, x) - smoothstep(c + w - f, c + w + f, x); }
+  vec2 carFrame(vec2 p, vec4 car){ vec2 d = p - car.xy; float cs = cos(car.z), sn = sin(car.z); return vec2(cs * d.x - sn * d.y, sn * d.x + cs * d.y); }
+  void main(){
+    // Road coordinates (x across, + toward +X; z along) from the arc segment this point lies beside
+    float x = vP.x, z = vP.z, best = 1e9;
+    for (int i = 0; i < 3; i++) {
+      vec4 g = uSeg[i];
+      vec2 p = vP.xz - g.xy, t = vec2(sin(g.z), cos(g.z)), n = vec2(t.y, -t.x);
+      float sl, xl;
+      if (abs(g.w) < 1e-6) { sl = dot(p, t); xl = dot(p, n); }
+      else {
+        float R = 1.0 / g.w;
+        vec2 v0 = -R * n, v = p - R * n;   // from the arc's center to its start, and to this point
+        sl = -atan(v0.x * v.y - v0.y * v.x, dot(v0, v)) * R;
+        xl = sign(R) * (abs(R) - length(v));
+      }
+      float len = i < 2 ? uSegS[i + 1] - uSegS[i] : 1e6;
+      float outside = max(i == 0 ? 0.0 : -sl, sl - len);   // the first arc also runs on behind its start
+      float score = abs(xl) + 1000.0 * max(outside, 0.0);
+      if (score < best) { best = score; x = xl; z = uSegS[i] + sl; }
+    }
+    float zl = z;   // distance along the road from our car
+    z += uRoad; float ax = abs(x);
+    float grain = hash(floor(vec2(x, z) * 40.0)) * 0.5 + hash(floor(vec2(x, z) * 7.0)) * 0.5;
+    vec3 asphalt = vec3(0.060, 0.062, 0.066) * (0.85 + 0.3 * grain);
+    vec3 shoulder = vec3(0.13, 0.125, 0.12) * (0.85 + 0.3 * grain);
+    vec3 desert = vec3(0.30, 0.22, 0.15) * (0.75 + 0.35 * grain);
+    vec3 c = mix(asphalt, shoulder, smoothstep(5.7, 5.8, ax));
+    c = mix(c, desert, smoothstep(8.2, 9.5, ax));
+    float dash = step(fract(z / 12.192), 0.25);                        // 10 ft lines, 30 ft gaps
+    float paint = max(band(ax, 1.85, 0.075) * dash, band(ax, 5.55, 0.1)); // lane dividers + edge lines
+    if (uStop > 0.0) paint = max(paint, band(zl, uStop, 0.25) * (1.0 - step(5.45, ax)));  // stop line
+    c = mix(c, vec3(0.80, 0.80, 0.78), paint);
+    vec3 light = irr(vec3(0, 1, 0)) + uSunC * max(uSun.y, 0.0) / PI;
+    // headlights (night): two merged cones ahead of our car
+    vec2 h = carFrame(vP.xz, uCars[0]) / uCarScale;
+    float fwd = h.y - uNose, w = 0.9 + max(fwd, 0.0) * 0.22;
+    float beam = smoothstep(0.0, 1.5, fwd) * exp(-max(fwd, 0.0) * 0.045) * (1.0 - smoothstep(w * 0.55, w, abs(h.x)));
+    light += vec3(1.0, 0.92, 0.80) * beam * uHead * 2.2 * (1.0 - uStudio);
+    vec3 col = c * light;
+    // studio floor: a little darker under and around the car, fading into the background
+    // further away and toward the horizon, so there is no visible floor edge
+    float rc = length(vP.xz - uCars[0].xy) / uCarScale;
+    float dy = normalize(vP - uCam).y;   // how steeply we look down at this point
+    float away = max(smoothstep(5.0, 30.0, rc), smoothstep(-0.12, -0.015, dy));
+    col = mix(col, mix(uFloor, uFog, away), uStudio);
+    // assist-engaged lane highlight, with chevrons flowing forward
+    if (uAdas > 0.001) {
+      float lane = 1.0 - smoothstep(1.35, 1.65, ax);
+      float along = smoothstep(-2.8, -1.8, zl) * (1.0 - smoothstep(18.0, 60.0, zl));
+      float ch = fract((zl + ax * 0.8 - uTime * 7.0) / 7.0);
+      float stripe = smoothstep(0.0, 0.08, ch) * (1.0 - smoothstep(0.08, 0.35, ch));
+      col = mix(col, uAdasC, uAdas * lane * along * (0.38 + 0.3 * stripe));
+    }
+    // contact shadows in each car's frame: a soft shade under the body, and a tight dark
+    // patch where each tire touches the ground (tires are 0.24 m wide, centered 0.12 m inside the half width)
+    float sh = 0.0;
+    for (int i = 0; i < 3; i++) {
+      if (uCars[i].w <= 0.0) continue;
+      vec2 q = carFrame(vP.xz, uCars[i]) / uCarScale;   // shadow shape at true size
+      vec4 cd = uCarDims[i];
+      vec2 dq = abs(q) - cd.xy;
+      float sd = length(max(dq, 0.0)) + min(max(dq.x, dq.y), 0.0);
+      float body = (1.0 - smoothstep(-0.5, 0.7, sd)) * 0.55;
+      vec2 wq = vec2(abs(q.x) - (cd.x - 0.12), min(abs(q.y - cd.z), abs(q.y - cd.w)));
+      float tire = length(wq / vec2(0.15, 0.30));
+      float s = max(body, 1.0 - smoothstep(0.3, 1.0, tire));
+      sh = max(sh, s * uCars[i].w);
+    }
+    // haze off the road so the dashboard text reads cleanly over it
+    col = mix(col, uFog, smoothstep(6.0, 13.0, ax) * 0.4);
+    // shadows darken the final on-screen color, so they read the same on dark asphalt and a light floor
+    o = vec4(fogged(col, length(uCam - vP)) * (1.0 - 0.7 * sh), 1.0);
+  }`;
+        function program(vs, fs) {
+          const mk = (t, s) => {
+            const sh = gl.createShader(t);
+            gl.shaderSource(sh, s);
+            gl.compileShader(sh);
+            if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS))
+              throw new Error(gl.getShaderInfoLog(sh));
+            return sh;
+          };
+          const p = gl.createProgram();
+          gl.attachShader(p, mk(gl.VERTEX_SHADER, vs));
+          gl.attachShader(p, mk(gl.FRAGMENT_SHADER, fs));
+          gl.linkProgram(p);
+          if (!gl.getProgramParameter(p, gl.LINK_STATUS))
+            throw new Error(gl.getProgramInfoLog(p));
+          const u = {};
+          const n = gl.getProgramParameter(p, gl.ACTIVE_UNIFORMS);
+          for (let i = 0; i < n; i++) {
+            const nm = gl.getActiveUniform(p, i).name;
+            u[nm.replace("[0]", "")] = gl.getUniformLocation(p, nm);
+          }
+          return { p, u };
+        }
+        const carProg = program(CAR_VS, CAR_FS),
+          skyProg = program(SKY_VS, SKY_FS),
+          groundProg = program(GROUND_VS, GROUND_FS);
+        const groundVao = gl.createVertexArray();
+        gl.bindVertexArray(groundVao);
+        const gb = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, gb);
+        gl.bufferData(
+          gl.ARRAY_BUFFER,
+          new Float32Array([-1, -1, 1, -1, 1, 1, -1, -1, 1, 1, -1, 1]),
+          gl.STATIC_DRAW,
+        );
+        gl.enableVertexAttribArray(gl.getAttribLocation(groundProg.p, "aP"));
+        gl.vertexAttribPointer(
+          gl.getAttribLocation(groundProg.p, "aP"),
+          2,
+          gl.FLOAT,
+          false,
+          0,
+          0,
+        );
+        const skyVao = gl.createVertexArray();
+        const locP = gl.getAttribLocation(carProg.p, "aP"),
+          locN = gl.getAttribLocation(carProg.p, "aN"),
+          locU = gl.getAttribLocation(carProg.p, "aUV");
+
+        // ---------- simple shapes (traffic light parts) ----------
+        function uploadMesh(P, N, I) {
+          // Turn each triangle to face the same way as its normals: the car shader treats
+          // a triangle seen from behind as its back side, which would show the wrong lighting.
+          for (let t = 0; t < I.length; t += 3) {
+            const [a, b, c] = [I[t], I[t + 1], I[t + 2]].map((i) => [
+              P[3 * i],
+              P[3 * i + 1],
+              P[3 * i + 2],
+            ]);
+            const g = cross(sub(b, a), sub(c, a));
+            const n = [0, 1, 2].map(
+              (k) =>
+                N[3 * I[t] + k] + N[3 * I[t + 1] + k] + N[3 * I[t + 2] + k],
+            );
+            if (dot(g, n) < 0) [I[t + 1], I[t + 2]] = [I[t + 2], I[t + 1]];
+          }
+          const vao = gl.createVertexArray();
+          gl.bindVertexArray(vao);
+          const buf = (data, loc) => {
+            const b = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, b);
+            gl.bufferData(
+              gl.ARRAY_BUFFER,
+              new Float32Array(data),
+              gl.STATIC_DRAW,
+            );
+            gl.enableVertexAttribArray(loc);
+            gl.vertexAttribPointer(loc, 3, gl.FLOAT, false, 0, 0);
+          };
+          buf(P, locP);
+          buf(N, locN);
+          const ib = gl.createBuffer();
+          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib);
+          gl.bufferData(
+            gl.ELEMENT_ARRAY_BUFFER,
+            new Uint16Array(I),
+            gl.STATIC_DRAW,
+          );
+          gl.bindVertexArray(null);
+          return { vao, count: I.length, type: gl.UNSIGNED_SHORT };
+        }
+        // unit cube, centered on the origin
+        const cube = (() => {
+          const P = [],
+            N = [],
+            I = [];
+          for (const n of [
+            [1, 0, 0],
+            [-1, 0, 0],
+            [0, 1, 0],
+            [0, -1, 0],
+            [0, 0, 1],
+            [0, 0, -1],
+          ]) {
+            const [a, b] = n[0]
+              ? [
+                  [0, 1, 0],
+                  [0, 0, 1],
+                ]
+              : n[1]
+                ? [
+                    [1, 0, 0],
+                    [0, 0, 1],
+                  ]
+                : [
+                    [1, 0, 0],
+                    [0, 1, 0],
+                  ];
+            const base = P.length / 3;
+            for (const [s, t] of [
+              [-1, -1],
+              [1, -1],
+              [1, 1],
+              [-1, 1],
+            ]) {
+              for (let i = 0; i < 3; i++)
+                P.push(0.5 * (n[i] + s * a[i] + t * b[i]));
+              N.push(...n);
+            }
+            I.push(base, base + 1, base + 2, base, base + 2, base + 3);
+          }
+          return uploadMesh(P, N, I);
+        })();
+        // unit disc: a short cylinder along Z, 1 wide and 1 deep, for the round lamps
+        const disc = (() => {
+          const SEG = 32,
+            P = [],
+            N = [],
+            I = [];
+          for (const z of [-0.5, 0.5]) {
+            // flat caps facing -Z (toward our car) and +Z
+            const c = P.length / 3;
+            P.push(0, 0, z);
+            N.push(0, 0, Math.sign(z));
+            for (let i = 0; i < SEG; i++) {
+              const a = (i / SEG) * Math.PI * 2;
+              P.push(0.5 * Math.cos(a), 0.5 * Math.sin(a), z);
+              N.push(0, 0, Math.sign(z));
+              I.push(c, c + 1 + i, c + 1 + ((i + 1) % SEG));
+            }
+          }
+          const s = P.length / 3; // side wall
+          for (let i = 0; i < SEG; i++) {
+            const a = (i / SEG) * Math.PI * 2,
+              x = Math.cos(a),
+              y = Math.sin(a);
+            P.push(0.5 * x, 0.5 * y, -0.5, 0.5 * x, 0.5 * y, 0.5);
+            N.push(x, y, 0, x, y, 0);
+            const j = s + 2 * i,
+              k = s + 2 * ((i + 1) % SEG);
+            I.push(j, j + 1, k + 1, j, k + 1, k);
+          }
+          return uploadMesh(P, N, I);
+        })();
+        // signal housing: a box with rounded corners (seen from the front), at real size in meters
+        const housing = (() => {
+          const W = 0.44,
+            H = 1.32,
+            D = 0.32,
+            R = 0.12,
+            SEG = 6,
+            prof = []; // [x, y, nx, ny] around the outline, counter-clockwise
+          [
+            [1, 1],
+            [-1, 1],
+            [-1, -1],
+            [1, -1],
+          ].forEach(([sx, sy], q) => {
+            for (let i = 0; i <= SEG; i++) {
+              const a = ((q + i / SEG) * Math.PI) / 2,
+                nx = Math.cos(a),
+                ny = Math.sin(a);
+              prof.push([
+                sx * (W / 2 - R) + R * nx,
+                sy * (H / 2 - R) + R * ny,
+                nx,
+                ny,
+              ]);
+            }
+          });
+          const P = [],
+            N = [],
+            I = [];
+          for (const z of [-D / 2, D / 2]) {
+            // flat front and back
+            const c = P.length / 3;
+            P.push(0, 0, z);
+            N.push(0, 0, Math.sign(z));
+            prof.forEach(([x, y]) => {
+              P.push(x, y, z);
+              N.push(0, 0, Math.sign(z));
+            });
+            for (let i = 0; i < prof.length; i++)
+              I.push(c, c + 1 + i, c + 1 + ((i + 1) % prof.length));
+          }
+          const s = P.length / 3; // rounded side wall
+          prof.forEach(([x, y, nx, ny]) => {
+            P.push(x, y, -D / 2, x, y, D / 2);
+            N.push(nx, ny, 0, nx, ny, 0);
+          });
+          for (let i = 0; i < prof.length; i++) {
+            const j = s + 2 * i,
+              k = s + 2 * ((i + 1) % prof.length);
+            I.push(j, j + 1, k + 1, j, k + 1, k);
+          }
+          return uploadMesh(P, N, I);
+        })();
+        // lamp hood: a thin curved shade over the top of each lamp, sticking out toward our car (-Z)
+        const visor = (() => {
+          const SEG = 16,
+            R = 0.19,
+            L = 0.24,
+            P = [],
+            N = [],
+            I = [];
+          for (let i = 0; i <= SEG; i++) {
+            const a = (-0.12 + (1.24 * i) / SEG) * Math.PI,
+              x = Math.cos(a),
+              y = Math.sin(a);
+            P.push(R * x, R * y, 0, R * x, R * y, -L);
+            N.push(x, y, 0, x, y, 0);
+            if (i < SEG)
+              I.push(2 * i, 2 * i + 1, 2 * i + 3, 2 * i, 2 * i + 3, 2 * i + 2);
+          }
+          return uploadMesh(P, N, I);
+        })();
+
+        // ---------- GLB loader (just what these models need; from tesla_road_view) ----------
+        const white = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, white);
+        gl.texImage2D(
+          gl.TEXTURE_2D,
+          0,
+          gl.RGBA,
+          1,
+          1,
+          0,
+          gl.RGBA,
+          gl.UNSIGNED_BYTE,
+          new Uint8Array([255, 255, 255, 255]),
+        );
+        const aniso = gl.getExtension("EXT_texture_filter_anisotropic");
+        async function loadGLB(url) {
+          const res = await fetch(url);
+          if (!res.ok)
+            throw new Error(
+              "Could not load " + url + " (HTTP " + res.status + ")",
+            );
+          // A base64 text copy works too, for hosts that do not serve .glb
+          let buf = await res.arrayBuffer();
+          if (new DataView(buf).getUint32(0, true) !== 0x46546c67) {
+            const bin = atob(new TextDecoder().decode(buf).trim());
+            const u8 = new Uint8Array(bin.length);
+            for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+            buf = u8.buffer;
+          }
+          const dv = new DataView(buf);
+          if (dv.getUint32(0, true) !== 0x46546c67)
+            throw new Error("The model file is not a GLB file.");
+          const jl = dv.getUint32(12, true);
+          const json = JSON.parse(
+            new TextDecoder().decode(new Uint8Array(buf, 20, jl)),
+          );
+          const binOff = 20 + jl + 8;
+          const TYPES = {
+              5126: Float32Array,
+              5125: Uint32Array,
+              5123: Uint16Array,
+            },
+            SIZE = { SCALAR: 1, VEC2: 2, VEC3: 3 };
+          const cache = {};
+          const accessor = (i) => {
+            const a = json.accessors[i],
+              bv = json.bufferViews[a.bufferView];
+            const T = TYPES[a.componentType];
+            return {
+              data: new T(
+                buf,
+                binOff + (bv.byteOffset || 0) + (a.byteOffset || 0),
+                a.count * SIZE[a.type],
+              ),
+              type: a.componentType,
+              count: a.count,
+            };
+          };
+          const vbo = (i) =>
+            cache[i] ||
+            (cache[i] = (() => {
+              const b = gl.createBuffer();
+              gl.bindBuffer(gl.ARRAY_BUFFER, b);
+              gl.bufferData(gl.ARRAY_BUFFER, accessor(i).data, gl.STATIC_DRAW);
+              return b;
+            })());
+          // textures embedded in the file (sRGB color, mipmapped)
+          const texs = await Promise.all(
+            (json.textures || []).map(async (t) => {
+              const im = json.images[t.source],
+                bv = json.bufferViews[im.bufferView];
+              const bmp = await createImageBitmap(
+                new Blob(
+                  [
+                    new Uint8Array(
+                      buf,
+                      binOff + (bv.byteOffset || 0),
+                      bv.byteLength,
+                    ),
+                  ],
+                  { type: im.mimeType },
+                ),
+              );
+              const tx = gl.createTexture();
+              gl.bindTexture(gl.TEXTURE_2D, tx);
+              gl.texImage2D(
+                gl.TEXTURE_2D,
+                0,
+                gl.SRGB8_ALPHA8,
+                gl.RGBA,
+                gl.UNSIGNED_BYTE,
+                bmp,
+              );
+              gl.generateMipmap(gl.TEXTURE_2D);
+              gl.texParameteri(
+                gl.TEXTURE_2D,
+                gl.TEXTURE_MIN_FILTER,
+                gl.LINEAR_MIPMAP_LINEAR,
+              );
+              gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+              gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+              if (aniso)
+                gl.texParameterf(
+                  gl.TEXTURE_2D,
+                  aniso.TEXTURE_MAX_ANISOTROPY_EXT,
+                  8,
+                );
+              return tx;
+            }),
+          );
+          const mats = json.materials.map((m) => {
+            const pb = m.pbrMetallicRoughness;
+            return {
+              name: m.name,
+              base: pb.baseColorFactor.slice(0, 3),
+              alpha: pb.baseColorFactor[3] ?? 1,
+              metal: pb.metallicFactor,
+              rough: pb.roughnessFactor,
+              cc:
+                m.extensions && m.extensions.KHR_materials_clearcoat
+                  ? m.extensions.KHR_materials_clearcoat.clearcoatFactor
+                  : 0,
+              emis: (m.emissiveFactor || [0, 0, 0]).map((v) => v * 2), // glowing parts: tail-light bars, light strips
+              mode: m.alphaMode || "OPAQUE",
+              tex: pb.baseColorTexture ? texs[pb.baseColorTexture.index] : null,
+              emTex: m.emissiveTexture ? texs[m.emissiveTexture.index] : null,
+            };
+          });
+          const nodes = {};
+          let bmin = [1e9, 1e9, 1e9],
+            bmax = [-1e9, -1e9, -1e9];
+          for (const n of json.nodes) {
+            if (n.mesh === undefined) continue;
+            const t = n.translation || [0, 0, 0];
+            const prims = json.meshes[n.mesh].primitives.map((pr) => {
+              const vao = gl.createVertexArray();
+              gl.bindVertexArray(vao);
+              gl.bindBuffer(gl.ARRAY_BUFFER, vbo(pr.attributes.POSITION));
+              gl.enableVertexAttribArray(locP);
+              gl.vertexAttribPointer(locP, 3, gl.FLOAT, false, 0, 0);
+              gl.bindBuffer(gl.ARRAY_BUFFER, vbo(pr.attributes.NORMAL));
+              gl.enableVertexAttribArray(locN);
+              gl.vertexAttribPointer(locN, 3, gl.FLOAT, false, 0, 0);
+              if (pr.attributes.TEXCOORD_0 !== undefined) {
+                gl.bindBuffer(gl.ARRAY_BUFFER, vbo(pr.attributes.TEXCOORD_0));
+                gl.enableVertexAttribArray(locU);
+                gl.vertexAttribPointer(locU, 2, gl.FLOAT, false, 0, 0);
+              } else gl.disableVertexAttribArray(locU);
+              const ia = accessor(pr.indices);
+              const ib = gl.createBuffer();
+              gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ib);
+              gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, ia.data, gl.STATIC_DRAW);
+              gl.bindVertexArray(null);
+              const pa = json.accessors[pr.attributes.POSITION];
+              if (n.name === "Body")
+                for (let k = 0; k < 3; k++) {
+                  bmin[k] = Math.min(bmin[k], pa.min[k] + t[k]);
+                  bmax[k] = Math.max(bmax[k], pa.max[k] + t[k]);
+                }
+              return {
+                vao,
+                count: ia.count,
+                type: ia.type === 5125 ? gl.UNSIGNED_INT : gl.UNSIGNED_SHORT,
+                mat: mats[pr.material],
+              };
+            });
+            const sc = n.scale || null;
+            nodes[n.name] = {
+              prims,
+              t,
+              q: n.rotation || null,
+              s: sc,
+              mirrored: !!sc && sc[0] * sc[1] * sc[2] < 0, // negative scale flips which side of a triangle faces out
+            };
+          }
+          const wf = nodes.Wheel_FR || nodes.Wheel_FL,
+            wr = nodes.Wheel_RR || nodes.Wheel_RL;
+          return {
+            nodes,
+            mats,
+            wheelR: wf ? wf.t[1] : 0.36, // hub height above the road = tire radius
+            bmin,
+            bmax,
+            // ground shadow (at true size): half width to the outer tire edge, half length, front and rear axle positions
+            dims: [
+              (wf ? Math.abs(wf.t[0]) : 0.8) + 0.12,
+              ((bmax[2] - bmin[2]) / 2) * 0.93,
+              wf ? wf.t[2] : 1.46,
+              wr ? wr.t[2] : -1.42,
+            ],
+          };
+        }
+        const quatMat = ([x, y, z, w]) => [
+          1 - 2 * (y * y + z * z),
+          2 * (x * y + z * w),
+          2 * (x * z - y * w),
+          0,
+          2 * (x * y - z * w),
+          1 - 2 * (x * x + z * z),
+          2 * (y * z + x * w),
+          0,
+          2 * (x * z + y * w),
+          2 * (y * z - x * w),
+          1 - 2 * (x * x + y * y),
+          0,
+          0,
+          0,
+          0,
+          1,
+        ];
+
+        // Each car's model loads once, the first time it is needed
+        const models = {}; // id -> loaded model
+        const loading = {}; // id -> promise
+        function loadCar(id) {
+          if (!loading[id])
+            loading[id] = loadGLB(CARS[id].file)
+              .then((m) => (models[id] = { ...m, underbody: CARS[id].underbody }))
+              .catch((err) => {
+                delete loading[id];
+                throw err;
+              });
+          return loading[id];
+        }
+
+        // ---------- paint (tap the car to cycle, saved in the app's storage) ----------
+        function loadAppData() {
+          try {
+            const s =
+              window.NativeCarState?.getAppData?.() ??
+              window.__DASHPILOT_APP_DATA__ ??
+              localStorage.getItem("dashpilot-vanilla-v2");
+            if (!s) return {};
+            return typeof s === "object" ? s : JSON.parse(s);
+          } catch {
+            return {};
+          }
+        }
+        function saveAppData(data) {
+          const s = JSON.stringify(data);
+          try {
+            if (window.NativeCarState?.setAppData)
+              window.NativeCarState.setAppData(s);
+            else if (window.webkit?.messageHandlers?.appData)
+              window.webkit.messageHandlers.appData.postMessage(s);
+            else localStorage.setItem("dashpilot-vanilla-v2", s);
+          } catch {}
+        }
+        const saved = loadAppData();
+        if (Number.isInteger(saved.paint) && PAINTS[saved.paint])
+          state.paint = saved.paint;
+        if (MAIN_CARS.includes(saved.car)) state.car = saved.car;
+        const paintOf = (i) => {
+          const [, hex, metal, rough] = PAINTS[i];
+          return { base: srgbToLin(hex), metal, rough };
+        };
+        const toast = document.getElementById("paintToast");
+        let toastTimer = 0;
+        function cyclePaint() {
+          state.paint = (state.paint + 1) % PAINTS.length;
+          saveAppData({ ...loadAppData(), paint: state.paint });
+          showToast(PAINTS[state.paint][0]);
+        }
+        function showToast(text) {
+          toast.textContent = text;
+          toast.style.opacity = "1";
+          clearTimeout(toastTimer);
+          toastTimer = setTimeout(() => (toast.style.opacity = "0"), 1400);
+        }
+        // ---------- vehicle picker (long press anywhere) ----------
+        const LONG_PRESS_MS = 500;
+        const picker = document.getElementById("carPicker"),
+          carOptions = document.getElementById("carOptions");
+        MAIN_CARS.forEach((id) => {
+          const b = document.createElement("button");
+          b.type = "button";
+          b.textContent = CARS[id].name;
+          b.dataset.car = id;
+          b.addEventListener("click", () => {
+            setMainCar(id);
+            closePicker();
+          });
+          carOptions.appendChild(b);
+        });
+        // Pause the app's swipe-to-next-dashboard gesture while the picker is open
+        function setEditing(on) {
+          try {
+            if (window.NativeCarState?.setEditing)
+              window.NativeCarState.setEditing(on);
+            else window.webkit?.messageHandlers?.editing?.postMessage(on);
+          } catch {}
+        }
+        function openPicker() {
+          carOptions
+            .querySelectorAll("button")
+            .forEach((b) =>
+              b.setAttribute(
+                "aria-pressed",
+                String(b.dataset.car === state.car),
+              ),
+            );
+          picker.hidden = false;
+          setEditing(true);
+        }
+        function closePicker() {
+          picker.hidden = true;
+          setEditing(false);
+        }
+        picker.addEventListener("click", (e) => {
+          if (e.target === picker) closePicker(); // tap outside the card
+        });
+        window.addEventListener("contextmenu", (e) => e.preventDefault()); // no Android long-press menu
+
+        // A short tap (not a swipe) inside the car's on-screen bounds changes the paint;
+        // holding still anywhere for LONG_PRESS_MS opens the vehicle picker.
+        let carRect = null,
+          tap = null,
+          pressTimer = 0;
+        window.addEventListener("pointerdown", (e) => {
+          if (!picker.hidden) return;
+          tap = {
+            x: e.clientX,
+            y: e.clientY,
+            t: performance.now(),
+            long: false,
+          };
+          clearTimeout(pressTimer);
+          pressTimer = setTimeout(() => {
+            if (!tap) return;
+            tap.long = true;
+            openPicker();
+          }, LONG_PRESS_MS);
+        });
+        window.addEventListener("pointermove", (e) => {
+          if (tap && Math.hypot(e.clientX - tap.x, e.clientY - tap.y) > 12)
+            clearTimeout(pressTimer); // a swipe
+        });
+        window.addEventListener("pointercancel", () => {
+          clearTimeout(pressTimer);
+          tap = null;
+        });
+        window.addEventListener("pointerup", (e) => {
+          clearTimeout(pressTimer);
+          if (!tap || tap.long || !carRect || !models[state.car]) {
+            tap = null;
+            return;
+          }
+          const moved = Math.hypot(e.clientX - tap.x, e.clientY - tap.y),
+            held = performance.now() - tap.t;
+          tap = null;
+          if (moved > 12 || held > LONG_PRESS_MS) return;
+          if (
+            e.clientX >= carRect[0] &&
+            e.clientX <= carRect[2] &&
+            e.clientY >= carRect[1] &&
+            e.clientY <= carRect[3]
+          )
+            cyclePaint();
+        });
+
+        // ---------- data from the dashboard ----------
+        function setMainCar(id) {
+          if (!MAIN_CARS.includes(id) || id === state.car) return;
+          state.car = id;
+          saveAppData({ ...loadAppData(), car: id });
+          if (!models[id]) statusEl.hidden = false;
+          loadCar(id).then(() => {
+            if (state.car === id) statusEl.hidden = true;
+          });
+        }
+        const blinkerFog = document.getElementById("blinkerFog");
+        const TL_FOG_FAR = 45,
+          TL_FOG_NEAR = 20; // meters to the traffic light's stop line
+        const TL_FOG_RETURN = 2.5; // seconds for the arrow fog to fade back in once the light is passed
+        let blinkerFogLevel = 1;
+        let forcedTrafficCar = null; // set by a demo to always use one car in the blind spots
+        function update(car) {
+          forcedTrafficCar = TRAFFIC_CARS.includes(car.demoTrafficCar) ? car.demoTrafficCar : null;
+          // a demo can show a car and paint without saving them as the user's choice
+          if (MAIN_CARS.includes(car.demoCar) && car.demoCar !== state.car) {
+            state.car = car.demoCar;
+            loadCar(car.demoCar).catch(() => {});
+            showToast(CARS[car.demoCar].name);
+          }
+          if (PAINTS[car.demoPaint] && car.demoPaint !== state.paint) {
+            state.paint = car.demoPaint;
+            if (car.gear !== 1) showToast(PAINTS[state.paint][0]); // in Park the car's name is showing
+          }
+          const gear =
+            { 1: "P", 2: "R", 3: "N", 4: "D" }[parseInt(car.gear)] || "D";
+          state.steer = Math.max(
+            -STEER_LOCK,
+            Math.min(STEER_LOCK, Number(car.egoSteeringAngle) || 0),
+          );
+          const spd = Math.abs(Number(car.egoSpeed) || 0),
+            ms = car.isImperial ? spd * 0.44704 : spd / 3.6;
+          state.vTarget = gear === "P" ? 0 : gear === "R" ? -ms : ms;
+          view = VIEWS[gear];
+          state.nightTarget = car.darkMode ? 1 : 0;
+          state.gray = Math.max(
+            0,
+            Math.min(255, Number(car.darkModeBackgroundGray) || 0),
+          );
+          state.adasTarget =
+            car.adasOn && (gear === "D" || gear === "N") ? 1 : 0;
+          state.studioTarget = gear === "P" ? 1 : 0;
+          const alwaysOn = car.alwaysOnBlindSpotMonitor !== false;
+          const sides = [
+            [car.leftBlindSpot, car.leftBlinker],
+            [car.rightBlindSpot, car.rightBlinker],
+          ];
+          sides.forEach(([bs, blinker], i) => {
+            bs = parseInt(bs) || 0;
+            state.bs[i].on = bs > 0 && (alwaysOn || parseInt(blinker) > 0);
+            state.bs[i].urgent = bs > 1;
+          });
+          const dist = Number(car.stopLineDist);
+          state.tlColor =
+            dist > 0
+              ? { 1: "red", 2: "green", 3: "yellow" }[
+                  parseInt(car.trafficLightColor)
+                ] || null
+              : null;
+          // the stop line only shows with a traffic light (not at stop signs, crosswalks or map-only stop points)
+          state.stopDist = state.tlColor && dist < 127 ? dist : -1;
+          // the arrow fog clears as the light gets close: full beyond TL_FOG_FAR, gone by TL_FOG_NEAR
+          // (none in Reverse: the top-down view puts the car itself under it)
+          const fog = gear === "R" ? 0 : state.tlColor
+            ? Math.min(1, Math.max(0, (dist - TL_FOG_NEAR) / (TL_FOG_FAR - TL_FOG_NEAR)))
+            : 1;
+          // clearing follows the light quickly; coming back (after passing it) eases in slowly
+          if (fog !== blinkerFogLevel) {
+            blinkerFog.style.transitionDuration = fog > blinkerFogLevel ? TL_FOG_RETURN + "s" : "0.4s";
+            blinkerFog.style.opacity = fog;
+            blinkerFogLevel = fog;
+          }
+          state.dprCap =
+            { 1: 1, 2: 1.5, 3: 2 }[parseInt(car.renderQuality)] || 2;
+        }
+        window.CarScene = { update, cars: MAIN_CARS, paints: PAINTS.length }; // the list and count are for the demo
+
+        // A point on the road: s meters ahead along the curve, x meters to the left of our lane's center.
+        // Returns world [x, z, heading] using the same arc as the road shader.
+        // The road's center line is arcs end to end (ROAD_SHAPE), through our car at s = 0 heading along +z.
+        // Each segment: [start s, start x, start z, start heading (+ toward +X), curvature (+ bends toward +X)]
+        let roadSegs = [];
+        function arcStep(x, z, h, k, ds) {
+          if (Math.abs(k) < 1e-6) return [x + Math.sin(h) * ds, z + Math.cos(h) * ds, h];
+          const h2 = h + k * ds;
+          return [x + (Math.cos(h) - Math.cos(h2)) / k, z + (Math.sin(h2) - Math.sin(h)) / k, h2];
+        }
+        function setRoadSegs() {
+          const b = ROAD_SHAPE.bend;
+          let [x, z, h] = arcStep(0, 0, 0, state.curv * b[0][1], b[0][0]); // back from our car to the first start
+          roadSegs = b.map(([s0, share], i) => {
+            const seg = [s0, x, z, h, state.curv * share];
+            if (i + 1 < b.length) [x, z, h] = arcStep(x, z, h, seg[4], b[i + 1][0] - s0);
+            return seg;
+          });
+        }
+        setRoadSegs();
+        // world [x, z, heading] of the point s meters along the road and x meters across it (+ toward +X)
+        function roadPoint(s, x) {
+          let g = roadSegs[0];
+          for (const seg of roadSegs) if (s >= seg[0]) g = seg;
+          const [cx, cz, h] = arcStep(g[1], g[2], g[3], g[4], s - g[0]);
+          return [cx + Math.cos(h) * x, cz - Math.sin(h) * x, h];
+        }
+
+        // ---------- drawing ----------
+        // mat: { base, metal, rough, cc, emis, alpha, mode, tex, emTex } (only base, metal and rough are required)
+        function drawPrim(m, mesh, mat) {
+          gl.uniformMatrix4fv(carProg.u.uM, false, m);
+          gl.uniform3fv(carProg.u.uBase, mat.base);
+          gl.uniform1f(carProg.u.uMetal, mat.metal);
+          gl.uniform1f(carProg.u.uRough, mat.rough);
+          gl.uniform1f(carProg.u.uCC, mat.cc || 0);
+          gl.uniform3fv(carProg.u.uEmit, mat.emis || [0, 0, 0]);
+          gl.uniform1f(carProg.u.uAlpha, mat.alpha ?? 1);
+          gl.uniform1f(carProg.u.uTint, mat.tint || 0);
+          gl.uniform1f(
+            carProg.u.uMode,
+            mat.mode === "MASK" ? 1 : mat.mode === "BLEND" ? 2 : 0,
+          );
+          gl.activeTexture(gl.TEXTURE0);
+          gl.bindTexture(gl.TEXTURE_2D, mat.tex || white);
+          gl.uniform1f(carProg.u.uHasTex, mat.tex ? 1 : 0);
+          gl.activeTexture(gl.TEXTURE1);
+          gl.bindTexture(gl.TEXTURE_2D, mat.emTex || white);
+          gl.uniform1f(carProg.u.uHasEm, mat.emTex ? 1 : 0);
+          gl.bindVertexArray(mesh.vao);
+          gl.drawElements(gl.TRIANGLES, mesh.count, mesh.type, 0);
+        }
+        // Draws a car's solid parts now; its see-through parts (lamp lenses) go on the blended list,
+        // drawn after everything solid. paint (optional) recolors every "Paint..." material.
+        function drawCar(
+          model,
+          root,
+          steerRad,
+          paint,
+          blended,
+          scale = CAR_SCALE,
+          flip = false, // drawing a mirror image: triangles face the other way
+          tint = 0, // 0..1: whole car red (urgent warning)
+        ) {
+          const spin = state.travel / (model.wheelR * scale);
+          for (const [name, node] of Object.entries(model.nodes)) {
+            let m = M.mul(root, M.tr(...node.t));
+            if (node.q) m = M.mul(m, quatMat(node.q));
+            if (name.startsWith("Wheel_F") || name.startsWith("Brake_F"))
+              m = M.mul(m, M.ry(steerRad));
+            if (name.startsWith("Wheel")) m = M.mul(m, M.rx(spin)); // brakes steer but don't spin
+            if (node.s) m = M.mul(m, M.sc(...node.s));
+            for (const pr of node.prims) {
+              let mat =
+                paint && pr.mat.name.startsWith("Paint")
+                  ? { ...pr.mat, ...paint }
+                  : pr.mat;
+              if (tint > 0) mat = { ...mat, tint };
+              if (mat.mode === "BLEND") {
+                if (!flip) blended.push([m, pr, mat, node.mirrored]);
+                continue;
+              }
+              gl.frontFace(node.mirrored !== flip ? gl.CW : gl.CCW);
+              drawPrim(m, pr, mat);
+            }
+          }
+          gl.frontFace(gl.CCW);
+          if (model.underbody) {
+            for (const [hw, zf, zr, y] of model.underbody)
+              drawPrim(
+                M.mul(root, M.mul(M.tr(0, y, (zf + zr) / 2), M.sc(hw * 2, 0.02, zf - zr))),
+                cube,
+                UNDERBODY,
+              );
+          }
+        }
+        const UNDERBODY = { base: [0.018, 0.018, 0.02], metal: 0, rough: 0.6 };
+        const OTHER_PAINT = {
+          base: srgbToLin("#8d9298"),
+          metal: 0.3,
+          rough: 0.35,
+        };
+        const URGENT_TINT = 0.75; // how red an urgent blind-spot car turns (1 = solid red, shading kept)
+        const URGENT_FADE = 4; // how fast it fades to and from red (higher = faster; 4 is about 0.75 s)
+        const LAMPS = {
+          // glow of a lit lamp; kept low enough that the colors stay saturated on screen
+          red: [2.4, 0.015, 0.008],
+          yellow: [2.2, 0.5, 0.0],
+          green: [0.01, 2.0, 0.15],
+        };
+        function drawTrafficLight() {
+          const [x, z, hd] = roadPoint(
+            state.stopDist > 0 ? state.stopDist + 1.5 : 30,
+            0,
+          );
+          const root = M.mul(M.tr(x, 0, z), M.ry(hd));
+          const part = (
+            mesh,
+            cx,
+            cy,
+            cz,
+            sx,
+            sy,
+            sz,
+            base,
+            metal,
+            rough,
+            emit,
+          ) =>
+            drawPrim(
+              M.mul(root, M.mul(M.tr(cx, cy, cz), M.sc(sx, sy, sz))),
+              mesh,
+              { base, metal, rough, emis: emit },
+            );
+          const box = (...args) => part(cube, ...args),
+            round = (...args) => part(disc, ...args);
+          const grey = [0.22, 0.23, 0.24],
+            dark = [0.005, 0.005, 0.005];
+          box(-6.6, 2.9, 0, 0.22, 5.8, 0.22, grey, 0.6, 0.45); // pole on the right shoulder
+          box(-3.3, 5.7, 0, 6.6, 0.14, 0.14, grey, 0.6, 0.45); // mast arm over the lanes
+          part(housing, 0, 4.95, 0, 1, 1, 1, dark, 0.0, 0.6); // housing over our lane
+          [
+            ["red", 5.35],
+            ["yellow", 4.95],
+            ["green", 4.55],
+          ].forEach(([name, y]) => {
+            const lit = state.tlColor === name,
+              c = LAMPS[name];
+            round(
+              0,
+              y,
+              -0.17,
+              0.3,
+              0.3,
+              0.05,
+              dark,
+              0.0,
+              0.2,
+              lit ? c : c.map((v) => v * 0.025),
+            );
+            part(visor, 0, y, -0.16, 1, 1, 1, dark, 0.0, 0.6);
+          });
+        }
+
+        // ---------- render loop ----------
+        const SUN = norm([-0.45, 0.75, -0.35]);
+        const ADAS_COLOR = srgbToLin("#5cbd68").map((v) => v * 1.6); // same green in light and dark mode
+        function resize() {
+          const dpr = Math.min(window.devicePixelRatio || 1, state.dprCap);
+          const w = Math.round(canvas.clientWidth * dpr),
+            h = Math.round(canvas.clientHeight * dpr);
+          if (canvas.width !== w || canvas.height !== h) {
+            canvas.width = w;
+            canvas.height = h;
+          }
+        }
+        function setEnv(prog, env, day) {
+          gl.uniform3fv(prog.u.uSun, SUN);
+          gl.uniform3fv(prog.u.uSunC, env.sunC);
+          gl.uniform3fv(prog.u.uZen, env.zen);
+          gl.uniform3fv(prog.u.uHor, env.hor);
+          gl.uniform3fv(prog.u.uGnd, env.gnd);
+          gl.uniform3fv(prog.u.uFog, env.fog);
+          gl.uniform3fv(prog.u.uAmbLo, env.ambLo);
+          gl.uniform3fv(prog.u.uAmbHi, env.ambHi);
+          gl.uniform1f(prog.u.uDay, day);
+        }
+        let last = performance.now();
+        function frame(now) {
+          const dt = Math.min(0.05, (now - last) / 1000);
+          last = now;
+          state.time += dt;
+          resize();
+          gl.viewport(0, 0, canvas.width, canvas.height);
+          // smooth the incoming values so 25 Hz updates and gear changes look natural
+          state.steerShown += (state.steer - state.steerShown) * ease(dt, 12);
+          state.v += (state.vTarget - state.v) * ease(dt, 4);
+          state.night += (state.nightTarget - state.night) * ease(dt, 3);
+          state.adas += (state.adasTarget - state.adas) * ease(dt, 4);
+          state.studio += (state.studioTarget - state.studio) * ease(dt, 3);
+          const studio = state.studio > 0.5; // in the studio look, no traffic or traffic light
+          for (const b of state.bs) {
+            // a car arriving in a blind spot is a random one of the loaded traffic cars, kept until it leaves
+            if (b.on && b.p < 0.01) {
+              const ready = TRAFFIC_CARS.filter((id) => models[id]);
+              if (forcedTrafficCar) b.car = forcedTrafficCar; // drawn once its model has loaded
+              else if (ready.length)
+                b.car = ready[Math.floor(Math.random() * ready.length)];
+            }
+            b.p += ((b.on ? 1 : 0) - b.p) * ease(dt, 3);
+            b.u += ((b.urgent ? 1 : 0) - b.u) * ease(dt, URGENT_FADE); // red fades in and out
+          }
+          for (const k of ["az", "el", "dist"])
+            cam[k] += (view[k] - cam[k]) * ease(dt, 2.5);
+          for (let i = 0; i < 3; i++)
+            cam.target[i] += (view.target[i] - cam.target[i]) * ease(dt, 2.5);
+          const targetK = -state.steerShown / STEER_LOCK / MIN_RADIUS;
+          state.curv += (targetK - state.curv) * ease(dt, CURVE_EASE);
+          setRoadSegs();
+          const roadDeg = -state.steerShown / STEER_RATIO; // + = front wheels point left
+          const clampDeg = (v, lim) => Math.max(-lim, Math.min(lim, v));
+          const yaw = (clampDeg(roadDeg * YAW_GAIN, MAX_YAW) * Math.PI) / 180;
+          const wheelDeg = clampDeg(roadDeg * WHEEL_GAIN, MAX_WHEEL);
+          state.road = (state.road + state.v * dt) % 1219.2;
+          state.travel += state.v * dt;
+
+          const env = (() => {
+            const n = nightEnv(state.gray),
+              t = state.night,
+              o = {};
+            for (const k in DAY) o[k] = lerp3(DAY[k], n[k], t);
+            return o;
+          })();
+          const day = 1 - state.night;
+
+          const aspect = canvas.width / canvas.height,
+            fov = ((aspect < 1 ? 58 : 38) * Math.PI) / 180;
+          const dist = cam.dist * (aspect < 1 ? 1.25 : 1);
+          const eye = [
+            cam.target[0] +
+              dist * Math.cos(cam.el) * Math.sin(cam.az + Math.PI),
+            cam.target[1] + dist * Math.sin(cam.el),
+            cam.target[2] +
+              dist * Math.cos(cam.el) * Math.cos(cam.az + Math.PI),
+          ];
+          const fw = norm(sub(cam.target, eye)),
+            rt = norm(cross(fw, [0, 1, 0])),
+            up = cross(rt, fw);
+          const viewM = [
+            rt[0],
+            up[0],
+            -fw[0],
+            0,
+            rt[1],
+            up[1],
+            -fw[1],
+            0,
+            rt[2],
+            up[2],
+            -fw[2],
+            0,
+            -dot(rt, eye),
+            -dot(up, eye),
+            dot(fw, eye),
+            1,
+          ];
+          const VP = M.mul(M.persp(fov, aspect, 0.1, 900), viewM);
+
+          // other cars in the blind spots slide in from behind along the curved road
+          const main = models[state.car];
+          const others = state.bs.map((b, i) => {
+            if (studio || b.p < 0.01 || !models[b.car]) return null;
+            const [x, z, hd] = roadPoint(
+              BS_S - (1 - b.p) * 14,
+              i === 0 ? LANE : -LANE,
+            );
+            return {
+              x,
+              z,
+              hd,
+              p: b.p,
+              urgent: b.u,
+              model: models[b.car],
+              id: b.car,
+            };
+          });
+          const shadows = main ? [0, 0, yaw, 1] : [0, 0, 0, 0];
+          const dims = [...(main ? main.dims : [0.82, 2.15, 1.46, -1.42])];
+          for (let i = 0; i < 2; i++) {
+            const o = others[i];
+            shadows.push(...(o ? [o.x, o.z, o.hd, o.p] : [0, 0, 0, 0]));
+            dims.push(
+              ...(o
+                ? o.model.dims.map((v) => v * TRAFFIC_SCALE)
+                : [1, 1, 0, 0]),
+            );
+          }
+
+          gl.enable(gl.DEPTH_TEST);
+          gl.clearColor(0, 0, 0, 1);
+          gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+          // sky
+          gl.useProgram(skyProg.p);
+          gl.bindVertexArray(skyVao);
+          setEnv(skyProg, env, day);
+          gl.uniform3fv(skyProg.u.uRt, rt);
+          gl.uniform3fv(skyProg.u.uUp, up);
+          gl.uniform3fv(skyProg.u.uFw, fw);
+          gl.uniform2f(
+            skyProg.u.uTan,
+            Math.tan(fov / 2) * aspect,
+            Math.tan(fov / 2),
+          );
+          gl.depthMask(false);
+          gl.drawArrays(gl.TRIANGLES, 0, 3);
+          gl.depthMask(true);
+          // ground
+          gl.useProgram(groundProg.p);
+          gl.bindVertexArray(groundVao);
+          setEnv(groundProg, env, day);
+          gl.uniformMatrix4fv(groundProg.u.uVP, false, VP);
+          gl.uniform3fv(groundProg.u.uCam, eye);
+          gl.uniform1f(groundProg.u.uRoad, state.road);
+          gl.uniform4fv(groundProg.u.uSeg, roadSegs.flatMap((g) => g.slice(1)));
+          gl.uniform1fv(groundProg.u.uSegS, roadSegs.map((g) => g[0]));
+          gl.uniform1f(groundProg.u.uTime, state.time);
+          gl.uniform1f(groundProg.u.uStop, state.stopDist);
+          gl.uniform1f(groundProg.u.uHead, state.night);
+          gl.uniform1f(groundProg.u.uAdas, state.adas);
+          gl.uniform3fv(groundProg.u.uAdasC, ADAS_COLOR);
+          gl.uniform4fv(groundProg.u.uCars, shadows);
+          gl.uniform1f(groundProg.u.uCarScale, CAR_SCALE);
+          gl.uniform4fv(groundProg.u.uCarDims, dims);
+          gl.uniform1f(groundProg.u.uNose, main ? main.bmax[2] : 2.3);
+          gl.uniform1f(groundProg.u.uStudio, state.studio);
+          gl.uniform3fv(
+            groundProg.u.uFloor,
+            env.fog.map((f) =>
+              untonemap(
+                lerp(
+                  tonemap1(f) * STUDIO_FLOOR,
+                  STUDIO_FLOOR_DARK,
+                  state.night,
+                ),
+              ),
+            ),
+          );
+          gl.drawArrays(gl.TRIANGLES, 0, 6);
+          // cars and traffic light
+          gl.useProgram(carProg.p);
+          // cars (and the traffic light) keep daytime lighting in both modes so they stay crisp;
+          // only the fog follows the night scene
+          setEnv(carProg, { ...DAY, fog: env.fog }, 1);
+          gl.uniformMatrix4fv(carProg.u.uVP, false, VP);
+          gl.uniform3fv(carProg.u.uCam, eye);
+          if (state.tlColor && !studio) drawTrafficLight();
+          gl.uniform1i(carProg.u.uTex, 0);
+          gl.uniform1i(carProg.u.uEmTex, 1);
+          const carSize = M.sc(CAR_SCALE, CAR_SCALE, CAR_SCALE);
+          const ts = CAR_SCALE * TRAFFIC_SCALE,
+            trafficSize = M.sc(ts, ts, ts);
+          const blended = [];
+          if (main && state.studio > 0.01) {
+            // Park studio: a faint mirror image of the car in the floor. Depth first (so the image hides
+            // its own far side), then color blended over the floor; then the depth is cleared so the
+            // real car draws over it.
+            const steer = (wheelDeg * Math.PI) / 180,
+              mirror = M.mul(M.sc(1, -1, 1), M.mul(M.ry(yaw), carSize));
+            gl.uniform1f(carProg.u.uReflectFade, REFLECT_FADE * CAR_SCALE);
+            gl.uniform1f(carProg.u.uReflect, REFLECT * state.studio);
+            gl.clear(gl.DEPTH_BUFFER_BIT);
+            gl.colorMask(false, false, false, false);
+            drawCar(main, mirror, steer, paintOf(state.paint), [], CAR_SCALE, true);
+            gl.colorMask(true, true, true, true);
+            gl.depthFunc(gl.LEQUAL);
+            gl.depthMask(false);
+            gl.enable(gl.BLEND);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+            drawCar(main, mirror, steer, paintOf(state.paint), [], CAR_SCALE, true);
+            gl.disable(gl.BLEND);
+            gl.depthMask(true);
+            gl.depthFunc(gl.LESS);
+            gl.uniform1f(carProg.u.uReflect, 0);
+            gl.clear(gl.DEPTH_BUFFER_BIT);
+          }
+          if (main) {
+            const root = M.mul(M.ry(yaw), carSize);
+            drawCar(
+              main,
+              root,
+              (wheelDeg * Math.PI) / 180,
+              paintOf(state.paint),
+              blended,
+            );
+            // on-screen bounds of our car, for tap-to-change-paint
+            const r = canvas.getBoundingClientRect();
+            let x0 = Infinity,
+              y0 = Infinity,
+              x1 = -Infinity,
+              y1 = -Infinity;
+            for (const cx of [main.bmin[0], main.bmax[0]])
+              for (const cy of [main.bmin[1], main.bmax[1]])
+                for (const cz of [main.bmin[2], main.bmax[2]]) {
+                  const p = M.xf(VP, M.xf(root, [cx, cy, cz]));
+                  if (p[3] <= 0) continue;
+                  const sx = r.left + ((p[0] / p[3]) * 0.5 + 0.5) * r.width,
+                    sy = r.top + (0.5 - (p[1] / p[3]) * 0.5) * r.height;
+                  x0 = Math.min(x0, sx);
+                  y0 = Math.min(y0, sy);
+                  x1 = Math.max(x1, sx);
+                  y1 = Math.max(y1, sy);
+                }
+            carRect = [x0, y0, x1, y1];
+          }
+          // traffic: grey (the Cybertruck keeps its bare stainless); the whole car turns red when urgent
+          for (const o of others)
+            if (o)
+              drawCar(
+                o.model,
+                M.mul(M.tr(o.x, 0, o.z), M.mul(M.ry(o.hd), trafficSize)),
+                0,
+                o.id === "cybertruck" ? null : OTHER_PAINT,
+                blended,
+                CAR_SCALE * TRAFFIC_SCALE,
+                false,
+                o.urgent * URGENT_TINT,
+              );
+          // see-through parts last, so what's behind them shows through
+          if (blended.length) {
+            gl.enable(gl.BLEND);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+            gl.depthMask(false);
+            for (const [m, pr, mat, mirrored] of blended) {
+              gl.frontFace(mirrored ? gl.CW : gl.CCW);
+              drawPrim(m, pr, mat);
+            }
+            gl.frontFace(gl.CCW);
+            gl.depthMask(true);
+            gl.disable(gl.BLEND);
+          }
+          requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+
+        // Our car first (the saved choice, or ?car=model3 for testing in a browser);
+        // the other traffic cars load in the background afterwards
+        const urlCar = new URLSearchParams(location.search).get("car");
+        if (MAIN_CARS.includes(urlCar)) state.car = urlCar;
+        loadCar(state.car)
+          .then(() => {
+            statusEl.hidden = true;
+            TRAFFIC_CARS.forEach((id) => loadCar(id).catch(() => {}));
+          })
+          .catch((err) => {
+            statusEl.textContent =
+              "The 3D model could not be loaded. " + err.message;
+          });
+      })();
+    </script>
+
+    <script>
+      const leftBlinkerIcon = document.getElementById("leftBlinkerIcon");
+      const rightBlinkerIcon = document.getElementById("rightBlinkerIcon");
+
+      function showBlinker(blinkerState, blinkerIcon) {
+        if (blinkerState == 2) {
+          blinkerIcon.style.opacity = "1";
+        } else if (blinkerState == 1) {
+          blinkerIcon.style.opacity = "0.3";
+        } else {
+          blinkerIcon.style.opacity = "0.0";
+        }
+      }
+
+      function applyBlindSpotBorderEffect(blindSpotState, blindSpotView) {
+        blindSpotView.style.display = blindSpotState > 0 ? "block" : "none";
+      }
+
+      var receiveMessage = function (car) {
+        try {
+          document.body.classList.toggle("dark-mode", !!car.darkMode);
+
+          window.CarScene.update(car);
+
+          const angle = car.egoSteeringAngle;
+          const speed = parseInt(car.egoSpeed);
+          const gear = parseInt(car.gear);
+          const leftBlinker = parseInt(car.leftBlinker);
+          const rightBlinker = parseInt(car.rightBlinker);
+          const speedLimit = parseInt(car.fusedSpeedLimit);
+
+          // Show gears
+          const gearMap = { 1: "P", 2: "R", 3: "N", 4: "D" };
+          gearText.textContent = gearMap[gear] || "-";
+
+          showBlinker(leftBlinker, leftBlinkerIcon);
+          showBlinker(rightBlinker, rightBlinkerIcon);
+
+          speedText.textContent = speed;
+          speedUnit.textContent = car.isImperial ? "mph" : "km/h";
+
+          const isParked = gearMap[gear] == "P";
+
+          if (isParked || speedLimit == 0) {
+            speedLimitText.textContent = "";
+          } else {
+            speedLimitText.textContent = speedLimit;
+          }
+          document.getElementById("speedSignRow").style.display = isParked
+            ? "none"
+            : "flex";
+          document.getElementById("speedLimitSign").style.visibility =
+            speedLimitText.textContent ? "visible" : "hidden";
+
+          const accSet = parseInt(car.accSetSpeed);
+
+          if (!isParked && accSet > 0) {
+            accValue.textContent = accSet;
+            accMax.textContent = "max";
+          } else {
+            accValue.textContent = "";
+            accMax.textContent = "";
+          }
+
+          accSetSpeed.style.color = car.adasOn ? "#5cbd68" : "#d3d3d3";
+
+          applyBlindSpotBorderEffect(car.leftBlindSpot, leftBlindSpot);
+          applyBlindSpotBorderEffect(car.rightBlindSpot, rightBlindSpot);
+
+          const buckle = car.buckleStatus;
+          seatbeltIcon.style.display =
+            buckle != null && buckle == 0 ? "block" : "none";
+
+          // Door open warning
+          const door = car.anyDoorOpen;
+          doorIcon.style.display = door != null && door > 0 ? "block" : "none";
+
+          // Phone battery
+          const phoneBatGroup = document.getElementById("phoneBatteryGroup");
+          if (car.showPhoneBattery) {
+            const phoneBat = car.phoneBattery;
+            if (phoneBat != null && phoneBat >= 0) {
+              phoneBatGroup.style.display = "flex";
+              document.getElementById("phoneBatteryFill").style.width =
+                phoneBat + "%";
+              document.getElementById("phoneBatteryPercent").textContent =
+                phoneBat + "%";
+              if (phoneBat <= 20) {
+                document.getElementById("phoneBatteryFill").style.background =
+                  "#ff4444";
+              } else {
+                document.getElementById("phoneBatteryFill").style.background =
+                  "#4a90d9";
+              }
+            }
+          } else {
+            phoneBatGroup.style.display = "none";
+          }
+
+          // Show separator only when both phone and car groups are visible
+          document.getElementById("statusSeparator").style.display =
+            car.showPhoneBattery && car.showCarBattery ? "block" : "none";
+
+          // Battery SOC + temperature widget
+          if (car.showCarBattery) {
+            const fullPack = car.fullPackEnergy;
+            const remaining = car.nominalEnergyRemaining;
+            const buffer = car.energyBuffer;
+            const tMin = car.packTMin;
+            const tMax = car.packTMax;
+            const hasBattery =
+              fullPack > 0 && remaining > 0 && fullPack - buffer > 0;
+            const hasTemp =
+              tMin != null && tMax != null && (tMin > 0 || tMax > 0);
+
+            if (hasBattery || hasTemp) {
+              document.getElementById("carBatteryGroup").style.display = "flex";
+            }
+            if (hasBattery) {
+              const soc = Math.round(
+                ((remaining - buffer) / (fullPack - buffer)) * 100,
+              );
+              const clampedSoc = Math.max(0, Math.min(100, soc));
+              document.getElementById("carBatteryFill").style.width =
+                clampedSoc + "%";
+              document.getElementById("carBatteryPercent").textContent =
+                soc + "%";
+              if (clampedSoc <= 20) {
+                document.getElementById("carBatteryFill").style.background =
+                  "#ff4444";
+              } else {
+                document.getElementById("carBatteryFill").style.background =
+                  "#5cbd68";
+              }
+            }
+            if (hasTemp) {
+              const avgTemp = (tMin + tMax) / 2;
+              document.getElementById("batteryTempText").textContent =
+                avgTemp.toFixed(0) + (car.isImperial ? "°F" : "°C");
+            }
+          } else {
+            document.getElementById("carBatteryGroup").style.display = "none";
+          }
+
+          // Power bar
+          const powerLevel = car.powerLevel;
+          if (
+            powerLevel != null &&
+            car.maxDischargePower > 0 &&
+            car.maxRegenPower > 0
+          ) {
+            document.getElementById("powerBar").style.display = "flex";
+            const fill = document.getElementById("powerBarFill");
+            const pct = Math.abs(powerLevel) / 2;
+            if (powerLevel >= 0) {
+              // Discharging — bar goes up from center
+              fill.style.top = 50 - pct + "%";
+              fill.style.height = pct + "%";
+              fill.style.background = "#555";
+            } else {
+              // Regenerating — bar goes down from center
+              fill.style.top = "50%";
+              fill.style.height = pct + "%";
+              fill.style.background = "#5cbd68";
+            }
+          }
+
+          // Odometer
+          if (car.showOdometer) {
+            const odo = car.odometer;
+            if (odo != null && odo > 0) {
+              document.getElementById("odometer").textContent =
+                Math.round(odo).toLocaleString() +
+                (car.isImperial ? " mi" : " km");
+              document.getElementById("bottomLeft").style.display = "flex";
+            }
+          } else {
+            document.getElementById("bottomLeft").style.display = "none";
+          }
+
+          // Experimental mode icon
+          document.getElementById("experimentalIcon").style.display =
+            car.experimentalMode ? "block" : "none";
+
+          // Steering wheel: colorize green when ADAS or MADS is active
+          if (car.adasOn || car.madsActive) {
+            steeringWheel.style.filter =
+              "brightness(0) saturate(100%) invert(68%) sepia(52%) saturate(405%) hue-rotate(88deg) brightness(92%) contrast(87%)";
+          } else {
+            steeringWheel.style.filter = "";
+          }
+
+          // Rotate the steering wheel
+          steeringWheel.style.transform = `rotate(${angle}deg)`;
+
+          // Driver alerts
+          const native = window.NativeCarState;
+          const camDist =
+            car.speedCameraDistance ?? native?.getSpeedCameraDistance?.() ?? -1;
+          const isChangingLane =
+            car.changingLane ?? native?.isChangingLane?.() ?? false;
+          const alertEl = document.getElementById("driverAlert");
+          if (isChangingLane) {
+            alertEl.textContent = "Changing lane";
+            alertEl.style.display = "block";
+          } else if (camDist > 0) {
+            alertEl.textContent = "Speed camera " + camDist + "m ahead";
+            alertEl.style.display = "block";
+          } else {
+            alertEl.style.display = "none";
+          }
+        } catch (err) {
+          console.error("Failed to parse message", err);
+        }
+      };
+
+      window.onCarStateUpdate = function () {
+        var car = {
+          egoSteeringAngle: NativeCarState.getEgoSteeringAngle(),
+          egoSpeed: NativeCarState.getEgoSpeed(),
+          leftBlinker: NativeCarState.getLeftBlinker(),
+          rightBlinker: NativeCarState.getRightBlinker(),
+          gear: NativeCarState.getGear(),
+          adasOn: NativeCarState.isAdasOn(),
+          leftBlindSpot: NativeCarState.getLeftBlindSpot(),
+          rightBlindSpot: NativeCarState.getRightBlindSpot(),
+          fusedSpeedLimit: NativeCarState.getFusedSpeedLimit(),
+          stopLineDist: NativeCarState.getStopLineDist(),
+          trafficLightColor: NativeCarState.getTrafficLightColor(),
+          buckleStatus: NativeCarState.getBuckleStatus?.() ?? undefined,
+          anyDoorOpen: NativeCarState.getAnyDoorOpen?.() ?? undefined,
+          accSetSpeed: NativeCarState.getAccSetSpeed?.() ?? undefined,
+          odometer: NativeCarState.getOdometer?.() ?? undefined,
+          phoneBattery: NativeCarState.getPhoneBattery?.() ?? undefined,
+          fullPackEnergy: NativeCarState.getFullPackEnergy?.() ?? undefined,
+          nominalEnergyRemaining:
+            NativeCarState.getNominalEnergyRemaining?.() ?? undefined,
+          energyBuffer: NativeCarState.getEnergyBuffer?.() ?? undefined,
+          packTMin: NativeCarState.getPackTMin?.() ?? undefined,
+          packTMax: NativeCarState.getPackTMax?.() ?? undefined,
+          maxRegenPower: NativeCarState.getMaxRegenPower?.() ?? undefined,
+          maxDischargePower:
+            NativeCarState.getMaxDischargePower?.() ?? undefined,
+          packVoltage: NativeCarState.getPackVoltage?.() ?? undefined,
+          packCurrent: NativeCarState.getPackCurrent?.() ?? undefined,
+          powerLevel: NativeCarState.getPowerLevel?.() ?? undefined,
+          showPhoneBattery: NativeCarState.getShowPhoneBattery?.() ?? true,
+          showCarBattery: NativeCarState.getShowCarBattery?.() ?? true,
+          showOdometer: NativeCarState.getShowOdometer?.() ?? true,
+          isImperial: NativeCarState.isImperial?.() ?? false,
+          darkMode: NativeCarState.isDarkMode?.() ?? false,
+          alwaysOnBlindSpotMonitor:
+            NativeCarState.isAlwaysOnBlindSpotMonitor?.() ?? true,
+          experimentalMode: NativeCarState.isExperimentalMode?.() ?? false,
+          madsActive: NativeCarState.isMadsActive?.() ?? false,
+          renderQuality: NativeCarState.getRenderQuality?.() ?? 3,
+          darkModeBackgroundGray:
+            NativeCarState.getDarkModeBackgroundGray?.() ?? 0,
+        };
+        receiveMessage(car);
+      };
+
+      window.receiveMessage = receiveMessage;
+
+      // In a desktop browser: ?demo plays a made-up drive (add &dark=1, &gear=P|R|N|D);
+      // otherwise connect to a local websocket feed like web-vanilla does.
+      (function () {
+        const params = new URLSearchParams(location.search);
+        // ?demo=cycle: a 34 s loop. Park showing each of the cars in turn -> drive away, cycling through the
+        // paints, cruise past a Cybertruck, slow for a red light that turns green and drive through it,
+        // slow to a stop -> reverse a little -> Park.
+        if (params.get("demo") === "cycle") {
+          const SHOWCASE = 8, // s in Park at the start, split between the cars
+            LOOP = 26 + SHOWCASE;
+          const cars = window.CarScene.cars || [],
+            paints = window.CarScene.paints || 1;
+          const CAR_TIME = SHOWCASE / Math.max(cars.length, 1),
+            PAINT_TIME = 20 / paints; // the drive (4-24 s on the timeline below) shows every paint
+          const LIGHT_AT = 13, // s: a traffic light appears this far ahead,
+            LIGHT_DIST = 70, // m
+            LIGHT_GREEN = 17; // s: red until here, then green
+          const ramp = (t, a, b) => {
+            const x = Math.min(1, Math.max(0, (t - a) / (b - a)));
+            return x * x * (3 - 2 * x);
+          };
+          const t0 = performance.now();
+          let lastT = 0,
+            lineDist = 0; // meters to the traffic light's stop line, counted down as the car drives
+          setInterval(() => {
+            const r = ((performance.now() - t0) / 1000) % LOOP;
+            // the timeline below runs 0-30 s with Park until 4 s; the showcase stretches that Park to SHOWCASE
+            const t = r < SHOWCASE ? (r * 4) / SHOWCASE : r - SHOWCASE + 4;
+            const dt = t >= lastT ? t - lastT : 0;
+            lastT = t;
+            let gear, speed, steer, power;
+            if (t < 4) {
+              // parked
+              gear = 1; speed = 0; steer = 0; power = 0;
+            } else if (t < 24) {
+              // drive: pull away (4-9 s), cruise with gentle curves (9-12 s), slow for the red light (13-16.5 s),
+              // speed back up when it turns green and drive through (17-20 s), slow to a stop (21-24 s)
+              gear = 4;
+              speed =
+                62 * ramp(t, 4.5, 9) -
+                40 * ramp(t, 13, 16.5) +
+                40 * ramp(t, 17.2, 19.5);
+              speed *= 1 - ramp(t, 21, 23.6);
+              steer = Math.round(Math.sin((t - 4) * 0.6) * 45 * ramp(t, 6, 8) * (1 - ramp(t, 11, 13)));
+              power =
+                t < 9 ? 55 * (1 - ramp(t, 8, 9))
+                : t < 13 ? 12
+                : t < 17 ? -35
+                : t < 19.5 ? 40
+                : t < 21 ? 12
+                : -50 * (1 - ramp(t, 23, 24));
+            } else if (t < 28) {
+              // reverse a few meters at walking pace, turning a little
+              gear = 2;
+              speed = 5 * ramp(t, 24.5, 25.5) * (1 - ramp(t, 26.8, 27.8));
+              steer = -120 * ramp(t, 24.5, 25.5);
+              power = speed > 0.5 ? 8 : 0;
+            } else {
+              // back in Park
+              gear = 1; speed = 0; steer = 0; power = 0;
+            }
+            const driving = gear === 4 && t > 6 && t < 22;
+            // the traffic light: appears LIGHT_DIST ahead, gets closer as the car drives, gone once passed
+            if (t < LIGHT_AT) lineDist = LIGHT_DIST;
+            else lineDist = Math.max(0, lineDist - (speed / 3.6) * dt);
+            receiveMessage({
+              egoSteeringAngle: steer,
+              egoSpeed: Math.round(speed),
+              gear,
+              // left blinker and a Cybertruck in the left blind spot during the cruise
+              leftBlinker: t > 9.5 && t < 12 ? (Math.floor(t * 2.5) % 2 ? 2 : 1) : 0,
+              demoTrafficCar: "cybertruck",
+              demoCar: cars[Math.min(Math.floor(r / CAR_TIME), cars.length - 1)],
+              demoPaint: Math.min(Math.floor(Math.max(t - 4, 0) / PAINT_TIME), paints - 1),
+              rightBlinker: 0,
+              adasOn: driving,
+              accSetSpeed: driving ? 65 : 0,
+              fusedSpeedLimit: 70,
+              // the warning turns urgent (2: signaling into the occupied lane) halfway through
+              leftBlindSpot: t > 9 && t < 12.5 ? (t > 10.3 && t < 11.8 ? 2 : 1) : 0,
+              rightBlindSpot: 0,
+              stopLineDist: t >= LIGHT_AT ? lineDist : 0,
+              trafficLightColor: t >= LIGHT_AT && lineDist > 0 ? (t < LIGHT_GREEN ? 1 : 2) : 0,
+              phoneBattery: 76,
+              showPhoneBattery: true,
+              showCarBattery: true,
+              showOdometer: true,
+              fullPackEnergy: 75,
+              nominalEnergyRemaining: 52,
+              energyBuffer: 3,
+              packTMin: 28,
+              packTMax: 31,
+              powerLevel: Math.round(power),
+              maxDischargePower: 250,
+              maxRegenPower: 80,
+              odometer: 18452,
+              darkMode: params.get("dark") === "1",
+              darkModeBackgroundGray: 0,
+              alwaysOnBlindSpotMonitor: true,
+              buckleStatus: 1,
+              renderQuality: 3,
+            });
+          }, 40);
+          return;
+        }
+        if (params.has("demo")) {
+          const gear = { P: 1, R: 2, N: 3, D: 4 }[params.get("gear")] || 4;
+          const t0 = performance.now();
+          setInterval(() => {
+            const t = (performance.now() - t0) / 1000,
+              cycle = t % 16;
+            receiveMessage({
+              egoSteeringAngle: Math.round(Math.sin(t * 0.35) * 60),
+              egoSpeed: gear === 1 ? 0 : 62,
+              gear,
+              leftBlinker:
+                cycle > 9 && cycle < 13 ? (Math.floor(t * 2.5) % 2 ? 2 : 1) : 0,
+              rightBlinker: 0,
+              adasOn: t % 20 > 3,
+              accSetSpeed: 65,
+              fusedSpeedLimit: 70,
+              leftBlindSpot: cycle > 6 && cycle < 13 ? 1 : 0,
+              rightBlindSpot: cycle > 2 && cycle < 5 ? 1 : 0,
+              stopLineDist: Math.max(0, 110 - (t % 14) * 9),
+              trafficLightColor: [2, 3, 1][Math.floor(t / 14) % 3],
+              phoneBattery: 76,
+              showPhoneBattery: true,
+              showCarBattery: true,
+              showOdometer: true,
+              fullPackEnergy: 75,
+              nominalEnergyRemaining: 52,
+              energyBuffer: 3,
+              packTMin: 28,
+              packTMax: 31,
+              // power bar: swings between using power (up to 70%) and regen braking (down to -60%) every ~10 s
+              powerLevel:
+                gear === 1 ? 0 : Math.round(Math.sin(t * 0.6) * 65 + 5),
+              maxDischargePower: 250,
+              maxRegenPower: 80,
+              odometer: 18452,
+              darkMode: params.get("dark") === "1",
+              darkModeBackgroundGray: 0,
+              alwaysOnBlindSpotMonitor: true,
+              buckleStatus: 1,
+              renderQuality: 3,
+            });
+          }, 40);
+          return;
+        }
+        if (typeof NativeCarState !== "undefined") return;
+        const ws = new WebSocket(
+          `ws://${window.location.hostname || "localhost"}:8080`,
+        );
+        ws.onopen = () => console.log("WebSocket connected");
+        ws.onmessage = (event) => receiveMessage(JSON.parse(event.data));
+        ws.onerror = (err) => console.error("WebSocket error", err);
+        ws.onclose = () => console.log("WebSocket closed");
+      })();
+    </script>
+  </body>
+</html>
