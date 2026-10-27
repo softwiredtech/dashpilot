@@ -1,0 +1,126 @@
+<Rive version="1" kind="fragment">
+    <FontAsset file="fonts/exo2-500.ttf" name="Exo 2 Medium" id="2:902"/>
+    <FontAsset file="fonts/exo2-700.ttf" name="Exo 2 Bold" id="2:903"/>
+    <FontAsset file="fonts/exo2-600-italic.ttf" name="Exo 2 SemiBold Italic" id="2:904"/>
+    <FontAsset file="fonts/exo2-700-italic.ttf" name="Exo 2 Bold Italic" id="2:905"/>
+    <FontAsset file="fonts/exo2-800-italic.ttf" name="Exo 2 ExtraBold Italic" id="2:906"/>
+    <FontAsset file="fonts/saira-italic-sub.ttf" name="Saira Italic" id="2:907"/>
+    <!-- the ribbons: every live value maps to 0..1 of its ribbon, smoothed -->
+    <DataConverterRangeMapper minInput="0" maxInput="200" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Speed Ribbon" id="9:1"/>
+    <DataConverterGroup name="Speed Ribbon Smooth" id="9:2"><DataConverterGroupItem converterId="9:1"/><DataConverterGroupItem converterId="8:50"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="0" maxInput="100" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Percent To Unit" id="9:3"/>
+    <DataConverterGroup name="Power Ribbon Smooth" id="9:4"><DataConverterGroupItem converterId="9:3"/><DataConverterGroupItem converterId="8:51"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="-100" maxInput="0" minOutput="1" maxOutput="0" clampLower="true" clampUpper="true" name="Regen Ribbon" id="9:5"/>
+    <DataConverterGroup name="Regen Ribbon Smooth" id="9:6"><DataConverterGroupItem converterId="9:5"/><DataConverterGroupItem converterId="8:51"/></DataConverterGroup>
+    <DataConverterGroup name="Charge Unit Smooth" id="9:8"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="9:3"/><DataConverterGroupItem converterId="8:51"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="-12" maxInput="-2" minOutput="1" maxOutput="0" clampLower="true" clampUpper="true" name="Is Regen" id="9:9"/>
+    <DataConverterGroup name="Is Regen Smooth" id="9:10"><DataConverterGroupItem converterId="9:9"/><DataConverterGroupItem converterId="8:55"/></DataConverterGroup>
+    <!-- kW as a size, never negative: regen is told by the REGEN label and the ribbon colour -->
+    <DataConverterFormula name="Absolute" id="9:11">
+        <FormulaTokenFunction functionType="5"/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="2"/>
+        <FormulaTokenInput/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+    <DataConverterGroup name="Kilowatts Size Text" id="9:12"><DataConverterGroupItem converterId="2:24"/><DataConverterGroupItem converterId="9:11"/><DataConverterGroupItem converterId="2:1"/></DataConverterGroup>
+    <!-- side gauges: eight dashes each, every dash fills over its own slice of the range -->
+    <DataConverterRangeMapper minInput="0.0" maxInput="12.5" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Charge Dash 0" id="9:40"/>
+    <DataConverterGroup name="Charge Dash 0 Of SoC" id="9:50"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="9:40"/><DataConverterGroupItem converterId="8:51"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="10" maxInput="15" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Temp Dash 0" id="9:60"/>
+    <DataConverterRangeMapper minInput="12.5" maxInput="25.0" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Charge Dash 1" id="9:41"/>
+    <DataConverterGroup name="Charge Dash 1 Of SoC" id="9:51"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="9:41"/><DataConverterGroupItem converterId="8:51"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="15" maxInput="20" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Temp Dash 1" id="9:61"/>
+    <DataConverterRangeMapper minInput="25.0" maxInput="37.5" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Charge Dash 2" id="9:42"/>
+    <DataConverterGroup name="Charge Dash 2 Of SoC" id="9:52"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="9:42"/><DataConverterGroupItem converterId="8:51"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="20" maxInput="25" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Temp Dash 2" id="9:62"/>
+    <DataConverterRangeMapper minInput="37.5" maxInput="50.0" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Charge Dash 3" id="9:43"/>
+    <DataConverterGroup name="Charge Dash 3 Of SoC" id="9:53"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="9:43"/><DataConverterGroupItem converterId="8:51"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="25" maxInput="30" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Temp Dash 3" id="9:63"/>
+    <DataConverterRangeMapper minInput="50.0" maxInput="62.5" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Charge Dash 4" id="9:44"/>
+    <DataConverterGroup name="Charge Dash 4 Of SoC" id="9:54"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="9:44"/><DataConverterGroupItem converterId="8:51"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="30" maxInput="35" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Temp Dash 4" id="9:64"/>
+    <DataConverterRangeMapper minInput="62.5" maxInput="75.0" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Charge Dash 5" id="9:45"/>
+    <DataConverterGroup name="Charge Dash 5 Of SoC" id="9:55"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="9:45"/><DataConverterGroupItem converterId="8:51"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="35" maxInput="40" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Temp Dash 5" id="9:65"/>
+    <DataConverterRangeMapper minInput="75.0" maxInput="87.5" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Charge Dash 6" id="9:46"/>
+    <DataConverterGroup name="Charge Dash 6 Of SoC" id="9:56"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="9:46"/><DataConverterGroupItem converterId="8:51"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="40" maxInput="45" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Temp Dash 6" id="9:66"/>
+    <DataConverterRangeMapper minInput="87.5" maxInput="100.0" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Charge Dash 7" id="9:47"/>
+    <DataConverterGroup name="Charge Dash 7 Of SoC" id="9:57"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="9:47"/><DataConverterGroupItem converterId="8:51"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="45" maxInput="50" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Temp Dash 7" id="9:67"/>
+    <!-- the bright head of the power fill: a sliver of the fill stroke just behind its end -->
+    <DataConverterFormula name="Minus Sliver" id="9:70">
+        <FormulaTokenFunction functionType="1"/>
+        <FormulaTokenValue operationValue="0"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue operationValue="0.004"/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+    <DataConverterGroup name="Power Head Start" id="9:71"><DataConverterGroupItem converterId="9:3"/><DataConverterGroupItem converterId="8:51"/><DataConverterGroupItem converterId="9:70"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="0.5" maxInput="2" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Power On" id="9:72"/>
+    <!-- start-up: the gauge sweep rides on top of the live values, then hands them back -->
+    <DataConverterFormula name="Max With Sweep" id="9:82">
+        <FormulaTokenFunction functionType="1"/>
+        <FormulaTokenInput/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenValue><DataBindContext sourcePathIds="1:1-1:86" propertyKey="777"/></FormulaTokenValue>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+    <DataConverterGroup name="Bar With Sweep" id="9:80"><DataConverterGroupItem converterId="9:3"/><DataConverterGroupItem converterId="8:51"/><DataConverterGroupItem converterId="9:82"/></DataConverterGroup>
+    <DataConverterGroup name="Bar Head With Sweep" id="9:81"><DataConverterGroupItem converterId="9:3"/><DataConverterGroupItem converterId="8:51"/><DataConverterGroupItem converterId="9:82"/><DataConverterGroupItem converterId="9:70"/></DataConverterGroup>
+    <DataConverterFormula name="Speed Max Sweep" id="9:84">
+        <FormulaTokenFunction functionType="1"/>
+        <FormulaTokenInput/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenValue><DataBindContext sourcePathIds="1:1-1:86" propertyKey="777"/></FormulaTokenValue>
+        <FormulaTokenOperation operationType="2"/>
+        <FormulaTokenValue operationValue="200"/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+    <DataConverterGroup name="Speed Text With Sweep" id="9:83"><DataConverterGroupItem converterId="9:84"/><DataConverterGroupItem converterId="2:1"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="0" maxInput="1" minOutput="0.5" maxOutput="0" clampLower="true" clampUpper="true" name="Centre Out Start" id="9:100"/>
+    <DataConverterRangeMapper minInput="0" maxInput="1" minOutput="0.5" maxOutput="1" clampLower="true" clampUpper="true" name="Centre Out End" id="9:101"/>
+    <DataConverterRangeMapper minInput="0" maxInput="1" minOutput="0.72" maxOutput="1" clampLower="true" clampUpper="true" name="Bloom Scale" id="9:102"/>
+    <DataConverterRangeMapper minInput="0.0000" maxInput="0.1250" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Sweep Rail 0" id="9:90"/>
+    <DataConverterRangeMapper minInput="0.1250" maxInput="0.2500" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Sweep Rail 1" id="9:91"/>
+    <DataConverterRangeMapper minInput="0.2500" maxInput="0.3750" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Sweep Rail 2" id="9:92"/>
+    <DataConverterRangeMapper minInput="0.3750" maxInput="0.5000" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Sweep Rail 3" id="9:93"/>
+    <DataConverterRangeMapper minInput="0.5000" maxInput="0.6250" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Sweep Rail 4" id="9:94"/>
+    <DataConverterRangeMapper minInput="0.6250" maxInput="0.7500" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Sweep Rail 5" id="9:95"/>
+    <DataConverterRangeMapper minInput="0.7500" maxInput="0.8750" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Sweep Rail 6" id="9:96"/>
+    <DataConverterRangeMapper minInput="0.8750" maxInput="1.0000" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Sweep Rail 7" id="9:97"/>
+    <DataConverterRangeMapper minInput="0.0000" maxInput="0.0100" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Scale Lights 0" id="9:110"/>
+    <DataConverterRangeMapper minInput="0.0600" maxInput="0.1100" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Scale Lights 1" id="9:111"/>
+    <DataConverterRangeMapper minInput="0.1600" maxInput="0.2100" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Scale Lights 2" id="9:112"/>
+    <DataConverterRangeMapper minInput="0.2600" maxInput="0.3100" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Scale Lights 3" id="9:113"/>
+    <DataConverterRangeMapper minInput="0.3600" maxInput="0.4100" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Scale Lights 4" id="9:114"/>
+    <DataConverterRangeMapper minInput="0.4600" maxInput="0.5100" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Scale Lights 5" id="9:115"/>
+    <DataConverterRangeMapper minInput="0.5600" maxInput="0.6100" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Scale Lights 6" id="9:116"/>
+    <DataConverterRangeMapper minInput="0.6600" maxInput="0.7100" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Scale Lights 7" id="9:117"/>
+    <DataConverterRangeMapper minInput="0.7600" maxInput="0.8100" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Scale Lights 8" id="9:118"/>
+    <DataConverterRangeMapper minInput="0.8600" maxInput="0.9100" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Scale Lights 9" id="9:119"/>
+    <DataConverterRangeMapper minInput="0.9600" maxInput="1.0100" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Scale Lights 10" id="9:120"/>
+    <!-- one shared display value for power (written by the GPU script, filtered once) -->
+    <DataConverterRangeMapper minInput="0" maxInput="100" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Display Power End" id="9:130"/>
+    <DataConverterFormula name="Minus Head" id="9:133">
+        <FormulaTokenFunction functionType="1"/>
+        <FormulaTokenValue operationValue="0"/>
+        <FormulaTokenArgumentSeparator/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="1"/>
+        <FormulaTokenValue operationValue="0.002"/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+    <DataConverterGroup name="Display Power Head Start" id="9:131"><DataConverterGroupItem converterId="9:130"/><DataConverterGroupItem converterId="9:133"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="-100" maxInput="0" minOutput="1" maxOutput="0" clampLower="true" clampUpper="true" name="Display Regen End" id="9:132"/>
+    <!-- live-state transitions: 100 ms fades; urgent blind spot replaces amber instead of stacking on it -->
+    <DataConverterInterpolator interpolationType="linear" duration="0.1" name="Fade 100ms" id="9:140"/>
+    <DataConverterGroup name="Blind Amber Only" id="9:142"><DataConverterGroupItem converterId="2:11"/><DataConverterGroupItem converterId="9:140"/></DataConverterGroup>
+    <DataConverterGroup name="Blind Urgent L" id="9:143"><DataConverterGroupItem converterId="2:33"/><DataConverterGroupItem converterId="9:140"/></DataConverterGroup>
+    <DataConverterGroup name="Blind Urgent R" id="9:144"><DataConverterGroupItem converterId="2:34"/><DataConverterGroupItem converterId="9:140"/></DataConverterGroup>
+    <DataConverterGroup name="Assist On Fade" id="9:145"><DataConverterGroupItem converterId="2:41"/><DataConverterGroupItem converterId="9:140"/></DataConverterGroup>
+    <DataConverterGroup name="Assist Off Fade" id="9:146"><DataConverterGroupItem converterId="2:43"/><DataConverterGroupItem converterId="9:140"/></DataConverterGroup>
+</Rive>
