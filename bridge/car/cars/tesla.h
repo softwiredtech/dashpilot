@@ -5,6 +5,7 @@
 #include <chrono>
 #include <cstdint>
 #include <cstring>
+#include <string>
 
 #include "car/car_state_mapper.h"
 
@@ -185,6 +186,26 @@ public:
 
         updateVehicleBus(cp, cs);
         vin_.update(cp, cs);
+        // TPMS: mux 5 carries all four pressures; muxes 0-3 carry one sensor each.
+        // Fields keep their last value until a frame carries that wheel again.
+        int tpmsIndex = static_cast<int>(cp.get(1, "VCSEC_TPMSData", "VCSEC_TPMSDataIndex"));
+        double* pressures[4] = {&cs.tpmsPressureFL, &cs.tpmsPressureFR, &cs.tpmsPressureRL, &cs.tpmsPressureRR};
+        double* temps[4] = {&cs.tpmsTempFL, &cs.tpmsTempFR, &cs.tpmsTempRL, &cs.tpmsTempRR};
+        if (tpmsIndex == 5) {
+            static const char* const kP[4] = {"FL", "FR", "RL", "RR"};
+            for (int w = 0; w < 4; w++) {
+                double v = cp.get(1, "VCSEC_TPMSData", std::string("VCSEC_TPMSPressure") + kP[w]);
+                if (v >= 0.5 && v < 6.36) *pressures[w] = v;
+            }
+        } else if (tpmsIndex >= 0 && tpmsIndex <= 3) {
+            static const int kWheelOfMux[4] = {2, 3, 1, 0};  // mux 0 RL, 1 RR, 2 FR, 3 FL
+            int w = kWheelOfMux[tpmsIndex];
+            std::string n = std::to_string(tpmsIndex);
+            double p = cp.get(1, "VCSEC_TPMSData", "VCSEC_TPMSPressure" + n);
+            double t = cp.get(1, "VCSEC_TPMSData", "VCSEC_TPMSTemperature" + n);
+            if (p >= 0.5 && p < 6.36) *pressures[w] = p;
+            if (t < 214.5) *temps[w] = t;
+        }
     }
 
 private:
