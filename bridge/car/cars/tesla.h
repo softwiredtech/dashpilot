@@ -5,6 +5,7 @@
 #include <chrono>
 #include <cstdint>
 #include <cstring>
+#include <string>
 
 #include "car/car_state_mapper.h"
 
@@ -185,6 +186,27 @@ public:
 
         updateVehicleBus(cp, cs);
         vin_.update(cp, cs);
+        // TPMS: pressures come from mux 5 (all four wheels, 0.025 bar resolution);
+        // temperatures from muxes 0-3 (one sensor each). Their per-sensor pressure is
+        // coarser (0.05 bar) and would alternate with mux 5, so it is not used.
+        // Fields keep their last value until a frame carries that wheel again.
+        // getRaw fails until a frame has been seen; get() would read 0 and look like mux 0.
+        uint64_t tpmsIndex = 0;
+        if (cp.getRaw(1, "VCSEC_TPMSData", "VCSEC_TPMSDataIndex", &tpmsIndex)) {
+            if (tpmsIndex == 5) {
+                double* pressures[4] = {&cs.tpmsPressureFL, &cs.tpmsPressureFR, &cs.tpmsPressureRL, &cs.tpmsPressureRR};
+                static const char* const kP[4] = {"FL", "FR", "RL", "RR"};
+                for (int w = 0; w < 4; w++) {
+                    double v = cp.get(1, "VCSEC_TPMSData", std::string("VCSEC_TPMSPressure") + kP[w]);
+                    if (v >= 0.5 && v < 6.36) *pressures[w] = v;
+                }
+            } else if (tpmsIndex <= 3) {
+                // Mux 0 RR, 1 RL, 2 FR, 3 FL (verified against mux 5 in CAN logs).
+                double* tempOfMux[4] = {&cs.tpmsTempRR, &cs.tpmsTempRL, &cs.tpmsTempFR, &cs.tpmsTempFL};
+                double t = cp.get(1, "VCSEC_TPMSData", "VCSEC_TPMSTemperature" + std::to_string(tpmsIndex));
+                if (t < 214.5) *tempOfMux[tpmsIndex] = t;
+            }
+        }
     }
 
 private:

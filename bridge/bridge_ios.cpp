@@ -43,6 +43,14 @@ static void carStateToBridge(const CarState& cs, BridgeCarState* out) {
     out->selfdriveActive = cs.selfdriveActive;
     out->experimentalMode = cs.experimentalMode;
     out->changingLane = cs.changingLane;
+    out->tpmsPressureFL = cs.tpmsPressureFL;
+    out->tpmsPressureFR = cs.tpmsPressureFR;
+    out->tpmsPressureRL = cs.tpmsPressureRL;
+    out->tpmsPressureRR = cs.tpmsPressureRR;
+    out->tpmsTempFL = cs.tpmsTempFL;
+    out->tpmsTempFR = cs.tpmsTempFR;
+    out->tpmsTempRL = cs.tpmsTempRL;
+    out->tpmsTempRR = cs.tpmsTempRR;
 }
 
 static std::atomic<bool> receiveLoopRunning{false};

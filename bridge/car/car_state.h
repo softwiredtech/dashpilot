@@ -46,13 +46,26 @@ struct CarState {
     double experimentalMode = 0;
     double changingLane = 0;
 
+    // Tyre pressure (bar) and temperature (degC) per wheel from VCSEC_TPMSData;
+    // pressure -1 = no reading, temperature -100 = no reading.
+    double tpmsPressureFL = -1;
+    double tpmsPressureFR = -1;
+    double tpmsPressureRL = -1;
+    double tpmsPressureRR = -1;
+    double tpmsTempFL = -100;
+    double tpmsTempFR = -100;
+    double tpmsTempRL = -100;
+    double tpmsTempRR = -100;
+
     // Vehicle VIN, empty until fully assembled by the mapper.
     static constexpr size_t VIN_LENGTH = 17;
     char vin[VIN_LENGTH + 1] = {};
 
     static constexpr size_t VIN_DOUBLE_COUNT = 3;
     static constexpr size_t VIN_OFFSET = 36;
-    static constexpr size_t FIELD_COUNT = VIN_OFFSET + VIN_DOUBLE_COUNT;
+    static constexpr size_t TPMS_OFFSET = VIN_OFFSET + VIN_DOUBLE_COUNT;
+    static constexpr size_t TPMS_COUNT = 8;
+    static constexpr size_t FIELD_COUNT = TPMS_OFFSET + TPMS_COUNT;
 
     void toArray(double* out) const {
         // Party bus
@@ -103,5 +116,15 @@ struct CarState {
         char padded[VIN_DOUBLE_COUNT * sizeof(double)] = {};
         std::memcpy(padded, vin, VIN_LENGTH);
         std::memcpy(out + VIN_OFFSET, padded, sizeof(padded));
+
+        // TPMS (after VIN): pressures FL FR RL RR, then temperatures FL FR RL RR.
+        out[TPMS_OFFSET + 0] = tpmsPressureFL;
+        out[TPMS_OFFSET + 1] = tpmsPressureFR;
+        out[TPMS_OFFSET + 2] = tpmsPressureRL;
+        out[TPMS_OFFSET + 3] = tpmsPressureRR;
+        out[TPMS_OFFSET + 4] = tpmsTempFL;
+        out[TPMS_OFFSET + 5] = tpmsTempFR;
+        out[TPMS_OFFSET + 6] = tpmsTempRL;
+        out[TPMS_OFFSET + 7] = tpmsTempRR;
     }
 };

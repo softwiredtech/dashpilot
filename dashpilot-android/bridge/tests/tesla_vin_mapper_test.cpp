@@ -140,7 +140,7 @@ void empty_vin_encodes_as_zero_doubles() {
     CarState cs;
     double out[CarState::FIELD_COUNT];
     cs.toArray(out);
-    for (size_t i = CarState::VIN_OFFSET; i < CarState::FIELD_COUNT; i++) {
+    for (size_t i = CarState::VIN_OFFSET; i < CarState::TPMS_OFFSET; i++) {
         CHECK(out[i] == 0.0);
     }
 }

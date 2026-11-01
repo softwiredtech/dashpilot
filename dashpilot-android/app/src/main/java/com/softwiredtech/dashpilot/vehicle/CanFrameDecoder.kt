@@ -65,7 +65,16 @@ class CanFrameDecoder(
                 hvacRecirc = values[33].toFloat(),
                 hvacKeepClimateOn = values[34].toFloat(),
                 powerLevel = values[35].toFloat(),
-                vin = decodeVin(values, offset = 36)
+                vin = decodeVin(values, offset = 36),
+                // TPMS after VIN (see CarState::TPMS_OFFSET): pressures FL FR RL RR, temperatures FL FR RL RR.
+                tpmsPressureFL = values[39].toFloat(),
+                tpmsPressureFR = values[40].toFloat(),
+                tpmsPressureRL = values[41].toFloat(),
+                tpmsPressureRR = values[42].toFloat(),
+                tpmsTempFL = values[43].toFloat(),
+                tpmsTempFR = values[44].toFloat(),
+                tpmsTempRL = values[45].toFloat(),
+                tpmsTempRR = values[46].toFloat()
             )
         }
 
