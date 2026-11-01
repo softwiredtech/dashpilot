@@ -43,6 +43,16 @@ data class CarState(
 
     val changingLane: Boolean = false,
 
+    // TPMS: pressure (bar, -1 = none) and temperature (degC, -100 = none) per wheel.
+    val tpmsPressureFL: Float = -1f,
+    val tpmsPressureFR: Float = -1f,
+    val tpmsPressureRL: Float = -1f,
+    val tpmsPressureRR: Float = -1f,
+    val tpmsTempFL: Float = -100f,
+    val tpmsTempFR: Float = -100f,
+    val tpmsTempRL: Float = -100f,
+    val tpmsTempRR: Float = -100f,
+
     // Empty until fully assembled from the CAN stream by the native mapper.
     val vin: String = ""
 ) {
@@ -56,7 +66,7 @@ data class CarState(
     )
 
     companion object {
-        const val FIELD_COUNT = 39
+        const val FIELD_COUNT = 47
         private const val KM_TO_MILES = 0.621371f
 
         private val MILES_COUNTRIES = setOf("US", "GB", "MM", "LR")

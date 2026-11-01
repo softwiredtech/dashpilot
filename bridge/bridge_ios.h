@@ -50,6 +50,16 @@ typedef struct {
     double selfdriveActive;
     double experimentalMode;
     double changingLane;
+
+    // TPMS: pressure (bar, -1 = none) and temperature (degC, -100 = none) per wheel.
+    double tpmsPressureFL;
+    double tpmsPressureFR;
+    double tpmsPressureRL;
+    double tpmsPressureRR;
+    double tpmsTempFL;
+    double tpmsTempFR;
+    double tpmsTempRL;
+    double tpmsTempRR;
 } BridgeCarState;
 
 // Context
