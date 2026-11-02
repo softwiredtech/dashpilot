@@ -97,6 +97,13 @@ object VehicleControl {
     const val CMD_AC_SWING_INTENSITY: Int = 0x4D
     const val CMD_AC_SWING_TOGGLE: Int = 0x4E
 
+    // --- Door unlatch (VCSEC_requests 0x1F9); value = door index ---
+    const val CMD_DOOR_UNLATCH: Int = 0x50
+    const val DOOR_FRONT_LEFT: Int = 0
+    const val DOOR_FRONT_RIGHT: Int = 1
+    const val DOOR_REAR_LEFT: Int = 2
+    const val DOOR_REAR_RIGHT: Int = 3
+
     /** Bind (or clear, with actionValue 0) an N-finger tap to a control action. */
     fun sendFingerAction(manager: DashKitBleManager, fingers: Int, actionValue: Int): Boolean =
         send(manager, CMD_MULTI_FINGER_ACTION, (fingers shl 8) or (actionValue and 0xFF))
@@ -118,6 +125,10 @@ object VehicleControl {
 
     fun sendSportKickdownThreshold(manager: DashKitBleManager, percent: Int): Boolean =
         send(manager, CMD_SPORT_KICKDOWN_THRESHOLD, percent)
+
+    /** Pop one door latch (firmware only acts in Park). */
+    fun sendDoorUnlatch(manager: DashKitBleManager, door: Int): Boolean =
+        send(manager, CMD_DOOR_UNLATCH, door)
 
     fun sendAcSwingToggle(manager: DashKitBleManager): Boolean =
         send(manager, CMD_AC_SWING_TOGGLE, 0)

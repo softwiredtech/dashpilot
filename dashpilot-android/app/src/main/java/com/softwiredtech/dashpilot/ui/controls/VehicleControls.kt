@@ -17,6 +17,7 @@ import androidx.compose.material.icons.rounded.SouthEast
 import androidx.compose.material.icons.rounded.EvStation
 import androidx.compose.material.icons.rounded.Flip
 import androidx.compose.material.icons.rounded.Inbox
+import androidx.compose.material.icons.rounded.MeetingRoom
 import androidx.compose.material.icons.rounded.PushPin
 import androidx.compose.material.icons.rounded.SwapHoriz
 import androidx.compose.material.icons.rounded.Thermostat
@@ -173,6 +174,54 @@ val vehicleControls: List<ControlAction> = listOf(
         gestureValue = 8,
         perform = { manager ->
             manager?.let { VehicleControl.sendMirrorDipToggle(it) }
+        }
+    ),
+    // Momentary latch release, like the Tesla app's "Unlatch Door". Firmware
+    // ignores it outside Park.
+    ControlAction(
+        id = "unlatch_front_left",
+        icon = Icons.Rounded.MeetingRoom,
+        labelRes = { R.string.control_unlatch_front_left },
+        active = { false },
+        gestureValue = 10,
+        perform = { manager ->
+            manager?.let { VehicleControl.sendDoorUnlatch(it, VehicleControl.DOOR_FRONT_LEFT) }
+        }
+    ),
+    // Momentary latch release, like the Tesla app's "Unlatch Door". Firmware
+    // ignores it outside Park.
+    ControlAction(
+        id = "unlatch_front_right",
+        icon = Icons.Rounded.MeetingRoom,
+        labelRes = { R.string.control_unlatch_front_right },
+        active = { false },
+        gestureValue = 11,
+        perform = { manager ->
+            manager?.let { VehicleControl.sendDoorUnlatch(it, VehicleControl.DOOR_FRONT_RIGHT) }
+        }
+    ),
+    // Momentary latch release, like the Tesla app's "Unlatch Door". Firmware
+    // ignores it outside Park.
+    ControlAction(
+        id = "unlatch_rear_left",
+        icon = Icons.Rounded.MeetingRoom,
+        labelRes = { R.string.control_unlatch_rear_left },
+        active = { false },
+        gestureValue = 12,
+        perform = { manager ->
+            manager?.let { VehicleControl.sendDoorUnlatch(it, VehicleControl.DOOR_REAR_LEFT) }
+        }
+    ),
+    // Momentary latch release, like the Tesla app's "Unlatch Door". Firmware
+    // ignores it outside Park.
+    ControlAction(
+        id = "unlatch_rear_right",
+        icon = Icons.Rounded.MeetingRoom,
+        labelRes = { R.string.control_unlatch_rear_right },
+        active = { false },
+        gestureValue = 13,
+        perform = { manager ->
+            manager?.let { VehicleControl.sendDoorUnlatch(it, VehicleControl.DOOR_REAR_RIGHT) }
         }
     ),
     // Glovebox is an electronic latch release: open only (closed by hand).
