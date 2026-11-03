@@ -53,6 +53,15 @@ struct CarState: Codable {
     var tpmsTempRL: Float = -100
     var tpmsTempRR: Float = -100
 
+    // Closures: 1 while the door/trunk latch is not closed, else 0. Trunk angle
+    // in degrees from the powered liftgate (0 when closed or not powered).
+    var doorOpenFL: Float = 0
+    var doorOpenFR: Float = 0
+    var doorOpenRL: Float = 0
+    var doorOpenRR: Float = 0
+    var trunkOpen: Float = 0
+    var trunkPosition: Float = 0
+
     init() {}
 
     init(from bridge: BridgeCarState) {
@@ -100,6 +109,12 @@ struct CarState: Codable {
         tpmsTempFR = Float(bridge.tpmsTempFR)
         tpmsTempRL = Float(bridge.tpmsTempRL)
         tpmsTempRR = Float(bridge.tpmsTempRR)
+        doorOpenFL = Float(bridge.doorOpenFL)
+        doorOpenFR = Float(bridge.doorOpenFR)
+        doorOpenRL = Float(bridge.doorOpenRL)
+        doorOpenRR = Float(bridge.doorOpenRR)
+        trunkOpen = Float(bridge.trunkOpen)
+        trunkPosition = Float(bridge.trunkPosition)
     }
 
     private static let kmToMiles: Float = 0.621371
@@ -162,5 +177,11 @@ struct CarState: Codable {
         selfdriveActive      = try c.decodeIfPresent(Bool.self,  forKey: .selfdriveActive)      ?? false
         experimentalMode     = try c.decodeIfPresent(Bool.self,  forKey: .experimentalMode)     ?? false
         changingLane         = try c.decodeIfPresent(Bool.self,  forKey: .changingLane)         ?? false
+        doorOpenFL           = try c.decodeIfPresent(Float.self, forKey: .doorOpenFL)           ?? 0
+        doorOpenFR           = try c.decodeIfPresent(Float.self, forKey: .doorOpenFR)           ?? 0
+        doorOpenRL           = try c.decodeIfPresent(Float.self, forKey: .doorOpenRL)           ?? 0
+        doorOpenRR           = try c.decodeIfPresent(Float.self, forKey: .doorOpenRR)           ?? 0
+        trunkOpen            = try c.decodeIfPresent(Float.self, forKey: .trunkOpen)            ?? 0
+        trunkPosition        = try c.decodeIfPresent(Float.self, forKey: .trunkPosition)        ?? 0
     }
 }
