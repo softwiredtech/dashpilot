@@ -143,6 +143,58 @@ let vehicleControls: [ControlAction] = [
             VehicleControl.sendMirrorDipToggle(manager)
         }
     ),
+    // Momentary latch release, like the Tesla app's "Unlatch Door". Firmware
+    // ignores it while the car is in gear.
+    ControlAction(
+        id: "unlatch_front_left",
+        icon: "door.left.hand.open",
+        label: { String(localized: "Unlatch Driver Door") },
+        active: { false },
+        gestureValue: 10,
+        perform: { manager in
+            guard let manager else { return }
+            VehicleControl.sendDoorUnlatch(manager, door: VehicleControl.doorFrontLeft)
+        }
+    ),
+    // Momentary latch release, like the Tesla app's "Unlatch Door". Firmware
+    // ignores it while the car is in gear.
+    ControlAction(
+        id: "unlatch_front_right",
+        icon: "door.right.hand.open",
+        label: { String(localized: "Unlatch Passenger Door") },
+        active: { false },
+        gestureValue: 11,
+        perform: { manager in
+            guard let manager else { return }
+            VehicleControl.sendDoorUnlatch(manager, door: VehicleControl.doorFrontRight)
+        }
+    ),
+    // Momentary latch release, like the Tesla app's "Unlatch Door". Firmware
+    // ignores it while the car is in gear.
+    ControlAction(
+        id: "unlatch_rear_left",
+        icon: "door.left.hand.open",
+        label: { String(localized: "Unlatch Rear Left Door") },
+        active: { false },
+        gestureValue: 12,
+        perform: { manager in
+            guard let manager else { return }
+            VehicleControl.sendDoorUnlatch(manager, door: VehicleControl.doorRearLeft)
+        }
+    ),
+    // Momentary latch release, like the Tesla app's "Unlatch Door". Firmware
+    // ignores it while the car is in gear.
+    ControlAction(
+        id: "unlatch_rear_right",
+        icon: "door.right.hand.open",
+        label: { String(localized: "Unlatch Rear Right Door") },
+        active: { false },
+        gestureValue: 13,
+        perform: { manager in
+            guard let manager else { return }
+            VehicleControl.sendDoorUnlatch(manager, door: VehicleControl.doorRearRight)
+        }
+    ),
     // Glovebox is an electronic latch release: open only (closed by hand).
     ControlAction(
         id: "glovebox",
