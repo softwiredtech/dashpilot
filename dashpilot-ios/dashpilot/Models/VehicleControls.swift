@@ -144,7 +144,7 @@ let vehicleControls: [ControlAction] = [
         }
     ),
     // Momentary latch release, like the Tesla app's "Unlatch Door". Firmware
-    // ignores it while the car is in gear.
+    // ignores it while the car is in gear or moving.
     ControlAction(
         id: "unlatch_front_left",
         icon: "door.left.hand.open",
@@ -157,7 +157,7 @@ let vehicleControls: [ControlAction] = [
         }
     ),
     // Momentary latch release, like the Tesla app's "Unlatch Door". Firmware
-    // ignores it while the car is in gear.
+    // ignores it while the car is in gear or moving.
     ControlAction(
         id: "unlatch_front_right",
         icon: "door.right.hand.open",
@@ -170,7 +170,7 @@ let vehicleControls: [ControlAction] = [
         }
     ),
     // Momentary latch release, like the Tesla app's "Unlatch Door". Firmware
-    // ignores it while the car is in gear.
+    // ignores it while the car is in gear or moving.
     ControlAction(
         id: "unlatch_rear_left",
         icon: "door.left.hand.open",
@@ -183,7 +183,7 @@ let vehicleControls: [ControlAction] = [
         }
     ),
     // Momentary latch release, like the Tesla app's "Unlatch Door". Firmware
-    // ignores it while the car is in gear.
+    // ignores it while the car is in gear or moving.
     ControlAction(
         id: "unlatch_rear_right",
         icon: "door.right.hand.open",

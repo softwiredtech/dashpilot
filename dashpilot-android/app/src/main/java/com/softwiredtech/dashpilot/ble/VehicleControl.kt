@@ -126,7 +126,7 @@ object VehicleControl {
     fun sendSportKickdownThreshold(manager: DashKitBleManager, percent: Int): Boolean =
         send(manager, CMD_SPORT_KICKDOWN_THRESHOLD, percent)
 
-    /** Pop one door latch (firmware only acts in Park). */
+    /** Pop one door latch (firmware refuses it in R/N/D or while moving). */
     fun sendDoorUnlatch(manager: DashKitBleManager, door: Int): Boolean =
         send(manager, CMD_DOOR_UNLATCH, door)
 

@@ -177,7 +177,7 @@ val vehicleControls: List<ControlAction> = listOf(
         }
     ),
     // Momentary latch release, like the Tesla app's "Unlatch Door". Firmware
-    // ignores it outside Park.
+    // ignores it while the car is in gear or moving.
     ControlAction(
         id = "unlatch_front_left",
         icon = Icons.Rounded.MeetingRoom,
@@ -189,7 +189,7 @@ val vehicleControls: List<ControlAction> = listOf(
         }
     ),
     // Momentary latch release, like the Tesla app's "Unlatch Door". Firmware
-    // ignores it outside Park.
+    // ignores it while the car is in gear or moving.
     ControlAction(
         id = "unlatch_front_right",
         icon = Icons.Rounded.MeetingRoom,
@@ -201,7 +201,7 @@ val vehicleControls: List<ControlAction> = listOf(
         }
     ),
     // Momentary latch release, like the Tesla app's "Unlatch Door". Firmware
-    // ignores it outside Park.
+    // ignores it while the car is in gear or moving.
     ControlAction(
         id = "unlatch_rear_left",
         icon = Icons.Rounded.MeetingRoom,
@@ -213,7 +213,7 @@ val vehicleControls: List<ControlAction> = listOf(
         }
     ),
     // Momentary latch release, like the Tesla app's "Unlatch Door". Firmware
-    // ignores it outside Park.
+    // ignores it while the car is in gear or moving.
     ControlAction(
         id = "unlatch_rear_right",
         icon = Icons.Rounded.MeetingRoom,
