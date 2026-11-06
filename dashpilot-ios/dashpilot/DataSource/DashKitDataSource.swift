@@ -89,6 +89,7 @@ final class DashKitDataSource: IDataSource {
         var offset = 1
         var state = BridgeCarState()
         var decodedAny = false
+        var decodedAmbientLighting = false
         for _ in 0..<count {
             guard offset + 4 <= bytes.count else { break }
             // Timestamp is currently unused by the decoder; skip it.
@@ -106,6 +107,7 @@ final class DashKitDataSource: IDataSource {
             let len = Int(bytes[offset])
             offset += 1
             guard offset + len <= bytes.count else { break }
+            decodedAmbientLighting = decodedAmbientLighting || (bus == 1 && addr == 0x679 && len >= 7)
             bytes[offset..<(offset + len)].withUnsafeBufferPointer { buf in
                 bridge_decode_can_frame(decoder, Int32(bus), addr, buf.baseAddress, Int32(len), &state)
             }
@@ -115,7 +117,9 @@ final class DashKitDataSource: IDataSource {
         guard decodedAny else { return }
 
         let now = ProcessInfo.processInfo.systemUptime
-        guard now - lastEmit >= Self.emitInterval else { return }
+        // Ambient updates may be infrequent. Deliver even a final update that
+        // arrives inside the throttle window, without waiting for another frame.
+        guard decodedAmbientLighting || now - lastEmit >= Self.emitInterval else { return }
         lastEmit = now
         continuation?.yield(CarState(from: state))
     }

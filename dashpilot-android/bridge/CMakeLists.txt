@@ -94,4 +94,13 @@ add_executable(tesla_closure_mapper_test
 target_include_directories(tesla_closure_mapper_test PRIVATE ${MSGQ_ROOT})
 target_compile_options(tesla_closure_mapper_test PRIVATE -Wall -Wextra)
 add_test(NAME tesla_closure_mapper COMMAND tesla_closure_mapper_test)
+
+add_executable(tesla_ambient_lighting_test
+        tests/tesla_ambient_lighting_test.cpp
+        ${MSGQ_ROOT}/dbc/dbc.cc
+        ${MSGQ_ROOT}/dbc/dbcfile.cc
+)
+target_include_directories(tesla_ambient_lighting_test PRIVATE ${MSGQ_ROOT})
+target_compile_options(tesla_ambient_lighting_test PRIVATE -Wall -Wextra)
+add_test(NAME tesla_ambient_lighting COMMAND tesla_ambient_lighting_test)
 endif()

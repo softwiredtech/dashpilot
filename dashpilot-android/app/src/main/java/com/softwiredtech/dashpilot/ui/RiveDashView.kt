@@ -27,6 +27,7 @@ import app.rive.rememberRiveWorkerOrNull
 import app.rive.rememberViewModelInstance
 import app.rive.runtime.kotlin.core.ViewModel.PropertyDataType
 import com.softwiredtech.dashpilot.datamodel.dash.DashState
+import com.softwiredtech.dashpilot.datamodel.dash.DashColor
 import com.softwiredtech.dashpilot.datamodel.dash.dashValues
 import kotlinx.coroutines.flow.Flow
 
@@ -122,14 +123,29 @@ private fun BoundRive(
             vmi.setBoolean("darkMode", systemDarkMode)
         }
         dashStateFlow.collect { state ->
-            for ((name, value) in state.dashValues(systemDarkMode)) {
-                when (properties[name]) {
-                    PropertyDataType.NUMBER -> (value as? Float)?.let { vmi.setNumber(name, it) }
-                    PropertyDataType.BOOLEAN -> (value as? Boolean)?.let { vmi.setBoolean(name, it) }
-                    PropertyDataType.STRING -> vmi.setString(name, value.toString())
-                    else -> {}
-                }
-            }
+            applyRiveDashValues(properties, state.dashValues(systemDarkMode),
+                vmi::setNumber, vmi::setBoolean, vmi::setString, vmi::setColor)
+        }
+    }
+}
+
+// Keep typed dispatch independent of the native Rive worker so it can be
+// checked with successive telemetry snapshots as well as newly mounted files.
+internal fun applyRiveDashValues(
+    properties: Map<String, PropertyDataType>,
+    values: Map<String, Any>,
+    setNumber: (String, Float) -> Unit,
+    setBoolean: (String, Boolean) -> Unit,
+    setString: (String, String) -> Unit,
+    setColor: (String, Int) -> Unit,
+) {
+    for ((name, value) in values) {
+        when (properties[name]) {
+            PropertyDataType.NUMBER -> (value as? Float)?.let { setNumber(name, it) }
+            PropertyDataType.BOOLEAN -> (value as? Boolean)?.let { setBoolean(name, it) }
+            PropertyDataType.STRING -> setString(name, value.toString())
+            PropertyDataType.COLOR -> (value as? DashColor)?.let { setColor(name, it.argb) }
+            else -> {}
         }
     }
 }

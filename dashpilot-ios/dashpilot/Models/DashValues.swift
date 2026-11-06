@@ -4,13 +4,22 @@ enum DashValue {
     case number(Float)
     case bool(Bool)
     case string(String)
+    case color(red: Float, green: Float, blue: Float)
 }
 
 extension DashState {
     func dashValues(systemDarkMode: Bool? = nil) -> [(String, DashValue)] {
         let c = carState
         let d = displaySettings
-        return [
+        var values: [(String, DashValue)] = [
+            ("ambientLightingAvailable", .bool(c.ambientLightingAvailable)),
+            ("ambientLightingHex", .string(c.ambientLightingHex)),
+            ("ambientLightingRed", .number(c.ambientLightingRed)),
+            ("ambientLightingGreen", .number(c.ambientLightingGreen)),
+            ("ambientLightingBlue", .number(c.ambientLightingBlue)),
+            ("ambientLightingBrightness", .number(c.ambientLightingBrightness)),
+            ("ambientLightingEnableEffectRaw", .number(c.ambientLightingEnableEffectRaw)),
+            ("ambientLightingSectionMaskRaw", .number(c.ambientLightingSectionMaskRaw)),
             ("egoSpeed", .number(c.egoSpeed)),
             ("gear", .number(c.gear)),
             ("egoSteeringAngle", .number(c.egoSteeringAngle)),
@@ -72,6 +81,11 @@ extension DashState {
             ("renderQuality", .number(Float(d.renderQuality))),
             ("dataSourceType", .string(dataSourceType?.rawValue ?? "")),
         ]
+        if c.ambientLightingAvailable {
+            values.append(("ambientLightingColor", .color(red: c.ambientLightingRed,
+                green: c.ambientLightingGreen, blue: c.ambientLightingBlue)))
+        }
+        return values
     }
 
     private static func secondsSinceLocalMidnight(_ epochMillis: Int64) -> Float {

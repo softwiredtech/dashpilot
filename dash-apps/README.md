@@ -121,6 +121,46 @@ The app plays the file's default state machine and resizes the artboard to the s
 
 To try your own `.riv` on a phone, go to Settings → Developer → **Load Rive File**.
 
+### Tesla interior ambient lighting (candidate)
+
+DashKit and Juniper profiles receive standard CAN ID `0x679`
+(`UI_ambientLightingCtrls`) on Vehicle CAN, bus 1. This candidate layout is
+pending vehicle validation. It requires at least seven payload bytes and adds
+no vehicle writes, so it also works on read-only BLE connections.
+
+Declare these optional properties on the default `DashViewModel` instance:
+
+| Rive property | Rive type | meaning |
+|---|---|---|
+| `ambientLightingColor` | Color | Opaque RGB color, independent of brightness |
+| `ambientLightingHex` | String | Uppercase, zero-padded `#RRGGBB`; also retained in app CarState |
+| `ambientLightingRed`, `ambientLightingGreen`, `ambientLightingBlue` | Number | Unsigned byte values, 0–255 |
+| `ambientLightingBrightness` | Number | Byte 4 masked with `0x7F`; documented range 0–100 percent |
+| `ambientLightingEnableEffectRaw` | Number | Uninterpreted byte 0, 0–255; not an on/off flag |
+| `ambientLightingSectionMaskRaw` | Number | Uninterpreted bits 43–48, 0–63; no section labels are assigned |
+| `ambientLightingAvailable` | Boolean | A complete ambient frame has been received in this session |
+
+Bind `ambientLightingColor` to your accent fill/stroke color. Bind brightness
+separately if desired (for example, divide by 100 in a Rive converter for
+opacity); the host never scales RGB or alpha by brightness. These properties
+are added to the Rive interface; Android's web JavaScript interface is unchanged.
+
+There is no existing dashboard section-priority convention. The global accent
+therefore uses the **latest complete frame**, including section-specific frames;
+the raw mask and RGB/brightness belong to that same update. Dashboards can use
+the mask to implement their own selection policy once vehicle validation
+establishes its meaning.
+
+Before the first frame, availability is false, hex is empty, numeric values
+are zero, and the Color property is left at its authored value. Use availability
+to select your fallback accent. Like other CAN telemetry, the latest value is
+held without a timeout until the session is reset; truncated or unrelated
+frames cannot clear it. Mounted dashboards receive updates and new dashboard
+subscriptions replay the session's latest state.
+
+For example, `A5 12 34 56 E4 AD FF 5A` gives `#123456`, RGB (18, 52, 86),
+brightness 100, raw enable/effect 165, and raw section mask 53.
+
 ## Saving settings
 
 Web apps get one string of storage, usually JSON.

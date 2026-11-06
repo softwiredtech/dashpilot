@@ -86,7 +86,16 @@ class CanFrameDecoder(
                 doorOpenRR = values[54].toFloat(),
                 trunkOpen = values[55].toFloat(),
                 trunkPosition = values[56].toFloat(),
-                frunkOpen = values[57].toFloat()
+                frunkOpen = values[57].toFloat(),
+                ambientLightingAvailable = values[58] > 0,
+                ambientLightingHex = if (values[58] > 0)
+                    "#%02X%02X%02X".format(values[59].toInt(), values[60].toInt(), values[61].toInt()) else "",
+                ambientLightingRed = values[59].toFloat(),
+                ambientLightingGreen = values[60].toFloat(),
+                ambientLightingBlue = values[61].toFloat(),
+                ambientLightingBrightness = values[62].toFloat(),
+                ambientLightingEnableEffectRaw = values[63].toFloat(),
+                ambientLightingSectionMaskRaw = values[64].toFloat(),
             )
         }
 

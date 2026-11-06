@@ -73,6 +73,14 @@ typedef struct {
     double trunkOpen;
     double trunkPosition;
     double frunkOpen;
+
+    double ambientLightingAvailable;
+    double ambientLightingRed;
+    double ambientLightingGreen;
+    double ambientLightingBlue;
+    double ambientLightingBrightness;
+    double ambientLightingEnableEffectRaw;
+    double ambientLightingSectionMaskRaw;
 } BridgeCarState;
 
 // Context
