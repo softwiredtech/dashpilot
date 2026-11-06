@@ -74,7 +74,16 @@ class CanFrameDecoder(
                 tpmsTempFL = values[43].toFloat(),
                 tpmsTempFR = values[44].toFloat(),
                 tpmsTempRL = values[45].toFloat(),
-                tpmsTempRR = values[46].toFloat()
+                tpmsTempRR = values[46].toFloat(),
+                ambientLightingAvailable = values[47] > 0,
+                ambientLightingHex = if (values[47] > 0)
+                    "#%02X%02X%02X".format(values[48].toInt(), values[49].toInt(), values[50].toInt()) else "",
+                ambientLightingRed = values[48].toFloat(),
+                ambientLightingGreen = values[49].toFloat(),
+                ambientLightingBlue = values[50].toFloat(),
+                ambientLightingBrightness = values[51].toFloat(),
+                ambientLightingEnableEffectRaw = values[52].toFloat(),
+                ambientLightingSectionMaskRaw = values[53].toFloat(),
             )
         }
 

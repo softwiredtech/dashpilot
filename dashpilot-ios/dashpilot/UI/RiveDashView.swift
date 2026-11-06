@@ -65,6 +65,7 @@ final class RiveDashBinder {
     private var numbers: [String: RiveDataBindingViewModel.Instance.NumberProperty] = [:]
     private var bools: [String: RiveDataBindingViewModel.Instance.BooleanProperty] = [:]
     private var strings: [String: RiveDataBindingViewModel.Instance.StringProperty] = [:]
+    private var colors: [String: RiveDataBindingViewModel.Instance.ColorProperty] = [:]
     private var missing: Set<String> = []
     private var systemDarkMode = false
 
@@ -118,6 +119,11 @@ final class RiveDashBinder {
                 guard let p = strings[name] ?? instance.stringProperty(fromPath: name) else { missing.insert(name); continue }
                 strings[name] = p
                 p.value = v
+            case .color(let red, let green, let blue):
+                guard let p = colors[name] ?? instance.colorProperty(fromPath: name) else { missing.insert(name); continue }
+                colors[name] = p
+                p.value = UIColor(red: CGFloat(red) / 255, green: CGFloat(green) / 255,
+                                  blue: CGFloat(blue) / 255, alpha: 1)
             }
         }
         if !riveViewModel.isPlaying {

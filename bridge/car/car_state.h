@@ -65,7 +65,16 @@ struct CarState {
     static constexpr size_t VIN_OFFSET = 36;
     static constexpr size_t TPMS_OFFSET = VIN_OFFSET + VIN_DOUBLE_COUNT;
     static constexpr size_t TPMS_COUNT = 8;
-    static constexpr size_t FIELD_COUNT = TPMS_OFFSET + TPMS_COUNT;
+    // Append fields after TPMS to preserve all existing array indices.
+    double ambientLightingAvailable = 0;
+    double ambientLightingRed = 0;
+    double ambientLightingGreen = 0;
+    double ambientLightingBlue = 0;
+    double ambientLightingBrightness = 0;
+    double ambientLightingEnableEffectRaw = 0;
+    double ambientLightingSectionMaskRaw = 0;
+    static constexpr size_t AMBIENT_OFFSET = TPMS_OFFSET + TPMS_COUNT;
+    static constexpr size_t FIELD_COUNT = AMBIENT_OFFSET + 7;
 
     void toArray(double* out) const {
         // Party bus
@@ -126,5 +135,12 @@ struct CarState {
         out[TPMS_OFFSET + 5] = tpmsTempFR;
         out[TPMS_OFFSET + 6] = tpmsTempRL;
         out[TPMS_OFFSET + 7] = tpmsTempRR;
+        out[AMBIENT_OFFSET + 0] = ambientLightingAvailable;
+        out[AMBIENT_OFFSET + 1] = ambientLightingRed;
+        out[AMBIENT_OFFSET + 2] = ambientLightingGreen;
+        out[AMBIENT_OFFSET + 3] = ambientLightingBlue;
+        out[AMBIENT_OFFSET + 4] = ambientLightingBrightness;
+        out[AMBIENT_OFFSET + 5] = ambientLightingEnableEffectRaw;
+        out[AMBIENT_OFFSET + 6] = ambientLightingSectionMaskRaw;
     }
 };

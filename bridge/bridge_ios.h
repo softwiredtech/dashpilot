@@ -60,6 +60,13 @@ typedef struct {
     double tpmsTempFR;
     double tpmsTempRL;
     double tpmsTempRR;
+    double ambientLightingAvailable;
+    double ambientLightingRed;
+    double ambientLightingGreen;
+    double ambientLightingBlue;
+    double ambientLightingBrightness;
+    double ambientLightingEnableEffectRaw;
+    double ambientLightingSectionMaskRaw;
 } BridgeCarState;
 
 // Context
