@@ -51,6 +51,13 @@ static void carStateToBridge(const CarState& cs, BridgeCarState* out) {
     out->tpmsTempFR = cs.tpmsTempFR;
     out->tpmsTempRL = cs.tpmsTempRL;
     out->tpmsTempRR = cs.tpmsTempRR;
+    out->ambientLightingAvailable = cs.ambientLightingAvailable;
+    out->ambientLightingRed = cs.ambientLightingRed;
+    out->ambientLightingGreen = cs.ambientLightingGreen;
+    out->ambientLightingBlue = cs.ambientLightingBlue;
+    out->ambientLightingBrightness = cs.ambientLightingBrightness;
+    out->ambientLightingEnableEffectRaw = cs.ambientLightingEnableEffectRaw;
+    out->ambientLightingSectionMaskRaw = cs.ambientLightingSectionMaskRaw;
 }
 
 static std::atomic<bool> receiveLoopRunning{false};
