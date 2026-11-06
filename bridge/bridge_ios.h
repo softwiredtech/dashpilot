@@ -68,6 +68,7 @@ typedef struct {
     double doorOpenRR;
     double trunkOpen;
     double trunkPosition;
+    double frunkOpen;
 } BridgeCarState;
 
 // Context

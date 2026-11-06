@@ -75,13 +75,14 @@ class CanFrameDecoder(
                 tpmsTempFR = values[44].toFloat(),
                 tpmsTempRL = values[45].toFloat(),
                 tpmsTempRR = values[46].toFloat(),
-                // Closures after TPMS (see CarState::DOOR_OFFSET): doors FL FR RL RR, trunk open, trunk angle.
+                // Closures after TPMS (see CarState::DOOR_OFFSET): doors FL FR RL RR, trunk open, trunk angle, frunk open.
                 doorOpenFL = values[47].toFloat(),
                 doorOpenFR = values[48].toFloat(),
                 doorOpenRL = values[49].toFloat(),
                 doorOpenRR = values[50].toFloat(),
                 trunkOpen = values[51].toFloat(),
-                trunkPosition = values[52].toFloat()
+                trunkPosition = values[52].toFloat(),
+                frunkOpen = values[53].toFloat()
             )
         }
 

@@ -31,6 +31,7 @@ class CarStateBridge(
     @Volatile private var doorOpenRR: Float = 0f
     @Volatile private var trunkOpen: Float = 0f
     @Volatile private var trunkPosition: Float = 0f
+    @Volatile private var frunkOpen: Float = 0f
     @Volatile private var accSetSpeed: Float = 0f
     @Volatile private var fullPackEnergy: Float = 0f
     @Volatile private var nominalEnergyRemaining: Float = 0f
@@ -79,6 +80,7 @@ class CarStateBridge(
         doorOpenRR = state.doorOpenRR
         trunkOpen = state.trunkOpen
         trunkPosition = state.trunkPosition
+        frunkOpen = state.frunkOpen
         accSetSpeed = state.accSetSpeed
         fullPackEnergy = state.fullPackEnergy
         nominalEnergyRemaining = state.nominalEnergyRemaining
@@ -115,6 +117,7 @@ class CarStateBridge(
     @JavascriptInterface fun getDoorOpenRR(): Float = doorOpenRR
     @JavascriptInterface fun getTrunkOpen(): Float = trunkOpen
     @JavascriptInterface fun getTrunkPosition(): Float = trunkPosition
+    @JavascriptInterface fun getFrunkOpen(): Float = frunkOpen
     @JavascriptInterface fun getAccSetSpeed(): Float = accSetSpeed
     @JavascriptInterface fun getFullPackEnergy(): Float = fullPackEnergy
     @JavascriptInterface fun getNominalEnergyRemaining(): Float = nominalEnergyRemaining

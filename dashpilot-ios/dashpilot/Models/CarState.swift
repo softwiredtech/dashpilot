@@ -61,6 +61,7 @@ struct CarState: Codable {
     var doorOpenRR: Float = 0
     var trunkOpen: Float = 0
     var trunkPosition: Float = 0
+    var frunkOpen: Float = 0
 
     init() {}
 
@@ -115,6 +116,7 @@ struct CarState: Codable {
         doorOpenRR = Float(bridge.doorOpenRR)
         trunkOpen = Float(bridge.trunkOpen)
         trunkPosition = Float(bridge.trunkPosition)
+        frunkOpen = Float(bridge.frunkOpen)
     }
 
     private static let kmToMiles: Float = 0.621371
@@ -183,5 +185,6 @@ struct CarState: Codable {
         doorOpenRR           = try c.decodeIfPresent(Float.self, forKey: .doorOpenRR)           ?? 0
         trunkOpen            = try c.decodeIfPresent(Float.self, forKey: .trunkOpen)            ?? 0
         trunkPosition        = try c.decodeIfPresent(Float.self, forKey: .trunkPosition)        ?? 0
+        frunkOpen            = try c.decodeIfPresent(Float.self, forKey: .frunkOpen)            ?? 0
     }
 }

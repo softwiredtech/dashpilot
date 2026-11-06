@@ -19,6 +19,7 @@ fun DashState.dashValues(systemDarkMode: Boolean? = null): Map<String, Any> {
         "doorOpenRR" to c.doorOpenRR,
         "trunkOpen" to c.trunkOpen,
         "trunkPosition" to c.trunkPosition,
+        "frunkOpen" to c.frunkOpen,
         "buckleStatus" to c.buckleStatus,
         "odometer" to c.odometer,
         "adasOn" to c.adasOn,

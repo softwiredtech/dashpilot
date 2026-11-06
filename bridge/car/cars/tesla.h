@@ -97,8 +97,8 @@ static inline double latchOpen(double latchStatus) {
     return (s == 1 || s == 3 || s == 4 || s == 5) ? 1.0 : 0.0;
 }
 
-// Per-door and trunk latch state plus the powered-liftgate angle, from the
-// vehicle bus (DashKit forwards 0x102, 0x103 and 0x142).
+// Per-door, trunk and frunk latch state plus the powered-liftgate angle, from
+// the vehicle bus (DashKit forwards 0x102, 0x103, 0x142 and 0x2E1).
 static inline void updateClosures(const CANParsers& cp, CarState& cs) {
     cs.doorOpenFL = latchOpen(cp.get(1, "VCLEFT_doorStatus", "VCLEFT_frontLatchStatus"));
     cs.doorOpenRL = latchOpen(cp.get(1, "VCLEFT_doorStatus", "VCLEFT_rearLatchStatus"));
@@ -109,6 +109,10 @@ static inline void updateClosures(const CANParsers& cp, CarState& cs) {
     // last angle across mux-0 frames. Closed reads slightly negative on some cars.
     if (static_cast<int>(cp.get(1, "VCLEFT_liftgateStatus", "VCLEFT_liftgateStatusIndex")) == 1) {
         cs.trunkPosition = std::max(0.0, cp.get(1, "VCLEFT_liftgateStatus", "VCLEFT_liftgatePosition"));
+    }
+    // VCFRONT_status is multiplexed: the frunk latch lives on mux 0.
+    if (static_cast<int>(cp.get(1, "VCFRONT_status", "VCFRONT_statusIndex")) == 0) {
+        cs.frunkOpen = latchOpen(cp.get(1, "VCFRONT_status", "VCFRONT_frunkLatchStatus"));
     }
 }
 
