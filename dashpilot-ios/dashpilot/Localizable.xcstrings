@@ -3310,6 +3310,70 @@
         }
       }
     },
+    "Unlatch Driver Door" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fahrertür entriegeln"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vezetőajtó kioldása"
+          }
+        }
+      }
+    },
+    "Unlatch Passenger Door" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Beifahrertür entriegeln"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utasajtó kioldása"
+          }
+        }
+      }
+    },
+    "Unlatch Rear Left Door" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tür hinten links entriegeln"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bal hátsó ajtó kioldása"
+          }
+        }
+      }
+    },
+    "Unlatch Rear Right Door" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tür hinten rechts entriegeln"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jobb hátsó ajtó kioldása"
+          }
+        }
+      }
+    },
     "Unsupported dashboard type: %@" : {
       "localizations" : {
         "de" : {

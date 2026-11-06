@@ -247,6 +247,10 @@
     <string name="control_mirror_dip">Toggle Mirror Dip</string>
     <string name="control_ac_swing">Toggle AC Swing</string>
     <string name="control_glovebox">Open Glovebox</string>
+    <string name="control_unlatch_front_left">Unlatch Driver Door</string>
+    <string name="control_unlatch_front_right">Unlatch Passenger Door</string>
+    <string name="control_unlatch_rear_left">Unlatch Rear Left Door</string>
+    <string name="control_unlatch_rear_right">Unlatch Rear Right Door</string>
 
     <!-- Automations -->
     <string name="automations_title">Automations</string>
