@@ -85,4 +85,13 @@ add_executable(tesla_vin_mapper_test
 target_include_directories(tesla_vin_mapper_test PRIVATE ${MSGQ_ROOT})
 target_compile_options(tesla_vin_mapper_test PRIVATE -Wall -Wextra)
 add_test(NAME tesla_vin_mapper COMMAND tesla_vin_mapper_test)
+
+add_executable(tesla_closure_mapper_test
+        tests/tesla_closure_mapper_test.cpp
+        ${MSGQ_ROOT}/dbc/dbc.cc
+        ${MSGQ_ROOT}/dbc/dbcfile.cc
+)
+target_include_directories(tesla_closure_mapper_test PRIVATE ${MSGQ_ROOT})
+target_compile_options(tesla_closure_mapper_test PRIVATE -Wall -Wextra)
+add_test(NAME tesla_closure_mapper COMMAND tesla_closure_mapper_test)
 endif()
