@@ -60,6 +60,14 @@ typedef struct {
     double tpmsTempFR;
     double tpmsTempRL;
     double tpmsTempRR;
+
+    // Closures: doors/trunk 0/1 (1 = latch not closed), trunk angle in degrees.
+    double doorOpenFL;
+    double doorOpenFR;
+    double doorOpenRL;
+    double doorOpenRR;
+    double trunkOpen;
+    double trunkPosition;
 } BridgeCarState;
 
 // Context
