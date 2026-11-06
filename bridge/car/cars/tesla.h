@@ -89,6 +89,33 @@ static inline double powerLevel(const CarState& cs) {
     return std::clamp(kw / limit, -1.0, 1.0) * 100.0;
 }
 
+// VCLEFT/VCRIGHT_*LatchStatus: 0 SNA, 1 OPENED, 2 CLOSED, 3 CLOSING, 4 OPENING,
+// 5 AJAR, 6 TIMEOUT, 7 DEFAULT, 8 FAULT. Open until the latch reports closed;
+// unknown/fault states read as closed so a stale bus doesn't light a warning.
+static inline double latchOpen(double latchStatus) {
+    int s = static_cast<int>(latchStatus);
+    return (s == 1 || s == 3 || s == 4 || s == 5) ? 1.0 : 0.0;
+}
+
+// Per-door, trunk and frunk latch state plus the powered-liftgate angle, from
+// the vehicle bus (DashKit forwards 0x102, 0x103, 0x142 and 0x2E1).
+static inline void updateClosures(const CANParsers& cp, CarState& cs) {
+    cs.doorOpenFL = latchOpen(cp.get(1, "VCLEFT_doorStatus", "VCLEFT_frontLatchStatus"));
+    cs.doorOpenRL = latchOpen(cp.get(1, "VCLEFT_doorStatus", "VCLEFT_rearLatchStatus"));
+    cs.doorOpenFR = latchOpen(cp.get(1, "VCRIGHT_doorStatus", "VCRIGHT_frontLatchStatus"));
+    cs.doorOpenRR = latchOpen(cp.get(1, "VCRIGHT_doorStatus", "VCRIGHT_rearLatchStatus"));
+    cs.trunkOpen = latchOpen(cp.get(1, "VCRIGHT_doorStatus", "VCRIGHT_trunkLatchStatus"));
+    // VCLEFT_liftgateStatus is multiplexed: the angle lives on mux 1. Keep the
+    // last angle across mux-0 frames. Closed reads slightly negative on some cars.
+    if (static_cast<int>(cp.get(1, "VCLEFT_liftgateStatus", "VCLEFT_liftgateStatusIndex")) == 1) {
+        cs.trunkPosition = std::max(0.0, cp.get(1, "VCLEFT_liftgateStatus", "VCLEFT_liftgatePosition"));
+    }
+    // VCFRONT_status is multiplexed: the frunk latch lives on mux 0.
+    if (static_cast<int>(cp.get(1, "VCFRONT_status", "VCFRONT_statusIndex")) == 0) {
+        cs.frunkOpen = latchOpen(cp.get(1, "VCFRONT_status", "VCFRONT_frunkLatchStatus"));
+    }
+}
+
 static inline void updateVehicleBus(const CANParsers& cp, CarState& cs) {
     // Vehicle bus specific signals
     // BMS_energyStatus is multiplexed: mux 0 has pack/remaining energy, mux 1 has energyBuffer
@@ -174,6 +201,8 @@ public:
         if (static_cast<int>(cp.get(1, "VCLEFT_switchStatus", "VCLEFT_switchStatusIndex")) == 0) {
             cs.buckleStatus = cp.get(1, "VCLEFT_switchStatus", "VCLEFT_frontBuckleSwitch") == 2.0 ? 1.0 : 0.0;
         }
+
+        updateClosures(cp, cs);
 
         // Climate setpoint temperature (degC) from the vehicle bus.
         cs.acTemp = cp.get(1, "UI_hvacRequest", "UI_hvacReqTempSetpointLeft");

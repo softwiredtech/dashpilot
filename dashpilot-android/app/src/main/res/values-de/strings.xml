@@ -247,6 +247,10 @@
     <string name="control_mirror_dip">Spiegelabsenkung umschalten</string>
     <string name="control_ac_swing">Klima-Schwenkmodus umschalten</string>
     <string name="control_glovebox">Handschuhfach öffnen</string>
+    <string name="control_unlatch_front_left">Fahrertür entriegeln</string>
+    <string name="control_unlatch_front_right">Beifahrertür entriegeln</string>
+    <string name="control_unlatch_rear_left">Tür hinten links entriegeln</string>
+    <string name="control_unlatch_rear_right">Tür hinten rechts entriegeln</string>
 
     <!-- Automations -->
     <string name="automations_title">Automatisierungen</string>

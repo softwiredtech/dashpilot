@@ -67,6 +67,10 @@ Values not received yet are `0` / `false`. For speed limit, stop line and energy
 | `egoSteeringAngle` | degrees | steering wheel angle, negative = left |
 | `leftBlinker`, `rightBlinker` | 0–2 | 0 off, 1 blinking (lamp dark), 2 blinking (lamp lit) |
 | `anyDoorOpen` | 0/1 | |
+| `doorOpenFL`, `doorOpenFR`, `doorOpenRL`, `doorOpenRR` | 0/1 | per door, 1 until the latch reports closed. **DashKit only** |
+| `trunkOpen` | 0/1 | rear trunk latch. **DashKit only** |
+| `trunkPosition` | degrees | powered liftgate angle, 0 when closed or not powered. **DashKit only** |
+| `frunkOpen` | 0/1 | frunk latch, same rule as the doors (no position). **DashKit only** |
 | `buckleStatus` | 0/1 | 1 = driver buckled |
 | `odometer` | number | km, or miles when `isImperial` |
 

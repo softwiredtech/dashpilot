@@ -94,6 +94,8 @@
       read: (r) => num(r.maxDischargePower) || undefined },
     { id: "odometer", kind: "number", unit: "dist", precision: 0, category: "vehicle", bus: "vehicle",
       read: (r) => num(r.odometer) || undefined },
+    { id: "trunkPosition", kind: "number", unit: "deg", precision: 0, range: () => [0, 95], category: "vehicle", bus: "vehicle",
+      read: (r) => num(r.trunkPosition) },
 
     // surroundings
     { id: "stopLineDist", kind: "number", unit: "meter", precision: 0, range: () => [0, 200], category: "assist", bus: "any",
@@ -116,6 +118,12 @@
     { id: "leftBlindSpot", kind: "bool", unit: "none", category: "signals", bus: "any", read: (r) => flag(r.leftBlindSpot) },
     { id: "rightBlindSpot", kind: "bool", unit: "none", category: "signals", bus: "any", read: (r) => flag(r.rightBlindSpot) },
     { id: "anyDoorOpen", kind: "bool", unit: "none", category: "warnings", bus: "any", read: (r) => flag(r.anyDoorOpen) },
+    { id: "doorOpenFL", kind: "bool", unit: "none", category: "warnings", bus: "vehicle", read: (r) => flag(r.doorOpenFL) },
+    { id: "doorOpenFR", kind: "bool", unit: "none", category: "warnings", bus: "vehicle", read: (r) => flag(r.doorOpenFR) },
+    { id: "doorOpenRL", kind: "bool", unit: "none", category: "warnings", bus: "vehicle", read: (r) => flag(r.doorOpenRL) },
+    { id: "doorOpenRR", kind: "bool", unit: "none", category: "warnings", bus: "vehicle", read: (r) => flag(r.doorOpenRR) },
+    { id: "trunkOpen", kind: "bool", unit: "none", category: "warnings", bus: "vehicle", read: (r) => flag(r.trunkOpen) },
+    { id: "frunkOpen", kind: "bool", unit: "none", category: "warnings", bus: "vehicle", read: (r) => flag(r.frunkOpen) },
     { id: "seatbeltUnbuckled", kind: "bool", unit: "none", category: "warnings", bus: "any",
       read: (r) => (r.buckleStatus === undefined ? undefined : Number(r.buckleStatus) === 0) },
   ];

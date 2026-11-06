@@ -90,6 +90,15 @@ enum VehicleControl {
     static let cmdAcSwingIntensity = 0x4D
     static let cmdAcSwingToggle = 0x4E
 
+    // --- Door unlatch (VCSEC_requests 0x1F9); value = door index ---
+    // Momentary latch release like the Tesla app's "Unlatch Door". The
+    // firmware refuses it while the car is in R/N/D.
+    static let cmdDoorUnlatch = 0x50
+    static let doorFrontLeft = 0
+    static let doorFrontRight = 1
+    static let doorRearLeft = 2
+    static let doorRearRight = 3
+
     /// Bind (or clear, with actionValue 0) an N-finger tap to a control action.
     @discardableResult
     static func sendFingerAction(_ manager: DashKitBleManager, fingers: Int, actionValue: Int) -> Bool {
@@ -157,6 +166,12 @@ enum VehicleControl {
     @discardableResult
     static func sendSportKickdownThreshold(_ manager: DashKitBleManager, percent: Int) -> Bool {
         send(manager, opcode: cmdSportKickdownThreshold, value: percent)
+    }
+
+    /// Pop one door latch (firmware only acts outside R/N/D).
+    @discardableResult
+    static func sendDoorUnlatch(_ manager: DashKitBleManager, door: Int) -> Bool {
+        send(manager, opcode: cmdDoorUnlatch, value: door)
     }
 
     @discardableResult
