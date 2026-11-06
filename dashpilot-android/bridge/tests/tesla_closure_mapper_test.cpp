@@ -35,7 +35,11 @@ const char* kVehicleDbc =
     "BO_ 322 VCLEFT_liftgateStatus: 8 VEH\n"
     " SG_ VCLEFT_liftgateStatusIndex M : 0|2@1+ (1,0) [0|2] \"\" X\n"
     " SG_ VCLEFT_liftgatePosition m1 : 21|7@1- (1,46) [-5|95] \"deg\" X\n"
-    " SG_ VCLEFT_liftgateState m0 : 3|4@1+ (1,0) [0|12] \"\" X\n";
+    " SG_ VCLEFT_liftgateState m0 : 3|4@1+ (1,0) [0|12] \"\" X\n"
+    "\n"
+    "BO_ 737 VCFRONT_status: 8 VEH\n"
+    " SG_ VCFRONT_statusIndex M : 0|3@1+ (1,0) [0|6] \"\" X\n"
+    " SG_ VCFRONT_frunkLatchStatus m0 : 3|4@1+ (1,0) [0|8] \"\" X\n";
 
 enum Latch { SNA = 0, OPENED = 1, CLOSED = 2, CLOSING = 3, OPENING = 4, AJAR = 5, TIMEOUT = 6, DEFAULT = 7, FAULT = 8 };
 
@@ -79,6 +83,13 @@ std::string liftgateMux1(int raw) {
     return f;
 }
 
+std::string frontStatus(int mux, int frunk) {
+    std::string f(8, '\0');
+    setBits(f, 0, 3, mux);
+    setBits(f, 3, 4, frunk);
+    return f;
+}
+
 struct Harness {
     CANParsers cp;
     TeslaDashKitMapper mapper;
@@ -99,7 +110,7 @@ void doors_default_closed_before_any_frame() {
     Harness h;
     h.feed(0x405, std::string(8, '\0'));  // unrelated frame
     CHECK(h.cs.doorOpenFL == 0 && h.cs.doorOpenFR == 0 && h.cs.doorOpenRL == 0 && h.cs.doorOpenRR == 0);
-    CHECK(h.cs.trunkOpen == 0 && h.cs.trunkPosition == 0);
+    CHECK(h.cs.trunkOpen == 0 && h.cs.trunkPosition == 0 && h.cs.frunkOpen == 0);
 }
 
 void left_frame_maps_front_and_rear_left() {
@@ -149,21 +160,33 @@ void liftgate_angle_only_from_mux_1_and_clamped_at_zero() {
     CHECK(h.cs.trunkPosition == 0);
 }
 
+void frunk_latch_only_from_vcfront_mux_0() {
+    Harness h;
+    h.feed(0x2E1, frontStatus(0, OPENED));
+    CHECK(h.cs.frunkOpen == 1);
+    h.feed(0x2E1, frontStatus(1, CLOSED));  // another mux: those bits mean something else, keep the last value
+    CHECK(h.cs.frunkOpen == 1);
+    h.feed(0x2E1, frontStatus(0, CLOSED));
+    CHECK(h.cs.frunkOpen == 0);
+}
+
 void closures_round_trip_through_the_double_array() {
     Harness h;
     h.feed(0x102, leftDoors(OPENED, CLOSED));
     h.feed(0x103, rightDoors(CLOSED, AJAR, OPENED));
     h.feed(0x142, liftgateMux1(14));
+    h.feed(0x2E1, frontStatus(0, AJAR));
 
     double out[CarState::FIELD_COUNT];
     h.cs.toArray(out);
-    CHECK(CarState::DOOR_OFFSET == 51 && CarState::FIELD_COUNT == 57);
+    CHECK(CarState::DOOR_OFFSET == 51 && CarState::FIELD_COUNT == 58);
     CHECK(out[CarState::DOOR_OFFSET + 0] == 1);   // FL
     CHECK(out[CarState::DOOR_OFFSET + 1] == 0);   // FR
     CHECK(out[CarState::DOOR_OFFSET + 2] == 0);   // RL
     CHECK(out[CarState::DOOR_OFFSET + 3] == 1);   // RR
     CHECK(out[CarState::DOOR_OFFSET + 4] == 1);   // trunk open
     CHECK(out[CarState::DOOR_OFFSET + 5] == 60);  // trunk angle
+    CHECK(out[CarState::DOOR_OFFSET + 6] == 1);   // frunk open
 }
 
 }  // namespace
@@ -174,6 +197,7 @@ int main() {
     right_frame_maps_front_rear_right_and_trunk();
     unknown_and_fault_latch_states_read_closed();
     liftgate_angle_only_from_mux_1_and_clamped_at_zero();
+    frunk_latch_only_from_vcfront_mux_0();
     closures_round_trip_through_the_double_array();
 
     if (failures) {

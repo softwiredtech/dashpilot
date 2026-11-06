@@ -29,6 +29,7 @@
     doorOpenRR: "getDoorOpenRR",
     trunkOpen: "getTrunkOpen",
     trunkPosition: "getTrunkPosition",
+    frunkOpen: "getFrunkOpen",
     buckleStatus: "getBuckleStatus",
     accSetSpeed: "getAccSetSpeed",
     fullPackEnergy: "getFullPackEnergy",

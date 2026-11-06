@@ -23,6 +23,7 @@ extension DashState {
             ("doorOpenRR", .number(c.doorOpenRR)),
             ("trunkOpen", .number(c.trunkOpen)),
             ("trunkPosition", .number(c.trunkPosition)),
+            ("frunkOpen", .number(c.frunkOpen)),
             ("buckleStatus", .number(c.buckleStatus)),
             ("odometer", .number(c.odometer)),
             ("adasOn", .bool(c.adasOn)),

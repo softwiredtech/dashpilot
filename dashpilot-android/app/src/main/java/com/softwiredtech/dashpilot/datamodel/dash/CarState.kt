@@ -65,6 +65,7 @@ data class CarState(
     val doorOpenRR: Float = 0f,
     val trunkOpen: Float = 0f,
     val trunkPosition: Float = 0f,
+    val frunkOpen: Float = 0f,
 
     // Empty until fully assembled from the CAN stream by the native mapper.
     val vin: String = ""
@@ -79,7 +80,7 @@ data class CarState(
     )
 
     companion object {
-        const val FIELD_COUNT = 57
+        const val FIELD_COUNT = 58
         private const val KM_TO_MILES = 0.621371f
 
         private val MILES_COUNTRIES = setOf("US", "GB", "MM", "LR")

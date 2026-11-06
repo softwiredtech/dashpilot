@@ -123,6 +123,7 @@
     { id: "doorOpenRL", kind: "bool", unit: "none", category: "warnings", bus: "vehicle", read: (r) => flag(r.doorOpenRL) },
     { id: "doorOpenRR", kind: "bool", unit: "none", category: "warnings", bus: "vehicle", read: (r) => flag(r.doorOpenRR) },
     { id: "trunkOpen", kind: "bool", unit: "none", category: "warnings", bus: "vehicle", read: (r) => flag(r.trunkOpen) },
+    { id: "frunkOpen", kind: "bool", unit: "none", category: "warnings", bus: "vehicle", read: (r) => flag(r.frunkOpen) },
     { id: "seatbeltUnbuckled", kind: "bool", unit: "none", category: "warnings", bus: "any",
       read: (r) => (r.buckleStatus === undefined ? undefined : Number(r.buckleStatus) === 0) },
   ];

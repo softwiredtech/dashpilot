@@ -71,6 +71,8 @@ struct CarState {
     // Powered liftgate angle in degrees from VCLEFT_liftgateStatus (mux 1);
     // 0 when closed or when the car has no powered liftgate.
     double trunkPosition = 0;
+    // Frunk latch from VCFRONT_status (mux 0), same rule as the doors; it has no position.
+    double frunkOpen = 0;
 
     // Vehicle VIN, empty until fully assembled by the mapper.
     static constexpr size_t VIN_LENGTH = 17;
@@ -81,7 +83,7 @@ struct CarState {
     static constexpr size_t TPMS_OFFSET = VIN_OFFSET + VIN_DOUBLE_COUNT;
     static constexpr size_t TPMS_COUNT = 12;
     static constexpr size_t DOOR_OFFSET = TPMS_OFFSET + TPMS_COUNT;
-    static constexpr size_t DOOR_COUNT = 6;
+    static constexpr size_t DOOR_COUNT = 7;
     static constexpr size_t FIELD_COUNT = DOOR_OFFSET + DOOR_COUNT;
 
     void toArray(double* out) const {
@@ -148,12 +150,13 @@ struct CarState {
         out[TPMS_OFFSET + 10] = tpmsBattRL;
         out[TPMS_OFFSET + 11] = tpmsBattRR;
 
-        // Closures (after TPMS): doors FL FR RL RR, trunk open, trunk position.
+        // Closures (after TPMS): doors FL FR RL RR, trunk open, trunk position, frunk open.
         out[DOOR_OFFSET + 0] = doorOpenFL;
         out[DOOR_OFFSET + 1] = doorOpenFR;
         out[DOOR_OFFSET + 2] = doorOpenRL;
         out[DOOR_OFFSET + 3] = doorOpenRR;
         out[DOOR_OFFSET + 4] = trunkOpen;
         out[DOOR_OFFSET + 5] = trunkPosition;
+        out[DOOR_OFFSET + 6] = frunkOpen;
     }
 };
