@@ -95,7 +95,7 @@ Values not received yet are `0` / `false`. For speed limit, stop line and energy
 | `maxRegenPower`, `maxDischargePower` | kW | current limits |
 | `packTMin`, `packTMax` | °C, or °F when `isImperial` | |
 
-**Tyres** (Tesla via DashKit; **Rive only** for now)
+**Tyres** (Tesla via DashKit)
 
 | key | type | meaning |
 |---|---|---|
