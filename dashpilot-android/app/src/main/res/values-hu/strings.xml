@@ -246,6 +246,10 @@
     <string name="control_mirror_dip">Tükördöntés váltása</string>
     <string name="control_ac_swing">Klíma legyező mód váltása</string>
     <string name="control_glovebox">Kesztyűtartó nyitása</string>
+    <string name="control_unlatch_front_left">Vezetőajtó kioldása</string>
+    <string name="control_unlatch_front_right">Utasajtó kioldása</string>
+    <string name="control_unlatch_rear_left">Bal hátsó ajtó kioldása</string>
+    <string name="control_unlatch_rear_right">Jobb hátsó ajtó kioldása</string>
 
     <!-- Automations -->
     <string name="automations_title">Automatizációk</string>
