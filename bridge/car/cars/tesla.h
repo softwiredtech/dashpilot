@@ -187,7 +187,7 @@ public:
         updateVehicleBus(cp, cs);
         vin_.update(cp, cs);
         // TPMS: pressures come from mux 5 (all four wheels, 0.025 bar resolution);
-        // temperatures from muxes 0-3 (one sensor each). Their per-sensor pressure is
+        // temperatures and sensor battery voltages from muxes 0-3 (one sensor each). Their per-sensor pressure is
         // coarser (0.05 bar) and would alternate with mux 5, so it is not used.
         // Fields keep their last value until a frame carries that wheel again.
         // getRaw fails until a frame has been seen; get() would read 0 and look like mux 0.
@@ -205,6 +205,9 @@ public:
                 double* tempOfMux[4] = {&cs.tpmsTempRR, &cs.tpmsTempRL, &cs.tpmsTempFR, &cs.tpmsTempFL};
                 double t = cp.get(1, "VCSEC_TPMSData", "VCSEC_TPMSTemperature" + std::to_string(tpmsIndex));
                 if (t < 214.5) *tempOfMux[tpmsIndex] = t;
+                double* battOfMux[4] = {&cs.tpmsBattRR, &cs.tpmsBattRL, &cs.tpmsBattFR, &cs.tpmsBattFL};
+                double v = cp.get(1, "VCSEC_TPMSData", "VCSEC_TPMSBatVoltage" + std::to_string(tpmsIndex));
+                if (v < 4.045) *battOfMux[tpmsIndex] = v;  // raw 0xFF (4.05 V) = not available
             }
         }
     }

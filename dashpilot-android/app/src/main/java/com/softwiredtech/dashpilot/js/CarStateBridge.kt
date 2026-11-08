@@ -50,6 +50,18 @@ class CarStateBridge(
     @Volatile private var renderQuality: Int = 3
     @Volatile private var darkModeBackgroundGray: Int = 0
     @Volatile private var changingLane: Boolean = false
+    @Volatile private var tpmsPressureFL: Float = -1f
+    @Volatile private var tpmsPressureFR: Float = -1f
+    @Volatile private var tpmsPressureRL: Float = -1f
+    @Volatile private var tpmsPressureRR: Float = -1f
+    @Volatile private var tpmsTempFL: Float = -100f
+    @Volatile private var tpmsTempFR: Float = -100f
+    @Volatile private var tpmsTempRL: Float = -100f
+    @Volatile private var tpmsTempRR: Float = -100f
+    @Volatile private var tpmsBattFL: Float = -1f
+    @Volatile private var tpmsBattFR: Float = -1f
+    @Volatile private var tpmsBattRL: Float = -1f
+    @Volatile private var tpmsBattRR: Float = -1f
     @Volatile private var speedCameraDistance: Int = -1
     @Volatile private var dataSourceType: String = ""
 
@@ -82,6 +94,18 @@ class CarStateBridge(
         experimentalMode = state.experimentalMode
         madsActive = state.madsActive
         changingLane = state.changingLane
+        tpmsPressureFL = state.tpmsPressureFL
+        tpmsPressureFR = state.tpmsPressureFR
+        tpmsPressureRL = state.tpmsPressureRL
+        tpmsPressureRR = state.tpmsPressureRR
+        tpmsTempFL = state.tpmsTempFL
+        tpmsTempFR = state.tpmsTempFR
+        tpmsTempRL = state.tpmsTempRL
+        tpmsTempRR = state.tpmsTempRR
+        tpmsBattFL = state.tpmsBattFL
+        tpmsBattFR = state.tpmsBattFR
+        tpmsBattRL = state.tpmsBattRL
+        tpmsBattRR = state.tpmsBattRR
     }
 
     @JavascriptInterface fun getEgoSteeringAngle(): Float = egoSteeringAngle
@@ -122,6 +146,18 @@ class CarStateBridge(
     @JavascriptInterface fun getRenderQuality(): Int = renderQuality
     @JavascriptInterface fun getDarkModeBackgroundGray(): Int = darkModeBackgroundGray
     @JavascriptInterface fun isChangingLane(): Boolean = changingLane
+    @JavascriptInterface fun getTpmsPressureFL(): Float = tpmsPressureFL
+    @JavascriptInterface fun getTpmsPressureFR(): Float = tpmsPressureFR
+    @JavascriptInterface fun getTpmsPressureRL(): Float = tpmsPressureRL
+    @JavascriptInterface fun getTpmsPressureRR(): Float = tpmsPressureRR
+    @JavascriptInterface fun getTpmsTempFL(): Float = tpmsTempFL
+    @JavascriptInterface fun getTpmsTempFR(): Float = tpmsTempFR
+    @JavascriptInterface fun getTpmsTempRL(): Float = tpmsTempRL
+    @JavascriptInterface fun getTpmsTempRR(): Float = tpmsTempRR
+    @JavascriptInterface fun getTpmsBattFL(): Float = tpmsBattFL
+    @JavascriptInterface fun getTpmsBattFR(): Float = tpmsBattFR
+    @JavascriptInterface fun getTpmsBattRL(): Float = tpmsBattRL
+    @JavascriptInterface fun getTpmsBattRR(): Float = tpmsBattRR
     @JavascriptInterface fun getSpeedCameraDistance(): Int = speedCameraDistance
 
     fun updateSpeedCameraDistance(distanceMeters: Int) {

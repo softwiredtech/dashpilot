@@ -43,7 +43,7 @@ struct CarState: Codable {
     var experimentalMode: Bool = false
     var changingLane: Bool = false
 
-    // Tyre pressure (bar, -1 = none) and temperature (degC, -100 = none) per wheel.
+    // Tyre pressure (bar, -1 = none), temperature (degC, -100 = none) and sensor battery (V, -1 = none) per wheel.
     var tpmsPressureFL: Float = -1
     var tpmsPressureFR: Float = -1
     var tpmsPressureRL: Float = -1
@@ -52,6 +52,10 @@ struct CarState: Codable {
     var tpmsTempFR: Float = -100
     var tpmsTempRL: Float = -100
     var tpmsTempRR: Float = -100
+    var tpmsBattFL: Float = -1
+    var tpmsBattFR: Float = -1
+    var tpmsBattRL: Float = -1
+    var tpmsBattRR: Float = -1
 
     init() {}
 
@@ -100,6 +104,10 @@ struct CarState: Codable {
         tpmsTempFR = Float(bridge.tpmsTempFR)
         tpmsTempRL = Float(bridge.tpmsTempRL)
         tpmsTempRR = Float(bridge.tpmsTempRR)
+        tpmsBattFL = Float(bridge.tpmsBattFL)
+        tpmsBattFR = Float(bridge.tpmsBattFR)
+        tpmsBattRL = Float(bridge.tpmsBattRL)
+        tpmsBattRR = Float(bridge.tpmsBattRR)
     }
 
     private static let kmToMiles: Float = 0.621371

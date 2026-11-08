@@ -95,6 +95,14 @@ Values not received yet are `0` / `false`. For speed limit, stop line and energy
 | `maxRegenPower`, `maxDischargePower` | kW | current limits |
 | `packTMin`, `packTMax` | °C, or °F when `isImperial` | |
 
+**Tyres** (Tesla via DashKit)
+
+| key | type | meaning |
+|---|---|---|
+| `tpmsPressureFL`, `tpmsPressureFR`, `tpmsPressureRL`, `tpmsPressureRR` | bar | -1 = no reading |
+| `tpmsTempFL`, `tpmsTempFR`, `tpmsTempRL`, `tpmsTempRR` | °C | -100 = no reading |
+| `tpmsBattFL`, `tpmsBattFR`, `tpmsBattRL`, `tpmsBattRR` | V | sensor battery, -1 = no reading |
+
 The app's CarState also has climate fields and the VIN; dash apps don't receive those yet.
 
 ## Rive
