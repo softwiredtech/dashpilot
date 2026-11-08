@@ -46,8 +46,8 @@ struct CarState {
     double experimentalMode = 0;
     double changingLane = 0;
 
-    // Tyre pressure (bar) and temperature (degC) per wheel from VCSEC_TPMSData;
-    // pressure -1 = no reading, temperature -100 = no reading.
+    // Tyre pressure (bar), temperature (degC) and sensor battery (V) per wheel from
+    // VCSEC_TPMSData; pressure -1, temperature -100 and battery -1 = no reading.
     double tpmsPressureFL = -1;
     double tpmsPressureFR = -1;
     double tpmsPressureRL = -1;
@@ -56,6 +56,10 @@ struct CarState {
     double tpmsTempFR = -100;
     double tpmsTempRL = -100;
     double tpmsTempRR = -100;
+    double tpmsBattFL = -1;
+    double tpmsBattFR = -1;
+    double tpmsBattRL = -1;
+    double tpmsBattRR = -1;
 
     // Vehicle VIN, empty until fully assembled by the mapper.
     static constexpr size_t VIN_LENGTH = 17;
@@ -64,7 +68,7 @@ struct CarState {
     static constexpr size_t VIN_DOUBLE_COUNT = 3;
     static constexpr size_t VIN_OFFSET = 36;
     static constexpr size_t TPMS_OFFSET = VIN_OFFSET + VIN_DOUBLE_COUNT;
-    static constexpr size_t TPMS_COUNT = 8;
+    static constexpr size_t TPMS_COUNT = 12;
     static constexpr size_t FIELD_COUNT = TPMS_OFFSET + TPMS_COUNT;
 
     void toArray(double* out) const {
@@ -117,7 +121,7 @@ struct CarState {
         std::memcpy(padded, vin, VIN_LENGTH);
         std::memcpy(out + VIN_OFFSET, padded, sizeof(padded));
 
-        // TPMS (after VIN): pressures FL FR RL RR, then temperatures FL FR RL RR.
+        // TPMS (after VIN): pressures FL FR RL RR, temperatures FL FR RL RR, sensor batteries FL FR RL RR.
         out[TPMS_OFFSET + 0] = tpmsPressureFL;
         out[TPMS_OFFSET + 1] = tpmsPressureFR;
         out[TPMS_OFFSET + 2] = tpmsPressureRL;
@@ -126,5 +130,9 @@ struct CarState {
         out[TPMS_OFFSET + 5] = tpmsTempFR;
         out[TPMS_OFFSET + 6] = tpmsTempRL;
         out[TPMS_OFFSET + 7] = tpmsTempRR;
+        out[TPMS_OFFSET + 8] = tpmsBattFL;
+        out[TPMS_OFFSET + 9] = tpmsBattFR;
+        out[TPMS_OFFSET + 10] = tpmsBattRL;
+        out[TPMS_OFFSET + 11] = tpmsBattRR;
     }
 };

@@ -51,6 +51,10 @@ static void carStateToBridge(const CarState& cs, BridgeCarState* out) {
     out->tpmsTempFR = cs.tpmsTempFR;
     out->tpmsTempRL = cs.tpmsTempRL;
     out->tpmsTempRR = cs.tpmsTempRR;
+    out->tpmsBattFL = cs.tpmsBattFL;
+    out->tpmsBattFR = cs.tpmsBattFR;
+    out->tpmsBattRL = cs.tpmsBattRL;
+    out->tpmsBattRR = cs.tpmsBattRR;
 }
 
 static std::atomic<bool> receiveLoopRunning{false};
