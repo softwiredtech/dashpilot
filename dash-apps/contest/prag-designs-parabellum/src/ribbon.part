@@ -1,0 +1,59 @@
+<Rive version="1" kind="fragment">
+    <FontAsset file="fonts/chakrapetch-500.ttf" name="Chakra Petch Medium" id="2:902"/>
+    <FontAsset file="fonts/chakrapetch-600.ttf" name="Chakra Petch SemiBold" id="2:903"/>
+    <!-- the ribbons: every live value maps to 0..1 of its ribbon, smoothed -->
+    <DataConverterRangeMapper minInput="0" maxInput="200" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Speed Ribbon" id="9:1"/>
+    <DataConverterGroup name="Speed Ribbon Smooth" id="9:2"><DataConverterGroupItem converterId="9:1"/><DataConverterGroupItem converterId="8:50"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="0" maxInput="100" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Percent To Unit" id="9:3"/>
+    <DataConverterGroup name="Power Ribbon Smooth" id="9:4"><DataConverterGroupItem converterId="9:3"/><DataConverterGroupItem converterId="8:51"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="-100" maxInput="0" minOutput="1" maxOutput="0" clampLower="true" clampUpper="true" name="Regen Ribbon" id="9:5"/>
+    <DataConverterGroup name="Regen Ribbon Smooth" id="9:6"><DataConverterGroupItem converterId="9:5"/><DataConverterGroupItem converterId="8:51"/></DataConverterGroup>
+    <DataConverterGroup name="Charge Unit Smooth" id="9:8"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="9:3"/><DataConverterGroupItem converterId="8:51"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="-12" maxInput="-2" minOutput="1" maxOutput="0" clampLower="true" clampUpper="true" name="Is Regen" id="9:9"/>
+    <DataConverterGroup name="Is Regen Smooth" id="9:10"><DataConverterGroupItem converterId="9:9"/><DataConverterGroupItem converterId="8:55"/></DataConverterGroup>
+    <!-- kW as a size, never negative: regen is told by the REGEN label and the ribbon colour -->
+    <DataConverterFormula name="Absolute" id="9:11">
+        <FormulaTokenFunction functionType="5"/>
+        <FormulaTokenInput/>
+        <FormulaTokenOperation operationType="2"/>
+        <FormulaTokenInput/>
+        <FormulaTokenParenthesisClose/>
+    </DataConverterFormula>
+    <DataConverterGroup name="Kilowatts Size Text" id="9:12"><DataConverterGroupItem converterId="2:24"/><DataConverterGroupItem converterId="9:11"/><DataConverterGroupItem converterId="2:1"/></DataConverterGroup>
+    <!-- the power gauge tells one story in kW: the arc, the signed number and REGEN all read pack volts x amps -->
+    <DataConverterGroup name="Kilowatts Signed Text" id="9:13"><DataConverterGroupItem converterId="2:24"/><DataConverterGroupItem converterId="2:1"/></DataConverterGroup>
+    <DataConverterGroup name="Kilowatts Arc" id="9:14"><DataConverterGroupItem converterId="2:24"/><DataConverterGroupItem converterId="9:3"/><DataConverterGroupItem converterId="8:51"/></DataConverterGroup>
+    <DataConverterGroup name="Regen Kilowatts Arc" id="9:15"><DataConverterGroupItem converterId="2:24"/><DataConverterGroupItem converterId="9:5"/><DataConverterGroupItem converterId="8:51"/></DataConverterGroup>
+    <DataConverterGroup name="Is Regen Kilowatts" id="9:16"><DataConverterGroupItem converterId="2:24"/><DataConverterGroupItem converterId="9:9"/><DataConverterGroupItem converterId="8:55"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="0" maxInput="100" minOutput="0" maxOutput="252" clampLower="true" clampUpper="true" name="Charge To Surface X" id="9:18"/>
+    <DataConverterGroup name="Battery Surface X" id="9:17"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="9:18"/><DataConverterGroupItem converterId="8:51"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="4" maxInput="6" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Cell 0 Threshold" id="9:40"/>
+    <DataConverterGroup name="Cell 0 Lit" id="9:30"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="9:40"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="14" maxInput="16" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Cell 1 Threshold" id="9:41"/>
+    <DataConverterGroup name="Cell 1 Lit" id="9:31"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="9:41"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="24" maxInput="26" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Cell 2 Threshold" id="9:42"/>
+    <DataConverterGroup name="Cell 2 Lit" id="9:32"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="9:42"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="34" maxInput="36" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Cell 3 Threshold" id="9:43"/>
+    <DataConverterGroup name="Cell 3 Lit" id="9:33"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="9:43"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="44" maxInput="46" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Cell 4 Threshold" id="9:44"/>
+    <DataConverterGroup name="Cell 4 Lit" id="9:34"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="9:44"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="54" maxInput="56" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Cell 5 Threshold" id="9:45"/>
+    <DataConverterGroup name="Cell 5 Lit" id="9:35"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="9:45"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="64" maxInput="66" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Cell 6 Threshold" id="9:46"/>
+    <DataConverterGroup name="Cell 6 Lit" id="9:36"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="9:46"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="74" maxInput="76" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Cell 7 Threshold" id="9:47"/>
+    <DataConverterGroup name="Cell 7 Lit" id="9:37"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="9:47"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="84" maxInput="86" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Cell 8 Threshold" id="9:48"/>
+    <DataConverterGroup name="Cell 8 Lit" id="9:38"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="9:48"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="94" maxInput="96" minOutput="0" maxOutput="1" clampLower="true" clampUpper="true" name="Cell 9 Threshold" id="9:49"/>
+    <DataConverterGroup name="Cell 9 Lit" id="9:39"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="9:49"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="0" maxInput="100" minOutput="0" maxOutput="260" clampLower="true" clampUpper="true" name="Charge To Bar X" id="9:51"/>
+    <DataConverterGroup name="Battery Surface On Bar" id="9:19"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="9:51"/><DataConverterGroupItem converterId="8:51"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="0" maxInput="100" minOutput="12" maxOutput="248" clampLower="true" clampUpper="true" name="Charge To Edge X" id="9:71"/>
+    <DataConverterGroup name="Battery Edge On Bar" id="9:70"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="9:71"/><DataConverterGroupItem converterId="8:51"/></DataConverterGroup>
+    <DataConverterRangeMapper minInput="16" maxInput="22" minOutput="1" maxOutput="0" clampLower="true" clampUpper="true" name="Low Charge" id="9:22"/>
+    <DataConverterGroup name="Battery Low" id="9:20"><DataConverterGroupItem converterId="2:16"/><DataConverterGroupItem converterId="9:22"/><DataConverterGroupItem converterId="8:55"/></DataConverterGroup>
+    <DataConverterFormula name="Cruise Overridden" id="9:60"><FormulaTokenFunction functionType="0"/><FormulaTokenValue operationValue="1"/><FormulaTokenArgumentSeparator/><FormulaTokenFunction functionType="1"/><FormulaTokenValue operationValue="0"/><FormulaTokenArgumentSeparator/><FormulaTokenParenthesisOpen/><FormulaTokenInput/><FormulaTokenOperation operationType="1"/><FormulaTokenValue><DataBindContext sourcePathIds="1:1-1:18" propertyKey="777"/></FormulaTokenValue><FormulaTokenOperation operationType="1"/><FormulaTokenValue operationValue="3"/><FormulaTokenParenthesisClose/><FormulaTokenOperation operationType="3"/><FormulaTokenValue operationValue="3"/><FormulaTokenParenthesisClose/><FormulaTokenParenthesisClose/></DataConverterFormula>
+    <DataConverterFormula name="Cruise Held" id="9:61"><FormulaTokenFunction functionType="1"/><FormulaTokenValue operationValue="0"/><FormulaTokenArgumentSeparator/><FormulaTokenFunction functionType="0"/><FormulaTokenValue operationValue="1"/><FormulaTokenArgumentSeparator/><FormulaTokenParenthesisOpen/><FormulaTokenValue><DataBindContext sourcePathIds="1:1-1:18" propertyKey="777"/></FormulaTokenValue><FormulaTokenOperation operationType="0"/><FormulaTokenValue operationValue="6"/><FormulaTokenOperation operationType="1"/><FormulaTokenInput/><FormulaTokenParenthesisClose/><FormulaTokenOperation operationType="3"/><FormulaTokenValue operationValue="3"/><FormulaTokenParenthesisClose/><FormulaTokenParenthesisClose/></DataConverterFormula>
+    <DataConverterGroup name="Cruise Overridden Smooth" id="9:62"><DataConverterGroupItem converterId="9:60"/><DataConverterGroupItem converterId="8:55"/></DataConverterGroup><DataConverterGroup name="Cruise Held Smooth" id="9:63"><DataConverterGroupItem converterId="9:61"/><DataConverterGroupItem converterId="8:55"/></DataConverterGroup>
+</Rive>
