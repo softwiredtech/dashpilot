@@ -1,0 +1,10 @@
+{
+  "$schema": "../manifest.schema.json",
+  "manifestVersion": 1,
+  "id": "vanilla-v2",
+  "settings": [
+    "showPhoneBattery", "showCarBattery", "showOdometer",
+    "alwaysOnBlindSpotMonitor", "useImperial", "darkMode",
+    "renderQuality", "darkModeBackgroundGray"
+  ]
+}
