@@ -69,15 +69,9 @@ data class CarState(
 
     // Empty until fully assembled from the CAN stream by the native mapper.
     val vin: String = "",
-    // Candidate Tesla ambient lighting; unknown until a complete frame arrives.
     val ambientLightingAvailable: Boolean = false,
-    val ambientLightingHex: String = "",
-    val ambientLightingRed: Float = 0f,
-    val ambientLightingGreen: Float = 0f,
-    val ambientLightingBlue: Float = 0f,
+    val ambientLightingColor: Int = 0, // Packed RGB (0xRRGGBB).
     val ambientLightingBrightness: Float = 0f,
-    val ambientLightingEnableEffectRaw: Float = 0f,
-    val ambientLightingSectionMaskRaw: Float = 0f,
 ) {
     fun toImperial(): CarState = copy(
         odometer = odometer * KM_TO_MILES,
@@ -89,7 +83,7 @@ data class CarState(
     )
 
     companion object {
-        const val FIELD_COUNT = 65
+        const val FIELD_COUNT = 61
         private const val KM_TO_MILES = 0.621371f
 
         private val MILES_COUNTRIES = setOf("US", "GB", "MM", "LR")

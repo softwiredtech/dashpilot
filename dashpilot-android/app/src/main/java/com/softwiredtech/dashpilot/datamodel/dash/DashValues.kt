@@ -3,23 +3,12 @@ package com.softwiredtech.dashpilot.datamodel.dash
 import java.time.Instant
 import java.time.ZoneId
 
-// Opaque ARGB for Rive's typed Color API; brightness is a separate property.
-data class DashColor(val red: Int, val green: Int, val blue: Int) {
-    val argb: Int get() = (0xFF shl 24) or (red shl 16) or (green shl 8) or blue
-}
-
 fun DashState.dashValues(systemDarkMode: Boolean? = null): Map<String, Any> {
     val c = carState
     val d = displaySettings
     val values = mutableMapOf<String, Any>(
         "ambientLightingAvailable" to c.ambientLightingAvailable,
-        "ambientLightingHex" to c.ambientLightingHex,
-        "ambientLightingRed" to c.ambientLightingRed,
-        "ambientLightingGreen" to c.ambientLightingGreen,
-        "ambientLightingBlue" to c.ambientLightingBlue,
         "ambientLightingBrightness" to c.ambientLightingBrightness,
-        "ambientLightingEnableEffectRaw" to c.ambientLightingEnableEffectRaw,
-        "ambientLightingSectionMaskRaw" to c.ambientLightingSectionMaskRaw,
         "egoSpeed" to c.egoSpeed,
         "gear" to c.gear,
         "egoSteeringAngle" to c.egoSteeringAngle,
@@ -83,8 +72,7 @@ fun DashState.dashValues(systemDarkMode: Boolean? = null): Map<String, Any> {
         "speedCameraDistance" to speedCameraDistance.toFloat(),
     )
     if (c.ambientLightingAvailable) {
-        values["ambientLightingColor"] = DashColor(c.ambientLightingRed.toInt(),
-            c.ambientLightingGreen.toInt(), c.ambientLightingBlue.toInt())
+        values["ambientLightingColor"] = c.ambientLightingColor or 0xFF000000.toInt()
     }
     return values
 }

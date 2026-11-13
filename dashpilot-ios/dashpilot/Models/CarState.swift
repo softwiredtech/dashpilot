@@ -37,15 +37,9 @@ struct CarState: Codable {
     var hvacKeepClimateOn: Float = 0
     var powerLevel: Float = 0
 
-    // Candidate Tesla ambient lighting; unknown until a complete frame arrives.
     var ambientLightingAvailable: Bool = false
-    var ambientLightingHex: String = ""
-    var ambientLightingRed: Float = 0
-    var ambientLightingGreen: Float = 0
-    var ambientLightingBlue: Float = 0
+    var ambientLightingColor: UInt32 = 0 // Packed RGB (0xRRGGBB).
     var ambientLightingBrightness: Float = 0
-    var ambientLightingEnableEffectRaw: Float = 0
-    var ambientLightingSectionMaskRaw: Float = 0
 
     // Openpilot state
     var madsActive: Bool = false
@@ -113,16 +107,8 @@ struct CarState: Codable {
         hvacKeepClimateOn = Float(bridge.hvacKeepClimateOn)
         powerLevel = Float(bridge.powerLevel)
         ambientLightingAvailable = bridge.ambientLightingAvailable > 0
-        ambientLightingRed = Float(bridge.ambientLightingRed)
-        ambientLightingGreen = Float(bridge.ambientLightingGreen)
-        ambientLightingBlue = Float(bridge.ambientLightingBlue)
+        ambientLightingColor = bridge.ambientLightingColor
         ambientLightingBrightness = Float(bridge.ambientLightingBrightness)
-        ambientLightingEnableEffectRaw = Float(bridge.ambientLightingEnableEffectRaw)
-        ambientLightingSectionMaskRaw = Float(bridge.ambientLightingSectionMaskRaw)
-        if ambientLightingAvailable {
-            ambientLightingHex = String(format: "#%02X%02X%02X",
-                Int(ambientLightingRed), Int(ambientLightingGreen), Int(ambientLightingBlue))
-        }
         madsActive = bridge.madsActive > 0
         selfdriveActive = bridge.selfdriveActive > 0
         experimentalMode = bridge.experimentalMode > 0
@@ -205,13 +191,8 @@ struct CarState: Codable {
         hvacKeepClimateOn    = try c.decodeIfPresent(Float.self, forKey: .hvacKeepClimateOn)    ?? 0
         powerLevel           = try c.decodeIfPresent(Float.self, forKey: .powerLevel)           ?? 0
         ambientLightingAvailable = try c.decodeIfPresent(Bool.self, forKey: .ambientLightingAvailable) ?? false
-        ambientLightingHex = try c.decodeIfPresent(String.self, forKey: .ambientLightingHex) ?? ""
-        ambientLightingRed = try c.decodeIfPresent(Float.self, forKey: .ambientLightingRed) ?? 0
-        ambientLightingGreen = try c.decodeIfPresent(Float.self, forKey: .ambientLightingGreen) ?? 0
-        ambientLightingBlue = try c.decodeIfPresent(Float.self, forKey: .ambientLightingBlue) ?? 0
+        ambientLightingColor = try c.decodeIfPresent(UInt32.self, forKey: .ambientLightingColor) ?? 0
         ambientLightingBrightness = try c.decodeIfPresent(Float.self, forKey: .ambientLightingBrightness) ?? 0
-        ambientLightingEnableEffectRaw = try c.decodeIfPresent(Float.self, forKey: .ambientLightingEnableEffectRaw) ?? 0
-        ambientLightingSectionMaskRaw = try c.decodeIfPresent(Float.self, forKey: .ambientLightingSectionMaskRaw) ?? 0
         madsActive           = try c.decodeIfPresent(Bool.self,  forKey: .madsActive)           ?? false
         selfdriveActive      = try c.decodeIfPresent(Bool.self,  forKey: .selfdriveActive)      ?? false
         experimentalMode     = try c.decodeIfPresent(Bool.self,  forKey: .experimentalMode)     ?? false

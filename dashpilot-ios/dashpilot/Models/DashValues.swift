@@ -4,7 +4,7 @@ enum DashValue {
     case number(Float)
     case bool(Bool)
     case string(String)
-    case color(red: Float, green: Float, blue: Float)
+    case color(UInt32)
 }
 
 extension DashState {
@@ -13,13 +13,7 @@ extension DashState {
         let d = displaySettings
         var values: [(String, DashValue)] = [
             ("ambientLightingAvailable", .bool(c.ambientLightingAvailable)),
-            ("ambientLightingHex", .string(c.ambientLightingHex)),
-            ("ambientLightingRed", .number(c.ambientLightingRed)),
-            ("ambientLightingGreen", .number(c.ambientLightingGreen)),
-            ("ambientLightingBlue", .number(c.ambientLightingBlue)),
             ("ambientLightingBrightness", .number(c.ambientLightingBrightness)),
-            ("ambientLightingEnableEffectRaw", .number(c.ambientLightingEnableEffectRaw)),
-            ("ambientLightingSectionMaskRaw", .number(c.ambientLightingSectionMaskRaw)),
             ("egoSpeed", .number(c.egoSpeed)),
             ("gear", .number(c.gear)),
             ("egoSteeringAngle", .number(c.egoSteeringAngle)),
@@ -82,8 +76,7 @@ extension DashState {
             ("dataSourceType", .string(dataSourceType?.rawValue ?? "")),
         ]
         if c.ambientLightingAvailable {
-            values.append(("ambientLightingColor", .color(red: c.ambientLightingRed,
-                green: c.ambientLightingGreen, blue: c.ambientLightingBlue)))
+            values.append(("ambientLightingColor", .color(c.ambientLightingColor)))
         }
         return values
     }

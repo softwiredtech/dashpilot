@@ -3,7 +3,6 @@
 #include "car/can_parsers.h"
 #include "car/car_state.h"
 #include "car/car_state_mapper.h"
-#include "car/tesla_ambient_lighting.h"
 #include "car/cars/tesla.h"
 #include "msgq/ipc.h"
 #include <vector>
@@ -31,11 +30,9 @@ public:
         }
         parsers_.buildCache();
         mapper_ = createMapper(vehicleType);
-        decodeAmbientLighting_ = vehicleType == "dashkit" || vehicleType == "tesla_juniper";
     }
 
     void updateFrame(int bus, uint32_t address, const uint8_t* data, size_t len) {
-        if (decodeAmbientLighting_) updateTeslaAmbientLighting(state_, bus, address, data, len);
         parsers_.updateFrame(bus, address, data, len);
     }
 
@@ -49,5 +46,4 @@ private:
     CANParsers parsers_;
     std::unique_ptr<CarStateMapper> mapper_;
     CarState state_;
-    bool decodeAmbientLighting_ = false;
 };

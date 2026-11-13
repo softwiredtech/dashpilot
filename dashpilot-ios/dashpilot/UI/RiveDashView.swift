@@ -119,11 +119,12 @@ final class RiveDashBinder {
                 guard let p = strings[name] ?? instance.stringProperty(fromPath: name) else { missing.insert(name); continue }
                 strings[name] = p
                 p.value = v
-            case .color(let red, let green, let blue):
+            case .color(let rgb):
                 guard let p = colors[name] ?? instance.colorProperty(fromPath: name) else { missing.insert(name); continue }
                 colors[name] = p
-                p.value = UIColor(red: CGFloat(red) / 255, green: CGFloat(green) / 255,
-                                  blue: CGFloat(blue) / 255, alpha: 1)
+                p.value = UIColor(red: CGFloat((rgb >> 16) & 255) / 255,
+                                  green: CGFloat((rgb >> 8) & 255) / 255,
+                                  blue: CGFloat(rgb & 255) / 255, alpha: 1)
             }
         }
         if !riveViewModel.isPlaying {

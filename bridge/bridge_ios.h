@@ -75,12 +75,8 @@ typedef struct {
     double frunkOpen;
 
     double ambientLightingAvailable;
-    double ambientLightingRed;
-    double ambientLightingGreen;
-    double ambientLightingBlue;
+    uint32_t ambientLightingColor;
     double ambientLightingBrightness;
-    double ambientLightingEnableEffectRaw;
-    double ambientLightingSectionMaskRaw;
 } BridgeCarState;
 
 // Context

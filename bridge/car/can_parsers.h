@@ -60,7 +60,8 @@ public:
 
     // Unscaled signal bits; false if the signal is unknown, no frame has been
     // seen, or the frame's multiplexor doesn't select this signal.
-    bool getRaw(int bus, const std::string& msgName, const std::string& sigName, uint64_t* out) const {
+    bool getRaw(int bus, const std::string& msgName, const std::string& sigName, uint64_t* out,
+                size_t minLength = 0) const {
         int maskedBus = bus & 3;
         auto busIt = busSignalCache_.find(maskedBus);
         if (busIt == busSignalCache_.end()) return false;
@@ -70,7 +71,7 @@ public:
 
         const auto& cached = it->second;
         auto frameIt = latestFrames_.find(frameKey(maskedBus, cached.address));
-        if (frameIt == latestFrames_.end()) return false;
+        if (frameIt == latestFrames_.end() || frameIt->second.size() < minLength) return false;
 
         return cached.signal->getRawBits(frameIt->second.data(), frameIt->second.size(), out);
     }
