@@ -121,6 +121,18 @@ The app plays the file's default state machine and resizes the artboard to the s
 
 To try your own `.riv` on a phone, go to Settings → Developer → **Load Rive File**.
 
+### Tesla interior ambient lighting
+
+DashKit dashboards can bind these optional Rive properties:
+
+| Property | Type | Value |
+|---|---|---|
+| `ambientLightingColor` | Color | Opaque interior accent color |
+| `ambientLightingBrightness` | Number | Brightness percent, independently of color |
+| `ambientLightingAvailable` | Boolean | Whether the app has received a valid lighting frame |
+
+Use availability to select a fallback accent. Color and brightness come from the latest valid frame.
+
 ## Saving settings
 
 Web apps get one string of storage, usually JSON.

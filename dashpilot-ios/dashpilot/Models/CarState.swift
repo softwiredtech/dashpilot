@@ -37,6 +37,10 @@ struct CarState: Codable {
     var hvacKeepClimateOn: Float = 0
     var powerLevel: Float = 0
 
+    var ambientLightingAvailable: Bool = false
+    var ambientLightingColor: UInt32 = 0 // Packed RGB (0xRRGGBB).
+    var ambientLightingBrightness: Float = 0
+
     // Openpilot state
     var madsActive: Bool = false
     var selfdriveActive: Bool = false
@@ -102,6 +106,9 @@ struct CarState: Codable {
         hvacRecirc = Float(bridge.hvacRecirc)
         hvacKeepClimateOn = Float(bridge.hvacKeepClimateOn)
         powerLevel = Float(bridge.powerLevel)
+        ambientLightingAvailable = bridge.ambientLightingAvailable > 0
+        ambientLightingColor = bridge.ambientLightingColor
+        ambientLightingBrightness = Float(bridge.ambientLightingBrightness)
         madsActive = bridge.madsActive > 0
         selfdriveActive = bridge.selfdriveActive > 0
         experimentalMode = bridge.experimentalMode > 0
@@ -183,6 +190,9 @@ struct CarState: Codable {
         hvacRecirc           = try c.decodeIfPresent(Float.self, forKey: .hvacRecirc)           ?? 0
         hvacKeepClimateOn    = try c.decodeIfPresent(Float.self, forKey: .hvacKeepClimateOn)    ?? 0
         powerLevel           = try c.decodeIfPresent(Float.self, forKey: .powerLevel)           ?? 0
+        ambientLightingAvailable = try c.decodeIfPresent(Bool.self, forKey: .ambientLightingAvailable) ?? false
+        ambientLightingColor = try c.decodeIfPresent(UInt32.self, forKey: .ambientLightingColor) ?? 0
+        ambientLightingBrightness = try c.decodeIfPresent(Float.self, forKey: .ambientLightingBrightness) ?? 0
         madsActive           = try c.decodeIfPresent(Bool.self,  forKey: .madsActive)           ?? false
         selfdriveActive      = try c.decodeIfPresent(Bool.self,  forKey: .selfdriveActive)      ?? false
         experimentalMode     = try c.decodeIfPresent(Bool.self,  forKey: .experimentalMode)     ?? false

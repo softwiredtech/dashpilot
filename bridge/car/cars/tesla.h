@@ -138,6 +138,17 @@ static inline void updateVehicleBus(const CANParsers& cp, CarState& cs) {
         cs.packTMax = cp.get(1, "BMS_bmbMinMax", "BMS_thermistorTMax");
     }
     cs.odometer = cp.get(1, "DI_odometerStatus", "DI_odometer");
+
+    constexpr auto ambient = "UI_ambientLightingCtrls";
+    uint64_t brightness = 0;
+    if (cp.getRaw(1, ambient, "UI_ambientLightingBrightness", &brightness, 7)) {
+        const auto red = static_cast<uint32_t>(cp.get(1, ambient, "UI_ambientLightingRed"));
+        const auto green = static_cast<uint32_t>(cp.get(1, ambient, "UI_ambientLightingGreen"));
+        const auto blue = static_cast<uint32_t>(cp.get(1, ambient, "UI_ambientLightingBlue"));
+        cs.ambientLightingColor = (red << 16) | (green << 8) | blue;
+        cs.ambientLightingBrightness = brightness;
+        cs.ambientLightingAvailable = 1;
+    }
 }
 
 

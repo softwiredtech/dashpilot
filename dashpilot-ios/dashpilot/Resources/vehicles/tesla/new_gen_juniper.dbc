@@ -521,6 +521,12 @@ BO_ 1029 VIN_info: 8 VEH
  SG_ VIN_C405 m18 : 8|56@1+ (1,0) [0|7.2057594038E+016] "" X
 
 
+BO_ 1657 UI_ambientLightingCtrls: 8 VEH
+ SG_ UI_ambientLightingRed : 8|8@1+ (1,0) [0|255] "" X
+ SG_ UI_ambientLightingGreen : 16|8@1+ (1,0) [0|255] "" X
+ SG_ UI_ambientLightingBlue : 24|8@1+ (1,0) [0|255] "" X
+ SG_ UI_ambientLightingBrightness : 32|7@1+ (1,0) [0|100] "%" X
+
 CM_ "New-generation Model Y (Juniper), Tesla FW 2026.x. Reverse-engineered from comma route 077b771458fd542f/000000a9--5f9f91a356 (2026-09-22 16:49-17:05) against an annotated action timeline; names and enums cross-checked with the Tesla FW 2026.2 signal dataset. Covers the messages listed in dbc/used_messages.txt plus DI_state (for DashPilot). Node VEH = seen on the vehicle bus (comma bus 1, DashKit bus 1); node CH = seen ONLY on the chassis bus (comma bus 0/2, DashKit bus 0). Each message comment lists the buses it was observed on. Bytesum checksum = (id_lo + id_hi + sum of data bytes except the checksum byte) & 0xFF.";
 CM_ BO_ 585 "CHANGED. Vehicle bus only, 20 Hz. DLC 3 -> 4. Byte 0 is no longer the Tesla bytesum (0 of 19597 frames match) and no CRC-8 matched: Tesla calls it SCCM_leftStalkCrc and the firmware cannot synthesize this frame until the algorithm is known. Bits 20-31 are a new 12-bit stalk angle. SCCM_washWipeButtonStatus and SCCM_highBeamStalkStatus (bits 12-15) never left 0 in the whole log, including the wiper button press at 16:49:47.9: the wiper button now reports through VCLEFT_switchStatus.VCLEFT_swcWiperButtonState.";
 CM_ SG_ 585 SCCM_turnIndicatorStalkStatus "Enum changed: right tap (16:53:31) = 2 UP_1, left tap (16:53:34, 16:53:35) = 6 DOWN_1 (legacy DOWN_1 was 7).";

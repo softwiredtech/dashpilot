@@ -6,7 +6,9 @@ import java.time.ZoneId
 fun DashState.dashValues(systemDarkMode: Boolean? = null): Map<String, Any> {
     val c = carState
     val d = displaySettings
-    return mapOf(
+    val values = mutableMapOf<String, Any>(
+        "ambientLightingAvailable" to c.ambientLightingAvailable,
+        "ambientLightingBrightness" to c.ambientLightingBrightness,
         "egoSpeed" to c.egoSpeed,
         "gear" to c.gear,
         "egoSteeringAngle" to c.egoSteeringAngle,
@@ -69,6 +71,10 @@ fun DashState.dashValues(systemDarkMode: Boolean? = null): Map<String, Any> {
         "dataSourceType" to dataSourceType,
         "speedCameraDistance" to speedCameraDistance.toFloat(),
     )
+    if (c.ambientLightingAvailable) {
+        values["ambientLightingColor"] = c.ambientLightingColor or 0xFF000000.toInt()
+    }
+    return values
 }
 
 private fun secondsSinceLocalMidnight(epochMillis: Long): Float =

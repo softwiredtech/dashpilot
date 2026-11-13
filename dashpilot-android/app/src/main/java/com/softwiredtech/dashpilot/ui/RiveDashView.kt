@@ -127,6 +127,7 @@ private fun BoundRive(
                     PropertyDataType.NUMBER -> (value as? Float)?.let { vmi.setNumber(name, it) }
                     PropertyDataType.BOOLEAN -> (value as? Boolean)?.let { vmi.setBoolean(name, it) }
                     PropertyDataType.STRING -> vmi.setString(name, value.toString())
+                    PropertyDataType.COLOR -> (value as? Int)?.let { vmi.setColor(name, it) }
                     else -> {}
                 }
             }
