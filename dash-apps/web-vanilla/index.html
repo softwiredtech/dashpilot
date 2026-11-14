@@ -781,8 +781,10 @@
         steeringWheel.style.transform = `rotate(${angle}deg)`;
 
         // Driver alerts
-        const camDist = NativeCarState?.getSpeedCameraDistance?.() ?? -1;
-        const isChangingLane = NativeCarState?.isChangingLane?.() ?? false;
+        // window.: on iOS there is no NativeCarState global, and a bare
+        // reference throws before ?. applies; iOS sends these fields in `car`.
+        const camDist = window.NativeCarState?.getSpeedCameraDistance?.() ?? car.speedCameraDistance ?? -1;
+        const isChangingLane = window.NativeCarState?.isChangingLane?.() ?? car.changingLane ?? false;
         const alertEl = document.getElementById('driverAlert');
         if (isChangingLane) {
           alertEl.textContent = 'Changing lane';
