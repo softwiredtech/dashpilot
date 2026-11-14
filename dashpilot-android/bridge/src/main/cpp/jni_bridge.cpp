@@ -251,7 +251,20 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeStartReceiveLoop(
             state.toArray(output);
             env->SetDoubleArrayRegion(g_buffer, 0, CarState::FIELD_COUNT, output);
             env->CallVoidMethod(g_callback, g_onCanDataMethod, g_buffer);
+            // A throwing callback must not leave the exception pending for the
+            // next JNI call (CheckJNI aborts on that); log it and carry on.
+            if (env->ExceptionCheck()) {
+                env->ExceptionDescribe();
+                env->ExceptionClear();
+            }
         });
+
+    // Release this loop's references (each start creates new ones; they kept
+    // the Kotlin callback, and through it the data source, alive).
+    env->DeleteGlobalRef(g_callback);
+    env->DeleteGlobalRef(g_buffer);
+    g_callback = nullptr;
+    g_buffer = nullptr;
 
     receiveLoopExited.store(true);
 }
