@@ -8,6 +8,9 @@ final class CommaDataSource: IDataSource {
     private var context: UnsafeMutableRawPointer?
     private var group: UnsafeMutableRawPointer?
     private var decoder: UnsafeMutableRawPointer?
+    // Signalled when the background receive loop returns. A stop issued before
+    // that loop has started is lost, so disconnect() keeps stopping until then.
+    private var loopDone: DispatchSemaphore?
 
     private let vehicleType: String
     private let dbcFiles: [(busIndex: Int, resourceName: String)]
@@ -58,6 +61,8 @@ final class CommaDataSource: IDataSource {
         // Pass continuation as unmanaged context to the C callback
         let cont = self.continuation
         let contextPtr = Unmanaged.passRetained(CallbackBox(cont)).toOpaque()
+        let done = DispatchSemaphore(value: 0)
+        self.loopDone = done
 
         DispatchQueue.global(qos: .userInitiated).async {
             bridge_start_receive_loop(grp, dec, contextPtr) { ctx, statePtr in
@@ -69,12 +74,22 @@ final class CommaDataSource: IDataSource {
             // Loop exited — release the retained context
             Unmanaged<CallbackBox>.fromOpaque(contextPtr).release()
             cont?.finish()
+            done.signal()
         }
     }
 
     func disconnect() {
-        // NOTE: This will block until receive loop has excited
-        bridge_stop_receive_loop()
+        // Blocks until the receive loop has exited. Repeat while the loop may
+        // not have started yet, so the sockets and decoder are never freed
+        // under it.
+        if let loopDone {
+            repeat {
+                bridge_stop_receive_loop()
+            } while loopDone.wait(timeout: .now() + .milliseconds(5)) == .timedOut
+        } else {
+            bridge_stop_receive_loop()
+        }
+        self.loopDone = nil
 
         if let group { bridge_delete_sub_sockets(group) }
         if let decoder { bridge_destroy_vehicle_decoder(decoder) }

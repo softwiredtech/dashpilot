@@ -8,6 +8,8 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.sample
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 class CommaDataSource(
     private val bridge: VehicleBridge,
@@ -29,19 +31,44 @@ class CommaDataSource(
 
     private var groupHandle: Long = 0
 
+    // connect() runs the receive loop on an IO thread while disconnect() can
+    // come from anywhere. A stop issued before the loop has started is lost
+    // (the native loop then runs on freed sockets and decoder), so disconnect
+    // keeps stopping until connect's loop has actually returned.
+    private val lock = Any()
+    private var closed = false          // guarded by lock
+    private var loopStarting = false    // guarded by lock
+    private val loopEnded = CountDownLatch(1)
+
     override fun connect(address: String) {
-        groupHandle = bridge.nativeCreateSubSockets(
-            ctx, arrayOf("can", "selfdriveState", "selfdriveStateSP"), address
-        )
-        bridge.nativeStartReceiveLoop(
-            decoderHandle, groupHandle, reusableBuffer
-        ) { values ->
-            _incoming.tryEmit(CanFrameDecoder.arrayToCarState(values))
+        synchronized(lock) {
+            if (closed) return
+            groupHandle = bridge.nativeCreateSubSockets(
+                ctx, arrayOf("can", "selfdriveState", "selfdriveStateSP"), address
+            )
+            loopStarting = true
+        }
+        try {
+            bridge.nativeStartReceiveLoop(
+                decoderHandle, groupHandle, reusableBuffer
+            ) { values ->
+                _incoming.tryEmit(CanFrameDecoder.arrayToCarState(values))
+            }
+        } finally {
+            loopEnded.countDown()
         }
     }
 
     override fun disconnect() {
-        bridge.nativeStopReceiveLoop()
+        val waitForLoop = synchronized(lock) {
+            closed = true
+            loopStarting
+        }
+        if (waitForLoop) {
+            do {
+                bridge.nativeStopReceiveLoop()
+            } while (!loopEnded.await(5, TimeUnit.MILLISECONDS))
+        }
         bridge.nativeDeleteSubSockets(groupHandle)
         bridge.nativeDestroyVehicleDecoder(decoderHandle)
         bridge.nativeDeleteContext(ctx)
