@@ -430,12 +430,20 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
             }
 
             if (finalServerAddress.isEmpty() && dataSourceType == DataSourceType.COMMA) {
-                var localIp = networkUtil.getWifiIpAddress()
-                while (localIp == null) {
-                    delay(1000)
-                    localIp = networkUtil.getWifiIpAddress()
+                // ds already holds a native context and decoder, but teardown
+                // only sees it once it is assigned below: release it if
+                // discovery is cancelled or fails.
+                try {
+                    var localIp = networkUtil.getWifiIpAddress()
+                    while (localIp == null) {
+                        delay(1000)
+                        localIp = networkUtil.getWifiIpAddress()
+                    }
+                    finalServerAddress = networkUtil.findCanPublisher(initialIp = localIp)
+                } catch (e: Throwable) {
+                    ds.disconnect()
+                    throw e
                 }
-                finalServerAddress = networkUtil.findCanPublisher(initialIp = localIp)
             }
 
             _dataSource.value = ds
