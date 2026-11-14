@@ -165,7 +165,11 @@ struct WebDashView: UIViewRepresentable {
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             onEditingChange(false)
-            guard let stream = incomingMessages else { return }
+            // The stream has a single consumer, and cancelling the task that
+            // iterates it terminates it for good. So start once and keep that
+            // task across reloads (content-process recovery, location.reload());
+            // it targets the current page.
+            guard receiveTask == nil, let stream = incomingMessages else { return }
             startReceiving(stream)
         }
 
@@ -175,7 +179,6 @@ struct WebDashView: UIViewRepresentable {
         }
 
         private func startReceiving(_ stream: AsyncStream<DashState>) {
-            receiveTask?.cancel()
             receiveTask = Task { @MainActor in
                 for await state in stream {
                     let json = state.toJSONString()
