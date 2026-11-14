@@ -66,8 +66,9 @@ class DashKitDataSource(
 
     private fun parseAndEmit(payload: ByteArray) {
         if (payload.isEmpty()) return
-        for (frame in parseCanPacket(payload)) {
-            currentState = decoder.decodeFrame(frame.bus, frame.address, frame.data) ?: return
+        val frames = parseCanPacket(payload)
+        if (frames.isNotEmpty()) {
+            currentState = decoder.decodeFrames(frames) ?: return
         }
         _incoming.tryEmit(currentState)
     }

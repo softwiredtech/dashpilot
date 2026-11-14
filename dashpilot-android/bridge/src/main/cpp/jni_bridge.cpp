@@ -190,22 +190,36 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeCreateVehicleDecoder(
 }
 
 JNIEXPORT jdoubleArray JNICALL
-Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDecodeCanFrame(
+Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDecodeCanFrames(
         JNIEnv* env, jobject thiz,
         jlong decoderHandle,
-        jint bus,
-        jint address,
+        jintArray buses,
+        jintArray addresses,
+        jintArray lengths,
         jbyteArray data) {
 
     auto* decoder = reinterpret_cast<VehicleDecoder*>(decoderHandle);
+    jsize count = env->GetArrayLength(buses);
+    std::vector<jint> bus(count), address(count), length(count);
+    env->GetIntArrayRegion(buses, 0, count, bus.data());
+    env->GetIntArrayRegion(addresses, 0, count, address.data());
+    env->GetIntArrayRegion(lengths, 0, count, length.data());
     jsize dataLen = env->GetArrayLength(data);
     jbyte* dataBytes = env->GetByteArrayElements(data, nullptr);
 
-    decoder->updateFrame(bus, static_cast<uint32_t>(address),
-                         reinterpret_cast<const uint8_t*>(dataBytes), dataLen);
-    decoder->updateMapper();
+    // One BLE packet carries several frames. Map after each one, not once at
+    // the end: multiplexed messages (TPMS, VIN, liftgate, ...) can repeat
+    // within a packet and the mapper only sees each message's latest frame.
+    jsize offset = 0;
+    for (jsize i = 0; i < count; i++) {
+        if (length[i] < 0 || length[i] > dataLen - offset) break;
+        decoder->updateFrame(bus[i], static_cast<uint32_t>(address[i]),
+                             reinterpret_cast<const uint8_t*>(dataBytes + offset), length[i]);
+        decoder->updateMapper();
+        offset += length[i];
+    }
 
-    env->ReleaseByteArrayElements(data, dataBytes, 0);
+    env->ReleaseByteArrayElements(data, dataBytes, JNI_ABORT);  // read-only: no copy back
 
     double output[CarState::FIELD_COUNT];
     decoder->state().toArray(output);
