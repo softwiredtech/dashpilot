@@ -5,8 +5,9 @@ Dashboards that run inside the Dashpilot app, fed live car data.
 | folder | |
 |---|---|
 | `web-*/` | web dashboards: `index.html`, `manifest.json`, `preview.jpg` |
-| `rive/` | Rive dashboards: built `.riv` files and their sources |
-| `contest/` | [dash app contest](contest/README.md) rules and entries |
+| `rive/` | the Rive demo dashboard: built `.riv` file and its source |
+| `rive-*/` | Rive dashboards: the `.riv`, `preview.jpg`, and sources |
+| `contest/` | [dash app contest](contest/README.md) rules |
 
 ## Getting data
 
@@ -155,3 +156,10 @@ Web apps get one string of storage, usually JSON.
 4. iOS: an entry in `availableDashboards` (`Models/DashboardConfig.swift`), `<id>` in `localApps` in `UI/WebDashView.swift`, and a `preview_<id>.imageset` in `Assets.xcassets` (copy an existing one).
 
 `node scripts/validate-manifests.js` checks the manifests; CI runs it too.
+
+## Adding a Rive dashboard to the apps
+
+1. `dash-apps/rive-<id>/` with the `.riv` and a `preview.jpg`.
+2. Add `rive-<id>` to `RIVE_FOLDERS` in both sync scripts. They copy the `.riv` with its name lowercased and hyphens turned into underscores; that name, without `.riv`, is the entry's `url`.
+3. Android: an entry in `availableDashboards` with `DashboardType.RIVE` and a `dashboard_name_<id>` string.
+4. iOS: an entry in `availableDashboards` with `.rive`, and a `preview_<id>.imageset`.

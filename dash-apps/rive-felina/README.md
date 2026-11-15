@@ -1,6 +1,7 @@
 # Felina
 
-**Category:** Rive
+**Category:** Rive  
+**Author:** [@prag-designs](https://github.com/prag-designs)  
 **File:** [`felina.riv`](felina.riv) (about 260 KB), built from [`src/`](src/)
 
 ![Felina](preview.jpg)

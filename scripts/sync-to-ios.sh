@@ -16,8 +16,9 @@ APPS_DIR="$REPO_ROOT/dash-apps"
 XCASSETS_DIR="$REPO_ROOT/dashpilot-ios/dashpilot/Assets.xcassets"
 
 # Default folders (override by passing arguments)
-DEFAULT_FOLDERS=(web-vanilla web-retro web-ambient web-analog web-compose)
-PREVIEW_FOLDERS=("${DEFAULT_FOLDERS[@]}" rive)
+DEFAULT_FOLDERS=(web-vanilla web-vanilla-v2 web-retro web-ambient web-analog web-compose)
+RIVE_FOLDERS=(rive rive-felina rive-halo rive-monte-carlo rive-parabellum)
+PREVIEW_FOLDERS=("${DEFAULT_FOLDERS[@]}" "${RIVE_FOLDERS[@]}")
 
 if [ $# -gt 0 ]; then
   FOLDERS=("$@")
@@ -27,6 +28,7 @@ fi
 
 for folder in "${PREVIEW_FOLDERS[@]}"; do
   name="${folder#web-}"
+  name="${name#rive-}"
   cp -f "$APPS_DIR/$folder/preview.jpg" "$XCASSETS_DIR/preview_$name.imageset/preview_$name.jpg"
   echo "Copied preview $folder -> $XCASSETS_DIR/preview_$name.imageset/preview_$name.jpg"
 done
@@ -51,7 +53,12 @@ for name in "${FOLDERS[@]}"; do
 done
 
 if [ -n "${BUILT_PRODUCTS_DIR:-}" ] && [ -n "${CONTENTS_FOLDER_PATH:-}" ]; then
-  cp -f "$APPS_DIR"/rive/*.riv "${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/"
+  # Same file names as the Android raw resources, so both apps share one url
+  for folder in "${RIVE_FOLDERS[@]}"; do
+    for riv in "$APPS_DIR/$folder"/*.riv; do
+      cp -f "$riv" "${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/$(basename "$riv" | tr '[:upper:]-' '[:lower:]_')"
+    done
+  done
   echo "Copied rive dashboards -> app bundle"
 fi
 

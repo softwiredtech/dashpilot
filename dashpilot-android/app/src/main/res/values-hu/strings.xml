@@ -20,6 +20,11 @@
     <string name="dashboard_name_analog">Analog</string>
     <string name="dashboard_name_compose">Egyéni</string>
     <string name="dashboard_name_rive">Rive</string>
+    <string name="dashboard_name_vanilla_v2">Vanilla v2</string>
+    <string name="dashboard_name_felina">Felina</string>
+    <string name="dashboard_name_halo">Halo</string>
+    <string name="dashboard_name_monte_carlo">Monte Carlo</string>
+    <string name="dashboard_name_parabellum">Parabellum</string>
     <string name="dashboard_name_dev_rive">Rive fájl</string>
     <string name="dashboard_name_dev_url">Dash app URL</string>
     <string name="settings_section_developer">Fejlesztő</string>

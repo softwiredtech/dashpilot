@@ -1,6 +1,7 @@
 # Monte Carlo
 
-**Category:** Rive
+**Category:** Rive  
+**Author:** [@prag-designs](https://github.com/prag-designs)  
 **File:** [`monte-carlo.riv`](monte-carlo.riv) (about 930 KB), built from [`src/`](src/)
 
 ![Monte Carlo](preview.jpg)

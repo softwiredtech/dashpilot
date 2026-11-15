@@ -13,8 +13,14 @@ DRAWABLES_DIR="$REPO_ROOT/dashpilot-android/app/src/main/res/drawable"
 RAW_DIR="$REPO_ROOT/dashpilot-android/app/src/main/res/raw"
 
 # Default folders to sync (override by passing arguments)
-DEFAULT_FOLDERS=(web-vanilla web-retro web-ambient web-analog web-compose)
-PREVIEW_FOLDERS=("${DEFAULT_FOLDERS[@]}" rive)
+DEFAULT_FOLDERS=(web-vanilla web-vanilla-v2 web-retro web-ambient web-analog web-compose)
+RIVE_FOLDERS=(rive rive-felina rive-halo rive-monte-carlo rive-parabellum)
+PREVIEW_FOLDERS=("${DEFAULT_FOLDERS[@]}" "${RIVE_FOLDERS[@]}")
+
+# Android resource names allow only lowercase letters, digits and underscores
+resource_name() {
+  echo "$1" | tr '[:upper:]-' '[:lower:]_'
+}
 
 if [ $# -gt 0 ]; then
   FOLDERS=("$@")
@@ -23,14 +29,19 @@ else
 fi
 
 for folder in "${PREVIEW_FOLDERS[@]}"; do
-  cp -f "$APPS_DIR/$folder/preview.jpg" "$DRAWABLES_DIR/preview_${folder#web-}.jpg"
-  echo "Copied preview $folder -> $DRAWABLES_DIR/preview_${folder#web-}.jpg"
+  name="${folder#web-}"
+  dst="$DRAWABLES_DIR/preview_$(resource_name "${name#rive-}").jpg"
+  cp -f "$APPS_DIR/$folder/preview.jpg" "$dst"
+  echo "Copied preview $folder -> $dst"
 done
 
 mkdir -p "$RAW_DIR"
-for riv in "$APPS_DIR"/rive/*.riv; do
-  cp -f "$riv" "$RAW_DIR/"
-  echo "Copied $(basename "$riv") -> $RAW_DIR"
+for folder in "${RIVE_FOLDERS[@]}"; do
+  for riv in "$APPS_DIR/$folder"/*.riv; do
+    dst="$RAW_DIR/$(resource_name "$(basename "$riv")")"
+    cp -f "$riv" "$dst"
+    echo "Copied $(basename "$riv") -> $dst"
+  done
 done
 
 for name in "${FOLDERS[@]}"; do

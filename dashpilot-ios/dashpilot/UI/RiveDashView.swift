@@ -26,9 +26,9 @@ struct RiveDashView: View {
 
     var body: some View {
         ZStack {
-            (colorScheme == .dark ? Color.black : Color.white).ignoresSafeArea()
+            (colorScheme == .dark ? SwiftUI.Color.black : SwiftUI.Color.white).ignoresSafeArea()
             if let binder {
-                binder.riveViewModel.view()
+                RiveUIViewRepresentable(rive: binder.rive)
                     .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height in
                         binder.fitHeight(height)
                     }
@@ -38,7 +38,7 @@ struct RiveDashView: View {
             }
         }
         .task(id: source) {
-            guard let source, let binder = RiveDashBinder(fileURL: source) else {
+            guard let source, let binder = await RiveDashBinder.load(fileURL: source) else {
                 failed = true
                 return
             }
@@ -60,75 +60,81 @@ final class RiveDashBinder {
     static let viewModelName = "DashViewModel"
     static let artboardHeight = 1080.0
 
-    let riveViewModel: RiveViewModel
-    private let instance: RiveDataBindingViewModel.Instance?
-    private var numbers: [String: RiveDataBindingViewModel.Instance.NumberProperty] = [:]
-    private var bools: [String: RiveDataBindingViewModel.Instance.BooleanProperty] = [:]
-    private var strings: [String: RiveDataBindingViewModel.Instance.StringProperty] = [:]
-    private var colors: [String: RiveDataBindingViewModel.Instance.ColorProperty] = [:]
-    private var missing: Set<String> = []
+    // A worker's rendering mode is fixed for its lifetime, so keep one per mode.
+    private static var workers: [Bool: Worker] = [:]
+
+    let rive: Rive
+    private let instance: ViewModelInstance?
+    private let types: [String: ViewModelProperty.DataType]
     private var systemDarkMode = false
 
-    init?(fileURL: URL) {
-        guard let data = try? Data(contentsOf: fileURL),
-              let file = try? RiveFile(data: data, loadCdn: false) else { return nil }
-        let model = RiveModel(riveFile: file)
-        riveViewModel = RiveViewModel(model, stateMachineName: nil, fit: .layout)
-        instance = file.viewModelNamed(Self.viewModelName)?.createDefaultInstance()
-        if let instance {
-            if let stateMachine = model.stateMachine {
-                stateMachine.bind(viewModelInstance: instance)
-            } else {
-                model.artboard.bind(viewModelInstance: instance)
+    private init(rive: Rive, instance: ViewModelInstance?, types: [String: ViewModelProperty.DataType]) {
+        self.rive = rive
+        self.instance = instance
+        self.types = types
+    }
+
+    private static func worker(gpuCanvas: Bool) async throws -> Worker {
+        if let worker = workers[gpuCanvas] { return worker }
+        let worker = try await Worker(configuration: .init(enableGPUCanvas: gpuCanvas))
+        workers[gpuCanvas] = worker
+        return worker
+    }
+
+    static func load(fileURL: URL) async -> RiveDashBinder? {
+        do {
+            let data = try Data(contentsOf: fileURL)
+            let worker = try await worker(gpuCanvas: DisplaySettings.devRiveGpuCanvas)
+            let file = try await File(source: .data(data), worker: worker)
+            let artboard = try await file.createArtboard()
+            var instance: ViewModelInstance?
+            var types: [String: ViewModelProperty.DataType] = [:]
+            if try await file.getViewModelNames().contains(viewModelName) {
+                instance = try await file.createViewModelInstance(.viewModelDefault(from: .name(viewModelName)))
+                for property in try await file.getProperties(of: viewModelName) {
+                    types[property.name] = property.type
+                }
             }
+            let stateMachine = try await artboard.createStateMachine(nil, binding: instance)
+            let rive = try await Rive(file: file, artboard: artboard, stateMachine: stateMachine,
+                                      fit: .layout(scaleFactor: .automatic))
+            return RiveDashBinder(rive: rive, instance: instance, types: types)
+        } catch {
+            print("[DashPilot] Rive load failed: \(error)")
+            return nil
         }
     }
 
     func fitHeight(_ points: CGFloat) {
-        let screenScale = riveViewModel.riveView?.window?.screen.nativeScale ?? UITraitCollection.current.displayScale
         guard points > 0 else { return }
-        riveViewModel.layoutScaleFactor = Double(points * screenScale) / Self.artboardHeight
+        let screenScale = UIApplication.shared.connectedScenes
+            .compactMap { ($0 as? UIWindowScene)?.screen.nativeScale }.first
+            ?? UITraitCollection.current.displayScale
+        rive.fit = .layout(scaleFactor: .explicit(Float(Double(points * screenScale) / Self.artboardHeight)))
     }
 
     func setSystemDarkMode(_ darkMode: Bool) {
         systemDarkMode = darkMode
         // Appearance must update even when no vehicle telemetry is arriving.
-        guard let instance, !missing.contains("darkMode") else { return }
-        guard let property = bools["darkMode"] ?? instance.booleanProperty(fromPath: "darkMode") else {
-            missing.insert("darkMode")
-            return
-        }
-        bools["darkMode"] = property
-        property.value = darkMode
-        if !riveViewModel.isPlaying { riveViewModel.play() }
+        guard let instance, types["darkMode"] == .boolean else { return }
+        instance.setValue(of: BoolProperty(path: "darkMode"), to: darkMode)
     }
 
     func apply(_ state: DashState) {
         guard let instance else { return }
-        for (name, value) in state.dashValues(systemDarkMode: systemDarkMode) where !missing.contains(name) {
-            switch value {
-            case .number(let v):
-                guard let p = numbers[name] ?? instance.numberProperty(fromPath: name) else { missing.insert(name); continue }
-                numbers[name] = p
-                p.value = v
-            case .bool(let v):
-                guard let p = bools[name] ?? instance.booleanProperty(fromPath: name) else { missing.insert(name); continue }
-                bools[name] = p
-                p.value = v
-            case .string(let v):
-                guard let p = strings[name] ?? instance.stringProperty(fromPath: name) else { missing.insert(name); continue }
-                strings[name] = p
-                p.value = v
-            case .color(let rgb):
-                guard let p = colors[name] ?? instance.colorProperty(fromPath: name) else { missing.insert(name); continue }
-                colors[name] = p
-                p.value = UIColor(red: CGFloat((rgb >> 16) & 255) / 255,
-                                  green: CGFloat((rgb >> 8) & 255) / 255,
-                                  blue: CGFloat(rgb & 255) / 255, alpha: 1)
+        for (name, value) in state.dashValues(systemDarkMode: systemDarkMode) {
+            switch (value, types[name]) {
+            case (.number(let v), .number):
+                instance.setValue(of: NumberProperty(path: name), to: v)
+            case (.bool(let v), .boolean):
+                instance.setValue(of: BoolProperty(path: name), to: v)
+            case (.string(let v), .string):
+                instance.setValue(of: StringProperty(path: name), to: v)
+            case (.color(let rgb), .color):
+                instance.setValue(of: ColorProperty(path: name), to: RiveRuntime.Color(0xFF00_0000 | rgb))
+            default:
+                break
             }
-        }
-        if !riveViewModel.isPlaying {
-            riveViewModel.play()
         }
     }
 }
