@@ -11,6 +11,14 @@ Build the dashboard people look at while they drive. Two categories, one winner 
 | Deadline | October 30, 23:00 GMT |
 | Winners announced | November 12, on the [DashKit Discord](https://discord.gg/naTZgwVqvA) and [@softwiredtech](https://x.com/softwiredtech) on X |
 
+## Entries
+
+The entries that ship in DashPilot now live next to the built-in dashboards:
+
+- [Vanilla v2](../web-vanilla-v2/) by [@philliprauschkolb](https://github.com/philliprauschkolb) (web)
+- [Felina](../rive-felina/), [Monte Carlo](../rive-monte-carlo/) and [Parabellum](../rive-parabellum/) by [@prag-designs](https://github.com/prag-designs) (Rive)
+- [Halo](../rive-halo/) by [@dillonblair](https://github.com/dillonblair) (Rive)
+
 ## Getting started
 
 Part of the challenge is finding your way around this repo. Start with the [dash-apps README](../README.md): it defines every value your dashboard receives, and how web and Rive dashboards get them. The existing dashboards in [`dash-apps/`](../) are working examples. [`rive/dash-demo/`](../rive/dash-demo/) is a complete Rive one.

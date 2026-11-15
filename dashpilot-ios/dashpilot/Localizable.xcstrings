@@ -1664,6 +1664,22 @@
         }
       }
     },
+    "GPU Canvas for Rive (experimental)" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GPU Canvas für Rive (experimentell)"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GPU Canvas Rive-hoz (kísérleti)"
+          }
+        }
+      }
+    },
     "High" : {
       "localizations" : {
         "de" : {

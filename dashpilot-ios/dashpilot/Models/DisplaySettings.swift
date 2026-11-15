@@ -13,6 +13,11 @@ struct DisplaySettings {
     // Legacy boolean Juniper toggle, migrated into keyCarModel.
     static let keyJuniper = "juniper"
     static let keySelectedDashboardId = "selected_dashboard_id"
+    static let keyDevRiveGpuCanvas = "dev_rive_gpu_canvas"
+
+    static var devRiveGpuCanvas: Bool {
+        UserDefaults.standard.bool(forKey: keyDevRiveGpuCanvas)
+    }
 }
 
 /// The car the DashKit is installed in. Selects the app's DBC/mapper and the

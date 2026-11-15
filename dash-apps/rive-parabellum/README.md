@@ -1,6 +1,7 @@
 # Parabellum
 
-**Category:** Rive
+**Category:** Rive  
+**Author:** [@prag-designs](https://github.com/prag-designs)  
 **File:** [`parabellum.riv`](parabellum.riv) (about 680 KB), built from [`src/`](src/)
 
 ![Parabellum](preview.jpg)

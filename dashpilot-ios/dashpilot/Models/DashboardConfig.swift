@@ -24,6 +24,13 @@ let availableDashboards: [DashboardConfig] = [
         screenshotName: "preview_vanilla"
     ),
     DashboardConfig(
+        id: "vanilla-v2",
+        name: "Vanilla v2",
+        url: "vanilla-v2",
+        type: .web,
+        screenshotName: "preview_vanilla-v2"
+    ),
+    DashboardConfig(
         id: "ambient",
         name: String(localized: "Ambient Dashboard"),
         url: "ambient",
@@ -57,6 +64,34 @@ let availableDashboards: [DashboardConfig] = [
         url: "dash_demo",
         type: .rive,
         screenshotName: "preview_rive"
+    ),
+    DashboardConfig(
+        id: "felina",
+        name: "Felina",
+        url: "felina",
+        type: .rive,
+        screenshotName: "preview_felina"
+    ),
+    DashboardConfig(
+        id: "halo",
+        name: "Halo",
+        url: "halo",
+        type: .rive,
+        screenshotName: "preview_halo"
+    ),
+    DashboardConfig(
+        id: "monte-carlo",
+        name: "Monte Carlo",
+        url: "monte_carlo",
+        type: .rive,
+        screenshotName: "preview_monte-carlo"
+    ),
+    DashboardConfig(
+        id: "parabellum",
+        name: "Parabellum",
+        url: "parabellum",
+        type: .rive,
+        screenshotName: "preview_parabellum"
     ),
 ]
 

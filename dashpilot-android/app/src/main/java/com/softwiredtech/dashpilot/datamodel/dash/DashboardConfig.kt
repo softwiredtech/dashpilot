@@ -29,6 +29,15 @@ val availableDashboards = buildList {
     )
     add(
         DashboardConfig(
+            id = "vanilla-v2",
+            nameRes = R.string.dashboard_name_vanilla_v2,
+            url = "${LOCAL_ASSET_BASE_URL}web-vanilla-v2/index.html",
+            type = DashboardType.WEB,
+            screenshotRes = R.drawable.preview_vanilla_v2
+        )
+    )
+    add(
+        DashboardConfig(
             id = "ambient",
             nameRes = R.string.dashboard_name_ambient,
             url = "${LOCAL_ASSET_BASE_URL}web-ambient/index.html",
@@ -70,6 +79,42 @@ val availableDashboards = buildList {
             url = "dash_demo",
             type = DashboardType.RIVE,
             screenshotRes = R.drawable.preview_rive
+        )
+    )
+    add(
+        DashboardConfig(
+            id = "felina",
+            nameRes = R.string.dashboard_name_felina,
+            url = "felina",
+            type = DashboardType.RIVE,
+            screenshotRes = R.drawable.preview_felina
+        )
+    )
+    add(
+        DashboardConfig(
+            id = "halo",
+            nameRes = R.string.dashboard_name_halo,
+            url = "halo",
+            type = DashboardType.RIVE,
+            screenshotRes = R.drawable.preview_halo
+        )
+    )
+    add(
+        DashboardConfig(
+            id = "monte-carlo",
+            nameRes = R.string.dashboard_name_monte_carlo,
+            url = "monte_carlo",
+            type = DashboardType.RIVE,
+            screenshotRes = R.drawable.preview_monte_carlo
+        )
+    )
+    add(
+        DashboardConfig(
+            id = "parabellum",
+            nameRes = R.string.dashboard_name_parabellum,
+            url = "parabellum",
+            type = DashboardType.RIVE,
+            screenshotRes = R.drawable.preview_parabellum
         )
     )
 }

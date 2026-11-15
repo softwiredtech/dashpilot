@@ -1,6 +1,7 @@
 # Vanilla v2
 
-**Category:** web
+**Category:** web  
+**Author:** [@philliprauschkolb](https://github.com/philliprauschkolb)
 
 Vanilla v2 rebuilds the Vanilla dashboard around a real-time 3D scene written in plain WebGL 2, with no libraries and no build step. Your Tesla (a legacy or 2025 Highland Model 3, or a legacy or 2025 Juniper Model Y; long-press anywhere to switch, tap the car to change its paint) drives a road that curves with the steering wheel. The car leans and steers its front wheels, and its wheels spin with your speed. The scene reacts to the car's data:
 
