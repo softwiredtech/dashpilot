@@ -3,7 +3,10 @@ package com.softwiredtech.dashpilot.ble
 import android.content.Context
 import android.util.Log
 import com.softwiredtech.dashpilot.api.FirmwareManifest
+import com.softwiredtech.dashpilot.api.FirmwareRelease
 import com.softwiredtech.dashpilot.api.FirmwareUpdateRepository
+import com.softwiredtech.dashpilot.api.DevelopmentFirmwareRepository
+import com.softwiredtech.dashpilot.api.VerifiedPrFirmware
 import com.softwiredtech.dashpilot.datamodel.dash.getCarModel
 import com.softwiredtech.dashpilot.datasource.DashKitBleManager
 import com.softwiredtech.dashpilot.util.SemVer
@@ -11,6 +14,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.security.MessageDigest
 import com.softwiredtech.dashpilot.R
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 
 /**
  * Orchestrates the end-to-end firmware update flow:
@@ -57,6 +63,10 @@ class FirmwareUpdateManager(
     private val _localFirmware = MutableStateFlow(prefs.getBoolean(KEY_LOCAL, false))
     val localFirmware: StateFlow<Boolean> = _localFirmware
     private var uploadingLocal = false
+    @Volatile private var installGeneration = 0
+    private val busy: Boolean get() = _downloadProgress.value != null ||
+        otaState.value is OtaState.Connecting || otaState.value is OtaState.Uploading ||
+        otaState.value is OtaState.Rebooting
 
     init {
         ota.onUploaded = {
@@ -75,6 +85,7 @@ class FirmwareUpdateManager(
      * installed version first (waiting briefly if it hasn't arrived yet).
      */
     suspend fun checkForUpdate() {
+        if (busy || _check.value is Check.Checking) return
         _check.value = Check.Checking
         val manifest = FirmwareUpdateRepository.fetchManifest(getCarModel(manager.context))
         if (manifest == null) {
@@ -99,13 +110,16 @@ class FirmwareUpdateManager(
      * manifest provides one, then start the BLE upload. Progress is reported
      * via [downloadProgress] during download and [otaState] during upload.
      */
-    suspend fun install(manifest: FirmwareManifest) {
+    suspend fun install(manifest: FirmwareManifest, custom: Boolean = false) {
+        if (busy) return
+        val generation = ++installGeneration
         try {
             _downloadProgress.value = 0f
             val bytes = FirmwareUpdateRepository.downloadBinary(manifest.url) { p ->
-                _downloadProgress.value = p
+                if (generation == installGeneration) _downloadProgress.value = p
             }
-            _downloadProgress.value = null
+            currentCoroutineContext().ensureActive()
+            if (generation != installGeneration) return
 
             val expected = manifest.sha256?.trim()?.lowercase()
             if (!expected.isNullOrEmpty()) {
@@ -115,15 +129,53 @@ class FirmwareUpdateManager(
                     return
                 }
             }
-            uploadingLocal = false
+            if (custom && bytes.firstOrNull() != ESP_IMAGE_MAGIC) {
+                _check.value = Check.Error(manager.context.getString(R.string.fw_error_not_firmware))
+                return
+            }
+            uploadingLocal = custom
             ota.start(bytes)
+        } catch (e: CancellationException) {
+            throw e
         } catch (e: Exception) {
-            _downloadProgress.value = null
-            _check.value = Check.Error(manager.context.getString(R.string.fw_error_download, e.message))
+            if (generation == installGeneration) {
+                _check.value = Check.Error(manager.context.getString(R.string.fw_error_download, e.message))
+            }
+        } finally {
+            if (generation == installGeneration) _downloadProgress.value = null
+        }
+    }
+
+    suspend fun installRelease(release: FirmwareRelease) = install(release.manifest, custom = true)
+
+    suspend fun installDevelopment(firmware: VerifiedPrFirmware, token: String) {
+        if (busy) return
+        val generation = ++installGeneration
+        try {
+            _downloadProgress.value = 0f
+            // A PR may have advanced or closed while its confirmation was open.
+            DevelopmentFirmwareRepository().ensureCurrent(firmware.build, token)
+            currentCoroutineContext().ensureActive()
+            if (generation != installGeneration) return
+            if (firmware.bytes.firstOrNull() != ESP_IMAGE_MAGIC) {
+                _check.value = Check.Error(manager.context.getString(R.string.fw_error_not_firmware))
+                return
+            }
+            uploadingLocal = true
+            ota.start(firmware.bytes)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            if (generation == installGeneration) {
+                _check.value = Check.Error(manager.context.developmentFirmwareError(e))
+            }
+        } finally {
+            if (generation == installGeneration) _downloadProgress.value = null
         }
     }
 
     fun installLocal(bytes: ByteArray): Boolean {
+        if (busy) return false
         if (bytes.firstOrNull() != ESP_IMAGE_MAGIC) return false
         uploadingLocal = true
         ota.start(bytes)
@@ -131,12 +183,13 @@ class FirmwareUpdateManager(
     }
 
     fun cancel() {
+        installGeneration++
         ota.cancel()
         _downloadProgress.value = null
     }
 
     fun dispose() {
-        ota.cancel()
+        cancel()
         versionReader.dispose()
     }
 
