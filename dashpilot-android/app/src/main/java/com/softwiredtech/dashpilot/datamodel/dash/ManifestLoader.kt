@@ -2,15 +2,25 @@ package com.softwiredtech.dashpilot.datamodel.dash
 
 import android.content.Context
 import android.util.Log
+import java.io.FileNotFoundException
 import java.io.IOException
 
 object ManifestLoader {
-    fun loadFromAssets(context: Context, dashboardIds: List<String>): Map<String, DashboardManifest> {
+    fun loadFromAssets(
+        context: Context,
+        dashboardIds: List<String>,
+        folderPrefix: String,
+        optional: Boolean = false,
+    ): Map<String, DashboardManifest> {
         val result = mutableMapOf<String, DashboardManifest>()
         for (id in dashboardIds) {
-            val path = "web-$id/manifest.json"
+            val path = "$folderPrefix-$id/manifest.json"
             try {
-                val json = context.assets.open(path).bufferedReader().use { it.readText() }
+                val json = try {
+                    context.assets.open(path).bufferedReader().use { it.readText() }
+                } catch (e: FileNotFoundException) {
+                    if (optional) continue else throw e
+                }
                 val manifest = DashboardManifest.parse(json)
                 if (manifest.id != id) {
                     Log.w("DashPilot", "Manifest at assets/$path declares id '${manifest.id}' but expected '$id'")

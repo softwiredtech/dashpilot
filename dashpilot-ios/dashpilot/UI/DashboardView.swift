@@ -6,7 +6,6 @@ struct DashboardView: View {
     let dashboardUrl: String
 
     @Environment(ConnectionViewModel.self) var connectionVM
-    @Environment(\.dismiss) private var dismiss
 
     /// This view's own subscription, recreated on every dashboard switch. The
     /// web view's coordinator consumes it and cancels it when it is torn down.
@@ -34,10 +33,12 @@ struct DashboardView: View {
                             .id(currentUrl)
                     case DashboardType.rive.rawValue:
                         RiveDashView(source: Bundle.main.url(forResource: currentUrl, withExtension: "riv"),
+                                     gpuCanvas: riveDashboardRequiresGpuCanvas(url: currentUrl),
                                      incomingMessages: dashStream)
                             .id(currentUrl)
                     case DashboardType.devRive.rawValue:
-                        RiveDashView(source: DevRiveFile.url, incomingMessages: dashStream)
+                        // A developer-loaded file has no manifest, so it always gets GPU Canvas.
+                        RiveDashView(source: DevRiveFile.url, gpuCanvas: true, incomingMessages: dashStream)
                     default:
                         Text("Unsupported dashboard type: \(currentType)")
                             .foregroundColor(.white)
@@ -46,19 +47,6 @@ struct DashboardView: View {
                     Color.black
                 }
             }
-
-            Button {
-                dismiss()
-            } label: {
-                Image(systemName: "arrow.backward")
-                    .foregroundColor(.white)
-                    .font(.system(size: 18, weight: .medium))
-                    .frame(width: 44, height: 44)
-                    .background(Color.black.opacity(0.4))
-                    .clipShape(Circle())
-            }
-            .padding(.top, 12)
-            .padding(.leading, 12)
 
             if let switchedToName {
                 Text(switchedToName)
@@ -78,6 +66,8 @@ struct DashboardView: View {
             DragGesture(minimumDistance: 30)
                 .onEnded { value in
                     let dx = value.translation.width
+                    // A drag from the left edge is the system back swipe.
+                    guard value.startLocation.x > 40 else { return }
                     guard abs(dx) > 60, abs(dx) > abs(value.translation.height) else { return }
                     switchDashboard(step: dx < 0 ? 1 : -1)
                 },

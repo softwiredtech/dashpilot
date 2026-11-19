@@ -17,6 +17,11 @@ enum class ManifestDisplaySetting {
     @SerialName("darkModeBackgroundGray") DARK_MODE_BACKGROUND_GRAY,
 }
 
+@Serializable
+enum class ManifestRequirement {
+    @SerialName("gpuCanvas") GPU_CANVAS,
+}
+
 class ManifestParseException(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
 
 @Serializable
@@ -24,6 +29,7 @@ data class DashboardManifest(
     val manifestVersion: Int,
     val id: String,
     val settings: Set<ManifestDisplaySetting>,
+    val requires: Set<ManifestRequirement> = emptySet(),
 ) {
     companion object {
         private val decoder = Json { ignoreUnknownKeys = true }

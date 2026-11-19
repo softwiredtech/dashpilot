@@ -6,7 +6,7 @@ Dashboards that run inside the Dashpilot app, fed live car data.
 |---|---|
 | `web-*/` | web dashboards: `index.html`, `manifest.json`, `preview.jpg` |
 | `rive/` | the Rive demo dashboard: built `.riv` file and its source |
-| `rive-*/` | Rive dashboards: the `.riv`, `preview.jpg`, and sources |
+| `rive-*/` | Rive dashboards: the `.riv`, `preview.jpg`, an optional `manifest.json`, and sources |
 | `contest/` | [dash app contest](contest/README.md) rules |
 
 ## Getting data
@@ -159,7 +159,10 @@ Web apps get one string of storage, usually JSON.
 
 ## Adding a Rive dashboard to the apps
 
-1. `dash-apps/rive-<id>/` with the `.riv` and a `preview.jpg`.
+1. `dash-apps/rive-<id>/` with the `.riv` and a `preview.jpg`. If the dashboard uses GPU Canvas (scripted WGSL passes), also add a `manifest.json` that says so; the apps only turn GPU Canvas on for dashboards that declare it:
+   ```json
+   { "$schema": "../manifest.schema.json", "manifestVersion": 1, "id": "<id>", "settings": [], "requires": ["gpuCanvas"] }
+   ```
 2. Add `rive-<id>` to `RIVE_FOLDERS` in both sync scripts. They copy the `.riv` with its name lowercased and hyphens turned into underscores; that name, without `.riv`, is the entry's `url`.
 3. Android: an entry in `availableDashboards` with `DashboardType.RIVE` and a `dashboard_name_<id>` string.
 4. iOS: an entry in `availableDashboards` with `.rive`, and a `preview_<id>.imageset`.

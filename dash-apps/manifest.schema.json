@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "DashPilot dash-app manifest",
-  "description": "Per-app declaration of honored native display settings.",
+  "description": "Per-app declaration of honored native display settings and runtime requirements.",
   "type": "object",
   "required": ["manifestVersion", "id", "settings"],
   "additionalProperties": false,
@@ -23,6 +23,13 @@
           "renderQuality",
           "darkModeBackgroundGray"
         ]
+      }
+    },
+    "requires": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": ["gpuCanvas"]
       }
     }
   }

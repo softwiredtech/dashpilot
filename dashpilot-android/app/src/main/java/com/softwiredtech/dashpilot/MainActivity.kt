@@ -113,7 +113,11 @@ class MainActivity : ComponentActivity() {
         val webIds = availableDashboards
             .filter { it.type == DashboardType.WEB && it.url.startsWith(LOCAL_ASSET_BASE_URL) }
             .map { it.id }
-        setLoadedManifests(ManifestLoader.loadFromAssets(applicationContext, webIds))
+        val riveIds = availableDashboards.filter { it.type == DashboardType.RIVE }.map { it.id }
+        setLoadedManifests(
+            ManifestLoader.loadFromAssets(applicationContext, webIds, "web") +
+                ManifestLoader.loadFromAssets(applicationContext, riveIds, "rive", optional = true)
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

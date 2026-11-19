@@ -2,6 +2,7 @@ __pycache__
 .DS_Store
 venv
 dashpilot-android/app/src/main/assets/web-*
+dashpilot-android/app/src/main/assets/rive-*
 dashpilot-android/app/src/main/res/drawable/preview_*
 dashpilot-android/app/src/main/res/raw/*.riv
 dashpilot-android/app/release/

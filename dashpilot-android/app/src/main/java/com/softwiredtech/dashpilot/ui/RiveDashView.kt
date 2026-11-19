@@ -50,8 +50,7 @@ fun RiveDashView(
     ) {
         val fit = Fit.Layout(constraints.maxHeight / ARTBOARD_HEIGHT)
         val context = LocalContext.current
-        // GPU Canvas content (WGSL shaders over a script-drawn canvas) only renders on a deferred
-        // worker. It is opt-in from Developer settings; every other case keeps the standard worker.
+        // GPU Canvas content only renders on a deferred worker.
         val errorState = remember { mutableStateOf<Throwable?>(null) }
         val riveWorker = if (useGpuCanvas) rememberDeferredRiveWorker() else rememberRiveWorkerOrNull(errorState)
         if (riveWorker == null) {

@@ -58,6 +58,11 @@ if [ -n "${BUILT_PRODUCTS_DIR:-}" ] && [ -n "${CONTENTS_FOLDER_PATH:-}" ]; then
     for riv in "$APPS_DIR/$folder"/*.riv; do
       cp -f "$riv" "${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/$(basename "$riv" | tr '[:upper:]-' '[:lower:]_')"
     done
+    rm -rf "${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/${folder}"
+    if [ -f "$APPS_DIR/$folder/manifest.json" ]; then
+      mkdir -p "${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/${folder}"
+      cp -f "$APPS_DIR/$folder/manifest.json" "${BUILT_PRODUCTS_DIR}/${CONTENTS_FOLDER_PATH}/${folder}/manifest.json"
+    fi
   done
   echo "Copied rive dashboards -> app bundle"
 fi

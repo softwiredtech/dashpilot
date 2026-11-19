@@ -24,7 +24,11 @@ struct dashpilotApp: App {
 
     init() {
         let webIds = availableDashboards.filter { $0.type == .web }.map { $0.id }
-        setLoadedManifests(ManifestLoader.loadFromBundle(dashboardIds: webIds))
+        let riveIds = availableDashboards.filter { $0.type == .rive }.map { $0.id }
+        setLoadedManifests(
+            ManifestLoader.loadFromBundle(dashboardIds: webIds, folderPrefix: "web")
+                .merging(ManifestLoader.loadFromBundle(dashboardIds: riveIds, folderPrefix: "rive", optional: true)) { web, _ in web }
+        )
     }
 
     var body: some Scene {

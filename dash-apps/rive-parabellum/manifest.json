@@ -1,0 +1,7 @@
+{
+  "$schema": "../manifest.schema.json",
+  "manifestVersion": 1,
+  "id": "parabellum",
+  "settings": [],
+  "requires": ["gpuCanvas"]
+}
