@@ -2,6 +2,7 @@ package com.softwiredtech.dashpilot.api
 
 import android.util.Log
 import com.google.gson.Gson
+import com.google.gson.JsonParser
 import com.softwiredtech.dashpilot.datamodel.dash.CarModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -22,6 +23,15 @@ data class FirmwareManifest(
     val minAppVersion: String? = null
 )
 
+data class FirmwareRelease(
+    val tag: String,
+    val name: String,
+    val prerelease: Boolean,
+    val manifest: FirmwareManifest,
+) {
+    val label: String get() = if (name == tag) tag else "$tag — $name"
+}
+
 /**
  * Fetches the firmware update manifest and downloads firmware binaries.
  *
@@ -38,6 +48,9 @@ data class FirmwareManifest(
  */
 object FirmwareUpdateRepository {
     private const val TAG = "FirmwareUpdateRepo"
+    private const val RELEASES_URL = "https://api.github.com/repos/softwiredtech/dashkit-firmware/releases"
+    private const val DOWNLOAD_PREFIX = "https://github.com/softwiredtech/dashkit-firmware/releases/download/"
+    private const val OTA_ASSET = "dashkit-firmware.bin"
 
     // One release track (storage folder) per car; must match tools/publish_ota.sh
     // in the firmware repo. Legacy keeps the original folder older apps read.
@@ -58,6 +71,43 @@ object FirmwareUpdateRepository {
     }
 
     private val gson = Gson()
+
+    suspend fun fetchReleases(): List<FirmwareRelease> = withContext(Dispatchers.IO) {
+        val releases = mutableListOf<FirmwareRelease>()
+        var page = 1
+        do {
+            val request = Request.Builder().url("$RELEASES_URL?per_page=100&page=$page")
+                .header("Accept", "application/vnd.github+json")
+                .header("X-GitHub-Api-Version", "2022-11-28")
+                .header("User-Agent", "DashPilot")
+                .build()
+            val more = client.newCall(request).execute().use { response ->
+                check(response.isSuccessful) { "GitHub releases: HTTP ${response.code}" }
+                releases += parseReleases(response.body?.string() ?: error("Empty GitHub response"))
+                response.header("Link").orEmpty().contains("rel=\"next\"")
+            }
+            page++
+        } while (more)
+        releases
+    }
+
+    internal fun parseReleases(json: String): List<FirmwareRelease> =
+        JsonParser.parseString(json).asJsonArray.mapNotNull { entry ->
+            val release = entry.asJsonObject
+            if (release["draft"]?.asBoolean == true) return@mapNotNull null
+            val tag = release["tag_name"]?.asString?.takeIf { it.isNotBlank() } ?: return@mapNotNull null
+            val asset = release.getAsJsonArray("assets")?.firstOrNull {
+                it.asJsonObject["name"]?.asString == OTA_ASSET
+            }?.asJsonObject ?: return@mapNotNull null
+            val url = asset["browser_download_url"]?.asString ?: return@mapNotNull null
+            if (!url.startsWith(DOWNLOAD_PREFIX) || (asset["size"]?.asLong ?: 0) <= 0) return@mapNotNull null
+            val digest = asset["digest"]?.takeUnless { it.isJsonNull }?.asString
+                ?.takeIf { it.startsWith("sha256:") }?.removePrefix("sha256:")
+                ?.takeIf { it.matches(Regex("[a-fA-F0-9]{64}")) }
+            val name = release["name"]?.takeUnless { it.isJsonNull }?.asString?.takeIf { it.isNotBlank() } ?: tag
+            FirmwareRelease(tag, name, release["prerelease"]?.asBoolean == true,
+                FirmwareManifest(tag, url, sha256 = digest))
+        }
 
     /** Download and parse [model]'s update manifest. Returns null on any failure. */
     suspend fun fetchManifest(model: CarModel): FirmwareManifest? = withContext(Dispatchers.IO) {

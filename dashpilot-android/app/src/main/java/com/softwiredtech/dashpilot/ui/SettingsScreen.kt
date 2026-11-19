@@ -44,6 +44,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -73,12 +74,14 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -853,7 +856,7 @@ private fun FirmwareInfoSection(updateManager: FirmwareUpdateManager, connected:
     InfoRow(
         label = stringResource(R.string.settings_firmware_info_version),
         value = installedVersion?.let {
-            if (localFirmware) stringResource(R.string.settings_firmware_info_local, it) else it
+            if (localFirmware) stringResource(R.string.settings_firmware_info_custom, it) else it
         } ?: stringResource(R.string.settings_firmware_info_unknown)
     )
 }
@@ -1020,6 +1023,9 @@ private fun teslaStatusText(status: TeslaStatus): String = when (status.linkStat
 @Composable
 private fun FirmwareUpdateSection(updateManager: FirmwareUpdateManager, connected: Boolean) {
     val scope = rememberCoroutineScope()
+    var developerExpanded by rememberSaveable { mutableStateOf(false) }
+    // Deliberately not persisted or saved across activity recreation.
+    var githubToken by remember { mutableStateOf("") }
     val otaState by updateManager.otaState.collectAsState()
     val checkState by updateManager.check.collectAsState()
     val downloadProgress by updateManager.downloadProgress.collectAsState()
@@ -1118,13 +1124,41 @@ private fun FirmwareUpdateSection(updateManager: FirmwareUpdateManager, connecte
             if (localFirmware) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    stringResource(R.string.settings_firmware_local_notice),
+                    stringResource(R.string.settings_firmware_custom_notice),
                     color = DarkColors.ContentDisabled,
                     fontSize = 13.sp
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
-            LocalFirmwareInstall(updateManager, connected && checkState !is FirmwareUpdateManager.Check.Checking)
+            TextButton(
+                onClick = { developerExpanded = !developerExpanded },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(stringResource(R.string.settings_section_developer))
+                Spacer(Modifier.weight(1f))
+                Icon(
+                    Icons.Default.ExpandMore,
+                    contentDescription = null,
+                    modifier = Modifier.rotate(if (developerExpanded) 180f else 0f),
+                )
+            }
+            if (developerExpanded) {
+                LocalFirmwareInstall(updateManager, connected && checkState !is FirmwareUpdateManager.Check.Checking)
+                Spacer(modifier = Modifier.height(16.dp))
+                FirmwareReleaseInstall(
+                    enabled = connected && checkState !is FirmwareUpdateManager.Check.Checking,
+                    onInstall = { release -> scope.launch { updateManager.installRelease(release) } },
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                DevelopmentFirmwareInstall(
+                    enabled = connected && checkState !is FirmwareUpdateManager.Check.Checking,
+                    token = githubToken,
+                    onTokenChanged = { githubToken = it },
+                    onInstall = { firmware, token ->
+                        scope.launch { updateManager.installDevelopment(firmware, token) }
+                    },
+                )
+            }
         }
     }
 }

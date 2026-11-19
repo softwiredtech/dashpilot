@@ -61,6 +61,7 @@ class DashKitOtaUpdate(
         firmware = fw
         firmwareOffset = 0
         uploadFinished = false
+        _state.value = OtaState.Connecting
 
         manager.suppressPings = true
         manager.addGattListener(this)
@@ -70,7 +71,6 @@ class DashKitOtaUpdate(
         if (g != null && manager.connectionState.value == ConnectionStatus.Connected) {
             setupOtaService(g)
         } else {
-            _state.value = OtaState.Connecting
             manager.connect()
         }
     }
