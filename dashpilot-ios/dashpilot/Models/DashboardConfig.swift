@@ -126,10 +126,13 @@ func dashboardById(_ id: String?) -> DashboardConfig? {
     guard let id = id?.trimmingCharacters(in: .whitespaces), !id.isEmpty else { return nil }
     if let dev = developerDashboard(id) { return dev }
     guard var config = availableDashboards.first(where: { $0.id == id }) else { return nil }
-    if config.type == .web {
-        config.manifest = loadedManifests[id]
-    }
+    config.manifest = loadedManifests[id]
     return config
+}
+
+func riveDashboardRequiresGpuCanvas(url: String) -> Bool {
+    guard let id = availableDashboards.first(where: { $0.type == .rive && $0.url == url })?.id else { return false }
+    return loadedManifests[id]?.requires?.contains(.gpuCanvas) == true
 }
 
 func selectedDashboard() -> DashboardConfig {

@@ -42,6 +42,12 @@ for folder in "${RIVE_FOLDERS[@]}"; do
     cp -f "$riv" "$dst"
     echo "Copied $(basename "$riv") -> $dst"
   done
+  rm -rf "$ASSETS_DIR/$folder"
+  if [ -f "$APPS_DIR/$folder/manifest.json" ]; then
+    mkdir -p "$ASSETS_DIR/$folder"
+    cp -f "$APPS_DIR/$folder/manifest.json" "$ASSETS_DIR/$folder/manifest.json"
+    echo "Copied $folder/manifest.json -> $ASSETS_DIR/$folder"
+  fi
 done
 
 for name in "${FOLDERS[@]}"; do

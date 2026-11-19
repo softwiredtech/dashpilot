@@ -1,0 +1,7 @@
+{
+  "$schema": "../manifest.schema.json",
+  "manifestVersion": 1,
+  "id": "monte-carlo",
+  "settings": [],
+  "requires": ["gpuCanvas"]
+}

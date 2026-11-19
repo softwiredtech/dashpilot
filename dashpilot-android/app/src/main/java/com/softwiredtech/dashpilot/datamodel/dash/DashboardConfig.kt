@@ -147,10 +147,10 @@ internal fun setLoadedManifests(map: Map<String, DashboardManifest>) {
     manifestsById = map
 }
 
-/**
- * Returns a copy of this DashboardConfig with its manifest field populated
- * from the loaded manifest store. WEB dashboards may have a non-null manifest;
- * other types always return the receiver unchanged (manifest stays null).
- */
 fun DashboardConfig.withManifest(): DashboardConfig =
-    if (type == DashboardType.WEB) copy(manifest = manifestsById[id]) else this
+    if (type == DashboardType.DEV_RIVE) this else copy(manifest = manifestsById[id])
+
+fun riveDashboardRequiresGpuCanvas(url: String): Boolean {
+    val id = availableDashboards.firstOrNull { it.type == DashboardType.RIVE && it.url == url }?.id
+    return manifestsById[id]?.requires?.contains(ManifestRequirement.GPU_CANVAS) == true
+}

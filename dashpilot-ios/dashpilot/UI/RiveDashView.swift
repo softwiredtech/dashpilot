@@ -18,6 +18,7 @@ enum DevRiveFile {
 struct RiveDashView: View {
 
     let source: URL?
+    let gpuCanvas: Bool
     let incomingMessages: AsyncStream<DashState>
 
     @Environment(\.colorScheme) private var colorScheme
@@ -38,7 +39,7 @@ struct RiveDashView: View {
             }
         }
         .task(id: source) {
-            guard let source, let binder = await RiveDashBinder.load(fileURL: source) else {
+            guard let source, let binder = await RiveDashBinder.load(fileURL: source, gpuCanvas: gpuCanvas) else {
                 failed = true
                 return
             }
@@ -81,10 +82,10 @@ final class RiveDashBinder {
         return worker
     }
 
-    static func load(fileURL: URL) async -> RiveDashBinder? {
+    static func load(fileURL: URL, gpuCanvas: Bool) async -> RiveDashBinder? {
         do {
             let data = try Data(contentsOf: fileURL)
-            let worker = try await worker(gpuCanvas: DisplaySettings.devRiveGpuCanvas)
+            let worker = try await worker(gpuCanvas: gpuCanvas)
             let file = try await File(source: .data(data), worker: worker)
             let artboard = try await file.createArtboard()
             var instance: ViewModelInstance?

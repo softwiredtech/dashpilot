@@ -47,7 +47,7 @@ import com.softwiredtech.dashpilot.datamodel.dash.DashState
 import com.softwiredtech.dashpilot.datamodel.dash.DashboardType
 import com.softwiredtech.dashpilot.datamodel.dash.availableDashboards
 import com.softwiredtech.dashpilot.datamodel.dash.dashboardById
-import com.softwiredtech.dashpilot.datamodel.dash.isDevRiveGpuCanvasEnabled
+import com.softwiredtech.dashpilot.datamodel.dash.riveDashboardRequiresGpuCanvas
 import com.softwiredtech.dashpilot.datamodel.dash.saveSelectedDashboard
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -168,8 +168,8 @@ fun DashboardScreen(
                     )
                 }
                 "rive", DEV_RIVE_TYPE -> {
-                    val context = LocalContext.current
-                    val useGpuCanvas = remember { isDevRiveGpuCanvasEnabled(context) }
+                    // A developer-loaded file has no manifest, so it always gets GPU Canvas.
+                    val useGpuCanvas = currentType == DEV_RIVE_TYPE || riveDashboardRequiresGpuCanvas(currentUrl)
                     RiveDashView(
                         assetName = if (currentType == DEV_RIVE_TYPE) "" else currentUrl,
                         dashStateFlow = dashStateFlow,

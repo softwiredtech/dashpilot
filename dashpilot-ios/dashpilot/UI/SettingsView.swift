@@ -26,7 +26,6 @@ struct SettingsView: View {
     @AppStorage(ConnectionViewModel.onboardingCompletedKey)   private var onboardingCompleted = false
     @AppStorage(devDashboardUrlKey)                           private var devDashboardUrl = ""
     @AppStorage("devUrlHintShown")                            private var devUrlHintShown = false
-    @AppStorage(DisplaySettings.keyDevRiveGpuCanvas)          private var devRiveGpuCanvas = false
 
     @State private var pickingRiveFile = false
     @State private var devUrlDraft = ""
@@ -345,8 +344,6 @@ struct SettingsView: View {
             if loadedRiveFile && selectedDashboardId == devRiveDashboardId {
                 loadedLabel
             }
-
-            SettingsToggleRow(label: "GPU Canvas for Rive (experimental)", isOn: $devRiveGpuCanvas)
 
             Text("Load dash app from URL")
                 .foregroundColor(.white)

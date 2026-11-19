@@ -11,6 +11,10 @@ enum ManifestDisplaySetting: String, Codable, Hashable {
     case darkModeBackgroundGray
 }
 
+enum ManifestRequirement: String, Codable, Hashable {
+    case gpuCanvas
+}
+
 enum ManifestParseError: Error {
     case invalidData
     case unsupportedVersion(Int)
@@ -20,6 +24,7 @@ struct DashboardManifest: Codable {
     let manifestVersion: Int
     let id: String
     let settings: Set<ManifestDisplaySetting>
+    let requires: Set<ManifestRequirement>?
 
     static func parse(_ json: String) throws -> DashboardManifest {
         guard let data = json.data(using: .utf8) else {

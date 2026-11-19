@@ -29,7 +29,6 @@
     <string name="dashboard_name_dev_url">Dash App URL</string>
     <string name="settings_section_developer">Developer</string>
     <string name="settings_developer_load_rive">Load Rive File</string>
-    <string name="settings_developer_rive_gpu_canvas">GPU Canvas for Rive (experimental)</string>
     <string name="settings_developer_url_label">Load dash app from URL</string>
     <string name="settings_developer_url_load">Load</string>
     <string name="settings_developer_url_invalid">Enter a valid http(s) URL</string>

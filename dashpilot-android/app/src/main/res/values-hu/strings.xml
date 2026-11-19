@@ -29,7 +29,6 @@
     <string name="dashboard_name_dev_url">Dash app URL</string>
     <string name="settings_section_developer">Fejlesztő</string>
     <string name="settings_developer_load_rive">Rive fájl betöltése</string>
-    <string name="settings_developer_rive_gpu_canvas">GPU Canvas Rive-hoz (kísérleti)</string>
     <string name="settings_developer_url_label">Dash app betöltése URL-ről</string>
     <string name="settings_developer_url_load">Betöltés</string>
     <string name="settings_developer_url_invalid">Adj meg egy érvényes http(s) URL-t</string>
