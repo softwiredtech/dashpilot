@@ -19,8 +19,8 @@ android {
         applicationId = "com.softwiredtech.dashpilot"
         minSdk = 29
         targetSdk = 36
-        versionCode = 20
-        versionName = "0.10.1"
+        versionCode = 21
+        versionName = "0.11.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
