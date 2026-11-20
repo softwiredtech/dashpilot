@@ -1,6 +1,7 @@
 package com.softwiredtech.dashpilot.ble
 
 import android.util.Log
+import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.DashKitBleManager
 import java.util.UUID
 
@@ -152,17 +153,29 @@ object VehicleControl {
 
     /** Ask the DashKit to open a pairing window for one new device. */
     fun sendEnterPairing(manager: DashKitBleManager): Boolean {
-        val ok = send(manager, CMD_ENTER_PAIRING, 1)
+        val ok = send(manager, CMD_ENTER_PAIRING, 1) { delivered ->
+            if (delivered) {
+                // Arm again from now: an earlier attempt that failed late may
+                // have disarmed it.
+                manager.expectPairingWindowDrop()
+            } else if (manager.connectionState.value == ConnectionStatus.Connected) {
+                // Lost while the link is still up: no pairing window opened, so
+                // nothing will drop us. (A write lost because the link dropped
+                // may well be the DashKit opening the window; that stays armed.)
+                manager.cancelPairingWindowDrop()
+            }
+        }
         // DashKit drops this phone to free its single connection slot for the
         // new device; tell the manager so it doesn't auto-reconnect and steal
-        // the slot back during the window.
+        // the slot back during the window. Armed as soon as the command is
+        // queued, because the drop can arrive before the write's own result.
         if (ok) manager.expectPairingWindowDrop()
         return ok
     }
 
     /** Toggle the rear AC fan (firmware flips OFF <-> HIGH; value ignored). */
-    fun sendRearFanToggle(manager: DashKitBleManager): Boolean =
-        send(manager, CMD_REAR_FAN_TOGGLE, 1)
+    fun sendRearFanToggle(manager: DashKitBleManager, onResult: ((delivered: Boolean) -> Unit)? = null): Boolean =
+        send(manager, CMD_REAR_FAN_TOGGLE, 1, onResult)
 
     /** Toggle mirror auto-dip while in reverse (no-op outside reverse; value ignored). */
     fun sendMirrorDipToggle(manager: DashKitBleManager): Boolean =
@@ -178,12 +191,19 @@ object VehicleControl {
 
     /**
      * Write a control command to the DashKit. Returns true if the write was
-     * dispatched (not necessarily acknowledged). No-op returning false if the
-     * link is down or the control characteristic is unavailable.
+     * queued (not yet acknowledged). No-op returning false if the link is down,
+     * the control characteristic is unavailable, or a firmware update is
+     * running. [onResult] runs on the main thread once the outcome is known:
+     * true if the DashKit acknowledged the command, false if it was lost.
      */
-    fun send(manager: DashKitBleManager, opcode: Int, value: Int): Boolean {
+    fun send(
+        manager: DashKitBleManager,
+        opcode: Int,
+        value: Int,
+        onResult: ((delivered: Boolean) -> Unit)? = null
+    ): Boolean {
         Log.d(TAG, "Sending control 0x%02X value=%d".format(opcode, value and 0xFFFF))
-        return manager.writeCommand(SERVICE_UUID, CONTROL_CHAR_UUID, payload(opcode, value), TAG)
+        return manager.writeCommand(SERVICE_UUID, CONTROL_CHAR_UUID, payload(opcode, value), TAG, onResult)
     }
 
     fun payload(opcode: Int, value: Int): ByteArray {

@@ -40,15 +40,18 @@ object TeslaClient {
     private val MAC_REGEX = Regex("([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}")
 
     /** Ask the firmware to begin enrollment for the staged car. */
-    fun sendStart(manager: DashKitBleManager): Boolean = sendTesla(manager, CMD_START)
+    fun sendStart(manager: DashKitBleManager, onResult: ((delivered: Boolean) -> Unit)? = null): Boolean =
+        sendTesla(manager, CMD_START, onResult)
 
     /** Factory-reset the Tesla key (erase -> the next sighting re-stages). */
-    fun sendReset(manager: DashKitBleManager): Boolean = sendTesla(manager, CMD_RESET)
+    fun sendReset(manager: DashKitBleManager, onResult: ((delivered: Boolean) -> Unit)? = null): Boolean =
+        sendTesla(manager, CMD_RESET, onResult)
 
     /** Cancel an open pairing window. */
     fun sendCancel(manager: DashKitBleManager): Boolean = sendTesla(manager, CMD_CANCEL)
 
-    // A successful write only dispatches provisioning; Staged acknowledges it.
+    // The write is only queued here, and a delivered write only dispatches
+    // provisioning; Staged acknowledges it (the caller waits for that).
     fun sendProvision(manager: DashKitBleManager, vin: String, mac: String): Boolean {
         val payload = buildProvisionPayload(vin, mac) ?: run {
             Log.w(TAG, "provision: rejecting invalid vehicle identity or address")
@@ -82,15 +85,20 @@ object TeslaClient {
 
     /** Write an app-channel command to the DashKit (same [opcode][value_lo][value_hi]
      * framing as [VehicleControl.send], but on the app-channel UUIDs).
-     * Returns true if dispatched (not acknowledged).
+     * Returns true if queued (not yet acknowledged); [onResult] then reports
+     * on the main thread whether the DashKit acknowledged it.
      */
-    fun sendTesla(manager: DashKitBleManager, opcode: Int): Boolean {
+    fun sendTesla(
+        manager: DashKitBleManager,
+        opcode: Int,
+        onResult: ((delivered: Boolean) -> Unit)? = null
+    ): Boolean {
         val payload = byteArrayOf(
             (opcode and 0xFF).toByte(),
             0,
             0
         )
         Log.d(TAG, "Sending app-channel 0x%02X".format(opcode))
-        return manager.writeCommand(SERVICE_UUID, COMMAND_CHAR_UUID, payload, TAG)
+        return manager.writeCommand(SERVICE_UUID, COMMAND_CHAR_UUID, payload, TAG, onResult)
     }
 }

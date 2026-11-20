@@ -94,7 +94,8 @@ class TeslaEnrollmentController(
                 (context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager).adapter
             }.getOrNull()
             val scanner = TeslaVehicleScanner(adapter)
-            return TeslaEnrollmentController(
+            lateinit var controller: TeslaEnrollmentController
+            controller = TeslaEnrollmentController(
                 scope = scope,
                 vinState = vinState,
                 status = status,
@@ -108,9 +109,18 @@ class TeslaEnrollmentController(
                 provision = { vin, mac ->
                     manager?.let { TeslaClient.sendProvision(it, vin, mac) } ?: false
                 },
-                startEnrollment = { manager?.let { TeslaClient.sendStart(it) } ?: false },
+                startEnrollment = {
+                    manager?.let { m ->
+                        // Queued is not sent: if the command is lost, say so
+                        // instead of waiting on a car that was never asked.
+                        TeslaClient.sendStart(m) { delivered ->
+                            if (!delivered) controller.startNotDelivered()
+                        }
+                    } ?: false
+                },
                 cancelPairing = { manager?.let { TeslaClient.sendCancel(it) } },
             )
+            return controller
         }
     }
 
@@ -176,6 +186,13 @@ class TeslaEnrollmentController(
     }
 
     fun cancelPairingWindow() = cancelPairing()
+
+    /** The start command was queued but never reached the DashKit. */
+    fun startNotDelivered() {
+        if (_state.value is TeslaEnrollmentState.Connecting) {
+            set(error(TeslaEnrollmentErrorReason.NotAcknowledged))
+        }
+    }
 
     private fun terminalStateFor(status: TeslaStatus): TeslaEnrollmentState? =
         when (status.linkState) {
