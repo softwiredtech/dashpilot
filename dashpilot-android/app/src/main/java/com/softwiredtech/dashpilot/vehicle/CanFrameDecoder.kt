@@ -19,6 +19,13 @@ class CanFrameDecoder(
         return arrayToCarState(values)
     }
 
+    /** The CAN ids this vehicle's mapper reads, in the DashKit CAN filter wire
+     * format; empty when there is nothing to subscribe to. */
+    @Synchronized fun canFilterPayload(): ByteArray {
+        if (decoderHandle == 0L) return ByteArray(0)
+        return bridge.nativeCanFilterPayload(decoderHandle)
+    }
+
     @Synchronized fun destroy() {
         bridge.nativeDestroyVehicleDecoder(decoderHandle)
         decoderHandle = 0

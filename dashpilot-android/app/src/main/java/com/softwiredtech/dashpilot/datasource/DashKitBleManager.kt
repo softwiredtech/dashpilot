@@ -74,6 +74,7 @@ class DashKitBleManager(internal val context: Context) {
         // write racing another subscribe can be refused; retry a few times.
         private val CCCD_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
         private const val MAX_SUBSCRIBE_ATTEMPTS = 3
+        private const val MAX_WRITE_ATTEMPTS = 8
         private const val SUBSCRIBE_RETRY_DELAY_MS = 250L
     }
 
@@ -682,6 +683,28 @@ class DashKitBleManager(internal val context: Context) {
             }
         }
         writeCccd()
+    }
+
+    /** [writeCommand], retried while another GATT operation is in flight (the
+     * stack runs one at a time and refuses the rest). For writes issued right
+     * after connecting, when subscriptions and reads are still queued up. */
+    fun writeCommandWithRetry(
+        serviceUuid: UUID,
+        charUuid: UUID,
+        payload: ByteArray,
+        logTag: String,
+        label: String
+    ) {
+        var attempt = 0
+        fun write() {
+            if (gatt == null) return
+            if (!writeCommand(serviceUuid, charUuid, payload, logTag) && attempt < MAX_WRITE_ATTEMPTS) {
+                attempt++
+                Log.d(logTag, "$label write not queued (attempt=$attempt); retrying")
+                handler.postDelayed({ write() }, SUBSCRIBE_RETRY_DELAY_MS)
+            }
+        }
+        write()
     }
 
     /** Write-with-response to a characteristic on the current connection.

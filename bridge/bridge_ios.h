@@ -96,6 +96,11 @@ void  bridge_destroy_vehicle_decoder(void* decoder);
 // loop — a decoder is used by either this or bridge_start_receive_loop.
 void bridge_decode_can_frame(void* decoder, int bus, uint32_t address, const uint8_t* data, int len, BridgeCarState* out);
 
+// DashKit CAN subscription: writes the CAN filter payload for this decoder's
+// vehicle (the ids its mapper reads) into `out` and returns its length. Returns
+// 0 if there is nothing to subscribe to or it does not fit in `capacity`.
+int bridge_can_filter_payload(void* decoder, uint8_t* out, int capacity);
+
 // Discovery
 // Returns a malloc'd C string with the discovered IP, or NULL if not found.
 // Caller must free() the result.

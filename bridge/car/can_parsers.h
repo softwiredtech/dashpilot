@@ -1,7 +1,9 @@
 #pragma once
 
 #include <map>
+#include <set>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 #include <string>
 #include <cstring>
@@ -50,6 +52,7 @@ public:
         if (it == busIt->second.end()) return 0.0;
 
         const auto& cached = it->second;
+        if (recording_) used_.insert(frameKey(maskedBus, cached.address));
         auto frameIt = latestFrames_.find(frameKey(maskedBus, cached.address));
         if (frameIt == latestFrames_.end()) return 0.0;
 
@@ -70,10 +73,31 @@ public:
         if (it == busIt->second.end()) return false;
 
         const auto& cached = it->second;
+        if (recording_) used_.insert(frameKey(maskedBus, cached.address));
         auto frameIt = latestFrames_.find(frameKey(maskedBus, cached.address));
         if (frameIt == latestFrames_.end() || frameIt->second.size() < minLength) return false;
 
         return cached.signal->getRawBits(frameIt->second.data(), frameIt->second.size(), out);
+    }
+
+    // Subscription discovery (see car/can_subscriptions.h): between begin and
+    // end, every message a get()/getRaw() resolves in the DBC is remembered,
+    // whether or not a frame for it has arrived. Returns (bus, address) pairs
+    // sorted by bus, then address.
+    void beginRecording() const {
+        used_.clear();
+        recording_ = true;
+    }
+
+    std::vector<std::pair<int, uint32_t>> endRecording() const {
+        recording_ = false;
+        std::vector<std::pair<int, uint32_t>> out;
+        out.reserve(used_.size());
+        for (uint64_t key : used_) {
+            out.emplace_back(static_cast<int>(key >> 32), static_cast<uint32_t>(key));
+        }
+        used_.clear();
+        return out;
     }
 
 private:
@@ -89,4 +113,6 @@ private:
     std::map<int, DBCFile*> busDbcFiles_;
     std::map<uint64_t, std::vector<uint8_t>> latestFrames_;
     std::map<int, std::unordered_map<std::string, CachedSignal>> busSignalCache_;
+    mutable bool recording_ = false;
+    mutable std::set<uint64_t> used_;
 };
