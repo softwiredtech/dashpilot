@@ -118,7 +118,7 @@ struct ControlsView: View {
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(.white)
                 Spacer()
-                Text("\(controls.count)")
+                Text(controls.count, format: .number)
                     .font(.system(size: 13))
                     .foregroundColor(.dashTextMuted)
             }
