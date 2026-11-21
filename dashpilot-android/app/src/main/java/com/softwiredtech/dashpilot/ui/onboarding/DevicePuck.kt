@@ -34,8 +34,6 @@ import androidx.compose.ui.unit.dp
 import com.softwiredtech.dashpilot.R
 import com.softwiredtech.dashpilot.ui.theme.OnboardingColors
 
-enum class PairingState { Idle, Searching, Paired }
-
 @Composable
 fun DevicePuck(
     state: PairingState,

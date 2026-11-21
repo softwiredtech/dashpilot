@@ -16,6 +16,29 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.core.content.ContextCompat
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.DirectionsCar
+import androidx.compose.material.icons.rounded.Tune
+import androidx.compose.material.icons.rounded.AutoAwesome
+import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.lifecycle.Lifecycle
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flowOf
+import com.softwiredtech.dashpilot.navigation.DashboardPreviewRoute
+import com.softwiredtech.dashpilot.ui.DashboardPreviewScreen
+import com.softwiredtech.dashpilot.ui.theme.DarkColors
+import com.softwiredtech.dashpilot.ui.theme.AccentColor
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -129,6 +152,7 @@ class MainActivity : ComponentActivity() {
 
         connectionVM.loadPinnedControl(this)
         connectionVM.loadAutomations(this)
+        connectionVM.loadAutoStartDrive(this)
 
         connectionVM.bindSpeedCamera(speedCameraVM.nearestApproachingCamera)
 
@@ -168,6 +192,13 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val context = LocalContext.current
                 val connectionStatus by connectionVM.connectionStatus.collectAsState()
+                val autoStartDrive by connectionVM.autoStartDrive.collectAsState()
+                val driveStateFlow by connectionVM.dashState.collectAsState()
+                val gearFlow = remember(driveStateFlow) {
+                    driveStateFlow?.map { it.carState.gear }?.distinctUntilChanged() ?: flowOf(null)
+                }
+                val currentGear by gearFlow.collectAsState(initial = null)
+                val activityState by lifecycle.currentStateFlow.collectAsState()
                 val pinnedControl by connectionVM.pinnedControl.collectAsState()
                 val wiperOffAutomation by connectionVM.wiperOffAutomation.collectAsState()
                 val carModel by connectionVM.carModel.collectAsState()
@@ -178,8 +209,28 @@ class MainActivity : ComponentActivity() {
                 val acSwing by connectionVM.acSwing.collectAsState()
                 val fingerActions by connectionVM.fingerActions.collectAsState()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val onDashboard = navBackStackEntry?.destination?.route
-                    ?.contains("DashboardRoute") == true
+                val onDashboard = navBackStackEntry?.destination?.let {
+                    it.hasRoute<DashboardRoute>() || it.hasRoute<DashboardPreviewRoute>()
+                } == true
+
+                LaunchedEffect(autoStartDrive, connectionStatus, currentGear, activityState, navBackStackEntry) {
+                    val destination = navController.currentDestination
+                    val canNavigate = activityState.isAtLeast(Lifecycle.State.RESUMED) &&
+                        destination != null && !destination.hasRoute<OnboardingRoute>() &&
+                        !destination.hasRoute<TeslaEnrollRoute>()
+                    if (connectionVM.autoStartDriveGate.shouldStart(
+                            enabled = autoStartDrive,
+                            connected = connectionStatus == ConnectionStatus.Connected,
+                            gear = currentGear,
+                            canNavigate = canNavigate,
+                            dashboardVisible = onDashboard
+                        )) {
+                        val dashboard = getSelectedDashboard(context)
+                        navController.navigate(DashboardRoute(dashboard.type.name.lowercase(), dashboard.url)) {
+                            launchSingleTop = true
+                        }
+                    }
+                }
 
                 val bleManager by connectionVM.bleManager.collectAsState()
                 val dashkitUpdateManager = remember(bleManager) {
@@ -227,8 +278,57 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                Scaffold(modifier = Modifier.fillMaxSize()) { _ ->
+                val destination = navBackStackEntry?.destination
+                val onDrive = destination?.hasRoute<SetupRoute>() == true
+                val onCommands = destination?.hasRoute<ControlsRoute>() == true
+                val onAutomations = destination?.hasRoute<AutomationsRoute>() == true
+                val onSettings = destination?.hasRoute<SettingsRoute>() == true
+                val showTabs = onDrive || onCommands || onAutomations || onSettings
+
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    containerColor = DarkColors.Background,
+                    bottomBar = {
+                        if (showTabs) {
+                            NavigationBar(containerColor = DarkColors.Surface) {
+                                val labels = listOf(R.string.home_drive, R.string.navigation_commands, R.string.home_automations, R.string.settings_title)
+                                val icons = listOf(Icons.Rounded.DirectionsCar, Icons.Rounded.Tune, Icons.Rounded.AutoAwesome, Icons.Rounded.Settings)
+                                val selected = listOf(onDrive, onCommands, onAutomations, onSettings)
+                                labels.forEachIndexed { index, label ->
+                                    NavigationBarItem(
+                                        selected = selected[index],
+                                        onClick = {
+                                            if (!selected[index]) {
+                                                val options: androidx.navigation.NavOptionsBuilder.() -> Unit = {
+                                                    popUpTo<SetupRoute> { saveState = true }
+                                                    launchSingleTop = true
+                                                    restoreState = true
+                                                }
+                                                when (index) {
+                                                    0 -> navController.navigate(SetupRoute, options)
+                                                    1 -> navController.navigate(ControlsRoute, options)
+                                                    2 -> navController.navigate(AutomationsRoute, options)
+                                                    3 -> navController.navigate(SettingsRoute, options)
+                                                }
+                                            }
+                                        },
+                                        icon = { Icon(icons[index], contentDescription = null) },
+                                        label = { Text(stringResource(label), maxLines = 1) },
+                                        colors = NavigationBarItemDefaults.colors(
+                                            selectedIconColor = AccentColor,
+                                            selectedTextColor = AccentColor,
+                                            indicatorColor = AccentColor.copy(alpha = 0.14f),
+                                            unselectedIconColor = DarkColors.TextMuted,
+                                            unselectedTextColor = DarkColors.TextMuted
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                    }
+                ) { padding ->
                     NavHost(
+                        modifier = if (showTabs) Modifier.padding(bottom = padding.calculateBottomPadding()).consumeWindowInsets(PaddingValues(bottom = padding.calculateBottomPadding())) else Modifier,
                         navController = navController,
                         startDestination = SetupRoute,
                         enterTransition = { EnterTransition.None },
@@ -290,12 +390,6 @@ class MainActivity : ComponentActivity() {
                                 onClimate = {
                                     navController.navigate(ClimateRoute)
                                 },
-                                onAutomations = {
-                                    navController.navigate(AutomationsRoute)
-                                },
-                                onControls = {
-                                    navController.navigate(ControlsRoute)
-                                },
                                 onDrive = toDashboard,
                                 onSettingsClick = {
                                     navController.navigate(SettingsRoute)
@@ -331,6 +425,7 @@ class MainActivity : ComponentActivity() {
                         composable<ControlsRoute> {
                             val manager by connectionVM.bleManager.collectAsState()
                             ControlScreen(
+                                isRoot = true,
                                 bleManager = manager,
                                 pinnedControlId = pinnedControl,
                                 onTogglePin = { connectionVM.togglePinnedControl(context, it) },
@@ -349,6 +444,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable<AutomationsRoute> {
                             AutomationsScreen(
+                                isRoot = true,
                                 wiperOffEnabled = wiperOffAutomation,
                                 onWiperOffChange = {
                                     connectionVM.updateWiperOffAutomation(context, it)
@@ -377,6 +473,9 @@ class MainActivity : ComponentActivity() {
                         composable<SettingsRoute> {
                             val manager by connectionVM.bleManager.collectAsState()
                             SettingsScreen(
+                                isRoot = true,
+                                autoStartDrive = autoStartDrive,
+                                onAutoStartDriveChange = { connectionVM.updateAutoStartDrive(context, it) },
                                 onBack = { navController.popBackStack() },
                                 onDisplaySettingsChanged = { connectionVM.updateDisplaySettings(it) },
                                 bleManager = manager,
@@ -392,8 +491,8 @@ class MainActivity : ComponentActivity() {
                                         popUpTo(SetupRoute) { inclusive = false }
                                     }
                                 },
-                                onThemeClick = {
-                                    navController.navigate(ThemePickerRoute)
+                                onPreviewDashboard = { dashboard ->
+                                    navController.navigate(DashboardPreviewRoute(dashboard.type.name.lowercase(), dashboard.url))
                                 },
                                 carModel = carModel,
                                 onCarModelChanged = { connectionVM.updateCarModel(context, it) }
@@ -410,8 +509,17 @@ class MainActivity : ComponentActivity() {
                         }
                         composable<ThemePickerRoute> {
                             ThemePickerScreen(
+                                onPreview = { dashboard ->
+                                    navController.navigate(DashboardPreviewRoute(dashboard.type.name.lowercase(), dashboard.url))
+                                },
                                 onBack = { navController.popBackStack(ThemePickerRoute, inclusive = true) }
                             )
+                        }
+                        composable<DashboardPreviewRoute> { entry ->
+                            val route = entry.toRoute<DashboardPreviewRoute>()
+                            DashboardPreviewScreen(route.dashboardType, route.dashboardUrl) {
+                                navController.popBackStack()
+                            }
                         }
                         composable<DashboardRoute> { backStackEntry ->
                             val route = backStackEntry.toRoute<DashboardRoute>()

@@ -2,6 +2,7 @@ package com.softwiredtech.dashpilot.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -25,11 +26,11 @@ import com.softwiredtech.dashpilot.R
  * screens line up.
  */
 @Composable
-fun ScreenHeader(title: String, onBack: () -> Unit) {
-    Box(modifier = Modifier.fillMaxWidth()) {
+fun ScreenHeader(title: String, onBack: () -> Unit, showBack: Boolean = true) {
+    Box(modifier = Modifier.fillMaxWidth().height(48.dp)) {
         // Pull the button left by its built-in content inset so the arrow
         // glyph — not the 48dp touch target — lines up with the content edge.
-        IconButton(
+        if (showBack) IconButton(
             onClick = onBack,
             modifier = Modifier
                 .align(Alignment.CenterStart)

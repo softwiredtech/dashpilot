@@ -61,15 +61,6 @@ struct HomeView: View {
         HStack(alignment: .top, spacing: DashMetrics.screenPadding) {
             widgetGrid(fillHeight: true)
             VStack(spacing: DashMetrics.gridGap) {
-                HStack(spacing: DashMetrics.gridGap) {
-                    ActionTile(label: "Automations", icon: "sparkles") {
-                        navigationPath.append(AppRoute.automations)
-                    }
-                    ActionTile(label: "Controls", icon: "slider.horizontal.3") {
-                        navigationPath.append(AppRoute.controls)
-                    }
-                }
-                .frame(maxHeight: .infinity)
                 VStack(spacing: 12) {
                     Spacer(minLength: 0)
                     if let control = pinnedControl {
@@ -86,25 +77,17 @@ struct HomeView: View {
     private func header(showDataSource: Bool) -> some View {
         ZStack {
             HStack {
-                Button {
-                    navigationPath.append(AppRoute.settings)
-                } label: {
-                    Image(systemName: "gearshape.fill")
-                        .font(.system(size: 22))
-                        .foregroundColor(.dashTextMuted)
-                        .frame(width: 44, height: 44)
-                }
-                .offset(x: -12)
                 Spacer()
                 if showDataSource {
                     DataSourceMenu(navigationPath: $navigationPath, alignment: .trailing)
                         .offset(x: 12)
                 }
             }
-            Text("DashPilot")
+            Text("Drive")
                 .foregroundColor(.white)
                 .font(.system(size: 20, weight: .bold))
         }
+        .frame(height: 44)
     }
 
     private func widgetGrid(fillHeight: Bool) -> some View {
@@ -186,19 +169,13 @@ struct HomeView: View {
 
     private var actionButtons: some View {
         VStack(spacing: 12) {
-            ActionButton(label: "Automations", icon: "sparkles") {
-                navigationPath.append(AppRoute.automations)
-            }
-            ActionButton(label: "Controls", icon: "slider.horizontal.3") {
-                navigationPath.append(AppRoute.controls)
-            }
             driveButton
         }
     }
 
     private var driveButton: some View {
         ActionButton(
-            label: "Drive",
+            label: "Start driving",
             icon: "car.fill",
             accent: true,
             enabled: connectionVM.connectionStatus == .connected
@@ -334,31 +311,6 @@ private struct InfoWidget: View {
         .padding(16)
         .background(Color.dashSurface)
         .clipShape(RoundedRectangle(cornerRadius: DashMetrics.corner))
-    }
-}
-
-private struct ActionTile: View {
-    let label: LocalizedStringKey
-    let icon: String
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            VStack(alignment: .leading, spacing: 0) {
-                IconChip(systemName: icon)
-                Spacer(minLength: 0)
-                Text(label)
-                    .foregroundColor(.white)
-                    .font(.system(size: 16, weight: .semibold))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-            .padding(16)
-            .background(Color.dashSurface)
-            .clipShape(RoundedRectangle(cornerRadius: DashMetrics.corner))
-        }
-        .buttonStyle(.plain)
     }
 }
 

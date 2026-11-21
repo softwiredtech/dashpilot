@@ -25,7 +25,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import android.util.Log
 import androidx.annotation.StringRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -62,7 +61,7 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -76,10 +75,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -148,6 +145,9 @@ private val settingsTabs = listOf(
 @Composable
 fun SettingsScreen(
     onBack: () -> Unit,
+    isRoot: Boolean = false,
+    autoStartDrive: Boolean = false,
+    onAutoStartDriveChange: (Boolean) -> Unit = {},
     onDisplaySettingsChanged: (DisplaySettings) -> Unit = {},
     bleManager: DashKitBleManager? = null,
     dashkitUpdateManager: FirmwareUpdateManager? = null,
@@ -156,7 +156,7 @@ fun SettingsScreen(
     onRemoveTesla: () -> Boolean = { false },
     onEnrollTesla: () -> Unit = {},
     onReplayOnboarding: () -> Unit = {},
-    onThemeClick: () -> Unit = {},
+    onPreviewDashboard: (com.softwiredtech.dashpilot.datamodel.dash.DashboardConfig) -> Unit = {},
     carModel: CarModel = CarModel.TESLA_LEGACY,
     onCarModelChanged: (CarModel) -> Unit = {}
 ) {
@@ -232,10 +232,10 @@ fun SettingsScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 title = { Text(stringResource(R.string.settings_title), color = Color.White) },
                 navigationIcon = {
-                    IconButton(onClick = onBack) {
+                    if (!isRoot) IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                             contentDescription = stringResource(R.string.settings_back),
@@ -291,52 +291,23 @@ fun SettingsScreen(
             SectionHeader(stringResource(R.string.settings_section_dashboard))
             Spacer(modifier = Modifier.height(10.dp))
 
-            val currentTheme = dashboardById(selectedDashboardId.value)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(DarkColors.Surface)
-                    .clickable { onThemeClick() }
-                    .padding(12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                if (currentTheme != null && currentTheme.screenshotRes != 0) {
-                    Image(
-                        painter = painterResource(id = currentTheme.screenshotRes),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .width(96.dp)
-                            .aspectRatio(16f / 9f)
-                            .clip(RoundedCornerShape(8.dp))
-                    )
-                } else {
-                    Box(
-                        modifier = Modifier
-                            .width(96.dp)
-                            .aspectRatio(16f / 9f)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(DarkColors.SurfaceSelected)
-                    )
-                }
-                Spacer(modifier = Modifier.width(12.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = currentTheme?.let { stringResource(it.nameRes) } ?: "",
-                        color = Color.White,
-                        fontSize = 16.sp
-                    )
-                    Text(
-                        text = stringResource(R.string.settings_dashboard_subtitle),
-                        color = DarkColors.TextMuted,
-                        fontSize = 13.sp
-                    )
-                }
-                Text(text = "›", color = DarkColors.TextMuted, fontSize = 20.sp)
-            }
+            DashboardGallery(
+                selectedDashboardId = selectedDashboardId.value,
+                onSelect = { dashboard ->
+                    com.softwiredtech.dashpilot.datamodel.dash.saveSelectedDashboard(context, dashboard)
+                    selectedDashboardId.value = dashboard.id
+                },
+                onPreview = onPreviewDashboard
+            )
+            Spacer(modifier = Modifier.height(16.dp))
 
-            Spacer(modifier = Modifier.height(8.dp))
+            SettingsToggle(stringResource(R.string.settings_auto_start_drive), autoStartDrive, onAutoStartDriveChange)
+            Text(
+                text = stringResource(R.string.settings_auto_start_drive_description),
+                color = DarkColors.TextMuted,
+                fontSize = 13.sp
+            )
+            Spacer(modifier = Modifier.height(16.dp))
 
             SectionHeader(stringResource(R.string.settings_section_car))
             Spacer(modifier = Modifier.height(8.dp))

@@ -71,7 +71,8 @@ fun AutomationsScreen(
     onSportKickdownChange: (Boolean) -> Unit,
     sportKickdownPercent: Int,
     onSportKickdownPercentChange: (Int) -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    isRoot: Boolean = false
 ) {
     Box(
         modifier = Modifier
@@ -85,7 +86,7 @@ fun AutomationsScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp, vertical = 24.dp)
         ) {
-            ScreenHeader(title = stringResource(R.string.automations_title), onBack = onBack)
+            ScreenHeader(title = stringResource(R.string.automations_title), onBack = onBack, showBack = !isRoot)
 
             Spacer(modifier = Modifier.height(24.dp))
 

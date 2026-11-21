@@ -62,7 +62,8 @@ private const val DEV_RIVE_TYPE = "dev_rive"
 fun DashboardScreen(
     dashboardType: String,
     dashboardUrl: String,
-    dashStateFlow: Flow<DashState>
+    dashStateFlow: Flow<DashState>,
+    isPreview: Boolean = false
 ) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -103,6 +104,7 @@ fun DashboardScreen(
     val currentUrl = swipedDashboard?.url ?: dashboardUrl
 
     val switchDashboard by rememberUpdatedState(fun(step: Int) {
+        if (isPreview) return
         val dashboards = swipeableDashboards
         if (dashboards.size < 2 || currentType == DEV_RIVE_TYPE) return
         val currentIndex = dashboards.indexOfFirst { it.url == currentUrl }

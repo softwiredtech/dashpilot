@@ -1,6 +1,28 @@
 package com.softwiredtech.dashpilot.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ExpandMore
+import androidx.compose.material3.Icon
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.text.font.FontWeight
+import com.softwiredtech.dashpilot.ui.controls.ControlCategory
+import com.softwiredtech.dashpilot.ui.theme.AccentColor
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -38,9 +60,11 @@ fun ControlScreen(
     onSetFingerAction: (fingers: Int, id: String?) -> Unit,
     onChangeFingerCount: (from: Int, to: Int) -> Unit,
     onRemoveFingerAction: (fingers: Int) -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    isRoot: Boolean = false
 ) {
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
+    var expandedCategories by rememberSaveable { mutableStateOf(emptyList<String>()) }
 
     // Debug builds simulate commands without a DashKit.
     val enabled = bleManager != null || BuildConfig.DEBUG
@@ -57,7 +81,7 @@ fun ControlScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp, vertical = 24.dp)
         ) {
-            ScreenHeader(title = stringResource(R.string.controls_title), onBack = onBack)
+            ScreenHeader(title = stringResource(R.string.navigation_commands), onBack = onBack, showBack = !isRoot)
 
             Spacer(modifier = Modifier.height(16.dp))
             SegmentedSelector(
@@ -77,7 +101,12 @@ fun ControlScreen(
                     bleManager = bleManager,
                     enabled = enabled,
                     pinnedControlId = pinnedControlId,
-                    onTogglePin = onTogglePin
+                    onTogglePin = onTogglePin,
+                    expandedCategories = expandedCategories,
+                    onToggleCategory = { id ->
+                        expandedCategories = if (id in expandedCategories) expandedCategories - id
+                        else expandedCategories + id
+                    }
                 )
             } else {
                 MultiTouchSection(
@@ -96,7 +125,9 @@ private fun ControlsTab(
     bleManager: DashKitBleManager?,
     enabled: Boolean,
     pinnedControlId: String?,
-    onTogglePin: (String) -> Unit
+    onTogglePin: (String) -> Unit,
+    expandedCategories: List<String>,
+    onToggleCategory: (String) -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         if (!enabled) {
@@ -110,17 +141,46 @@ private fun ControlsTab(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        vehicleControls.forEachIndexed { index, action ->
-            if (index > 0) {
-                Spacer(modifier = Modifier.height(12.dp))
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            ControlCategory.entries.forEach { category ->
+                val actions = vehicleControls.filter { it.category == category }
+                val expanded = category.name in expandedCategories
+                val rotation by animateFloatAsState(if (expanded) 180f else 0f, label = "categoryChevron")
+                val expansionState = stringResource(if (expanded) R.string.commands_category_expanded else R.string.commands_category_collapsed)
+                val toggleLabel = stringResource(if (expanded) R.string.commands_category_collapse else R.string.commands_category_expand)
+                Column {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp)
+                            .clip(RoundedCornerShape(16.dp)).background(DarkColors.Surface)
+                            .semantics(mergeDescendants = true) { stateDescription = expansionState }
+                            .clickable(role = Role.Button, onClickLabel = toggleLabel) { onToggleCategory(category.name) }
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Icon(category.icon, contentDescription = null, tint = AccentColor, modifier = Modifier.size(24.dp))
+                        Text(stringResource(category.titleRes), color = Color.White, fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
+                        Text(actions.size.toString(), color = DarkColors.TextMuted, fontSize = 13.sp)
+                        Icon(Icons.Rounded.ExpandMore, contentDescription = null, tint = DarkColors.TextMuted,
+                            modifier = Modifier.size(24.dp).rotate(rotation))
+                    }
+                    AnimatedVisibility(visible = expanded) {
+                        Column(modifier = Modifier.padding(start = 12.dp, top = 12.dp),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            actions.forEach { action ->
+                                ControlActionButton(
+                                    action = action,
+                                    pinned = action.id == pinnedControlId,
+                                    enabled = enabled,
+                                    onClick = { action.perform(bleManager) },
+                                    onLongClick = { onTogglePin(action.id) }
+                                )
+                            }
+                        }
+                    }
+                }
             }
-            ControlActionButton(
-                action = action,
-                pinned = action.id == pinnedControlId,
-                enabled = enabled,
-                onClick = { action.perform(bleManager) },
-                onLongClick = { onTogglePin(action.id) }
-            )
         }
 
         Spacer(modifier = Modifier.height(20.dp))

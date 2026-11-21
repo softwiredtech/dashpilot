@@ -16,6 +16,9 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.softwiredtech.dashpilot.datamodel.dash.DASH_PREFS_NAME
+import com.softwiredtech.dashpilot.datamodel.dash.getAutoStartDrive
+import com.softwiredtech.dashpilot.datamodel.dash.setAutoStartDrive
+import com.softwiredtech.dashpilot.navigation.AutoStartDriveGate
 import com.softwiredtech.dashpilot.datamodel.dash.DashState
 import com.softwiredtech.dashpilot.datamodel.dash.DisplaySettings
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_ALWAYS_ON_BLIND_SPOT_MONITOR
@@ -109,6 +112,19 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     }
 
     private val _pinnedControl = MutableStateFlow<String?>(null)
+    private val _autoStartDrive = MutableStateFlow(false)
+    val autoStartDrive = _autoStartDrive.asStateFlow()
+    val autoStartDriveGate = AutoStartDriveGate()
+
+    fun loadAutoStartDrive(context: Context) {
+        _autoStartDrive.value = getAutoStartDrive(context)
+    }
+
+    fun updateAutoStartDrive(context: Context, enabled: Boolean) {
+        setAutoStartDrive(context, enabled)
+        _autoStartDrive.value = enabled
+    }
+
     val pinnedControl = _pinnedControl.asStateFlow()
 
     fun loadPinnedControl(context: Context) {

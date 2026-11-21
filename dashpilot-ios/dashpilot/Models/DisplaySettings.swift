@@ -1,6 +1,7 @@
 import Foundation
 
 struct DisplaySettings {
+    static let keyAutoStartDrive = "auto_start_drive"
     static let keyShowPhoneBattery = "show_phone_battery"
     static let keyShowCarBattery = "show_car_battery"
     static let keyShowOdometer = "show_odometer"

@@ -4,6 +4,7 @@ struct DashboardView: View {
 
     let dashboardType: String
     let dashboardUrl: String
+    var isPreview = false
 
     @Environment(ConnectionViewModel.self) var connectionVM
 
@@ -89,6 +90,7 @@ struct DashboardView: View {
     }
 
     private func switchDashboard(step: Int) {
+        guard !isPreview else { return }
         let dashboards = Self.swipeableDashboards
         guard dashboards.count > 1, currentType != DashboardType.devRive.rawValue else { return }
         guard let currentIndex = dashboards.firstIndex(where: { $0.url == currentUrl }) else { return }
