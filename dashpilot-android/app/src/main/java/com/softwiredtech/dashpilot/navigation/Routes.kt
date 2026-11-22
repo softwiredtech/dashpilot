@@ -34,3 +34,6 @@ data class DashboardRoute(
     val dashboardType: String,
     val dashboardUrl: String
 )
+
+@Serializable
+data class DashboardPreviewRoute(val dashboardType: String, val dashboardUrl: String)

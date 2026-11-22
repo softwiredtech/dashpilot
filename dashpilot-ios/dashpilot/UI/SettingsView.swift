@@ -7,12 +7,14 @@ private let mutedText = Color(white: 0.53)
 private let borderColor = Color(white: 0.2)
 
 struct SettingsView: View {
+    var isRoot = false
 
     @Environment(\.dismiss) private var dismiss
     @Environment(ConnectionViewModel.self) private var connectionVM
 
     /// 0 = General, 1 = DashKit (mirrors the Android settings tabs).
     @State private var selectedTab = 0
+    @AppStorage(DisplaySettings.keyAutoStartDrive) private var autoStartDrive = false
 
     @AppStorage(DisplaySettings.keyCarModel)                  private var carModelRaw = DisplaySettings.carModel.rawValue
     @AppStorage(DisplaySettings.keyShowCarBattery)            private var showCarBattery = true
@@ -67,13 +69,15 @@ struct SettingsView: View {
             bgColor.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                header
-                Divider().background(borderColor)
-                tabRow
+                if !isRoot {
+                    ScreenHeader { dismiss() }
+                        .padding(.horizontal, 24)
+                }
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
                         if selectedTab == 0 {
                             dashboardSection
+                            autoStartDriveSection
                             carSection
                             displaySection
                             if showVisualizerSettings {
@@ -91,6 +95,9 @@ struct SettingsView: View {
                     }
                     .padding(.top, 16)
                 }
+                .frame(maxHeight: .infinity)
+                Divider().background(borderColor)
+                tabRow
             }
         }
         .navigationBarHidden(true)
@@ -107,26 +114,6 @@ struct SettingsView: View {
         } message: {
             Text("Tap Drive to open it. Not in your car? Pick Demo as the data source on the home screen.")
         }
-    }
-
-    // MARK: - Header
-
-    private var header: some View {
-        HStack {
-            Button { dismiss() } label: {
-                Image(systemName: "arrow.backward")
-                    .foregroundColor(.white)
-                    .font(.system(size: 18, weight: .medium))
-                    .frame(width: 44, height: 44)
-            }
-            Text("Settings")
-                .foregroundColor(.white)
-                .font(.system(size: 18, weight: .semibold))
-            Spacer()
-        }
-        .padding(.horizontal, 8)
-        .frame(height: 56)
-        .background(bgColor)
     }
 
     // MARK: - Tabs
@@ -151,7 +138,7 @@ struct SettingsView: View {
                 .frame(maxWidth: .infinity)
             }
         }
-        .padding(.top, 12)
+        .padding(.vertical, 12)
         .background(bgColor)
     }
 
@@ -178,49 +165,23 @@ struct SettingsView: View {
             sectionTitle("Dashboard")
                 .padding(.horizontal, 24)
 
-            NavigationLink(value: AppRoute.themePicker) {
-                HStack(spacing: 12) {
-                    dashboardThumbnail(for: currentDashboard)
-                        .frame(width: 96)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(currentDashboard.name)
-                            .foregroundColor(.white)
-                            .font(.system(size: 16))
-                        Text("Choose a dashboard")
-                            .foregroundColor(mutedText)
-                            .font(.system(size: 13))
-                    }
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .foregroundColor(mutedText)
-                        .font(.system(size: 14, weight: .medium))
-                }
-                .padding(12)
-                .background(Color(white: 0.1))
-                .clipShape(RoundedRectangle(cornerRadius: 12))
-            }
-            .buttonStyle(.plain)
-            .padding(.horizontal, 24)
-
-            Spacer().frame(height: 8)
+            DashboardGallery(selectedDashboardId: $selectedDashboardId)
+            Spacer().frame(height: 16)
         }
     }
 
-    private func dashboardThumbnail(for dashboard: DashboardConfig) -> some View {
-        Color(white: 0.16)
-            .aspectRatio(16.0 / 9.0, contentMode: .fit)
-            .overlay {
-                if let name = dashboard.screenshotName, UIImage(named: name) != nil {
-                    Image(name)
-                        .resizable()
-                        .scaledToFill()
-                }
-            }
-            .clipped()
-    }
-
     // MARK: - Car Section
+
+    private var autoStartDriveSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            SettingsToggleRow(label: "Autostart", isOn: $autoStartDrive)
+            Text("Automatically starts the dashboard when connected and the gear is shifted out of Park.")
+                .foregroundColor(mutedText)
+                .font(.system(size: 13))
+        }
+        .padding(.horizontal, 24)
+        .padding(.bottom, 16)
+    }
 
     private var carSection: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -479,7 +440,7 @@ private struct SettingsToggleRow: View {
                 .foregroundColor(.white)
                 .font(.system(size: 16))
             Spacer()
-            Toggle("", isOn: $isOn)
+            Toggle(label, isOn: $isOn)
                 .labelsHidden()
                 .tint(Color(red: 0x5C / 255.0, green: 0xBD / 255.0, blue: 0x68 / 255.0))
         }

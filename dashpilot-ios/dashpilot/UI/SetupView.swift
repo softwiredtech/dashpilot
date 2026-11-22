@@ -59,10 +59,6 @@ struct SetupView: View {
 
     private var headerSection: some View {
         VStack(spacing: 4) {
-            Text("dashpilot")
-                .foregroundColor(.white)
-                .font(.system(size: 28, weight: .bold))
-                .tracking(1)
             Text("Connect your comma device")
                 .foregroundColor(Color(white: 0.53))
                 .font(.system(size: 14))

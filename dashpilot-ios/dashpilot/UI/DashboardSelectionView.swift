@@ -10,18 +10,6 @@ struct DashboardSelectionView: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 0) {
-                VStack(spacing: 4) {
-                    Text("dashpilot")
-                        .foregroundColor(.white)
-                        .font(.system(size: 28, weight: .bold))
-                        .tracking(1)
-                    Text("Choose a dashboard")
-                        .foregroundColor(Color(white: 0.53))
-                        .font(.system(size: 14))
-                }
-
-                Spacer().frame(height: 32)
-
                 LazyVGrid(columns: columns, spacing: 16) {
                     ForEach(availableDashboards) { dashboard in
                         NavigationLink(value: AppRoute.dashboard(

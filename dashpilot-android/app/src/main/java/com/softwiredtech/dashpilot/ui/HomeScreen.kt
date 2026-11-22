@@ -24,17 +24,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AcUnit
-import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.BatteryChargingFull
 import androidx.compose.material.icons.rounded.DeviceThermostat
 import androidx.compose.material.icons.rounded.DirectionsCar
-import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.Speed
-import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -64,10 +60,8 @@ import com.softwiredtech.dashpilot.ui.controls.controlById
 import com.softwiredtech.dashpilot.ui.tesla.TeslaTile
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
 import com.softwiredtech.dashpilot.ui.theme.DarkColors
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlin.math.roundToInt
 import androidx.compose.ui.res.stringResource
 import com.softwiredtech.dashpilot.R
@@ -77,7 +71,7 @@ fun HomeScreen(
     connectionStatus: ConnectionStatus,
     activeSourceType: String?,
     bleManager: DashKitBleManager?,
-    dashState: Flow<DashState>?,
+    dashState: StateFlow<DashState>?,
     pinnedControlId: String?,
     teslaStatus: StateFlow<TeslaStatus>?,
     teslaResetPending: StateFlow<Boolean>?,
@@ -87,8 +81,6 @@ fun HomeScreen(
     onNext: () -> Unit,
     onBattery: () -> Unit,
     onClimate: () -> Unit,
-    onAutomations: () -> Unit,
-    onControls: () -> Unit,
     onDrive: () -> Unit,
     onSettingsClick: () -> Unit
 ) {
@@ -114,8 +106,6 @@ fun HomeScreen(
                 onSelectDataSource = { selectedDataSource = it },
                 onBattery = onBattery,
                 onClimate = onClimate,
-                onAutomations = onAutomations,
-                onControls = onControls,
                 onDrive = onDrive,
                 onSettingsClick = onSettingsClick
             )
@@ -139,7 +129,7 @@ private val HeaderHeight = 48.dp
 
 @Composable
 private fun ConnectedHomeContent(
-    dashState: Flow<DashState>?,
+    dashState: StateFlow<DashState>?,
     bleManager: DashKitBleManager?,
     connectionStatus: ConnectionStatus,
     activeSourceType: String?,
@@ -152,13 +142,11 @@ private fun ConnectedHomeContent(
     onSelectDataSource: (String) -> Unit,
     onBattery: () -> Unit,
     onClimate: () -> Unit,
-    onAutomations: () -> Unit,
-    onControls: () -> Unit,
     onDrive: () -> Unit,
     onSettingsClick: () -> Unit
 ) {
-    val fallback = DashState()
-    val state by (dashState ?: flowOf(fallback)).collectAsState(initial = fallback)
+    val idleDash = remember { MutableStateFlow(DashState()) }
+    val state by (dashState ?: idleDash).collectAsState()
     val car = state.carState
     val useImperial = state.displaySettings.useImperial
     val idleTesla = remember { MutableStateFlow(TeslaStatus.Idle) }
@@ -178,17 +166,19 @@ private fun ConnectedHomeContent(
                 .verticalScroll(rememberScrollState())
                 .padding(ScreenPadding)
         ) {
-            Header(
-                showDataSource = landscape,
-                connectionStatus = connectionStatus,
-                activeSourceType = activeSourceType,
-                onSelectDataSource = onSelectDataSource,
-                onConnect = onConnect,
-                onDisconnect = onDisconnect,
-                onSettingsClick = onSettingsClick
-            )
+            if (landscape) {
+                Header(
+                    showDataSource = landscape,
+                    connectionStatus = connectionStatus,
+                    activeSourceType = activeSourceType,
+                    onSelectDataSource = onSelectDataSource,
+                    onConnect = onConnect,
+                    onDisconnect = onDisconnect,
+                    onSettingsClick = onSettingsClick
+                )
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+            }
 
             if (landscape) {
                 LandscapeContent(
@@ -202,8 +192,6 @@ private fun ConnectedHomeContent(
                     onEnrollTesla = onEnrollTesla,
                     onBattery = onBattery,
                     onClimate = onClimate,
-                    onAutomations = onAutomations,
-                    onControls = onControls,
                     onDrive = onDrive,
                     driveEnabled = driveEnabled
                 )
@@ -223,8 +211,6 @@ private fun ConnectedHomeContent(
                     onSelectDataSource = onSelectDataSource,
                     onBattery = onBattery,
                     onClimate = onClimate,
-                    onAutomations = onAutomations,
-                    onControls = onControls,
                     onDrive = onDrive,
                     driveEnabled = driveEnabled
                 )
@@ -248,27 +234,6 @@ private fun Header(
             .fillMaxWidth()
             .height(HeaderHeight)
     ) {
-        // Offset cancels IconButton's inset so the gear aligns with the tiles.
-        IconButton(
-            onClick = onSettingsClick,
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .offset(x = (-12).dp)
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.Settings,
-                contentDescription = stringResource(R.string.settings_title),
-                tint = DarkColors.TextMuted,
-                modifier = Modifier.size(24.dp)
-            )
-        }
-        Text(
-            text = stringResource(R.string.app_name),
-            color = Color.White,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.align(Alignment.Center)
-        )
         if (showDataSource) {
             Box(
                 modifier = Modifier
@@ -297,8 +262,6 @@ private fun PortraitContent(
     onSelectDataSource: (String) -> Unit,
     onBattery: () -> Unit,
     onClimate: () -> Unit,
-    onAutomations: () -> Unit,
-    onControls: () -> Unit,
     onDrive: () -> Unit,
     driveEnabled: Boolean
 ) {
@@ -323,20 +286,6 @@ private fun PortraitContent(
             Spacer(modifier = Modifier.height(24.dp))
         }
 
-        ActionButton(
-            label = stringResource(R.string.home_automations),
-            icon = Icons.Rounded.AutoAwesome,
-            accent = false,
-            onClick = onAutomations
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-        ActionButton(
-            label = stringResource(R.string.home_controls),
-            icon = Icons.Rounded.Tune,
-            accent = false,
-            onClick = onControls
-        )
-        Spacer(modifier = Modifier.height(12.dp))
         DriveButton(onDrive, driveEnabled)
         Spacer(modifier = Modifier.height(12.dp))
         Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
@@ -357,8 +306,6 @@ private fun LandscapeContent(
     onEnrollTesla: () -> Unit,
     onBattery: () -> Unit,
     onClimate: () -> Unit,
-    onAutomations: () -> Unit,
-    onControls: () -> Unit,
     onDrive: () -> Unit,
     driveEnabled: Boolean
 ) {
@@ -385,29 +332,6 @@ private fun LandscapeContent(
                 .fillMaxHeight(),
             verticalArrangement = Arrangement.spacedBy(GridGap)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                horizontalArrangement = Arrangement.spacedBy(GridGap)
-            ) {
-                ActionTile(
-                    label = stringResource(R.string.home_automations),
-                    icon = Icons.Rounded.AutoAwesome,
-                    onClick = onAutomations,
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
-                )
-                ActionTile(
-                    label = stringResource(R.string.home_controls),
-                    icon = Icons.Rounded.Tune,
-                    onClick = onControls,
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
-                )
-            }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -499,7 +423,7 @@ private fun PinnedButton(action: ControlAction, bleManager: DashKitBleManager?) 
 @Composable
 private fun DriveButton(onDrive: () -> Unit, enabled: Boolean) {
     ActionButton(
-        label = stringResource(R.string.home_drive),
+        label = stringResource(R.string.drive_start),
         icon = Icons.Rounded.DirectionsCar,
         accent = true,
         onClick = onDrive,
@@ -539,31 +463,6 @@ private fun InfoWidget(
                 fontSize = 13.sp
             )
         }
-    }
-}
-
-@Composable
-private fun ActionTile(
-    label: String,
-    icon: ImageVector,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier
-            .background(DarkColors.Surface, RoundedCornerShape(16.dp))
-            .clickable(onClick = onClick)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.SpaceBetween
-    ) {
-        IconChip(icon = icon, tint = Color.White, background = Color.White.copy(alpha = 0.08f))
-        Text(
-            text = label,
-            color = Color.White,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 1
-        )
     }
 }
 

@@ -19,6 +19,31 @@ final class ControlsState {
     private init() {}
 }
 
+/// Categories change presentation only; command IDs and gesture codes stay stable.
+enum ControlCategory: String, CaseIterable, Identifiable {
+    case doors, storage, mirrors, climate, batteryCharging
+
+    var id: String { rawValue }
+    var title: LocalizedStringKey {
+        switch self {
+        case .doors: return "Doors"
+        case .storage: return "Storage"
+        case .mirrors: return "Mirrors"
+        case .climate: return "Climate"
+        case .batteryCharging: return "Battery & charging"
+        }
+    }
+    var icon: String {
+        switch self {
+        case .doors: return "door.left.hand.open"
+        case .storage: return "tray.fill"
+        case .mirrors: return "arrow.left.arrow.right"
+        case .climate: return "wind"
+        case .batteryCharging: return "bolt.car.fill"
+        }
+    }
+}
+
 /// A single vehicle control definition. `label` and `active` are read lazily so
 /// they reflect the latest `ControlsState` on each render.
 ///
@@ -27,6 +52,7 @@ final class ControlsState {
 /// `multi_finger_action_t` in the firmware's multi_finger.h).
 struct ControlAction: Identifiable {
     let id: String
+    let category: ControlCategory
     /// SF Symbol name.
     let icon: String
     let label: () -> String
@@ -42,6 +68,7 @@ struct ControlAction: Identifiable {
 let vehicleControls: [ControlAction] = [
     ControlAction(
         id: "battery_preheat",
+        category: .batteryCharging,
         icon: "thermometer",
         label: { ControlsState.shared.preheatOn ? String(localized: "Battery Preheat: On") : String(localized: "Battery Preheat: Off") },
         active: { ControlsState.shared.preheatOn },
@@ -56,6 +83,7 @@ let vehicleControls: [ControlAction] = [
     ),
     ControlAction(
         id: "frunk",
+        category: .storage,
         icon: "car.fill",
         label: { String(localized: "Frunk") },
         active: { false },
@@ -67,6 +95,7 @@ let vehicleControls: [ControlAction] = [
     ),
     ControlAction(
         id: "trunk",
+        category: .storage,
         icon: "shippingbox.fill",
         label: { String(localized: "Trunk") },
         active: { false },
@@ -78,6 +107,7 @@ let vehicleControls: [ControlAction] = [
     ),
     ControlAction(
         id: "charge_port",
+        category: .batteryCharging,
         icon: "bolt.car.fill",
         label: { ControlsState.shared.chargePortOpen ? String(localized: "Charge Port: Open") : String(localized: "Charge Port: Closed") },
         active: { ControlsState.shared.chargePortOpen },
@@ -93,6 +123,7 @@ let vehicleControls: [ControlAction] = [
     ),
     ControlAction(
         id: "mirror_fold",
+        category: .mirrors,
         icon: "arrow.left.arrow.right",
         label: { ControlsState.shared.mirrorsFolded ? String(localized: "Mirrors: Folded") : String(localized: "Mirrors: Unfolded") },
         active: { ControlsState.shared.mirrorsFolded },
@@ -109,6 +140,7 @@ let vehicleControls: [ControlAction] = [
     ),
     ControlAction(
         id: "rear_fan",
+        category: .climate,
         icon: "wind",
         label: { ControlsState.shared.rearFanOn ? String(localized: "Rear Fan: On") : String(localized: "Rear Fan: Off") },
         active: { ControlsState.shared.rearFanOn },
@@ -121,6 +153,7 @@ let vehicleControls: [ControlAction] = [
     ),
     ControlAction(
         id: "ac_swing",
+        category: .climate,
         icon: "arrow.left.and.right",
         label: { String(localized: "Toggle AC Swing") },
         active: { false },
@@ -134,6 +167,7 @@ let vehicleControls: [ControlAction] = [
     // the car leaves reverse, so there is no stable on/off state to show.
     ControlAction(
         id: "mirror_dip",
+        category: .mirrors,
         icon: "arrow.down.right",
         label: { String(localized: "Toggle Mirror Dip") },
         active: { false },
@@ -147,6 +181,7 @@ let vehicleControls: [ControlAction] = [
     // "Unlatch Door". The firmware refuses it in R/N/D or while moving.
     ControlAction(
         id: "unlatch_front_left",
+        category: .doors,
         icon: "door.left.hand.open",
         label: { String(localized: "Unlatch Driver Door") },
         active: { false },
@@ -158,6 +193,7 @@ let vehicleControls: [ControlAction] = [
     ),
     ControlAction(
         id: "unlatch_front_right",
+        category: .doors,
         icon: "door.right.hand.open",
         label: { String(localized: "Unlatch Passenger Door") },
         active: { false },
@@ -169,6 +205,7 @@ let vehicleControls: [ControlAction] = [
     ),
     ControlAction(
         id: "unlatch_rear_left",
+        category: .doors,
         icon: "door.left.hand.open",
         label: { String(localized: "Unlatch Rear Left Door") },
         active: { false },
@@ -180,6 +217,7 @@ let vehicleControls: [ControlAction] = [
     ),
     ControlAction(
         id: "unlatch_rear_right",
+        category: .doors,
         icon: "door.right.hand.open",
         label: { String(localized: "Unlatch Rear Right Door") },
         active: { false },
@@ -192,6 +230,7 @@ let vehicleControls: [ControlAction] = [
     // Glovebox is an electronic latch release: open only (closed by hand).
     ControlAction(
         id: "glovebox",
+        category: .storage,
         icon: "tray.fill",
         label: { String(localized: "Open Glovebox") },
         active: { false },

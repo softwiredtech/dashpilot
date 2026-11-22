@@ -111,14 +111,6 @@ fun SetupScreen(
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = stringResource(R.string.app_name),
-                color = Color.White,
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 1.sp
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
                 text = if (dataSources.size > 1) stringResource(R.string.setup_select_data_source) else stringResource(R.string.setup_connect_your_comma_device),
                 color = DarkColors.TextMuted,
                 fontSize = 14.sp

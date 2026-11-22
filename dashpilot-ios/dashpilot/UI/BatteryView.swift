@@ -16,7 +16,7 @@ struct BatteryView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-                    ScreenHeader(title: "Battery") { dismiss() }
+                    ScreenHeader { dismiss() }
 
                     Spacer().frame(height: 24)
 

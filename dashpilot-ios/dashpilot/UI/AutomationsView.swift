@@ -7,6 +7,7 @@ let climateKeepMinuteRange = 1...60
 private let sportKickdownPercentOptions = Array(stride(from: 10, through: 95, by: 5))
 
 struct AutomationsView: View {
+    var isRoot = false
     @Environment(\.dismiss) private var dismiss
     @Environment(ConnectionViewModel.self) private var connectionVM
 
@@ -27,9 +28,10 @@ struct AutomationsView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-                    ScreenHeader(title: "Automations") { dismiss() }
-
-                    Spacer().frame(height: 24)
+                    if !isRoot {
+                        ScreenHeader { dismiss() }
+                        Spacer().frame(height: 24)
+                    }
 
                     SectionLabel("Wipers")
                     Spacer().frame(height: 8)

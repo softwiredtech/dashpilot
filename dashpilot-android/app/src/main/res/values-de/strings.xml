@@ -37,7 +37,7 @@
     <string name="settings_developer_url_hint_body">Tippe auf Fahren, um sie zu öffnen. Nicht im Auto? Wähle Demo als Datenquelle auf dem Startbildschirm.</string>
     <string name="settings_section_display">Anzeige</string>
     <string name="settings_theme_availability_note">Einige Einstellungen hängen vom gewählten Design ab</string>
-    <string name="settings_theme_picker_title">Dashboard-Design</string>
+    <string name="settings_theme_picker_title">Dashboard-Galerie</string>
     <string name="settings_section_3d_visualizer">3D-Visualisierung</string>
     <string name="settings_toggle_show_phone_battery">Handy-Akku anzeigen</string>
     <string name="settings_toggle_show_car_battery">Fahrzeugakku anzeigen</string>
@@ -234,7 +234,7 @@
     <!-- Controls -->
     <string name="controls_title">Befehle</string>
     <string name="controls_connect_hint">Verbinde dich mit dem DashKit, um Befehle zu senden</string>
-    <string name="controls_pin_tip">Tipp: Halte einen Befehl gedrückt, um ihn auf dem Startbildschirm anzuheften</string>
+    <string name="controls_pin_tip">Tipp: Halte einen Befehl gedrückt, um ihn im Tab „Fahren“ anzuheften.</string>
     <string name="controls_tab_controls">Befehle</string>
     <string name="controls_tab_multitouch">Multi-Touch</string>
     <string name="control_pinned_cd">Angeheftet</string>
@@ -354,4 +354,25 @@
     <string name="ota_error_write">Schreiben fehlgeschlagen (Status %1$d)</string>
     <string name="ota_error_disconnected">Unerwartet getrennt</string>
     <string name="ota_error_device">Gerät hat einen Fehler gemeldet (0x%1$s)</string>
+
+    <!-- Navigation, dashboard gallery, and command categories -->
+    <string name="navigation_commands">Befehle</string>
+    <string name="commands_category_doors">Türen</string>
+    <string name="commands_category_storage">Stauraum</string>
+    <string name="commands_category_mirrors">Spiegel</string>
+    <string name="commands_category_climate">Klima</string>
+    <string name="commands_category_battery_charging">Akku &amp; Laden</string>
+    <string name="commands_category_expand">Kategorie aufklappen</string>
+    <string name="commands_category_collapse">Kategorie zuklappen</string>
+    <string name="commands_category_expanded">Aufgeklappt</string>
+    <string name="commands_category_collapsed">Zugeklappt</string>
+    <string name="drive_start">Fahrt starten</string>
+    <string name="settings_auto_start_drive">Autostart</string>
+    <string name="settings_auto_start_drive_description">Startet das Dashboard automatisch, sobald eine Verbindung besteht und von Parken in einen anderen Gang geschaltet wird.</string>
+    <string name="dashboard_gallery_preview">Vorschau</string>
+    <string name="dashboard_gallery_use">Dashboard verwenden</string>
+    <string name="dashboard_gallery_selected">Ausgewählt</string>
+    <string name="dashboard_gallery_hint">Wische zum Durchblättern nach links oder rechts. Die Vorschau verwendet simulierte Fahrdaten.</string>
+    <string name="dashboard_preview_close">Vorschau schließen</string>
+    <string name="dashboard_gallery_position">%1$d von %2$d</string>
 </resources>

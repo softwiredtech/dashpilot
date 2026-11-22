@@ -16,6 +16,9 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.softwiredtech.dashpilot.datamodel.dash.DASH_PREFS_NAME
+import com.softwiredtech.dashpilot.datamodel.dash.getAutoStartDrive
+import com.softwiredtech.dashpilot.datamodel.dash.setAutoStartDrive
+import com.softwiredtech.dashpilot.navigation.AutoStartDriveGate
 import com.softwiredtech.dashpilot.datamodel.dash.DashState
 import com.softwiredtech.dashpilot.datamodel.dash.DisplaySettings
 import com.softwiredtech.dashpilot.datamodel.dash.PREF_ALWAYS_ON_BLIND_SPOT_MONITOR
@@ -58,6 +61,7 @@ import com.softwiredtech.dashpilot.datamodel.dash.setAcSwing
 import com.softwiredtech.dashpilot.datamodel.dash.setSportKickdownPercent
 import com.softwiredtech.dashpilot.ui.controls.controlById
 import com.softwiredtech.dashpilot.datasource.DataSourceType
+import com.softwiredtech.dashpilot.datasource.cacheForConnection
 import com.softwiredtech.dashpilot.datasource.CommaDataSource
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.IDataSource
@@ -109,6 +113,19 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     }
 
     private val _pinnedControl = MutableStateFlow<String?>(null)
+    private val _autoStartDrive = MutableStateFlow(false)
+    val autoStartDrive = _autoStartDrive.asStateFlow()
+    val autoStartDriveGate = AutoStartDriveGate()
+
+    fun loadAutoStartDrive(context: Context) {
+        _autoStartDrive.value = getAutoStartDrive(context)
+    }
+
+    fun updateAutoStartDrive(context: Context, enabled: Boolean) {
+        setAutoStartDrive(context, enabled)
+        _autoStartDrive.value = enabled
+    }
+
     val pinnedControl = _pinnedControl.asStateFlow()
 
     fun loadPinnedControl(context: Context) {
@@ -346,7 +363,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     private val _displaySettings = MutableStateFlow(DisplaySettings())
     private val _speedCameraDistance = MutableStateFlow(-1)
 
-    private val _dashState = MutableStateFlow<Flow<DashState>?>(null)
+    private val _dashState = MutableStateFlow<StateFlow<DashState>?>(null)
     val dashState = _dashState.asStateFlow()
 
     // Vehicle VIN from CarState (assembled by the native mapper); null until known.
@@ -475,7 +492,10 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
                     dataSourceType = dataSourceType
                 )
             }
-            _dashState.value = combined
+            _dashState.value = combined.cacheForConnection(
+                scope = this,
+                initial = DashState(displaySettings = _displaySettings.value, dataSourceType = dataSourceType)
+            )
 
             launch(Dispatchers.IO) { ds.connect(finalServerAddress) }
             ds.incomingMessages.first()

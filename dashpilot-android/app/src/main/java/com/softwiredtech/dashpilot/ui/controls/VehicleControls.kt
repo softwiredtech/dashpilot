@@ -58,12 +58,22 @@ object ControlsState {
     var rearFanOn by mutableStateOf(false)
 }
 
+/** Categories change presentation only; command IDs and gesture codes stay stable. */
+enum class ControlCategory(val titleRes: Int, val icon: ImageVector) {
+    DOORS(R.string.commands_category_doors, Icons.Rounded.MeetingRoom),
+    STORAGE(R.string.commands_category_storage, Icons.Rounded.Inbox),
+    MIRRORS(R.string.commands_category_mirrors, Icons.Rounded.Flip),
+    CLIMATE(R.string.commands_category_climate, Icons.Rounded.Air),
+    BATTERY_CHARGING(R.string.commands_category_battery_charging, Icons.Rounded.EvStation)
+}
+
 /**
  * A single vehicle control definition. [labelRes] and [active] are read lazily so
  * they reflect the latest [ControlsState] each recomposition.
  */
 data class ControlAction(
     val id: String,
+    val category: ControlCategory,
     val icon: ImageVector,
     val labelRes: () -> Int,
     val active: () -> Boolean,
@@ -81,6 +91,7 @@ data class ControlAction(
 val vehicleControls: List<ControlAction> = listOf(
     ControlAction(
         id = "battery_preheat",
+        category = ControlCategory.BATTERY_CHARGING,
         icon = Icons.Rounded.Thermostat,
         labelRes = { if (ControlsState.preheatOn) R.string.control_battery_preheat_on else R.string.control_battery_preheat_off },
         active = { ControlsState.preheatOn },
@@ -96,6 +107,7 @@ val vehicleControls: List<ControlAction> = listOf(
     ),
     ControlAction(
         id = "frunk",
+        category = ControlCategory.STORAGE,
         icon = VehicleIcons.Frunk,
         labelRes = { R.string.control_frunk },
         active = { false },
@@ -106,6 +118,7 @@ val vehicleControls: List<ControlAction> = listOf(
     ),
     ControlAction(
         id = "trunk",
+        category = ControlCategory.STORAGE,
         icon = VehicleIcons.Trunk,
         labelRes = { R.string.control_trunk },
         active = { false },
@@ -116,6 +129,7 @@ val vehicleControls: List<ControlAction> = listOf(
     ),
     ControlAction(
         id = "charge_port",
+        category = ControlCategory.BATTERY_CHARGING,
         icon = Icons.Rounded.EvStation,
         labelRes = { if (ControlsState.chargePortOpen) R.string.control_charge_port_open else R.string.control_charge_port_closed },
         active = { ControlsState.chargePortOpen },
@@ -130,6 +144,7 @@ val vehicleControls: List<ControlAction> = listOf(
     ),
     ControlAction(
         id = "mirror_fold",
+        category = ControlCategory.MIRRORS,
         icon = Icons.Rounded.Flip,
         labelRes = { if (ControlsState.mirrorsFolded) R.string.control_mirrors_folded else R.string.control_mirrors_unfolded },
         active = { ControlsState.mirrorsFolded },
@@ -144,6 +159,7 @@ val vehicleControls: List<ControlAction> = listOf(
     ),
     ControlAction(
         id = "rear_fan",
+        category = ControlCategory.CLIMATE,
         icon = Icons.Rounded.Air,
         labelRes = { if (ControlsState.rearFanOn) R.string.control_rear_fan_on else R.string.control_rear_fan_off },
         active = { ControlsState.rearFanOn },
@@ -156,6 +172,7 @@ val vehicleControls: List<ControlAction> = listOf(
     ),
     ControlAction(
         id = "ac_swing",
+        category = ControlCategory.CLIMATE,
         icon = Icons.Rounded.SwapHoriz,
         labelRes = { R.string.control_ac_swing },
         active = { false },
@@ -168,6 +185,7 @@ val vehicleControls: List<ControlAction> = listOf(
     // the car leaves reverse, so there is no stable on/off state to show.
     ControlAction(
         id = "mirror_dip",
+        category = ControlCategory.MIRRORS,
         icon = Icons.Rounded.SouthEast,
         labelRes = { R.string.control_mirror_dip },
         active = { false },
@@ -180,6 +198,7 @@ val vehicleControls: List<ControlAction> = listOf(
     // "Unlatch Door". The firmware refuses it in R/N/D or while moving.
     ControlAction(
         id = "unlatch_front_left",
+        category = ControlCategory.DOORS,
         icon = Icons.Rounded.MeetingRoom,
         labelRes = { R.string.control_unlatch_front_left },
         active = { false },
@@ -190,6 +209,7 @@ val vehicleControls: List<ControlAction> = listOf(
     ),
     ControlAction(
         id = "unlatch_front_right",
+        category = ControlCategory.DOORS,
         icon = Icons.Rounded.MeetingRoom,
         labelRes = { R.string.control_unlatch_front_right },
         active = { false },
@@ -200,6 +220,7 @@ val vehicleControls: List<ControlAction> = listOf(
     ),
     ControlAction(
         id = "unlatch_rear_left",
+        category = ControlCategory.DOORS,
         icon = Icons.Rounded.MeetingRoom,
         labelRes = { R.string.control_unlatch_rear_left },
         active = { false },
@@ -210,6 +231,7 @@ val vehicleControls: List<ControlAction> = listOf(
     ),
     ControlAction(
         id = "unlatch_rear_right",
+        category = ControlCategory.DOORS,
         icon = Icons.Rounded.MeetingRoom,
         labelRes = { R.string.control_unlatch_rear_right },
         active = { false },
@@ -221,6 +243,7 @@ val vehicleControls: List<ControlAction> = listOf(
     // Glovebox is an electronic latch release: open only (closed by hand).
     ControlAction(
         id = "glovebox",
+        category = ControlCategory.STORAGE,
         icon = Icons.Rounded.Inbox,
         labelRes = { R.string.control_glovebox },
         active = { false },
