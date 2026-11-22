@@ -93,6 +93,7 @@ import com.softwiredtech.dashpilot.viewmodel.SpeedCameraViewModel
 
 class MainActivity : ComponentActivity() {
     private val networkUtil by lazy { NetworkUtil(applicationContext) }
+    // Activity-owned: all tabs and live dashboards share this connection and its state.
     private val connectionVM: ConnectionViewModel by viewModels {
         viewModelFactory {
             initializer { ConnectionViewModel(networkUtil) }
@@ -208,9 +209,9 @@ class MainActivity : ComponentActivity() {
                 val acSwing by connectionVM.acSwing.collectAsState()
                 val fingerActions by connectionVM.fingerActions.collectAsState()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val onDashboard = navBackStackEntry?.destination?.let {
-                    it.hasRoute<DashboardRoute>() || it.hasRoute<DashboardPreviewRoute>()
-                } == true
+                val drivingDashboardVisible = navBackStackEntry?.destination?.hasRoute<DashboardRoute>() == true
+                val previewVisible = navBackStackEntry?.destination?.hasRoute<DashboardPreviewRoute>() == true
+                val onDashboard = drivingDashboardVisible || previewVisible
 
                 LaunchedEffect(autoStartDrive, connectionStatus, currentGear, activityState, navBackStackEntry) {
                     val destination = navController.currentDestination
@@ -222,7 +223,8 @@ class MainActivity : ComponentActivity() {
                             connected = connectionStatus == ConnectionStatus.Connected,
                             gear = currentGear,
                             canNavigate = canNavigate,
-                            dashboardVisible = onDashboard
+                            dashboardVisible = drivingDashboardVisible,
+                            previewVisible = previewVisible
                         )) {
                         val dashboard = getSelectedDashboard(context)
                         navController.navigate(DashboardRoute(dashboard.type.name.lowercase(), dashboard.url)) {

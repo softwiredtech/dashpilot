@@ -16,6 +16,7 @@ struct dashpilotApp: App {
     @State private var navigationPath = NavigationPath()
     @State private var selectedTab = 0
     @State private var dashboardVisible = false
+    @State private var dashboardPreviewPresented = false
     @State private var autoStartGate = AutoStartDriveGate()
     @AppStorage(DisplaySettings.keyAutoStartDrive) private var autoStartDrive = false
 
@@ -49,6 +50,7 @@ struct dashpilotApp: App {
             }
             .tint(.dashAccent)
             .environment(connectionVM)
+            .environment(\.dashboardPreviewPresented, $dashboardPreviewPresented)
             .task { connectionVM.startupAutoConnect() }
             .task(id: connectionVM.connectionStatus == .connected) {
                 var previousGear: Float?
@@ -60,6 +62,9 @@ struct dashpilotApp: App {
                 }
             }
             .onChange(of: autoStartDrive) { _, _ in
+                startDriveIfNeeded(gear: connectionVM.latestDashState?.carState.gear)
+            }
+            .onChange(of: dashboardPreviewPresented) { _, _ in
                 startDriveIfNeeded(gear: connectionVM.latestDashState?.carState.gear)
             }
             .onChange(of: connectionVM.connectionStatus) { _, _ in
@@ -171,7 +176,8 @@ struct dashpilotApp: App {
             connected: connectionVM.connectionStatus == .connected,
             gear: gear,
             canNavigate: scenePhase == .active && !connectionVM.onboardingRequested,
-            dashboardVisible: dashboardVisible
+            dashboardVisible: dashboardVisible,
+            previewVisible: dashboardPreviewPresented
         ) else { return }
         let dashboard = selectedDashboard()
         navigationPath = NavigationPath([

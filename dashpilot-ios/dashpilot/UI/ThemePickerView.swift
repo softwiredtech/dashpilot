@@ -21,6 +21,7 @@ struct ThemePickerView: View {
 }
 
 struct DashboardGallery: View {
+    @Environment(\.dashboardPreviewPresented) private var dashboardPreviewPresented
     @Binding var selectedDashboardId: String
     @State private var focusedId = ""
     @State private var previewDashboard: DashboardConfig?
@@ -49,6 +50,12 @@ struct DashboardGallery: View {
         }
     }
 
+    private func showPreview(_ dashboard: DashboardConfig) {
+        // Block live Autostart before presentation begins; release only after dismissal.
+        dashboardPreviewPresented.wrappedValue = true
+        previewDashboard = dashboard
+    }
+
     var body: some View {
         VStack(spacing: 12) {
             GeometryReader { geometry in
@@ -60,7 +67,7 @@ struct DashboardGallery: View {
                         let direction: CGFloat = isFocused ? 0 : (index == visibleIndices[0] ? -1 : 1)
                         Button {
                             if isFocused {
-                                previewDashboard = dashboard
+                                showPreview(dashboard)
                             } else {
                                 moveFocus(Int(direction))
                             }
@@ -127,7 +134,7 @@ struct DashboardGallery: View {
             .padding(.horizontal, 24)
 
             HStack(spacing: 12) {
-                Button { previewDashboard = focused } label: {
+                Button { showPreview(focused) } label: {
                     Text("Preview").frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.bordered)
@@ -157,7 +164,9 @@ struct DashboardGallery: View {
                     ?? availableDashboards[0].id
             }
         }
-        .fullScreenCover(item: $previewDashboard) { dashboard in
+        .fullScreenCover(item: $previewDashboard, onDismiss: {
+            dashboardPreviewPresented.wrappedValue = false
+        }) { dashboard in
             DashboardPreviewView(dashboard: dashboard)
         }
     }
