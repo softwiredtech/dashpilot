@@ -1926,6 +1926,9 @@
         }
       }
     },
+    "Lights" : {
+
+    },
     "Load" : {
       "localizations" : {
         "de" : {
@@ -3277,6 +3280,12 @@
           }
         }
       }
+    },
+    "Touch (not press) the high-beam button for two seconds to re-enable auto high beams. (Useful for re-enabling high beams after flashing them on stalkless vehicles)" : {
+
+    },
+    "Touch to Re-Enable Auto High Beams" : {
+
     },
     "Trunk" : {
       "localizations" : {
