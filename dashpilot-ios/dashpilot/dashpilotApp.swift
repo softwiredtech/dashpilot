@@ -37,46 +37,15 @@ struct dashpilotApp: App {
 
     var body: some Scene {
         WindowGroup {
-            TabView(selection: $selectedTab) {
-                NavigationStack(path: $navigationPath) {
-                    HomeView(navigationPath: $navigationPath)
-                        .navigationDestination(for: AppRoute.self) { destination($0) }
+            GeometryReader { geometry in
+                let landscape = geometry.size.width > geometry.size.height
+                HStack(spacing: 0) {
+                    mainTabs(landscape: landscape)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    if landscape && !dashboardVisible {
+                        AppNavigationRail(selection: $selectedTab)
+                    }
                 }
-                .toolbarBackground(Color.dashSurface, for: .tabBar)
-                .toolbarBackground(.visible, for: .tabBar)
-                .toolbarColorScheme(.dark, for: .tabBar)
-                .tabItem { Label("Drive", systemImage: "car.fill") }
-                .tag(0)
-
-                NavigationStack {
-                    ControlsView(isRoot: true)
-                        .navigationDestination(for: AppRoute.self) { destination($0) }
-                }
-                .toolbarBackground(Color.dashSurface, for: .tabBar)
-                .toolbarBackground(.visible, for: .tabBar)
-                .toolbarColorScheme(.dark, for: .tabBar)
-                .tabItem { Label("Commands", systemImage: "slider.horizontal.3") }
-                .tag(1)
-
-                NavigationStack {
-                    AutomationsView(isRoot: true)
-                        .navigationDestination(for: AppRoute.self) { destination($0) }
-                }
-                .toolbarBackground(Color.dashSurface, for: .tabBar)
-                .toolbarBackground(.visible, for: .tabBar)
-                .toolbarColorScheme(.dark, for: .tabBar)
-                .tabItem { Label("Automations", systemImage: "sparkles") }
-                .tag(2)
-
-                NavigationStack {
-                    SettingsView(isRoot: true)
-                        .navigationDestination(for: AppRoute.self) { destination($0) }
-                }
-                .toolbarBackground(Color.dashSurface, for: .tabBar)
-                .toolbarBackground(.visible, for: .tabBar)
-                .toolbarColorScheme(.dark, for: .tabBar)
-                .tabItem { Label("Settings", systemImage: "gearshape.fill") }
-                .tag(3)
             }
             .tint(.dashAccent)
             .environment(connectionVM)
@@ -118,6 +87,54 @@ struct dashpilotApp: App {
                 }
                 connectionVM.onAppForegrounded()
             }
+        }
+    }
+
+    private func mainTabs(landscape: Bool) -> some View {
+        TabView(selection: $selectedTab) {
+            NavigationStack(path: $navigationPath) {
+                HomeView(navigationPath: $navigationPath)
+                    .navigationDestination(for: AppRoute.self) { destination($0) }
+            }
+            .toolbar(landscape ? .hidden : .visible, for: .tabBar)
+            .toolbarBackground(Color.dashSurface, for: .tabBar)
+            .toolbarBackground(.visible, for: .tabBar)
+            .toolbarColorScheme(.dark, for: .tabBar)
+            .tabItem { Label("Drive", systemImage: "car.fill") }
+            .tag(0)
+
+            NavigationStack {
+                ControlsView(isRoot: true)
+                    .navigationDestination(for: AppRoute.self) { destination($0) }
+            }
+            .toolbar(landscape ? .hidden : .visible, for: .tabBar)
+            .toolbarBackground(Color.dashSurface, for: .tabBar)
+            .toolbarBackground(.visible, for: .tabBar)
+            .toolbarColorScheme(.dark, for: .tabBar)
+            .tabItem { Label("Commands", systemImage: "slider.horizontal.3") }
+            .tag(1)
+
+            NavigationStack {
+                AutomationsView(isRoot: true)
+                    .navigationDestination(for: AppRoute.self) { destination($0) }
+            }
+            .toolbar(landscape ? .hidden : .visible, for: .tabBar)
+            .toolbarBackground(Color.dashSurface, for: .tabBar)
+            .toolbarBackground(.visible, for: .tabBar)
+            .toolbarColorScheme(.dark, for: .tabBar)
+            .tabItem { Label("Automations", systemImage: "sparkles") }
+            .tag(2)
+
+            NavigationStack {
+                SettingsView(isRoot: true)
+                    .navigationDestination(for: AppRoute.self) { destination($0) }
+            }
+            .toolbar(landscape ? .hidden : .visible, for: .tabBar)
+            .toolbarBackground(Color.dashSurface, for: .tabBar)
+            .toolbarBackground(.visible, for: .tabBar)
+            .toolbarColorScheme(.dark, for: .tabBar)
+            .tabItem { Label("Settings", systemImage: "gearshape.fill") }
+            .tag(3)
         }
     }
 
@@ -167,5 +184,48 @@ struct dashpilotApp: App {
     private func completeOnboarding() {
         onboardingCompleted = true
         connectionVM.onboardingRequested = false
+    }
+}
+
+/// Uses the same tab selection in both orientations, preserving each navigation stack.
+private struct AppNavigationRail: View {
+    @Binding var selection: Int
+    private let labels: [LocalizedStringKey] = ["Drive", "Commands", "Automations", "Settings"]
+    private let icons = ["car.fill", "slider.horizontal.3", "sparkles", "gearshape.fill"]
+
+    var body: some View {
+        VStack(spacing: 8) {
+            Spacer(minLength: 0)
+            ForEach(labels.indices, id: \.self) { index in
+                Button { selection = index } label: {
+                    VStack(spacing: 4) {
+                        Image(systemName: icons[index])
+                            .font(.system(size: 20))
+                            .frame(width: 56, height: 32)
+                            .background {
+                                if selection == index {
+                                    Capsule().fill(Color.dashAccent.opacity(0.14))
+                                }
+                            }
+                        Text(labels[index])
+                            .font(.system(size: 11, weight: .medium))
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.85)
+                            .multilineTextAlignment(.center)
+                    }
+                    .foregroundColor(selection == index ? .dashAccent : .dashTextMuted)
+                    .frame(maxWidth: .infinity, minHeight: 56)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(selection == index ? .isSelected : [])
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 4)
+        .padding(.vertical, 8)
+        .frame(width: 108)
+        .frame(maxHeight: .infinity)
+        .background(Color.dashSurface.ignoresSafeArea(edges: [.top, .bottom, .trailing]))
     }
 }

@@ -5,6 +5,7 @@ import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.content.res.Configuration
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import androidx.activity.ComponentActivity
@@ -16,20 +17,19 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.core.content.ContextCompat
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets as ComposeWindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.dp
+import com.softwiredtech.dashpilot.ui.AppBottomNavigation
+import com.softwiredtech.dashpilot.ui.AppNavigationRail
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.DirectionsCar
-import androidx.compose.material.icons.rounded.Tune
-import androidx.compose.material.icons.rounded.AutoAwesome
-import androidx.compose.material.icons.rounded.Settings
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.lifecycle.Lifecycle
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -38,7 +38,6 @@ import kotlinx.coroutines.flow.flowOf
 import com.softwiredtech.dashpilot.navigation.DashboardPreviewRoute
 import com.softwiredtech.dashpilot.ui.DashboardPreviewScreen
 import com.softwiredtech.dashpilot.ui.theme.DarkColors
-import com.softwiredtech.dashpilot.ui.theme.AccentColor
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -285,254 +284,247 @@ class MainActivity : ComponentActivity() {
                 val onSettings = destination?.hasRoute<SettingsRoute>() == true
                 val showTabs = onDrive || onCommands || onAutomations || onSettings
 
+                val landscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+                val selectedTab = listOf(onDrive, onCommands, onAutomations, onSettings).indexOf(true)
+                val selectTab: (Int) -> Unit = { index ->
+                    if (index != selectedTab) {
+                        val options: androidx.navigation.NavOptionsBuilder.() -> Unit = {
+                            popUpTo<SetupRoute> { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                        when (index) {
+                            0 -> navController.navigate(SetupRoute, options)
+                            1 -> navController.navigate(ControlsRoute, options)
+                            2 -> navController.navigate(AutomationsRoute, options)
+                            3 -> navController.navigate(SettingsRoute, options)
+                        }
+                    }
+                }
+
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     containerColor = DarkColors.Background,
                     bottomBar = {
-                        if (showTabs) {
-                            NavigationBar(containerColor = DarkColors.Surface) {
-                                val labels = listOf(R.string.home_drive, R.string.navigation_commands, R.string.home_automations, R.string.settings_title)
-                                val icons = listOf(Icons.Rounded.DirectionsCar, Icons.Rounded.Tune, Icons.Rounded.AutoAwesome, Icons.Rounded.Settings)
-                                val selected = listOf(onDrive, onCommands, onAutomations, onSettings)
-                                labels.forEachIndexed { index, label ->
-                                    NavigationBarItem(
-                                        selected = selected[index],
-                                        onClick = {
-                                            if (!selected[index]) {
-                                                val options: androidx.navigation.NavOptionsBuilder.() -> Unit = {
-                                                    popUpTo<SetupRoute> { saveState = true }
-                                                    launchSingleTop = true
-                                                    restoreState = true
-                                                }
-                                                when (index) {
-                                                    0 -> navController.navigate(SetupRoute, options)
-                                                    1 -> navController.navigate(ControlsRoute, options)
-                                                    2 -> navController.navigate(AutomationsRoute, options)
-                                                    3 -> navController.navigate(SettingsRoute, options)
-                                                }
-                                            }
-                                        },
-                                        icon = { Icon(icons[index], contentDescription = null) },
-                                        label = { Text(stringResource(label), maxLines = 1) },
-                                        colors = NavigationBarItemDefaults.colors(
-                                            selectedIconColor = AccentColor,
-                                            selectedTextColor = AccentColor,
-                                            indicatorColor = AccentColor.copy(alpha = 0.14f),
-                                            unselectedIconColor = DarkColors.TextMuted,
-                                            unselectedTextColor = DarkColors.TextMuted
-                                        )
-                                    )
-                                }
-                            }
-                        }
+                        if (showTabs && !landscape) AppBottomNavigation(selectedTab, selectTab)
                     }
                 ) { padding ->
-                    NavHost(
-                        modifier = if (showTabs) Modifier.padding(bottom = padding.calculateBottomPadding()).consumeWindowInsets(PaddingValues(bottom = padding.calculateBottomPadding())) else Modifier,
-                        navController = navController,
-                        startDestination = SetupRoute,
-                        enterTransition = { EnterTransition.None },
-                        exitTransition = { ExitTransition.None },
-                        popEnterTransition = { EnterTransition.None },
-                        popExitTransition = { ExitTransition.None }
+                    val bottomPadding = if (showTabs && !landscape) padding.calculateBottomPadding() else 0.dp
+                    Row(
+                        modifier = Modifier.fillMaxSize().padding(bottom = bottomPadding)
+                            .consumeWindowInsets(PaddingValues(bottom = bottomPadding))
+                            .then(if (showTabs && landscape) Modifier.windowInsetsPadding(
+                                ComposeWindowInsets.safeDrawing.only(WindowInsetsSides.End)
+                            ) else Modifier)
                     ) {
-                        composable<OnboardingRoute> {
-                            OnboardingScreen(
-                                connectionVM = connectionVM,
-                                onFinish = {
-                                    setOnboardingCompleted(context, true)
-                                    navController.navigate(SetupRoute) {
-                                        popUpTo(OnboardingRoute) { inclusive = true }
+                        NavHost(
+                            modifier = Modifier.weight(1f),
+                            navController = navController,
+                            startDestination = SetupRoute,
+                            enterTransition = { EnterTransition.None },
+                            exitTransition = { ExitTransition.None },
+                            popEnterTransition = { EnterTransition.None },
+                            popExitTransition = { ExitTransition.None }
+                        ) {
+                            composable<OnboardingRoute> {
+                                OnboardingScreen(
+                                    connectionVM = connectionVM,
+                                    onFinish = {
+                                        setOnboardingCompleted(context, true)
+                                        navController.navigate(SetupRoute) {
+                                            popUpTo(OnboardingRoute) { inclusive = true }
+                                        }
+                                    },
+                                    onSkip = {
+                                        connectionVM.disconnect(context)
+                                        setOnboardingCompleted(context, true)
+                                        navController.navigate(SetupRoute) {
+                                            popUpTo(OnboardingRoute) { inclusive = true }
+                                        }
                                     }
-                                },
-                                onSkip = {
-                                    connectionVM.disconnect(context)
-                                    setOnboardingCompleted(context, true)
-                                    navController.navigate(SetupRoute) {
-                                        popUpTo(OnboardingRoute) { inclusive = true }
-                                    }
-                                }
-                            )
-                        }
-                        composable<SetupRoute> {
-                            val manager by connectionVM.bleManager.collectAsState()
-                            val dashStateFlow by connectionVM.dashState.collectAsState()
-                            val activeSourceType by connectionVM.activeSourceType.collectAsState()
-                            val toDashboard = {
-                                val dashboard = getSelectedDashboard(context)
-                                navController.navigate(DashboardRoute(
-                                    dashboard.type.name.lowercase(),
-                                    dashboard.url)
                                 )
                             }
-                            HomeScreen(
-                                connectionStatus = connectionStatus,
-                                activeSourceType = activeSourceType,
-                                bleManager = manager,
-                                dashState = dashStateFlow,
-                                pinnedControlId = pinnedControl,
-                                teslaStatus = teslaStatus,
-                                teslaResetPending = teslaResetPending,
-                                onEnrollTesla = { navController.navigate(TeslaEnrollRoute) },
-                                onConnect = { serverAddress, dataSourceType ->
-                                    connectionVM.connect(
-                                        context, serverAddress, dataSourceType,
-                                        userInitiated = true
+                            composable<SetupRoute> {
+                                val manager by connectionVM.bleManager.collectAsState()
+                                val dashStateFlow by connectionVM.dashState.collectAsState()
+                                val activeSourceType by connectionVM.activeSourceType.collectAsState()
+                                val toDashboard = {
+                                    val dashboard = getSelectedDashboard(context)
+                                    navController.navigate(DashboardRoute(
+                                        dashboard.type.name.lowercase(),
+                                        dashboard.url)
                                     )
-                                },
-                                onDisconnect = {
-                                    connectionVM.disconnect(context)
-                                },
-                                onNext = toDashboard,
-                                onBattery = {
-                                    navController.navigate(BatteryRoute)
-                                },
-                                onClimate = {
-                                    navController.navigate(ClimateRoute)
-                                },
-                                onDrive = toDashboard,
-                                onSettingsClick = {
-                                    navController.navigate(SettingsRoute)
                                 }
-                            )
-                        }
-                        composable<BatteryRoute> {
-                            val manager by connectionVM.bleManager.collectAsState()
-                            val dashStateFlow by connectionVM.dashState.collectAsState()
-                            BatteryScreen(
-                                dashState = dashStateFlow,
-                                bleManager = manager,
-                                onBack = { navController.popBackStack() }
-                            )
-                        }
-                        composable<ClimateRoute> {
-                            val dashStateFlow by connectionVM.dashState.collectAsState()
-                            ClimateScreen(
-                                dashState = dashStateFlow,
-                                climateKeepEnabled = climateKeepAutomation,
-                                onClimateKeepChange = {
-                                    connectionVM.updateClimateKeepAutomation(context, it)
-                                },
-                                climateKeepMinutes = climateKeepMinutes,
-                                onClimateKeepMinutesChange = {
-                                    connectionVM.updateClimateKeepMinutes(context, it)
-                                },
-                                acSwing = acSwing,
-                                onAcSwingChange = { connectionVM.updateAcSwing(context, it) },
-                                onBack = { navController.popBackStack() }
-                            )
-                        }
-                        composable<ControlsRoute> {
-                            val manager by connectionVM.bleManager.collectAsState()
-                            ControlScreen(
-                                isRoot = true,
-                                bleManager = manager,
-                                pinnedControlId = pinnedControl,
-                                onTogglePin = { connectionVM.togglePinnedControl(context, it) },
-                                fingerActions = fingerActions,
-                                onSetFingerAction = { fingers, id ->
-                                    connectionVM.setFingerAction(context, fingers, id)
-                                },
-                                onChangeFingerCount = { from, to ->
-                                    connectionVM.changeFingerCount(context, from, to)
-                                },
-                                onRemoveFingerAction = { fingers ->
-                                    connectionVM.removeFingerAction(context, fingers)
-                                },
-                                onBack = { navController.popBackStack() }
-                            )
-                        }
-                        composable<AutomationsRoute> {
-                            AutomationsScreen(
-                                isRoot = true,
-                                wiperOffEnabled = wiperOffAutomation,
-                                onWiperOffChange = {
-                                    connectionVM.updateWiperOffAutomation(context, it)
-                                },
-                                climateKeepEnabled = climateKeepAutomation,
-                                onClimateKeepChange = {
-                                    connectionVM.updateClimateKeepAutomation(context, it)
-                                },
-                                climateKeepMinutes = climateKeepMinutes,
-                                onClimateKeepMinutesChange = {
-                                    connectionVM.updateClimateKeepMinutes(context, it)
-                                },
-                                acSwing = acSwing,
-                                onAcSwingChange = { connectionVM.updateAcSwing(context, it) },
-                                sportKickdownEnabled = sportKickdownAutomation,
-                                onSportKickdownChange = {
-                                    connectionVM.updateSportKickdownAutomation(context, it)
-                                },
-                                sportKickdownPercent = sportKickdownPercent,
-                                onSportKickdownPercentChange = {
-                                    connectionVM.updateSportKickdownPercent(context, it)
-                                },
-                                onBack = { navController.popBackStack() }
-                            )
-                        }
-                        composable<SettingsRoute> {
-                            val manager by connectionVM.bleManager.collectAsState()
-                            SettingsScreen(
-                                isRoot = true,
-                                autoStartDrive = autoStartDrive,
-                                onAutoStartDriveChange = { connectionVM.updateAutoStartDrive(context, it) },
-                                onBack = { navController.popBackStack() },
-                                onDisplaySettingsChanged = { connectionVM.updateDisplaySettings(it) },
-                                bleManager = manager,
-                                dashkitUpdateManager = dashkitUpdateManager,
-                                teslaStatus = teslaStatus,
-                                teslaResetPending = teslaResetPending,
-                                onRemoveTesla = { teslaSource?.requestReset() == true },
-                                onEnrollTesla = { navController.navigate(TeslaEnrollRoute) },
-                                onReplayOnboarding = {
-                                    connectionVM.disconnect(context)
-                                    setOnboardingCompleted(context, false)
-                                    navController.navigate(OnboardingRoute) {
-                                        popUpTo(SetupRoute) { inclusive = false }
+                                HomeScreen(
+                                    connectionStatus = connectionStatus,
+                                    activeSourceType = activeSourceType,
+                                    bleManager = manager,
+                                    dashState = dashStateFlow,
+                                    pinnedControlId = pinnedControl,
+                                    teslaStatus = teslaStatus,
+                                    teslaResetPending = teslaResetPending,
+                                    onEnrollTesla = { navController.navigate(TeslaEnrollRoute) },
+                                    onConnect = { serverAddress, dataSourceType ->
+                                        connectionVM.connect(
+                                            context, serverAddress, dataSourceType,
+                                            userInitiated = true
+                                        )
+                                    },
+                                    onDisconnect = {
+                                        connectionVM.disconnect(context)
+                                    },
+                                    onNext = toDashboard,
+                                    onBattery = {
+                                        navController.navigate(BatteryRoute)
+                                    },
+                                    onClimate = {
+                                        navController.navigate(ClimateRoute)
+                                    },
+                                    onDrive = toDashboard,
+                                    onSettingsClick = {
+                                        navController.navigate(SettingsRoute)
                                     }
-                                },
-                                onPreviewDashboard = { dashboard ->
-                                    navController.navigate(DashboardPreviewRoute(dashboard.type.name.lowercase(), dashboard.url))
-                                },
-                                carModel = carModel,
-                                onCarModelChanged = { connectionVM.updateCarModel(context, it) }
-                            )
-                        }
-                        composable<TeslaEnrollRoute> {
-                            val manager by connectionVM.bleManager.collectAsState()
-                            TeslaEnrollFlow(
-                                manager = manager,
-                                statusFlow = teslaStatus,
-                                vinState = connectionVM.vehicleVin,
-                                onClose = { navController.popBackStack() },
-                            )
-                        }
-                        composable<ThemePickerRoute> {
-                            ThemePickerScreen(
-                                onPreview = { dashboard ->
-                                    navController.navigate(DashboardPreviewRoute(dashboard.type.name.lowercase(), dashboard.url))
-                                },
-                                onBack = { navController.popBackStack(ThemePickerRoute, inclusive = true) }
-                            )
-                        }
-                        composable<DashboardPreviewRoute> { entry ->
-                            val route = entry.toRoute<DashboardPreviewRoute>()
-                            DashboardPreviewScreen(route.dashboardType, route.dashboardUrl) {
-                                navController.popBackStack()
-                            }
-                        }
-                        composable<DashboardRoute> { backStackEntry ->
-                            val route = backStackEntry.toRoute<DashboardRoute>()
-                            val dashStateFlow by connectionVM.dashState.collectAsState()
-                            val flow = dashStateFlow
-                            if (flow != null) {
-                                DashboardScreen(
-                                    dashboardType = route.dashboardType,
-                                    dashboardUrl = route.dashboardUrl,
-                                    dashStateFlow = flow
                                 )
                             }
+                            composable<BatteryRoute> {
+                                val manager by connectionVM.bleManager.collectAsState()
+                                val dashStateFlow by connectionVM.dashState.collectAsState()
+                                BatteryScreen(
+                                    dashState = dashStateFlow,
+                                    bleManager = manager,
+                                    onBack = { navController.popBackStack() }
+                                )
+                            }
+                            composable<ClimateRoute> {
+                                val dashStateFlow by connectionVM.dashState.collectAsState()
+                                ClimateScreen(
+                                    dashState = dashStateFlow,
+                                    climateKeepEnabled = climateKeepAutomation,
+                                    onClimateKeepChange = {
+                                        connectionVM.updateClimateKeepAutomation(context, it)
+                                    },
+                                    climateKeepMinutes = climateKeepMinutes,
+                                    onClimateKeepMinutesChange = {
+                                        connectionVM.updateClimateKeepMinutes(context, it)
+                                    },
+                                    acSwing = acSwing,
+                                    onAcSwingChange = { connectionVM.updateAcSwing(context, it) },
+                                    onBack = { navController.popBackStack() }
+                                )
+                            }
+                            composable<ControlsRoute> {
+                                val manager by connectionVM.bleManager.collectAsState()
+                                ControlScreen(
+                                    isRoot = true,
+                                    bleManager = manager,
+                                    pinnedControlId = pinnedControl,
+                                    onTogglePin = { connectionVM.togglePinnedControl(context, it) },
+                                    fingerActions = fingerActions,
+                                    onSetFingerAction = { fingers, id ->
+                                        connectionVM.setFingerAction(context, fingers, id)
+                                    },
+                                    onChangeFingerCount = { from, to ->
+                                        connectionVM.changeFingerCount(context, from, to)
+                                    },
+                                    onRemoveFingerAction = { fingers ->
+                                        connectionVM.removeFingerAction(context, fingers)
+                                    },
+                                    onBack = { navController.popBackStack() }
+                                )
+                            }
+                            composable<AutomationsRoute> {
+                                AutomationsScreen(
+                                    isRoot = true,
+                                    wiperOffEnabled = wiperOffAutomation,
+                                    onWiperOffChange = {
+                                        connectionVM.updateWiperOffAutomation(context, it)
+                                    },
+                                    climateKeepEnabled = climateKeepAutomation,
+                                    onClimateKeepChange = {
+                                        connectionVM.updateClimateKeepAutomation(context, it)
+                                    },
+                                    climateKeepMinutes = climateKeepMinutes,
+                                    onClimateKeepMinutesChange = {
+                                        connectionVM.updateClimateKeepMinutes(context, it)
+                                    },
+                                    acSwing = acSwing,
+                                    onAcSwingChange = { connectionVM.updateAcSwing(context, it) },
+                                    sportKickdownEnabled = sportKickdownAutomation,
+                                    onSportKickdownChange = {
+                                        connectionVM.updateSportKickdownAutomation(context, it)
+                                    },
+                                    sportKickdownPercent = sportKickdownPercent,
+                                    onSportKickdownPercentChange = {
+                                        connectionVM.updateSportKickdownPercent(context, it)
+                                    },
+                                    onBack = { navController.popBackStack() }
+                                )
+                            }
+                            composable<SettingsRoute> {
+                                val manager by connectionVM.bleManager.collectAsState()
+                                SettingsScreen(
+                                    isRoot = true,
+                                    autoStartDrive = autoStartDrive,
+                                    onAutoStartDriveChange = { connectionVM.updateAutoStartDrive(context, it) },
+                                    onBack = { navController.popBackStack() },
+                                    onDisplaySettingsChanged = { connectionVM.updateDisplaySettings(it) },
+                                    bleManager = manager,
+                                    dashkitUpdateManager = dashkitUpdateManager,
+                                    teslaStatus = teslaStatus,
+                                    teslaResetPending = teslaResetPending,
+                                    onRemoveTesla = { teslaSource?.requestReset() == true },
+                                    onEnrollTesla = { navController.navigate(TeslaEnrollRoute) },
+                                    onReplayOnboarding = {
+                                        connectionVM.disconnect(context)
+                                        setOnboardingCompleted(context, false)
+                                        navController.navigate(OnboardingRoute) {
+                                            popUpTo(SetupRoute) { inclusive = false }
+                                        }
+                                    },
+                                    onPreviewDashboard = { dashboard ->
+                                        navController.navigate(DashboardPreviewRoute(dashboard.type.name.lowercase(), dashboard.url))
+                                    },
+                                    carModel = carModel,
+                                    onCarModelChanged = { connectionVM.updateCarModel(context, it) }
+                                )
+                            }
+                            composable<TeslaEnrollRoute> {
+                                val manager by connectionVM.bleManager.collectAsState()
+                                TeslaEnrollFlow(
+                                    manager = manager,
+                                    statusFlow = teslaStatus,
+                                    vinState = connectionVM.vehicleVin,
+                                    onClose = { navController.popBackStack() },
+                                )
+                            }
+                            composable<ThemePickerRoute> {
+                                ThemePickerScreen(
+                                    onPreview = { dashboard ->
+                                        navController.navigate(DashboardPreviewRoute(dashboard.type.name.lowercase(), dashboard.url))
+                                    },
+                                    onBack = { navController.popBackStack(ThemePickerRoute, inclusive = true) }
+                                )
+                            }
+                            composable<DashboardPreviewRoute> { entry ->
+                                val route = entry.toRoute<DashboardPreviewRoute>()
+                                DashboardPreviewScreen(route.dashboardType, route.dashboardUrl) {
+                                    navController.popBackStack()
+                                }
+                            }
+                            composable<DashboardRoute> { backStackEntry ->
+                                val route = backStackEntry.toRoute<DashboardRoute>()
+                                val dashStateFlow by connectionVM.dashState.collectAsState()
+                                val flow = dashStateFlow
+                                if (flow != null) {
+                                    DashboardScreen(
+                                        dashboardType = route.dashboardType,
+                                        dashboardUrl = route.dashboardUrl,
+                                        dashStateFlow = flow
+                                    )
+                                }
+                            }
                         }
+                        if (showTabs && landscape) AppNavigationRail(selectedTab, selectTab)
                     }
                 }
             }
