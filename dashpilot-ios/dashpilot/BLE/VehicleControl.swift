@@ -100,7 +100,7 @@ enum VehicleControl {
     static let doorRearRight = 3
 
     // 1=enable, 0=disable. Persisted in NVS by the firmware.
-    static let cmdAutoHighBeamHoldEnable = 0x51
+    static let cmdTouchAutoHighBeamEnable = 0x51
 
     /// Bind (or clear, with actionValue 0) an N-finger tap to a control action.
     @discardableResult
@@ -114,10 +114,10 @@ enum VehicleControl {
         send(manager, opcode: cmdWiperOffEnable, value: enabled ? 1 : 0)
     }
 
-    /// Enable or disable the firmware's high-beam hold automation.
+    /// Enable or disable the firmware's touch-to-re-enable auto high beams automation.
     @discardableResult
-    static func sendAutoHighBeamHold(_ manager: DashKitBleManager, enabled: Bool) -> Bool {
-        send(manager, opcode: cmdAutoHighBeamHoldEnable, value: enabled ? 1 : 0)
+    static func sendTouchAutoHighBeamEnable(_ manager: DashKitBleManager, enabled: Bool) -> Bool {
+        send(manager, opcode: cmdTouchAutoHighBeamEnable, value: enabled ? 1 : 0)
     }
 
     /// Ask the DashKit to open a pairing window for one new device.

@@ -11,7 +11,7 @@ struct AutomationsView: View {
     @Environment(ConnectionViewModel.self) private var connectionVM
 
     @AppStorage("wiper_off_automation") private var wiperOff: Bool = false
-    @AppStorage("auto_high_beam_hold_automation") private var autoHighBeamHold: Bool = false
+    @AppStorage("auto_high_beam_hold_automation") private var touchAutoHighBeamEnabled: Bool = false
     @AppStorage("climate_keep_automation") private var climateKeep: Bool = false
     @AppStorage("climate_keep_minutes") private var climateKeepMinutes: Int = 5
     @AppStorage("sport_kickdown_automation") private var sportKickdown: Bool = false
@@ -49,7 +49,7 @@ struct AutomationsView: View {
                         icon: "headlight.high.beam.fill",
                         title: "Touch to Re-Enable Auto High Beams",
                         subtitle: "Touch (not press) the high-beam button for two seconds to re-enable auto high beams. (Useful for re-enabling high beams after flashing them on stalkless vehicles)",
-                        isOn: $autoHighBeamHold
+                        isOn: $touchAutoHighBeamEnabled
                     )
 
                     Spacer().frame(height: 28)
@@ -113,9 +113,9 @@ struct AutomationsView: View {
                 VehicleControl.sendWiperOff(manager, enabled: newValue)
             }
         }
-        .onChange(of: autoHighBeamHold) { _, newValue in
+        .onChange(of: touchAutoHighBeamEnabled) { _, newValue in
             if let manager = connectionVM.bleManager {
-                VehicleControl.sendAutoHighBeamHold(manager, enabled: newValue)
+                VehicleControl.sendTouchAutoHighBeamEnable(manager, enabled: newValue)
             }
         }
         .onChange(of: climateKeep) { _, newValue in

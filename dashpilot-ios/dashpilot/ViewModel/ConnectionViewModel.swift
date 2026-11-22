@@ -162,8 +162,8 @@ final class ConnectionViewModel {
         }
         let wiperOff = UserDefaults.standard.bool(forKey: "wiper_off_automation")
         VehicleControl.sendWiperOff(manager, enabled: wiperOff)
-        let autoHighBeamHold = UserDefaults.standard.bool(forKey: "auto_high_beam_hold_automation")
-        VehicleControl.sendAutoHighBeamHold(manager, enabled: autoHighBeamHold)
+        let touchAutoHighBeamEnabled = UserDefaults.standard.bool(forKey: "auto_high_beam_hold_automation")
+        VehicleControl.sendTouchAutoHighBeamEnable(manager, enabled: touchAutoHighBeamEnabled)
         let climateKeep = UserDefaults.standard.bool(forKey: "climate_keep_automation")
         VehicleControl.sendClimateKeep(manager, enabled: climateKeep)
         let climateKeepMinutes = UserDefaults.standard.integer(forKey: "climate_keep_minutes")
