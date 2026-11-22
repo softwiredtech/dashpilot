@@ -201,6 +201,7 @@ class MainActivity : ComponentActivity() {
                 val activityState by lifecycle.currentStateFlow.collectAsState()
                 val pinnedControl by connectionVM.pinnedControl.collectAsState()
                 val wiperOffAutomation by connectionVM.wiperOffAutomation.collectAsState()
+                val signalOffAutomation by connectionVM.signalOffAutomation.collectAsState()
                 val carModel by connectionVM.carModel.collectAsState()
                 val climateKeepAutomation by connectionVM.climateKeepAutomation.collectAsState()
                 val climateKeepMinutes by connectionVM.climateKeepMinutes.collectAsState()
@@ -440,6 +441,10 @@ class MainActivity : ComponentActivity() {
                                     wiperOffEnabled = wiperOffAutomation,
                                     onWiperOffChange = {
                                         connectionVM.updateWiperOffAutomation(context, it)
+                                    },
+                                    signalOffEnabled = signalOffAutomation,
+                                    onSignalOffChange = {
+                                        connectionVM.updateSignalOffAutomation(context, it)
                                     },
                                     climateKeepEnabled = climateKeepAutomation,
                                     onClimateKeepChange = {

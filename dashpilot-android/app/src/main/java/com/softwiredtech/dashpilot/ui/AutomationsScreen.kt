@@ -23,6 +23,7 @@ import androidx.compose.material.icons.rounded.AcUnit
 import androidx.compose.material.icons.rounded.Air
 import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material.icons.rounded.Speed
+import androidx.compose.material.icons.rounded.LocalParking
 import androidx.compose.material.icons.rounded.WaterDrop
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -61,6 +62,8 @@ private const val SPORT_KICKDOWN_PERCENT_STEP = 5
 fun AutomationsScreen(
     wiperOffEnabled: Boolean,
     onWiperOffChange: (Boolean) -> Unit,
+    signalOffEnabled: Boolean,
+    onSignalOffChange: (Boolean) -> Unit,
     climateKeepEnabled: Boolean,
     onClimateKeepChange: (Boolean) -> Unit,
     climateKeepMinutes: Int,
@@ -99,6 +102,18 @@ fun AutomationsScreen(
                 subtitle = stringResource(R.string.automations_wiper_off_subtitle),
                 checked = wiperOffEnabled,
                 onToggle = { onWiperOffChange(!wiperOffEnabled) }
+            )
+
+            Spacer(modifier = Modifier.height(28.dp))
+
+            SectionLabel(stringResource(R.string.automations_section_lights))
+            Spacer(modifier = Modifier.height(8.dp))
+            AutomationRow(
+                icon = Icons.Rounded.LocalParking,
+                title = stringResource(R.string.automations_signal_off_title),
+                subtitle = stringResource(R.string.automations_signal_off_subtitle),
+                checked = signalOffEnabled,
+                onToggle = { onSignalOffChange(!signalOffEnabled) }
             )
 
             Spacer(modifier = Modifier.height(28.dp))

@@ -44,7 +44,9 @@ import com.softwiredtech.dashpilot.datamodel.dash.getPinnedControl
 import com.softwiredtech.dashpilot.datamodel.dash.setPinnedControl
 import com.softwiredtech.dashpilot.datamodel.dash.getFingerActions
 import com.softwiredtech.dashpilot.datamodel.dash.setFingerActions
+import com.softwiredtech.dashpilot.datamodel.dash.getSignalOffAutomation
 import com.softwiredtech.dashpilot.datamodel.dash.getWiperOffAutomation
+import com.softwiredtech.dashpilot.datamodel.dash.setSignalOffAutomation
 import com.softwiredtech.dashpilot.datamodel.dash.setWiperOffAutomation
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_CLIMATE_KEEP_MINUTES
 import com.softwiredtech.dashpilot.datamodel.dash.getClimateKeepAutomation
@@ -140,6 +142,8 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
 
     private val _wiperOffAutomation = MutableStateFlow(false)
     val wiperOffAutomation = _wiperOffAutomation.asStateFlow()
+    private val _signalOffAutomation = MutableStateFlow(false)
+    val signalOffAutomation = _signalOffAutomation.asStateFlow()
 
     private val _climateKeepAutomation = MutableStateFlow(false)
     val climateKeepAutomation = _climateKeepAutomation.asStateFlow()
@@ -165,6 +169,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     fun loadAutomations(context: Context) {
         _carModel.value = getCarModel(context)
         _wiperOffAutomation.value = getWiperOffAutomation(context)
+        _signalOffAutomation.value = getSignalOffAutomation(context)
         _climateKeepAutomation.value = getClimateKeepAutomation(context)
         _climateKeepMinutes.value = getClimateKeepMinutes(context)
         _sportKickdownAutomation.value = getSportKickdownAutomation(context)
@@ -186,6 +191,12 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         setWiperOffAutomation(context, value)
         _wiperOffAutomation.value = value
         pushWiperOff(value)
+    }
+
+    fun updateSignalOffAutomation(context: Context, value: Boolean) {
+        setSignalOffAutomation(context, value)
+        _signalOffAutomation.value = value
+        _bleManager.value?.let { VehicleControl.sendSignalOff(it, value) }
     }
 
     private fun pushWiperOff(enabled: Boolean) {
@@ -519,6 +530,9 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
                 val wiperOff = getWiperOffAutomation(context)
                 _wiperOffAutomation.value = wiperOff
                 VehicleControl.sendWiperOff(mgr, wiperOff)
+                val signalOff = getSignalOffAutomation(context)
+                _signalOffAutomation.value = signalOff
+                VehicleControl.sendSignalOff(mgr, signalOff)
 
                 // Re-sync the climate-keep automation the same way.
                 val climateKeep = getClimateKeepAutomation(context)
