@@ -5,7 +5,11 @@ struct HomeView: View {
     @Environment(ConnectionViewModel.self) var connectionVM
 
     @AppStorage("pinned_control_id") var pinnedControlId: String = ""
-    @State private var dash: DashState?
+    // Read the session's cached snapshot immediately when returning to Drive.
+    // A new per-view stream starts asynchronously and can flash empty values.
+    private var dash: DashState? {
+        connectionVM.connectionStatus == .disconnected ? nil : connectionVM.latestDashState
+    }
 
     var body: some View {
         ZStack {
@@ -16,8 +20,10 @@ struct HomeView: View {
                 let landscape = geo.size.width > geo.size.height
                 ScrollView {
                     VStack(spacing: 0) {
-                        header(showDataSource: landscape)
-                        Spacer().frame(height: 8)
+                        if landscape {
+                            header(showDataSource: true)
+                            Spacer().frame(height: 8)
+                        }
                         if landscape {
                             landscapeContent(
                                 minHeight: geo.size.height - 2 * DashMetrics.screenPadding - 52
@@ -31,16 +37,6 @@ struct HomeView: View {
             }
         }
         .navigationBarHidden(true)
-        .task {
-            for await state in connectionVM.dashStateStream() {
-                dash = state
-            }
-        }
-        .onChange(of: connectionVM.connectionStatus) { _, status in
-            if status == .disconnected {
-                dash = nil
-            }
-        }
     }
 
     private var portraitContent: some View {
@@ -83,9 +79,6 @@ struct HomeView: View {
                         .offset(x: 12)
                 }
             }
-            Text("Drive")
-                .foregroundColor(.white)
-                .font(.system(size: 20, weight: .bold))
         }
         .frame(height: 44)
     }

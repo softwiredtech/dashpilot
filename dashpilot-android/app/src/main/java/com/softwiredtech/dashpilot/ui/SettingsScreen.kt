@@ -228,14 +228,14 @@ fun SettingsScreen(
         darkModeBackgroundGray = darkModeBackgroundGrayState.floatValue.toInt(),
     )
 
-    val selectedTab = remember { mutableIntStateOf(0) }
+    val selectedTab = androidx.compose.runtime.saveable.rememberSaveable { mutableIntStateOf(0) }
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text(stringResource(R.string.settings_title), color = Color.White) },
+            if (!isRoot) CenterAlignedTopAppBar(
+                title = {},
                 navigationIcon = {
-                    if (!isRoot) IconButton(onClick = onBack) {
+                    IconButton(onClick = onBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
                             contentDescription = stringResource(R.string.settings_back),
@@ -255,31 +255,10 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            TabRow(
-                selectedTabIndex = selectedTab.intValue,
-                containerColor = DarkColors.Background,
-                contentColor = Color.White,
-                indicator = { tabPositions ->
-                    TabRowDefaults.SecondaryIndicator(
-                        modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTab.intValue]),
-                        color = AccentColor
-                    )
-                }
-            ) {
-                settingsTabs.forEachIndexed { index, titleRes ->
-                    Tab(
-                        selected = selectedTab.intValue == index,
-                        onClick = { selectedTab.intValue = index },
-                        selectedContentColor = AccentColor,
-                        unselectedContentColor = DarkColors.TextMuted,
-                        text = { Text(stringResource(titleRes)) }
-                    )
-                }
-            }
-
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
+                    .weight(1f)
                     .padding(horizontal = 24.dp, vertical = 16.dp)
                     .verticalScroll(rememberScrollState())
             ) {
@@ -481,6 +460,28 @@ fun SettingsScreen(
                 }
             }
             } // end scrollable content column
+
+            TabRow(
+                selectedTabIndex = selectedTab.intValue,
+                containerColor = DarkColors.Background,
+                contentColor = Color.White,
+                indicator = { tabPositions ->
+                    TabRowDefaults.SecondaryIndicator(
+                        modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTab.intValue]),
+                        color = AccentColor
+                    )
+                }
+            ) {
+                settingsTabs.forEachIndexed { index, titleRes ->
+                    Tab(
+                        selected = selectedTab.intValue == index,
+                        onClick = { selectedTab.intValue = index },
+                        selectedContentColor = AccentColor,
+                        unselectedContentColor = DarkColors.TextMuted,
+                        text = { Text(stringResource(titleRes)) }
+                    )
+                }
+            }
         }
     }
 }

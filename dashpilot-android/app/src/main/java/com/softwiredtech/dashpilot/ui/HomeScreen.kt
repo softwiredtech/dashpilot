@@ -60,10 +60,8 @@ import com.softwiredtech.dashpilot.ui.controls.controlById
 import com.softwiredtech.dashpilot.ui.tesla.TeslaTile
 import com.softwiredtech.dashpilot.ui.theme.AccentColor
 import com.softwiredtech.dashpilot.ui.theme.DarkColors
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlin.math.roundToInt
 import androidx.compose.ui.res.stringResource
 import com.softwiredtech.dashpilot.R
@@ -73,7 +71,7 @@ fun HomeScreen(
     connectionStatus: ConnectionStatus,
     activeSourceType: String?,
     bleManager: DashKitBleManager?,
-    dashState: Flow<DashState>?,
+    dashState: StateFlow<DashState>?,
     pinnedControlId: String?,
     teslaStatus: StateFlow<TeslaStatus>?,
     teslaResetPending: StateFlow<Boolean>?,
@@ -131,7 +129,7 @@ private val HeaderHeight = 48.dp
 
 @Composable
 private fun ConnectedHomeContent(
-    dashState: Flow<DashState>?,
+    dashState: StateFlow<DashState>?,
     bleManager: DashKitBleManager?,
     connectionStatus: ConnectionStatus,
     activeSourceType: String?,
@@ -147,8 +145,8 @@ private fun ConnectedHomeContent(
     onDrive: () -> Unit,
     onSettingsClick: () -> Unit
 ) {
-    val fallback = DashState()
-    val state by (dashState ?: flowOf(fallback)).collectAsState(initial = fallback)
+    val idleDash = remember { MutableStateFlow(DashState()) }
+    val state by (dashState ?: idleDash).collectAsState()
     val car = state.carState
     val useImperial = state.displaySettings.useImperial
     val idleTesla = remember { MutableStateFlow(TeslaStatus.Idle) }
@@ -168,17 +166,19 @@ private fun ConnectedHomeContent(
                 .verticalScroll(rememberScrollState())
                 .padding(ScreenPadding)
         ) {
-            Header(
-                showDataSource = landscape,
-                connectionStatus = connectionStatus,
-                activeSourceType = activeSourceType,
-                onSelectDataSource = onSelectDataSource,
-                onConnect = onConnect,
-                onDisconnect = onDisconnect,
-                onSettingsClick = onSettingsClick
-            )
+            if (landscape) {
+                Header(
+                    showDataSource = landscape,
+                    connectionStatus = connectionStatus,
+                    activeSourceType = activeSourceType,
+                    onSelectDataSource = onSelectDataSource,
+                    onConnect = onConnect,
+                    onDisconnect = onDisconnect,
+                    onSettingsClick = onSettingsClick
+                )
 
-            Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+            }
 
             if (landscape) {
                 LandscapeContent(
@@ -234,13 +234,6 @@ private fun Header(
             .fillMaxWidth()
             .height(HeaderHeight)
     ) {
-        Text(
-            text = stringResource(R.string.home_drive),
-            color = Color.White,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.align(Alignment.Center)
-        )
         if (showDataSource) {
             Box(
                 modifier = Modifier

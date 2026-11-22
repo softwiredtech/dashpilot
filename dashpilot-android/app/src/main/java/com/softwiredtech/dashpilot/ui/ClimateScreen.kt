@@ -68,7 +68,7 @@ fun ClimateScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp, vertical = 24.dp)
         ) {
-            ScreenHeader(title = stringResource(R.string.climate_title), onBack = onBack)
+            ScreenHeader(onBack = onBack)
 
             Spacer(modifier = Modifier.height(24.dp))
 

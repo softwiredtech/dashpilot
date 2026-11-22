@@ -81,9 +81,10 @@ fun ControlScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 24.dp, vertical = 24.dp)
         ) {
-            ScreenHeader(title = stringResource(R.string.navigation_commands), onBack = onBack, showBack = !isRoot)
-
-            Spacer(modifier = Modifier.height(16.dp))
+            if (!isRoot) {
+                ScreenHeader(onBack = onBack)
+                Spacer(modifier = Modifier.height(16.dp))
+            }
             SegmentedSelector(
                 options = listOf(
                     stringResource(R.string.controls_tab_controls),

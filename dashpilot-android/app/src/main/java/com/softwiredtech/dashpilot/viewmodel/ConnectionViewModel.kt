@@ -61,6 +61,7 @@ import com.softwiredtech.dashpilot.datamodel.dash.setAcSwing
 import com.softwiredtech.dashpilot.datamodel.dash.setSportKickdownPercent
 import com.softwiredtech.dashpilot.ui.controls.controlById
 import com.softwiredtech.dashpilot.datasource.DataSourceType
+import com.softwiredtech.dashpilot.datasource.cacheForConnection
 import com.softwiredtech.dashpilot.datasource.CommaDataSource
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.IDataSource
@@ -362,7 +363,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     private val _displaySettings = MutableStateFlow(DisplaySettings())
     private val _speedCameraDistance = MutableStateFlow(-1)
 
-    private val _dashState = MutableStateFlow<Flow<DashState>?>(null)
+    private val _dashState = MutableStateFlow<StateFlow<DashState>?>(null)
     val dashState = _dashState.asStateFlow()
 
     // Vehicle VIN from CarState (assembled by the native mapper); null until known.
@@ -491,7 +492,10 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
                     dataSourceType = dataSourceType
                 )
             }
-            _dashState.value = combined
+            _dashState.value = combined.cacheForConnection(
+                scope = this,
+                initial = DashState(displaySettings = _displaySettings.value, dataSourceType = dataSourceType)
+            )
 
             launch(Dispatchers.IO) { ds.connect(finalServerAddress) }
             ds.incomingMessages.first()

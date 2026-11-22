@@ -69,9 +69,10 @@ struct SettingsView: View {
             bgColor.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                header
-                Divider().background(borderColor)
-                tabRow
+                if !isRoot {
+                    ScreenHeader { dismiss() }
+                        .padding(.horizontal, 24)
+                }
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
                         if selectedTab == 0 {
@@ -94,6 +95,9 @@ struct SettingsView: View {
                     }
                     .padding(.top, 16)
                 }
+                .frame(maxHeight: .infinity)
+                Divider().background(borderColor)
+                tabRow
             }
         }
         .navigationBarHidden(true)
@@ -110,29 +114,6 @@ struct SettingsView: View {
         } message: {
             Text("Tap Drive to open it. Not in your car? Pick Demo as the data source on the home screen.")
         }
-    }
-
-    // MARK: - Header
-
-    private var header: some View {
-        HStack {
-            if isRoot { Spacer() }
-            if !isRoot {
-                Button { dismiss() } label: {
-                    Image(systemName: "arrow.backward")
-                        .foregroundColor(.white)
-                        .font(.system(size: 18, weight: .medium))
-                        .frame(width: 44, height: 44)
-                }
-            }
-            Text("Settings")
-                .foregroundColor(.white)
-                .font(.system(size: isRoot ? 20 : 18, weight: .semibold))
-            Spacer()
-        }
-        .padding(.horizontal, 8)
-        .frame(height: 56)
-        .background(bgColor)
     }
 
     // MARK: - Tabs
@@ -157,7 +138,7 @@ struct SettingsView: View {
                 .frame(maxWidth: .infinity)
             }
         }
-        .padding(.top, 12)
+        .padding(.vertical, 12)
         .background(bgColor)
     }
 

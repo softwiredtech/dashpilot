@@ -28,16 +28,10 @@ struct ControlsView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-                    if isRoot {
-                        Text("Commands")
-                            .font(.system(size: 20, weight: .bold))
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity, minHeight: 44)
-                    } else {
-                        ScreenHeader(title: "Commands") { dismiss() }
+                    if !isRoot {
+                        ScreenHeader { dismiss() }
+                        Spacer().frame(height: 16)
                     }
-
-                    Spacer().frame(height: 16)
                     SegmentedSelector(
                         options: ["Controls", "Multi-touch"],
                         selection: $selectedTab,

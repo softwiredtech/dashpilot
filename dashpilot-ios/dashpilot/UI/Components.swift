@@ -1,10 +1,7 @@
 import SwiftUI
 
-/// Shared header for back-navigable screens: back button on the left, title
-/// centered on the screen — mirrors the home screen header so all top-level
-/// screens line up (port of Android `ScreenHeader`).
+/// Back navigation for detail screens, without a page title.
 struct ScreenHeader: View {
-    let title: LocalizedStringKey
     let onBack: () -> Void
 
     var body: some View {
@@ -16,14 +13,12 @@ struct ScreenHeader: View {
                         .foregroundColor(.white)
                         .frame(width: 44, height: 44)
                 }
+                .accessibilityLabel(Text("Back"))
                 // Pull the button left by its touch-target inset so the arrow
                 // glyph — not the 44pt target — lines up with the content edge.
                 .offset(x: -12)
                 Spacer()
             }
-            Text(title)
-                .foregroundColor(.white)
-                .font(.system(size: 20, weight: .bold))
         }
     }
 }

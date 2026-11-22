@@ -24,7 +24,7 @@ struct ClimateView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-                    ScreenHeader(title: "Climate") { dismiss() }
+                    ScreenHeader { dismiss() }
 
                     Spacer().frame(height: 24)
 

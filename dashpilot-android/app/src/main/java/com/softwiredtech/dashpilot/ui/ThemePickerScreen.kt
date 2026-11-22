@@ -19,7 +19,7 @@ fun ThemePickerScreen(onBack: () -> Unit, onPreview: (DashboardConfig) -> Unit) 
     var selectedId by remember { mutableStateOf(getSelectedDashboard(context).id) }
     Column(Modifier.fillMaxSize().background(DarkColors.Background).systemBarsPadding()
         .verticalScroll(rememberScrollState()).padding(24.dp)) {
-        ScreenHeader(stringResource(R.string.settings_theme_picker_title), onBack)
+        ScreenHeader(onBack = onBack)
         Spacer(Modifier.height(24.dp))
         DashboardGallery(selectedId, onSelect = { dashboard ->
             saveSelectedDashboard(context, dashboard)

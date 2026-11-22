@@ -9,7 +9,7 @@ struct ThemePickerView: View {
             Color.dashBackground.ignoresSafeArea()
             ScrollView {
                 VStack(spacing: 24) {
-                    ScreenHeader(title: "Dashboard gallery") { dismiss() }
+                    ScreenHeader { dismiss() }
                         .padding(.horizontal, 24)
                     DashboardGallery(selectedDashboardId: $selectedDashboardId)
                 }

@@ -318,6 +318,23 @@
         }
       }
     },
+    "Back" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zurück"
+          }
+        },
+        "hu" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vissza"
+          }
+        }
+      }
+    },
     "Battery" : {
       "localizations" : {
         "de" : {

@@ -28,16 +28,10 @@ struct AutomationsView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-                    if isRoot {
-                        Text("Automations")
-                            .font(.system(size: 20, weight: .bold))
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity, minHeight: 44)
-                    } else {
-                        ScreenHeader(title: "Automations") { dismiss() }
+                    if !isRoot {
+                        ScreenHeader { dismiss() }
+                        Spacer().frame(height: 24)
                     }
-
-                    Spacer().frame(height: 24)
 
                     SectionLabel("Wipers")
                     Spacer().frame(height: 8)
