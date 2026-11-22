@@ -48,7 +48,7 @@ struct AutomationsView: View {
                     AutomationRow(
                         icon: "headlight.high.beam.fill",
                         title: "Touch to Re-Enable Auto High Beams",
-                        subtitle: "Touch (not press) the high-beam button for two seconds to re-enable auto high beams. (Useful for re-enabling high beams after flashing them on stalkless vehicles)",
+                        subtitle: "Touch (not press) the high-beam button for 1.5s to re-enable auto high beams. (Useful for re-enabling high beams after flashing them on stalkless vehicles)",
                         isOn: $touchAutoHighBeamEnabled
                     )
 
