@@ -148,10 +148,8 @@ final class ConnectionViewModel {
         startStreaming(ds, resyncDashKit: true)
     }
 
-    /// Pushes the persisted multi-finger bindings and the wiper-off flag to
-    /// the firmware. The firmware persists them in NVS too, but re-syncing on
-    /// each connect keeps its state matching the app exactly (e.g. after a
-    /// DashKit reboot or an edit made while disconnected).
+    /// Reapplies the saved automation settings and multi-finger bindings on
+    /// connection, including edits made while disconnected.
     func resyncDashKitAutomations() {
         guard let manager = bleManager else { return }
         let raw = UserDefaults.standard.string(forKey: "finger_actions") ?? ""
@@ -164,6 +162,8 @@ final class ConnectionViewModel {
         }
         let wiperOff = UserDefaults.standard.bool(forKey: "wiper_off_automation")
         VehicleControl.sendWiperOff(manager, enabled: wiperOff)
+        let touchAutoHighBeamEnabled = UserDefaults.standard.bool(forKey: "auto_high_beam_hold_automation")
+        VehicleControl.sendTouchAutoHighBeamEnable(manager, enabled: touchAutoHighBeamEnabled)
         let climateKeep = UserDefaults.standard.bool(forKey: "climate_keep_automation")
         VehicleControl.sendClimateKeep(manager, enabled: climateKeep)
         let climateKeepMinutes = UserDefaults.standard.integer(forKey: "climate_keep_minutes")
