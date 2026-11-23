@@ -65,10 +65,10 @@ struct DashboardGallery: View {
                         let dashboard = availableDashboards[index]
                         let isFocused = index == focusedIndex
                         let direction: CGFloat = isFocused ? 0 : (index == visibleIndices[0] ? -1 : 1)
+                        // Tapping a card only browses; the preview opens solely via the explicit
+                        // Preview button so swiping through the gallery never launches it by accident.
                         Button {
-                            if isFocused {
-                                showPreview(dashboard)
-                            } else {
+                            if !isFocused {
                                 moveFocus(Int(direction))
                             }
                         } label: {
@@ -90,9 +90,9 @@ struct DashboardGallery: View {
                         }
                         .buttonStyle(.plain)
                         .accessibilityLabel(dashboard.name)
-                        .accessibilityHint(Text(isFocused
-                            ? LocalizedStringKey("Preview this dashboard")
-                            : LocalizedStringKey("Show this dashboard in the center")))
+                        .accessibilityHint(isFocused
+                            ? Text(verbatim: "")
+                            : Text(LocalizedStringKey("Show this dashboard in the center")))
                         .scaleEffect(isFocused ? 1 : 0.82)
                         .opacity(isFocused ? 1 : 0.65)
                         .offset(x: direction * cardWidth * 0.43, y: isFocused ? 0 : 12)

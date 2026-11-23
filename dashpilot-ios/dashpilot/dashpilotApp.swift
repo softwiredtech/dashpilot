@@ -101,7 +101,7 @@ struct dashpilotApp: App {
                 HomeView(navigationPath: $navigationPath)
                     .navigationDestination(for: AppRoute.self) { destination($0) }
             }
-            .toolbar(landscape ? .hidden : .visible, for: .tabBar)
+            .toolbar(landscape || dashboardVisible ? .hidden : .visible, for: .tabBar)
             .toolbarBackground(Color.dashSurface, for: .tabBar)
             .toolbarBackground(.visible, for: .tabBar)
             .toolbarColorScheme(.dark, for: .tabBar)
@@ -112,7 +112,7 @@ struct dashpilotApp: App {
                 ControlsView(isRoot: true)
                     .navigationDestination(for: AppRoute.self) { destination($0) }
             }
-            .toolbar(landscape ? .hidden : .visible, for: .tabBar)
+            .toolbar(landscape || dashboardVisible ? .hidden : .visible, for: .tabBar)
             .toolbarBackground(Color.dashSurface, for: .tabBar)
             .toolbarBackground(.visible, for: .tabBar)
             .toolbarColorScheme(.dark, for: .tabBar)
@@ -123,7 +123,7 @@ struct dashpilotApp: App {
                 AutomationsView(isRoot: true)
                     .navigationDestination(for: AppRoute.self) { destination($0) }
             }
-            .toolbar(landscape ? .hidden : .visible, for: .tabBar)
+            .toolbar(landscape || dashboardVisible ? .hidden : .visible, for: .tabBar)
             .toolbarBackground(Color.dashSurface, for: .tabBar)
             .toolbarBackground(.visible, for: .tabBar)
             .toolbarColorScheme(.dark, for: .tabBar)
@@ -134,7 +134,7 @@ struct dashpilotApp: App {
                 SettingsView(isRoot: true)
                     .navigationDestination(for: AppRoute.self) { destination($0) }
             }
-            .toolbar(landscape ? .hidden : .visible, for: .tabBar)
+            .toolbar(landscape || dashboardVisible ? .hidden : .visible, for: .tabBar)
             .toolbarBackground(Color.dashSurface, for: .tabBar)
             .toolbarBackground(.visible, for: .tabBar)
             .toolbarColorScheme(.dark, for: .tabBar)
