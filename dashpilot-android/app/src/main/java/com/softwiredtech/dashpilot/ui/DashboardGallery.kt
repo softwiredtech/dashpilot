@@ -74,9 +74,10 @@ fun DashboardGallery(
                         .shadow(12.dp, RoundedCornerShape(12.dp))
                         .clip(RoundedCornerShape(12.dp)).background(DarkColors.Surface)
                         .border(2.dp, Color.White.copy(alpha = 1f - distance * 0.65f), RoundedCornerShape(12.dp))
-                        .clickable(enabled = abs(offset) <= 1.01f) {
-                            if (page == pager.settledPage) onPreview(dashboard)
-                            else scope.launch { pager.animateScrollToPage(page) }
+                        // Tapping a card only browses; the preview opens solely via the explicit
+                        // Preview button so swiping through the gallery never launches it by accident.
+                        .clickable(enabled = page != pager.settledPage && abs(offset) <= 1.01f) {
+                            scope.launch { pager.animateScrollToPage(page) }
                         },
                     contentAlignment = Alignment.Center
                 ) {
