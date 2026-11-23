@@ -1,6 +1,7 @@
 #pragma once
 
 #include "car/can_parsers.h"
+#include "car/can_subscriptions.h"
 #include "car/car_state.h"
 #include "car/car_state_mapper.h"
 #include "car/cars/tesla.h"
@@ -30,6 +31,16 @@ public:
         }
         parsers_.buildCache();
         mapper_ = createMapper(vehicleType);
+        vehicleType_ = vehicleType;
+    }
+
+    // The CAN filter payload a DashKit needs for this vehicle (see
+    // car/can_subscriptions.h); empty if the vehicle type has no mapper.
+    // Probes with a throwaway mapper so the live one keeps its state.
+    std::vector<uint8_t> canFilterPayload() const {
+        auto probe = createMapper(vehicleType_);
+        if (!probe) return {};
+        return encodeCanFilter(probeCanSubscriptions(parsers_, *probe));
     }
 
     void updateFrame(int bus, uint32_t address, const uint8_t* data, size_t len) {
@@ -45,5 +56,6 @@ public:
 private:
     CANParsers parsers_;
     std::unique_ptr<CarStateMapper> mapper_;
+    std::string vehicleType_;
     CarState state_;
 };

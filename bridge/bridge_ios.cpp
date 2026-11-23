@@ -122,6 +122,14 @@ void bridge_decode_can_frame(void* decoderPtr, int bus, uint32_t address, const 
     carStateToBridge(decoder->state(), out);
 }
 
+int bridge_can_filter_payload(void* decoderPtr, uint8_t* out, int capacity) {
+    if (!decoderPtr || !out || capacity <= 0) return 0;
+    std::vector<uint8_t> payload = static_cast<VehicleDecoder*>(decoderPtr)->canFilterPayload();
+    if (payload.empty() || payload.size() > static_cast<size_t>(capacity)) return 0;
+    std::memcpy(out, payload.data(), payload.size());
+    return static_cast<int>(payload.size());
+}
+
 void bridge_start_receive_loop(void* groupPtr, void* decoderPtr, void* callbackContext, bridge_car_state_callback_t callback) {
     auto* group = static_cast<SubSocketGroup*>(groupPtr);
     auto* decoder = static_cast<VehicleDecoder*>(decoderPtr);

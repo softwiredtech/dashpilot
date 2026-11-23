@@ -215,6 +215,24 @@ Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDecodeCanFrame(
     return result;
 }
 
+// DashKit CAN filter payload for this decoder's vehicle (the ids its mapper
+// reads); empty if there is nothing to subscribe to.
+JNIEXPORT jbyteArray JNICALL
+Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeCanFilterPayload(
+        JNIEnv* env, jobject thiz,
+        jlong decoderHandle) {
+    std::vector<uint8_t> payload;
+    if (decoderHandle != 0) {
+        payload = reinterpret_cast<VehicleDecoder*>(decoderHandle)->canFilterPayload();
+    }
+    jbyteArray result = env->NewByteArray(static_cast<jsize>(payload.size()));
+    if (result != nullptr && !payload.empty()) {
+        env->SetByteArrayRegion(result, 0, static_cast<jsize>(payload.size()),
+                                reinterpret_cast<const jbyte*>(payload.data()));
+    }
+    return result;
+}
+
 JNIEXPORT void JNICALL
 Java_com_softwiredtech_dashpilot_jni_VehicleBridge_nativeDestroyVehicleDecoder(
         JNIEnv* env, jobject thiz,

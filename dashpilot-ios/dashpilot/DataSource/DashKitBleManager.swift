@@ -31,6 +31,8 @@ enum DashKitGatt {
     static let canService = CBUUID(string: "CADA0000-CA00-B1E0-B0D6-C000AA0100A1")
     /// Batched raw CAN frames (notify).
     static let canCharacteristic = CBUUID(string: "CADA0001-CA00-B1E0-B0D6-C000AA0100A1")
+    /// CAN filter (write): the (bus, id) list the DashKit forwards.
+    static let filterCharacteristic = CBUUID(string: "CADA0002-CA00-B1E0-B0D6-C000AA0100A1")
     /// Vehicle control commands (write): [opcode][value_lo][value_hi].
     static let controlCharacteristic = CBUUID(string: "CADA0004-CA00-B1E0-B0D6-C000AA0100A1")
     /// Installed firmware version (read, ASCII).

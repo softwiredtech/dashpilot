@@ -47,6 +47,8 @@ class VehicleBridge {
     external fun nativeCreateVehicleDecoder(dbcContents: Array<String>, busIndices: IntArray, vehicleType: String): Long
     external fun nativeDecodeCanFrame(decoderHandle: Long, bus: Int, address: Int, data: ByteArray): DoubleArray
     external fun nativeDestroyVehicleDecoder(decoderHandle: Long)
+    // DashKit CAN filter payload: the (bus, id) list this decoder's mapper reads.
+    external fun nativeCanFilterPayload(decoderHandle: Long): ByteArray
 
     // Message
     external fun nativeGetData(msgPtr: Long): ByteArray
