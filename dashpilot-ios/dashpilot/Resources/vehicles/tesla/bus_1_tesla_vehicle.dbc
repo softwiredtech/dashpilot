@@ -1468,64 +1468,10 @@ BO_ 569 DAS_lanes: 8 CH
  SG_ DAS_rightFork: 54|2@1+ (1,0) [0|0] "" X
  SG_ DAS_lanesCounter: 60|4@1+ (1,0) [0|0] "" X
 
-BO_ 777 DAS_object: 8 CH
- SG_ DAS_objectId M: 0|3@1+ (1,0) [0|0] "" X
- SG_ DAS_leadVehType m0: 3|3@1+ (1,0) [0|0] "" X
- SG_ DAS_leadVehRelevantForControl m0: 7|1@1+ (1,0) [0|0] "" X
- SG_ DAS_leadVehDx m0: 8|8@1+ (0.5,0) [0|0] "m" X
- SG_ DAS_leadVehVxRel m0: 16|4@1+ (4,-30) [0|0] "m/s" X
- SG_ DAS_leadVehDy m0: 20|7@1+ (0.35,-22.05) [0|0] "m" X
- SG_ DAS_leadVehId m0: 27|7@1+ (1,0) [0|0] "" X
- SG_ DAS_leadVeh2Type m0: 34|3@1+ (1,0) [0|0] "" X
- SG_ DAS_leadVeh2RelevantForControl m0: 38|1@1+ (1,0) [0|0] "" X
- SG_ DAS_leadVeh2Dx m0: 39|8@1+ (0.5,0) [0|0] "m" X
- SG_ DAS_leadVeh2VxRel m0: 47|4@1+ (4,-30) [0|0] "m/s" X
- SG_ DAS_leadVeh2Dy m0: 51|7@1+ (0.35,-22.05) [0|0] "m" X
- SG_ DAS_leadVeh2Id m0: 58|6@1+ (1,0) [0|0] "" X
- SG_ DAS_leftVehType m1: 3|3@1+ (1,0) [0|0] "" X
- SG_ DAS_leftVehRelevantForControl m1: 7|1@1+ (1,0) [0|0] "" X
- SG_ DAS_leftVehDx m1: 8|8@1+ (0.5,0) [0|0] "m" X
- SG_ DAS_leftVehVxRel m1: 16|4@1+ (4,-30) [0|0] "m/s" X
- SG_ DAS_leftVehDy m1: 20|7@1+ (0.35,-22.05) [0|0] "m" X
- SG_ DAS_leftVehId m1: 27|7@1+ (1,0) [0|0] "" X
- SG_ DAS_leftVeh2Type m1: 34|3@1+ (1,0) [0|0] "" X
- SG_ DAS_leftVeh2RelevantForControl m1: 38|1@1+ (1,0) [0|0] "" X
- SG_ DAS_leftVeh2Dx m1: 39|8@1+ (0.5,0) [0|0] "m" X
- SG_ DAS_leftVeh2VxRel m1: 47|4@1+ (4,-30) [0|0] "m/s" X
- SG_ DAS_leftVeh2Dy m1: 51|7@1+ (0.35,-22.05) [0|0] "m" X
- SG_ DAS_leftVeh2Id m1: 58|6@1+ (1,0) [0|0] "" X
- SG_ DAS_rightVehType m2: 3|3@1+ (1,0) [0|0] "" X
- SG_ DAS_rightVehRelevantForControl m2: 7|1@1+ (1,0) [0|0] "" X
- SG_ DAS_rightVehDx m2: 8|8@1+ (0.5,0) [0|0] "m" X
- SG_ DAS_rightVehVxRel m2: 16|4@1+ (4,-30) [0|0] "m/s" X
- SG_ DAS_rightVehDy m2: 20|7@1+ (0.35,-22.05) [0|0] "m" X
- SG_ DAS_rightVehId m2: 27|7@1+ (1,0) [0|0] "" X
- SG_ DAS_rightVeh2Type m2: 34|3@1+ (1,0) [0|0] "" X
- SG_ DAS_rightVeh2RelevantForControl m2: 38|1@1+ (1,0) [0|0] "" X
- SG_ DAS_rightVeh2Dx m2: 39|8@1+ (0.5,0) [0|0] "m" X
- SG_ DAS_rightVeh2VxRel m2: 47|4@1+ (4,-30) [0|0] "m/s" X
- SG_ DAS_rightVeh2Dy m2: 51|7@1+ (0.35,-22.05) [0|0] "m" X
- SG_ DAS_rightVeh2Id m2: 58|6@1+ (1,0) [0|0] "" X
- SG_ DAS_cutinVehType m3: 3|3@1+ (1,0) [0|0] "" X
- SG_ DAS_cutinVehRelevantForControl m3: 7|1@1+ (1,0) [0|0] "" X
- SG_ DAS_cutinVehDx m3: 8|8@1+ (0.5,0) [0|0] "m" X
- SG_ DAS_cutinVehVxRel m3: 16|4@1+ (4,-30) [0|0] "m/s" X
- SG_ DAS_cutinVehDy m3: 20|7@1+ (0.35,-22.05) [0|0] "m" X
- SG_ DAS_cutinVehId m3: 27|7@1+ (1,0) [0|0] "" X
- SG_ DAS_roadSignColor m4: 3|3@1+ (1,0) [0|0] "" X
- SG_ DAS_roadSignId m4: 6|8@1+ (1,0) [0|0] "" X
- SG_ DAS_roadSignStopLineDist m4: 14|10@1+ (0.2,-20) [0|0] "m" X
- SG_ DAS_roadSignControlActive m4: 24|1@1+ (1,0) [0|0] "" X
- SG_ DAS_roadSignSource m4: 25|2@1+ (1,0) [0|0] "" X
- SG_ DAS_roadSignArrow m4: 27|3@1+ (1,0) [0|0] "" X
- SG_ DAS_roadSignOrientation m4: 30|2@1+ (1,0) [0|0] "" X
- SG_ DAS_leadVehHeading m5: 8|8@1+ (0.0245437,-3.14159) [0|0] "rad" X
- SG_ DAS_leadVeh2Heading m5: 16|8@1+ (0.0245437,-3.14159) [0|0] "rad" X
- SG_ DAS_leftVehHeading m5: 24|8@1+ (0.0245437,-3.14159) [0|0] "rad" X
- SG_ DAS_leftVeh2Heading m5: 32|8@1+ (0.0245437,-3.14159) [0|0] "rad" X
- SG_ DAS_rightVehHeading m5: 40|8@1+ (0.0245437,-3.14159) [0|0] "rad" X
- SG_ DAS_rightVeh2Heading m5: 48|8@1+ (0.0245437,-3.14159) [0|0] "rad" X
- SG_ DAS_cutinVehHeading m5: 56|8@1+ (0.0245437,-3.14159) [0|0] "rad" X
+BO_ 777 UI_locationStatus: 8 GTW
+ SG_ UI_latitude: 0|28@1- (1e-06,0) [-134.217728|134.217727] "deg" X
+ SG_ UI_longitude: 28|29@1- (1e-06,0) [-268.435456|268.435455] "deg" X
+ SG_ UI_gpsAccuracy: 57|7@1+ (0.2,0) [0|25.4] "m" X
 
 BO_ 921 DAS_status: 8 CH
  SG_ DAS_autoLaneChangeState: 46|5@1+ (1,0) [0|0] "" X
@@ -5322,10 +5268,10 @@ BO_ 516 PCS_chgStatus: 8 VEH
  SG_ PCS_chgPwmEnableLine: 56|1@1+ (1,0) [0|0] "" X
  SG_ PCS_gridConfig: 6|2@1+ (1,0) [0|0] "" X
 
-BO_ 692 PCS_dcdcBusStatus: 5 VEH
- SG_ PCS_dcdcHvBusVolt : 10|12@1+ (0.146484375,0) [0|599.853515625] "V" X
- SG_ PCS_dcdcLvBusVolt : 0|10@1+ (0.0390625,0) [0|39.9609375] "V" X
- SG_ PCS_dcdcLvOutputCurrent : 24|12@1+ (0.1,0) [0|400] "A" X
+BO_ 692 PCS_dcdcBusStatus: 6 VEH
+ SG_ PCS_dcdcHvBusVolt : 16|14@1+ (0.1,0) [0|1638.3] "V" X
+ SG_ PCS_dcdcLvBusVolt : 0|13@1+ (0.01,0) [0|81.91] "V" X
+ SG_ PCS_dcdcLvOutputCurrent : 32|13@1- (0.1,0) [-409.6|409.5] "A" X
 
 BO_ 548 PCS_dcdcStatus: 8 VEH
  SG_ PCS_dcdc12VSupportRtyCnt: 44|4@1+ (1,0) [0|0] "" X
@@ -9294,7 +9240,7 @@ BA_ "GenMsgSendType" BO_ 569 0;
 BA_ "GenMsgCycleTime" BO_ 569 100;
 
 BA_ "GenMsgSendType" BO_ 777 0;
-BA_ "GenMsgCycleTime" BO_ 777 30;
+BA_ "GenMsgCycleTime" BO_ 777 1000;
 
 BA_ "GenMsgSendType" BO_ 921 0;
 BA_ "GenMsgCycleTime" BO_ 921 500;
@@ -9992,6 +9938,7 @@ BA_ "GenMsgCycleTime" BO_ 793 1000;
 BA_ "GenMsgSendType" BO_ 505 0;
 BA_ "GenMsgCycleTime" BO_ 505 100;
 
+VAL_ 777 UI_gpsAccuracy 127 "SNA";
 VAL_ 600 APB_watchdogState 0 "UNKNOWN" 1 "DEGRADED" 2 "CRITICAL" 3 "HEALTHY" 7 "SNA";
 
 VAL_ 1020 APP_decisionTemperature 0 "UNKNOWN";
@@ -10174,48 +10121,6 @@ VAL_ 569 DAS_leftLineUsage 0 "REJECTED_UNAVAILABLE" 1 "AVAILABLE" 2 "FUSED" 3 "B
 VAL_ 569 DAS_rightFork 0 "NONE" 1 "AVAILABLE" 2 "SELECTED" 3 "UNAVAILABLE";
 VAL_ 569 DAS_rightLineUsage 0 "REJECTED_UNAVAILABLE" 1 "AVAILABLE" 2 "FUSED" 3 "BLACKLISTED";
 
-VAL_ 777 DAS_objectId 0 "LEAD_VEHICLES" 1 "LEFT_VEHICLES" 2 "RIGHT_VEHICLES" 3 "CUTIN_VEHICLE" 4 "ROAD_SIGN" 5 "VEHICLE_HEADINGS";
-VAL_ 777 DAS_leadVehType 0 "UNKNOWN" 1 "TRUCK" 2 "CAR" 3 "MOTORCYCLE" 4 "BICYCLE" 5 "PEDESTRIAN" 6 "IPSO";
-VAL_ 777 DAS_leadVehDx 255 "SNA";
-VAL_ 777 DAS_leadVehVxRel 15 "SNA";
-VAL_ 777 DAS_leadVehId 127 "SNA";
-VAL_ 777 DAS_leadVeh2Type 0 "UNKNOWN" 1 "TRUCK" 2 "CAR" 3 "MOTORCYCLE" 4 "BICYCLE" 5 "PEDESTRIAN";
-VAL_ 777 DAS_leadVeh2Dx 255 "SNA";
-VAL_ 777 DAS_leadVeh2VxRel 15 "SNA";
-VAL_ 777 DAS_leadVeh2Id 0 "SNA";
-VAL_ 777 DAS_leftVehType 0 "UNKNOWN" 1 "TRUCK" 2 "CAR" 3 "MOTORCYCLE" 4 "BICYCLE" 5 "PEDESTRIAN";
-VAL_ 777 DAS_leftVehDx 255 "SNA";
-VAL_ 777 DAS_leftVehVxRel 15 "SNA";
-VAL_ 777 DAS_leftVehId 127 "SNA";
-VAL_ 777 DAS_leftVeh2Type 0 "UNKNOWN" 1 "TRUCK" 2 "CAR" 3 "MOTORCYCLE" 4 "BICYCLE" 5 "PEDESTRIAN";
-VAL_ 777 DAS_leftVeh2Dx 255 "SNA";
-VAL_ 777 DAS_leftVeh2VxRel 15 "SNA";
-VAL_ 777 DAS_leftVeh2Id 0 "SNA";
-VAL_ 777 DAS_rightVehType 0 "UNKNOWN" 1 "TRUCK" 2 "CAR" 3 "MOTORCYCLE" 4 "BICYCLE" 5 "PEDESTRIAN";
-VAL_ 777 DAS_rightVehDx 255 "SNA";
-VAL_ 777 DAS_rightVehVxRel 15 "SNA";
-VAL_ 777 DAS_rightVehId 127 "SNA";
-VAL_ 777 DAS_rightVeh2Type 0 "UNKNOWN" 1 "TRUCK" 2 "CAR" 3 "MOTORCYCLE" 4 "BICYCLE" 5 "PEDESTRIAN";
-VAL_ 777 DAS_rightVeh2Dx 255 "SNA";
-VAL_ 777 DAS_rightVeh2VxRel 15 "SNA";
-VAL_ 777 DAS_rightVeh2Id 0 "SNA";
-VAL_ 777 DAS_cutinVehType 0 "UNKNOWN" 1 "TRUCK" 2 "CAR" 3 "MOTORCYCLE" 4 "BICYCLE" 5 "PEDESTRIAN";
-VAL_ 777 DAS_cutinVehDx 255 "SNA";
-VAL_ 777 DAS_cutinVehVxRel 15 "SNA";
-VAL_ 777 DAS_cutinVehId 127 "SNA";
-VAL_ 777 DAS_roadSignColor 0 "NONE" 1 "RED" 2 "YELLOW" 3 "GREEN" 4 "RED_YELLOW";
-VAL_ 777 DAS_roadSignId 0 "STOP_SIGN" 1 "TRAFFIC_LIGHT" 255 "SNA";
-VAL_ 777 DAS_roadSignStopLineDist 1023 "SNA";
-VAL_ 777 DAS_roadSignSource 0 "NONE" 1 "NAV" 2 "VISION";
-VAL_ 777 DAS_roadSignArrow 0 "CIRCLE" 1 "LEFT" 2 "RIGHT" 3 "STRAIGHT" 4 "UNKNOWN";
-VAL_ 777 DAS_roadSignOrientation 0 "UNKNOWN" 1 "VERTICAL_3_LIGHT" 2 "HORIZONTAL_3_LIGHT";
-VAL_ 777 DAS_leadVehHeading 255 "SNA";
-VAL_ 777 DAS_leadVeh2Heading 255 "SNA";
-VAL_ 777 DAS_leftVehHeading 255 "SNA";
-VAL_ 777 DAS_leftVeh2Heading 255 "SNA";
-VAL_ 777 DAS_rightVehHeading 255 "SNA";
-VAL_ 777 DAS_rightVeh2Heading 255 "SNA";
-VAL_ 777 DAS_cutinVehHeading 255 "SNA";
 
 VAL_ 921 DAS_autoLaneChangeState 0 "UNAVAILABLE_DISABLED" 1 "UNAVAILABLE_NO_LANES" 2 "UNAVAILABLE_SONICS_INVALID" 3 "UNAVAILABLE_TP_FOLLOW" 4 "UNAVAILABLE_EXITING_HIGHWAY" 5 "UNAVAILABLE_VEHICLE_SPEED" 6 "AVAILABLE_ONLY_L" 7 "AVAILABLE_ONLY_R" 8 "AVAILABLE_BOTH" 9 "IN_PROGRESS_L" 10 "IN_PROGRESS_R" 11 "WAITING_FOR_SIDE_OBST_TO_PASS_L" 12 "WAITING_FOR_SIDE_OBST_TO_PASS_R" 13 "WAITING_FOR_FWD_OBST_TO_PASS_L" 14 "WAITING_FOR_FWD_OBST_TO_PASS_R" 15 "ABORT_SIDE_OBSTACLE_PRESENT_L" 16 "ABORT_SIDE_OBSTACLE_PRESENT_R" 17 "ABORT_POOR_VIEW_RANGE" 18 "ABORT_LC_HEALTH_BAD" 19 "ABORT_BLINKER_TURNED_OFF" 20 "ABORT_OTHER_REASON" 21 "UNAVAILABLE_SOLID_LANE_LINE" 22 "BLOCKED_VEH_TTC_L" 23 "BLOCKED_VEH_TTC_AND_USS_L" 24 "BLOCKED_VEH_TTC_R" 25 "BLOCKED_VEH_TTC_AND_USS_R" 26 "BLOCKED_LANE_TYPE_L" 27 "BLOCKED_LANE_TYPE_R" 28 "WAITING_HANDS_ON" 29 "ABORT_TIMEOUT" 30 "ABORT_MISSION_PLAN_INVALID" 31 "SNA";
 VAL_ 921 DAS_autoparkReady 0 "UNAVAILABLE" 1 "READY";
