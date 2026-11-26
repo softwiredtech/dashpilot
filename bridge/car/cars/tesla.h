@@ -65,23 +65,6 @@ private:
     char pending_[CarState::VIN_LENGTH] = {};
 };
 
-static inline void updatePartyBus(const CANParsers& cp, CarState& cs) {
-    cs.egoSteeringAngle = cp.get(2, "SCCM_steeringAngleSensor", "SCCM_steeringAngle");
-    cs.gear = cp.get(2, "DI_systemStatus", "DI_gear");
-    cs.egoSpeed = cp.get(2, "DI_speed", "DI_uiSpeed");
-    cs.adasOn = cp.get(2, "DI_state", "DI_cruiseState") == 2.0 ? 1.0 : 0.0;
-    cs.leftBlindSpot = cp.get(2, "DAS_status", "DAS_blindSpotRearLeft");
-    cs.rightBlindSpot = cp.get(2, "DAS_status", "DAS_blindSpotRearRight");
-    cs.fusedSpeedLimit = cp.get(2, "DAS_status", "DAS_fusedSpeedLimit");
-    cs.trafficLightColor = cp.get(2, "DAS_road", "DAS_trafficLightColor");
-    cs.stopLineDist = cp.get(2, "DAS_road", "DAS_stopLineDist");
-    cs.leftBlinker = cp.get(2, "UI_warning", "leftBlinkerBlinking");
-    cs.rightBlinker = cp.get(2, "UI_warning", "rightBlinkerBlinking");
-    cs.anyDoorOpen = cp.get(2, "UI_warning", "anyDoorOpen");
-    cs.buckleStatus = cp.get(2, "UI_warning", "buckleStatus");
-    cs.accSetSpeed = cp.get(2, "DI_state", "DI_digitalSpeed");
-}
-
 static inline double powerLevel(const CarState& cs) {
     if (cs.packVoltage <= 0 || cs.maxDischargePower <= 0 || cs.maxRegenPower <= 0) return 0;
     double kw = cs.packVoltage * cs.packCurrent / 1000.0;
@@ -173,13 +156,6 @@ struct BlinkerHold {
     }
 };
 
-class TeslaCommaPartyMapper : public CarStateMapper {
-public:
-    void update(const CANParsers& cp, CarState& cs) override {
-        updatePartyBus(cp, cs);
-    }
-};
-
 class TeslaDashKitMapper : public CarStateMapper {
 public:
     void update(const CANParsers &cp, CarState &cs) override {
@@ -258,8 +234,8 @@ private:
     TeslaVinUpdater vin_;
 };
 
-// New-gen Model Y (Juniper) with new_gen_juniper.dbc on both buses. Comma and
-// DashKit number the buses the same way here: 0 = chassis, 1 = vehicle.
+// New-gen Model Y (Juniper) with new_gen_juniper.dbc on both buses:
+// 0 = chassis, 1 = vehicle.
 class TeslaJuniperMapper : public CarStateMapper {
 public:
     void update(const CANParsers &cp, CarState &cs) override {

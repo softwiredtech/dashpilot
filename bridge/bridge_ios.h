@@ -45,7 +45,7 @@ typedef struct {
     double hvacKeepClimateOn;
     double powerLevel;
 
-    // Openpilot state
+    // Assist state. No current data source sets these.
     double madsActive;
     double selfdriveActive;
     double experimentalMode;
@@ -79,37 +79,18 @@ typedef struct {
     double ambientLightingBrightness;
 } BridgeCarState;
 
-// Context
-void* bridge_create_context(void);
-void  bridge_delete_context(void* ctx);
-
-// Subscribe socket group
-void* bridge_create_sub_sockets(void* ctx, const char** endpoints, int count, const char* address);
-void  bridge_delete_sub_sockets(void* group);
-
 // Vehicle decoder
 void* bridge_create_vehicle_decoder(const char** dbcContents, const int* busIndices, int count, const char* vehicleType);
 void  bridge_destroy_vehicle_decoder(void* decoder);
 
 // Per-frame decode (DashKit BLE path): feed one raw CAN frame into the decoder
-// and read back the updated car state. Not thread-safe against the receive
-// loop — a decoder is used by either this or bridge_start_receive_loop.
+// and read back the updated car state.
 void bridge_decode_can_frame(void* decoder, int bus, uint32_t address, const uint8_t* data, int len, BridgeCarState* out);
 
 // DashKit CAN subscription: writes the CAN filter payload for this decoder's
 // vehicle (the ids its mapper reads) into `out` and returns its length. Returns
 // 0 if there is nothing to subscribe to or it does not fit in `capacity`.
 int bridge_can_filter_payload(void* decoder, uint8_t* out, int capacity);
-
-// Discovery
-// Returns a malloc'd C string with the discovered IP, or NULL if not found.
-// Caller must free() the result.
-char* bridge_discover_publisher(void* ctx, const char* endpoint, const char* initialIp, int timeoutMs);
-
-// Receive loop
-typedef void (*bridge_car_state_callback_t)(void* context, const BridgeCarState* state);
-void bridge_start_receive_loop(void* group, void* decoder, void* callbackContext, bridge_car_state_callback_t callback);
-void bridge_stop_receive_loop(void);
 
 #ifdef __cplusplus
 }

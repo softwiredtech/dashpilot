@@ -49,7 +49,7 @@ struct HomeView: View {
             }
             actionButtons
             Spacer().frame(height: 12)
-            DataSourceMenu(navigationPath: $navigationPath)
+            DataSourceMenu()
         }
     }
 
@@ -75,7 +75,7 @@ struct HomeView: View {
             HStack {
                 Spacer()
                 if showDataSource {
-                    DataSourceMenu(navigationPath: $navigationPath, alignment: .trailing)
+                    DataSourceMenu(alignment: .trailing)
                         .offset(x: 12)
                 }
             }
@@ -213,7 +213,6 @@ struct HomeView: View {
 
 // Separate view so 25 Hz dash updates don't rebuild the open Menu (taps get dropped).
 private struct DataSourceMenu: View {
-    @Binding var navigationPath: NavigationPath
     var alignment: Alignment = .center
     @Environment(ConnectionViewModel.self) var connectionVM
 
@@ -221,7 +220,6 @@ private struct DataSourceMenu: View {
         VStack(spacing: 4) {
             Menu {
                 if isIdle {
-                    Button("comma") { navigationPath.append(AppRoute.setup) }
                     Button("DashKit") { connectionVM.connectDashKit() }
                     Button("Demo") { connectionVM.connectDemo() }
                 } else {

@@ -54,7 +54,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -69,11 +68,10 @@ import com.softwiredtech.dashpilot.ui.theme.DarkColors
 private data class DataSource(
     val key: String,
     val label: String,
-    val icon: ImageVector?,
+    val icon: ImageVector,
 )
 
 private val dataSources = buildList {
-    add(DataSource(DataSourceType.COMMA, "comma", null))
     add(DataSource(DataSourceType.DASHKIT, "DashKit", Icons.Rounded.Bluetooth))
     if (BuildConfig.DEBUG) {
         add(DataSource(DataSourceType.WEBSOCKET, "WebSocket", Icons.Rounded.Lan))
@@ -111,7 +109,7 @@ fun SetupScreen(
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = if (dataSources.size > 1) stringResource(R.string.setup_select_data_source) else stringResource(R.string.setup_connect_your_comma_device),
+                text = stringResource(R.string.setup_select_data_source),
                 color = DarkColors.TextMuted,
                 fontSize = 14.sp
             )
@@ -130,8 +128,7 @@ fun SetupScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
         ) {
-            val showIpField = currentSource.key == DataSourceType.WEBSOCKET ||
-                    (currentSource.key == DataSourceType.COMMA && connectionStatus is ConnectionStatus.Error)
+            val showIpField = currentSource.key == DataSourceType.WEBSOCKET
             OutlinedTextField(
                 value = serverAddress,
                 onValueChange = { serverAddress = it },
@@ -172,14 +169,8 @@ fun SetupScreen(
                     }
                     Button(
                         onClick = {
-                            // For comma: pass empty unless the user has overridden via the
-                            // manual field (only shown after a discovery error). The VM takes
-                            // care of seed IP + discovery.
-                            val addressToSend = when (currentSource.key) {
-                                DataSourceType.COMMA -> if (connectionStatus is ConnectionStatus.Error) serverAddress else ""
-                                DataSourceType.WEBSOCKET -> serverAddress
-                                else -> ""
-                            }
+                            val addressToSend =
+                                if (currentSource.key == DataSourceType.WEBSOCKET) serverAddress else ""
                             onConnect(addressToSend, currentSource.key)
                         },
                         shape = RoundedCornerShape(16.dp),
@@ -391,7 +382,7 @@ private fun ConnectionVisualization(
 @Composable
 private fun DataSourceIcon(source: DataSource, size: Int, tint: Color = Color.Unspecified) {
     Icon(
-        imageVector = source.icon ?: ImageVector.vectorResource(R.drawable.ic_comma),
+        imageVector = source.icon,
         contentDescription = source.label,
         tint = tint,
         modifier = Modifier.size(size.dp)

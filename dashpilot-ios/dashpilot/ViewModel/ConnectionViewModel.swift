@@ -17,8 +17,6 @@ final class ConnectionViewModel {
     var onboardingRequested = false
 
     private(set) var connectionStatus: ConnectionStatus = .disconnected
-    private(set) var discoveredAddress: String?
-    private(set) var discoveryError: String?
 
     /// Most recent state of the session, replayed to new subscribers so a view
     /// opened mid-session renders immediately.
@@ -108,8 +106,8 @@ final class ConnectionViewModel {
             }
             disconnect()
             connectDashKit()
-        case .comma, .websocket, .demo:
-            // WiFi sources (and demo mode) are user-initiated on iOS; leave them alone.
+        case .websocket, .demo:
+            // User-initiated on iOS; leave them alone.
             return
         case nil:
             guard connectionStatus == .disconnected else { return }
@@ -124,8 +122,6 @@ final class ConnectionViewModel {
         guard canStartConnection else { return }
         if case .error = connectionStatus { disconnect() }  // drop failed-session remnants
         connectionStatus = .connecting
-        discoveryError = nil
-        discoveredAddress = nil
         activeSourceType = .dashkit
 
         let manager = DashKitBleManager()
@@ -179,62 +175,12 @@ final class ConnectionViewModel {
         VehicleControl.sendAcSwingIntensity(manager, intensity: defaults.object(forKey: "ac_swing_intensity") as? Int ?? 2)
     }
 
-    // MARK: - Comma (WiFi)
-
-    /// Auto-discover a publisher on the local subnet, then connect.
-    func autoConnect() {
-        guard canStartConnection else { return }
-        if case .error = connectionStatus { disconnect() }  // drop failed-session remnants
-        connectionStatus = .connecting
-        discoveryError = nil
-        discoveredAddress = nil
-        activeSourceType = .comma
-
-        connectTask = Task { @MainActor [weak self] in
-            guard let self else { return }
-
-            // Retry discovery in a loop until found or cancelled
-            var foundIp: String?
-            while foundIp == nil && !Task.isCancelled {
-                foundIp = await NetworkUtil.findPublisher(endpoint: "can", timeoutMs: 5000)
-                if foundIp == nil && !Task.isCancelled {
-                    // Brief pause before retrying
-                    try? await Task.sleep(for: .milliseconds(700))
-                }
-            }
-
-            guard !Task.isCancelled, let ip = foundIp else {
-                if !Task.isCancelled {
-                    self.discoveryError = String(localized: "Could not find device on the network")
-                    self.connectionStatus = .disconnected
-                }
-                return
-            }
-
-            self.discoveredAddress = ip
-            self.startCommaDataSource(address: ip)
-        }
-    }
-
-    /// Connect directly to a known address (manual entry).
-    func connect(serverAddress: String) {
-        guard canStartConnection else { return }
-        if case .error = connectionStatus { disconnect() }  // drop failed-session remnants
-        connectionStatus = .connecting
-        discoveryError = nil
-        discoveredAddress = serverAddress
-        activeSourceType = .comma
-        startCommaDataSource(address: serverAddress)
-    }
-
     // MARK: - Demo mode
 
     func connectDemo() {
         guard canStartConnection else { return }
         if case .error = connectionStatus { disconnect() }  // drop failed-session remnants
         connectionStatus = .connecting
-        discoveryError = nil
-        discoveredAddress = nil
         activeSourceType = .demo
 
         let ds = DemoDataSource()
@@ -249,10 +195,6 @@ final class ConnectionViewModel {
         case .dashkit:
             disconnect()
             connectDashKit()
-        case .comma:
-            let address = discoveredAddress
-            disconnect()
-            if let address { connect(serverAddress: address) }
         case .websocket, .demo, nil:
             return
         }
@@ -270,30 +212,10 @@ final class ConnectionViewModel {
         bleManager = nil
         activeSourceType = nil
         latestDashState = nil
-        discoveredAddress = nil
-        discoveryError = nil
         connectionStatus = .disconnected
     }
 
     // MARK: - Private
-
-    private func startCommaDataSource(address: String) {
-        let ds: CommaDataSource
-        if DisplaySettings.carModel == .teslaJuniper {
-            ds = CommaDataSource(
-                vehicleType: "tesla_juniper",
-                dbcFiles: [
-                    (0, "new_gen_juniper"),
-                    (1, "new_gen_juniper")
-                ]
-            )
-        } else {
-            ds = CommaDataSource()
-        }
-        dataSource = ds
-        ds.connect(address: address)
-        startStreaming(ds, resyncDashKit: false)
-    }
 
     /// Consumes the data source's `CarState` stream, republishes it as
     /// `DashState` to every subscribed view, and flips to `.connected` on the

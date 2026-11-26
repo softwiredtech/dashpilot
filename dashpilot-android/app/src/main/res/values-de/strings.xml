@@ -2,7 +2,6 @@
     <string name="app_name">DashPilot</string>
     <string name="connection_device_ip">Geräte-IP</string>
     <string name="setup_select_data_source">Datenquelle auswählen</string>
-    <string name="setup_connect_your_comma_device">Mit deinem comma-Gerät verbinden</string>
     <string name="setup_connect">Verbinden</string>
     <string name="setup_connecting">Verbinde…</string>
     <string name="setup_cancel">Abbrechen</string>

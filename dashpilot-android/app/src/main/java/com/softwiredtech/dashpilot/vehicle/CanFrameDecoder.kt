@@ -4,8 +4,7 @@ import com.softwiredtech.dashpilot.datamodel.dash.CarState
 import com.softwiredtech.dashpilot.datasource.RawCanFrame
 import com.softwiredtech.dashpilot.jni.VehicleBridge
 
-// This is a wrapper for the C++ VehicleDecoder so that DataSources that are
-// non-native (such as PandaBleDataSource) can still decode can frames.
+// Wrapper for the C++ VehicleDecoder so Kotlin data sources can decode CAN frames.
 class CanFrameDecoder(
     private val bridge: VehicleBridge,
     profile: VehicleProfile

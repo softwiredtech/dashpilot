@@ -165,8 +165,6 @@ struct dashpilotApp: App {
             AutomationsView()
         case .controls:
             ControlsView()
-        case .setup:
-            SetupView(navigationPath: $navigationPath)
         }
     }
 
