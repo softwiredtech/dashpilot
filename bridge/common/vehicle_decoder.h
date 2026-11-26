@@ -5,17 +5,11 @@
 #include "car/car_state.h"
 #include "car/car_state_mapper.h"
 #include "car/cars/tesla.h"
-#include "msgq/ipc.h"
 #include <vector>
 #include <memory>
 #include <string>
 
-struct SubSocketGroup {
-    std::vector<SubSocket*> sockets;
-};
-
 inline std::unique_ptr<CarStateMapper> createMapper(const std::string& vehicleType) {
-    if (vehicleType == "tesla_party") return std::make_unique<TeslaCommaPartyMapper>();
     if (vehicleType == "dashkit") return std::make_unique<TeslaDashKitMapper>();
     if (vehicleType == "tesla_juniper") return std::make_unique<TeslaJuniperMapper>();
     return nullptr;

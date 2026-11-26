@@ -20,7 +20,6 @@ enum AppRoute: Hashable {
     case climate
     case automations
     case controls
-    case setup
 }
 
 /// Opens once per departure from Park; unknown gear values never trigger a drive.

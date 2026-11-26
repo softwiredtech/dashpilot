@@ -2,7 +2,6 @@
     <string name="app_name">DashPilot</string>
     <string name="connection_device_ip">Eszköz IP-címe</string>
     <string name="setup_select_data_source">Válassz adatforrást</string>
-    <string name="setup_connect_your_comma_device">Csatlakozás a comma eszközhöz</string>
     <string name="setup_connect">Csatlakozás</string>
     <string name="setup_connecting">Csatlakozás…</string>
     <string name="setup_cancel">Mégse</string>

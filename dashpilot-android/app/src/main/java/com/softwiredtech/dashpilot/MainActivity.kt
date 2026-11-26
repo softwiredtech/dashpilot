@@ -13,8 +13,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.core.content.ContextCompat
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.Row
@@ -87,18 +85,12 @@ import com.softwiredtech.dashpilot.ui.ThemePickerScreen
 import com.softwiredtech.dashpilot.ui.onboarding.OnboardingScreen
 import com.softwiredtech.dashpilot.ui.tesla.TeslaEnrollFlow
 import com.softwiredtech.dashpilot.ui.theme.DashPilotTheme
-import com.softwiredtech.dashpilot.util.NetworkUtil
 import com.softwiredtech.dashpilot.viewmodel.ConnectionViewModel
 import com.softwiredtech.dashpilot.viewmodel.SpeedCameraViewModel
 
 class MainActivity : ComponentActivity() {
-    private val networkUtil by lazy { NetworkUtil(applicationContext) }
     // Activity-owned: all tabs and live dashboards share this connection and its state.
-    private val connectionVM: ConnectionViewModel by viewModels {
-        viewModelFactory {
-            initializer { ConnectionViewModel(networkUtil) }
-        }
-    }
+    private val connectionVM: ConnectionViewModel by viewModels()
 
     private val speedCameraVM: SpeedCameraViewModel by viewModels()
 
@@ -263,10 +255,7 @@ class MainActivity : ComponentActivity() {
                         }
                         ConnectionViewModel.StartupRoute.AUTOCONNECT_DASHKIT ->
                             connectionVM.connect(context, "", DataSourceType.DASHKIT)
-                        ConnectionViewModel.StartupRoute.DEFAULT ->
-                            if (!BuildConfig.DEBUG) {
-                                connectionVM.connect(context, "", DataSourceType.COMMA)
-                            }
+                        ConnectionViewModel.StartupRoute.DEFAULT,
                         ConnectionViewModel.StartupRoute.LOADING -> Unit
                     }
                 }

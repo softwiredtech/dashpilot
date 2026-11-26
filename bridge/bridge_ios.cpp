@@ -1,10 +1,8 @@
 #include "bridge_ios.h"
-#include "common/bridge_core.h"
+#include "common/vehicle_decoder.h"
 #include <vector>
 #include <string>
-#include <cstdio>
 #include <cstring>
-#include <atomic>
 
 static void carStateToBridge(const CarState& cs, BridgeCarState* out) {
     out->egoSteeringAngle = cs.egoSteeringAngle;
@@ -67,39 +65,7 @@ static void carStateToBridge(const CarState& cs, BridgeCarState* out) {
     out->ambientLightingBrightness = cs.ambientLightingBrightness;
 }
 
-static std::atomic<bool> receiveLoopRunning{false};
-static std::atomic<bool> receiveLoopExited{true};
-
 extern "C" {
-
-void* bridge_create_context(void) {
-    return bridge::createContext();
-}
-
-void bridge_delete_context(void* ctx) {
-    bridge::deleteContext(static_cast<Context*>(ctx));
-}
-
-char* bridge_discover_publisher(void* ctx, const char* endpoint, const char* initialIp, int timeoutMs) {
-    std::string result = bridge::discoverPublisher(
-        static_cast<Context*>(ctx), endpoint, initialIp, timeoutMs);
-    if (result.empty()) return nullptr;
-    return strdup(result.c_str());
-}
-
-void* bridge_create_sub_sockets(void* ctx, const char** endpoints, int count, const char* address) {
-    std::vector<std::string> eps;
-    for (int i = 0; i < count; i++) eps.emplace_back(endpoints[i]);
-    auto* group = bridge::createSubSockets(static_cast<Context*>(ctx), eps, address);
-    for (const auto& ep : eps) {
-        printf("[bridge_ios] subscribed to '%s' at %s\n", ep.c_str(), address);
-    }
-    return group;
-}
-
-void bridge_delete_sub_sockets(void* groupPtr) {
-    bridge::deleteSubSockets(static_cast<SubSocketGroup*>(groupPtr));
-}
 
 void* bridge_create_vehicle_decoder(const char** dbcContents, const int* busIndices, int count, const char* vehicleType) {
     std::vector<std::string> dbc;
@@ -108,11 +74,11 @@ void* bridge_create_vehicle_decoder(const char** dbcContents, const int* busIndi
         dbc.emplace_back(dbcContents[i]);
         buses.push_back(busIndices[i]);
     }
-    return bridge::createVehicleDecoder(dbc, buses, vehicleType);
+    return new VehicleDecoder(dbc, buses, vehicleType);
 }
 
 void bridge_destroy_vehicle_decoder(void* decoder) {
-    bridge::destroyVehicleDecoder(static_cast<VehicleDecoder*>(decoder));
+    delete static_cast<VehicleDecoder*>(decoder);
 }
 
 void bridge_decode_can_frame(void* decoderPtr, int bus, uint32_t address, const uint8_t* data, int len, BridgeCarState* out) {
@@ -128,31 +94,6 @@ int bridge_can_filter_payload(void* decoderPtr, uint8_t* out, int capacity) {
     if (payload.empty() || payload.size() > static_cast<size_t>(capacity)) return 0;
     std::memcpy(out, payload.data(), payload.size());
     return static_cast<int>(payload.size());
-}
-
-void bridge_start_receive_loop(void* groupPtr, void* decoderPtr, void* callbackContext, bridge_car_state_callback_t callback) {
-    auto* group = static_cast<SubSocketGroup*>(groupPtr);
-    auto* decoder = static_cast<VehicleDecoder*>(decoderPtr);
-    receiveLoopRunning.store(true);
-    receiveLoopExited.store(false);
-
-    BridgeCarState bridgeState = {};
-    bridge::runReceiveLoop(group, decoder, receiveLoopRunning,
-        [&bridgeState, callbackContext, callback](const CarState& state) {
-            carStateToBridge(state, &bridgeState);
-            callback(callbackContext, &bridgeState);
-        });
-
-    receiveLoopExited.store(true);
-}
-
-void bridge_stop_receive_loop(void) {
-    receiveLoopRunning.store(false);
-    // Wait for the receive loop to fully exit before returning,
-    // so the caller can safely delete sockets and other resources.
-    while (!receiveLoopExited.load()) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-    }
 }
 
 }

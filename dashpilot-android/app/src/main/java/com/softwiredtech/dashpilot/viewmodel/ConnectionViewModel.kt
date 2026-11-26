@@ -66,7 +66,6 @@ import com.softwiredtech.dashpilot.datamodel.dash.setSportKickdownPercent
 import com.softwiredtech.dashpilot.ui.controls.controlById
 import com.softwiredtech.dashpilot.datasource.DataSourceType
 import com.softwiredtech.dashpilot.datasource.cacheForConnection
-import com.softwiredtech.dashpilot.datasource.CommaDataSource
 import com.softwiredtech.dashpilot.datasource.ConnectionStatus
 import com.softwiredtech.dashpilot.datasource.IDataSource
 import com.softwiredtech.dashpilot.datasource.DashKitBleManager
@@ -75,7 +74,6 @@ import com.softwiredtech.dashpilot.datasource.DemoDataSource
 import com.softwiredtech.dashpilot.datasource.WebsocketDataSource
 import com.softwiredtech.dashpilot.ble.VehicleControl
 import com.softwiredtech.dashpilot.jni.VehicleBridge
-import com.softwiredtech.dashpilot.util.NetworkUtil
 import com.softwiredtech.dashpilot.vehicle.CanFrameDecoder
 import com.softwiredtech.dashpilot.vehicle.VehicleProfileLoader
 import kotlinx.coroutines.Dispatchers
@@ -97,7 +95,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.coroutines.resume
 import com.softwiredtech.dashpilot.R
 
-class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
+class ConnectionViewModel : ViewModel() {
     private val _dataSource = MutableStateFlow<IDataSource?>(null)
     private var connectionJob: Job? = null
 
@@ -316,7 +314,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     // Briefly scan for an advertising DashKit and decide the launch route:
     //  - found + bonded   -> auto-connect DashKit
     //  - found + unbonded -> open onboarding (pair flow)
-    //  - not found / no permission -> default (setup + comma)
+    //  - not found / no permission -> default (stay disconnected)
     fun runStartupDiscovery(context: Context, hasBlePermission: Boolean) {
         if (startupDiscoveryStarted) return
         startupDiscoveryStarted = true
@@ -433,7 +431,6 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         _activeSourceType.value = dataSourceType
         lastServerAddress = manualServerAddress
 
-        var finalServerAddress = manualServerAddress
         _connectionStatus.value = ConnectionStatus.Connecting
         connectionJob = viewModelScope.launch(Dispatchers.IO) {
             val vehicleName = "tesla" // TODO: make configurable via UI
@@ -442,8 +439,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
             _carModel.value = carModel
             val configFile = when {
                 carModel == CarModel.TESLA_JUNIPER -> "config_juniper.json"
-                dataSourceType == DataSourceType.DASHKIT -> "config_dashkit.json"
-                else -> "config_comma_normal.json"
+                else -> "config_dashkit.json"
             }
             val profile = VehicleProfileLoader.loadProfile(context, vehicleName, configFile)
             val bridge = VehicleBridge()
@@ -464,25 +460,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
                     DashKitDataSource(manager, decoder)
                 }
                 DataSourceType.WEBSOCKET -> WebsocketDataSource()
-                DataSourceType.DEMO -> DemoDataSource()
-                else -> CommaDataSource(bridge, profile)
-            }
-
-            if (finalServerAddress.isEmpty() && dataSourceType == DataSourceType.COMMA) {
-                // ds already holds a native context and decoder, but teardown
-                // only sees it once it is assigned below: release it if
-                // discovery is cancelled or fails.
-                try {
-                    var localIp = networkUtil.getWifiIpAddress()
-                    while (localIp == null) {
-                        delay(1000)
-                        localIp = networkUtil.getWifiIpAddress()
-                    }
-                    finalServerAddress = networkUtil.findCanPublisher(initialIp = localIp)
-                } catch (e: Throwable) {
-                    ds.disconnect()
-                    throw e
-                }
+                else -> DemoDataSource()
             }
 
             _dataSource.value = ds
@@ -527,7 +505,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
                 initial = DashState(displaySettings = _displaySettings.value, dataSourceType = dataSourceType)
             )
 
-            launch(Dispatchers.IO) { ds.connect(finalServerAddress) }
+            launch(Dispatchers.IO) { ds.connect(manualServerAddress) }
             ds.incomingMessages.first()
             _connectionStatus.value = ConnectionStatus.Connected
 

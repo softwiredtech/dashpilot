@@ -176,7 +176,7 @@ extension DashKitDataSource: DashKitGattListener {
     }
 }
 
-// MARK: - C string array helper (same shape as CommaDataSource's private one)
+// MARK: - C string array helper
 
 private extension Array where Element == String {
     func withCStringArray<R>(_ body: (UnsafeMutablePointer<UnsafePointer<CChar>?>) -> R) -> R {

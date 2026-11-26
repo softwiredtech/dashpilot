@@ -52,7 +52,7 @@ What a dash app receives: the [CarState](#carstate) fields plus these phone and 
 | `showPhoneBattery`, `showCarBattery`, `showOdometer` | bool | user wants these visible |
 | `alwaysOnBlindSpotMonitor` | bool | show blind spots even without a blinker |
 | `renderQuality` | 1–3 | hint for expensive effects |
-| `dataSourceType` | string | `"dashkit"`, `"comma"`, `"websocket"`, `"demo"` |
+| `dataSourceType` | string | `"dashkit"`, `"websocket"`, `"demo"` |
 | `speedCameraDistance` | meters | -1 = none nearby. **Android only** |
 
 ## CarState
@@ -86,8 +86,8 @@ Values not received yet are `0` / `false`. For speed limit, stop line and energy
 | `trafficLightColor` | 0–3 | 0 none, 1 red, 2 green, 3 yellow |
 | `stopLineDist` | meters | distance to the stop line |
 | `changingLane` | bool | lane change in progress |
-| `madsActive`, `experimentalMode` | bool | openpilot states, comma only |
-| `selfdriveActive` | bool | openpilot engaged, comma only. **iOS only** for web apps |
+| `madsActive`, `experimentalMode` | bool | openpilot states. DashKit doesn't set them; they are `false` unless a WebSocket server or the demo sends them |
+| `selfdriveActive` | bool | openpilot engaged, same as above. **iOS only** for web apps |
 
 **Battery**
 

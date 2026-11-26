@@ -22,7 +22,6 @@ To try yours on a phone, open Settings → Developer: **Load Rive File**, or **L
 
 - **DashKit**: the main one, over Bluetooth Low Energy.
 - **Demo**: a loop of simulated driving, built into the app.
-- **comma**: reads the car through a [comma](https://comma.ai) device running openpilot. It works, but it isn't actively maintained.
 - **WebSocket**: reads car data from your own server, handy for feeding recorded or generated drives. Android debug builds only.
 
 ### WebSocket data source
@@ -33,6 +32,10 @@ The app connects as a client to `ws://<ip>:8080`, where `<ip>` is the address yo
 { "egoSpeed": 87, "gear": 4, "leftBlinker": 2, "adasOn": true, "accSetSpeed": 90, "fusedSpeedLimit": 90 }
 ```
 
+### comma
+
+Support for reading the car through a [comma](https://comma.ai) device running openpilot has been removed from `main`. It lives on in the [`comma-data-source`](https://github.com/softwiredtech/dashpilot/tree/comma-data-source) branch, which is not actively maintained.
+
 ## Repo structure
 
 | folder | |
@@ -40,7 +43,7 @@ The app connects as a client to `ws://<ip>:8080`, where `<ip>` is the address yo
 | [`dashpilot-android/`](./dashpilot-android/) | Android app (Kotlin, Jetpack Compose) |
 | [`dashpilot-ios/`](./dashpilot-ios/) | iOS app (SwiftUI) |
 | [`dash-apps/`](./dash-apps/) | the built-in dashboards, and the contest |
-| [`bridge/`](./bridge/) | C++ car connection and CAN decoding used by the comma data source, see its [README](./bridge/README.md) |
+| [`bridge/`](./bridge/) | C++ CAN decoding shared by both apps, see its [README](./bridge/README.md) |
 | [`scripts/`](./scripts/) | copy the dash apps into the Android and iOS builds |
 
 The DashKit firmware lives in its own repo: [softwiredtech/dashkit-firmware](https://github.com/softwiredtech/dashkit-firmware).
