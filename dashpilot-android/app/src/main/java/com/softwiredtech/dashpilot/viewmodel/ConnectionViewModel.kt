@@ -45,8 +45,10 @@ import com.softwiredtech.dashpilot.datamodel.dash.setPinnedControl
 import com.softwiredtech.dashpilot.datamodel.dash.getFingerActions
 import com.softwiredtech.dashpilot.datamodel.dash.setFingerActions
 import com.softwiredtech.dashpilot.datamodel.dash.getSignalOffAutomation
+import com.softwiredtech.dashpilot.datamodel.dash.getTouchAutoHighBeamAutomation
 import com.softwiredtech.dashpilot.datamodel.dash.getWiperOffAutomation
 import com.softwiredtech.dashpilot.datamodel.dash.setSignalOffAutomation
+import com.softwiredtech.dashpilot.datamodel.dash.setTouchAutoHighBeamAutomation
 import com.softwiredtech.dashpilot.datamodel.dash.setWiperOffAutomation
 import com.softwiredtech.dashpilot.datamodel.dash.DEFAULT_CLIMATE_KEEP_MINUTES
 import com.softwiredtech.dashpilot.datamodel.dash.getClimateKeepAutomation
@@ -144,6 +146,8 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
     val wiperOffAutomation = _wiperOffAutomation.asStateFlow()
     private val _signalOffAutomation = MutableStateFlow(false)
     val signalOffAutomation = _signalOffAutomation.asStateFlow()
+    private val _touchAutoHighBeamAutomation = MutableStateFlow(false)
+    val touchAutoHighBeamAutomation = _touchAutoHighBeamAutomation.asStateFlow()
 
     private val _climateKeepAutomation = MutableStateFlow(false)
     val climateKeepAutomation = _climateKeepAutomation.asStateFlow()
@@ -170,6 +174,7 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         _carModel.value = getCarModel(context)
         _wiperOffAutomation.value = getWiperOffAutomation(context)
         _signalOffAutomation.value = getSignalOffAutomation(context)
+        _touchAutoHighBeamAutomation.value = getTouchAutoHighBeamAutomation(context)
         _climateKeepAutomation.value = getClimateKeepAutomation(context)
         _climateKeepMinutes.value = getClimateKeepMinutes(context)
         _sportKickdownAutomation.value = getSportKickdownAutomation(context)
@@ -197,6 +202,12 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
         setSignalOffAutomation(context, value)
         _signalOffAutomation.value = value
         _bleManager.value?.let { VehicleControl.sendSignalOff(it, value) }
+    }
+
+    fun updateTouchAutoHighBeamAutomation(context: Context, value: Boolean) {
+        setTouchAutoHighBeamAutomation(context, value)
+        _touchAutoHighBeamAutomation.value = value
+        _bleManager.value?.let { VehicleControl.sendTouchAutoHighBeamEnable(it, value) }
     }
 
     private fun pushWiperOff(enabled: Boolean) {
@@ -533,6 +544,9 @@ class ConnectionViewModel(private var networkUtil: NetworkUtil) : ViewModel() {
                 val signalOff = getSignalOffAutomation(context)
                 _signalOffAutomation.value = signalOff
                 VehicleControl.sendSignalOff(mgr, signalOff)
+                val touchAutoHighBeam = getTouchAutoHighBeamAutomation(context)
+                _touchAutoHighBeamAutomation.value = touchAutoHighBeam
+                VehicleControl.sendTouchAutoHighBeamEnable(mgr, touchAutoHighBeam)
 
                 // Re-sync the climate-keep automation the same way.
                 val climateKeep = getClimateKeepAutomation(context)

@@ -262,6 +262,8 @@
     <string name="automations_wiper_off_title">Wiper Off</string>
     <string name="automations_wiper_off_subtitle">Keep wipers disabled automatically</string>
     <string name="automations_section_lights">Lights</string>
+    <string name="automations_touch_auto_high_beam_title">Touch to Re-Enable Auto High Beams</string>
+    <string name="automations_touch_auto_high_beam_subtitle">Touch (not press) the high-beam button for 1.5s to re-enable auto high beams. (Useful for re-enabling high beams after flashing them on stalkless vehicles)</string>
     <string name="automations_signal_off_title">Signal Off in Park</string>
     <string name="automations_signal_off_subtitle">Cancel a turn signal left on when you shift into Park</string>
     <string name="automations_section_climate">Climate</string>

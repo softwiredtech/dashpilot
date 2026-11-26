@@ -52,6 +52,8 @@ object VehicleControl {
     const val CMD_WIPER_OFF_ENABLE: Int = 0x41
     // Turn signal off when shifting into Park (firmware signal_off module, persisted in NVS).
     const val CMD_SIGNAL_OFF_ENABLE: Int = 0x53
+    // 1=enable, 0=disable. Persisted in NVS by the firmware.
+    const val CMD_TOUCH_AUTO_HIGH_BEAM_ENABLE: Int = 0x51
 
     // --- Enter BLE pairing mode ---
     // Opens a window on the firmware during which one new (not-yet-bonded) device
@@ -117,6 +119,9 @@ object VehicleControl {
     /** Enable or disable the firmware's turn-signal-off-in-Park automation. */
     fun sendSignalOff(manager: DashKitBleManager, enabled: Boolean): Boolean =
         send(manager, CMD_SIGNAL_OFF_ENABLE, if (enabled) 1 else 0)
+
+    fun sendTouchAutoHighBeamEnable(manager: DashKitBleManager, enabled: Boolean): Boolean =
+        send(manager, CMD_TOUCH_AUTO_HIGH_BEAM_ENABLE, if (enabled) 1 else 0)
 
     /** Enable or disable the firmware's keep-climate-on automation. */
     fun sendClimateKeep(manager: DashKitBleManager, enabled: Boolean): Boolean =
