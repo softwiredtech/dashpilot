@@ -70,12 +70,17 @@ class DashKitBleManager(internal val context: Context) {
         // ping (KEEPALIVE_TIMEOUT_S), so this allows a few missed writes.
         private const val PING_INTERVAL_MS = 15_000L
 
-        // Android's GATT client allows only one operation in flight, so a CCCD
-        // write racing another subscribe can be refused; retry a few times.
         private val CCCD_UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
-        private const val MAX_SUBSCRIBE_ATTEMPTS = 3
-        private const val MAX_WRITE_ATTEMPTS = 8
-        private const val SUBSCRIBE_RETRY_DELAY_MS = 250L
+
+        // GATT operation queue (see enqueue). An operation the stack refuses is
+        // offered again every OP_RETRY_DELAY_MS for OP_BUSY_WINDOW_MS (something
+        // outside the queue holds the slot: the MTU request, a firmware update).
+        // One whose completion never comes is given up after OP_TIMEOUT_MS, which
+        // is longer than the link supervision timeout: a link that only stalls
+        // delivers the operation late, and that must not count as lost.
+        private const val OP_RETRY_DELAY_MS = 50L
+        private const val OP_BUSY_WINDOW_MS = 2_000L
+        private const val OP_TIMEOUT_MS = 8_000L
     }
 
     private val crashlytics = FirebaseCrashlytics.getInstance()
@@ -143,12 +148,23 @@ class DashKitBleManager(internal val context: Context) {
         pairingWindowUntilMs = android.os.SystemClock.elapsedRealtime() + PAIRING_WINDOW_MS
     }
 
+    /** The enter-pairing command did not reach the DashKit: no drop is coming. */
+    fun cancelPairingWindowDrop() {
+        pairingWindowUntilMs = 0L
+    }
+
     // All timeout/retry scheduling (plus the post-bond discovery delay) runs on
     // this handler; disconnect() clears it wholesale.
     private val handler = Handler(Looper.getMainLooper())
 
+    // Set for the length of a firmware update, which writes to the link itself:
+    // no pings, no commands, and queued subscriptions and reads wait.
     @Volatile
     var suppressPings = false
+        set(value) {
+            field = value
+            drainOps()
+        }
 
     // Keepalive: reschedules itself while Connected and in the foreground.
     private val pingRunnable = object : Runnable {
@@ -212,6 +228,7 @@ class DashKitBleManager(internal val context: Context) {
             BleConnectionException("$errorMessage (after $attemptCount attempts)")
         )
         _connectionState.value = ConnectionStatus.Error(errorMessage)
+        failPendingOps()
         forEachListener { it.onDisconnected() }
     }
 
@@ -379,6 +396,7 @@ class DashKitBleManager(internal val context: Context) {
                         Log.d(TAG, "Dropped for pairing window; auto-reconnect paused")
                         crashlytics.log("BLE: dropped for pairing window; auto-reconnect paused")
                         _connectionState.value = ConnectionStatus.Disconnected
+                        failPendingOps()
                         forEachListener { it.onDisconnected() }
                         return
                     }
@@ -389,6 +407,7 @@ class DashKitBleManager(internal val context: Context) {
                         Log.d(TAG, "Dropped while backgrounded; reconnect deferred to foreground")
                         crashlytics.log("BLE: dropped while backgrounded; reconnect deferred to foreground")
                         _connectionState.value = ConnectionStatus.Disconnected
+                        failPendingOps()
                         forEachListener { it.onDisconnected() }
                         return
                     }
@@ -411,6 +430,7 @@ class DashKitBleManager(internal val context: Context) {
                         // so the next attempt starts from a clean, unbonded
                         // state and pairs freshly.
                         _connectionState.value = ConnectionStatus.Connecting
+                        failPendingOps()
                         forEachListener { it.onDisconnected() }
                         attemptCount = 0
                         handler.postDelayed(retryRunnable, RETRY_DELAY_MS)
@@ -423,12 +443,14 @@ class DashKitBleManager(internal val context: Context) {
                     Log.d(TAG, "Link dropped after connect; auto-reconnecting")
                     crashlytics.recordException(BleConnectionException("Link dropped unexpectedly after connect (status=$status); auto-reconnecting"))
                     _connectionState.value = ConnectionStatus.Connecting
+                    failPendingOps()
                     forEachListener { it.onDisconnected() }
                     attemptCount = 0  // fresh retry budget for the reconnect
                     startScan()
                     return
                 }
                 _connectionState.value = ConnectionStatus.Disconnected
+                failPendingOps()
                 forEachListener { it.onDisconnected() }
             }
         }
@@ -473,7 +495,9 @@ class DashKitBleManager(internal val context: Context) {
 
         override fun onDescriptorWrite(g: BluetoothGatt, descriptor: BluetoothGattDescriptor, status: Int) {
             Log.d(TAG, "onDescriptorWrite status=${if (status == BluetoothGatt.GATT_SUCCESS) "SUCCESS" else status.toString()}")
+            completeOp(OpKind.SUBSCRIBE, descriptor.characteristic?.uuid, status)
             forEachListener { it.onDescriptorWrite(g, descriptor, status) }
+            drainOps()
         }
 
         // API 33+
@@ -501,7 +525,11 @@ class DashKitBleManager(internal val context: Context) {
             characteristic: BluetoothGattCharacteristic,
             status: Int
         ) {
+            completeOp(OpKind.WRITE, characteristic.uuid, status)
+            // Listeners first: the firmware update sends its next chunk from here
+            // and must get the slot before a queued operation does.
             forEachListener { it.onCharacteristicWrite(g, characteristic, status) }
+            drainOps()
         }
 
         // API 33+
@@ -511,7 +539,9 @@ class DashKitBleManager(internal val context: Context) {
             value: ByteArray,
             status: Int
         ) {
+            completeOp(OpKind.READ, characteristic.uuid, status)
             forEachListener { it.onCharacteristicRead(g, characteristic, value, status) }
+            drainOps()
         }
 
         // API < 33
@@ -523,7 +553,9 @@ class DashKitBleManager(internal val context: Context) {
         ) {
             @Suppress("DEPRECATION")
             val value = characteristic.value ?: ByteArray(0)
+            completeOp(OpKind.READ, characteristic.uuid, status)
             forEachListener { it.onCharacteristicRead(g, characteristic, value, status) }
+            drainOps()
         }
     }
 
@@ -581,6 +613,7 @@ class DashKitBleManager(internal val context: Context) {
         gatt = null
         discoveryStarted = false
         _connectionState.value = ConnectionStatus.Disconnected
+        failPendingOps()
         forEachListener { it.onDisconnected() }
     }
 
@@ -651,9 +684,9 @@ class DashKitBleManager(internal val context: Context) {
         scanning = false
     }
 
-    /** Subscribes to a characteristic's notifications, retrying if the CCCD
-     * write races another GATT operation. Shared by the CAN and Tesla status
-     * sources. */
+    /** Subscribes to a characteristic's notifications. The CCCD write goes
+     * through the operation queue, so it waits its turn instead of racing other
+     * GATT operations. Shared by the CAN and Tesla status sources. */
     fun subscribeWithRetry(
         gatt: BluetoothGatt,
         characteristic: BluetoothGattCharacteristic,
@@ -665,56 +698,37 @@ class DashKitBleManager(internal val context: Context) {
             Log.e(logTag, "$label CCCD (0x2902) not discovered")
             return
         }
-        var attempt = 0
-        fun writeCccd() {
-            val queued = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                gatt.writeDescriptor(descriptor, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE) ==
-                    BluetoothGatt.GATT_SUCCESS
-            } else {
-                @Suppress("DEPRECATION")
-                descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                @Suppress("DEPRECATION")
-                gatt.writeDescriptor(descriptor)
-            }
-            if (!queued && attempt < MAX_SUBSCRIBE_ATTEMPTS) {
-                attempt++
-                Log.d(logTag, "$label CCCD write not queued (attempt=$attempt); retrying")
-                handler.postDelayed({ writeCccd() }, SUBSCRIBE_RETRY_DELAY_MS)
-            }
-        }
-        writeCccd()
+        enqueue(PendingOp(OpKind.SUBSCRIBE, gatt, characteristic, descriptor, null, logTag, "$label CCCD write", null))
     }
 
-    /** [writeCommand], retried while another GATT operation is in flight (the
-     * stack runs one at a time and refuses the rest). For writes issued right
-     * after connecting, when subscriptions and reads are still queued up. */
-    fun writeCommandWithRetry(
-        serviceUuid: UUID,
-        charUuid: UUID,
-        payload: ByteArray,
-        logTag: String,
-        label: String
-    ) {
-        var attempt = 0
-        fun write() {
-            if (gatt == null) return
-            if (!writeCommand(serviceUuid, charUuid, payload, logTag) && attempt < MAX_WRITE_ATTEMPTS) {
-                attempt++
-                Log.d(logTag, "$label write not queued (attempt=$attempt); retrying")
-                handler.postDelayed({ write() }, SUBSCRIBE_RETRY_DELAY_MS)
-            }
-        }
-        write()
+    /** Reads a characteristic through the operation queue; the value arrives in
+     * [GattListener.onCharacteristicRead]. Returns false if [gatt] is no longer
+     * the current link. */
+    fun readCharacteristic(
+        gatt: BluetoothGatt,
+        characteristic: BluetoothGattCharacteristic,
+        logTag: String
+    ): Boolean {
+        if (gatt !== this.gatt) return false
+        enqueue(PendingOp(OpKind.READ, gatt, characteristic, null, null, logTag, "read", null))
+        return true
     }
 
     /** Write-with-response to a characteristic on the current connection.
-     * Returns true if the write was dispatched (not acknowledged). Shared by
-     * the CAN control and Tesla app-channel commands. */
+     * Returns true if the write was queued (not acknowledged). [onResult] then
+     * runs once on the main thread: true when the DashKit acknowledged the
+     * write, false when it was lost (the link dropped, the stack kept refusing
+     * it, the DashKit rejected it or never answered), so a caller that already
+     * showed the new state can take it back. Returns false, without calling
+     * [onResult], when there is no link, the characteristic is missing, or a
+     * firmware update owns the link. Shared by the CAN control and Tesla
+     * app-channel commands. */
     fun writeCommand(
         serviceUuid: UUID,
         charUuid: UUID,
         payload: ByteArray,
-        logTag: String
+        logTag: String,
+        onResult: ((delivered: Boolean) -> Unit)? = null
     ): Boolean {
         val gatt = gatt ?: run {
             Log.w(logTag, "No GATT connection; cannot write command")
@@ -724,19 +738,180 @@ class DashKitBleManager(internal val context: Context) {
             Log.w(logTag, "Characteristic $charUuid not found; firmware may be older")
             return false
         }
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            gatt.writeCharacteristic(
-                characteristic,
-                payload,
-                BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
-            ) == BluetoothGatt.GATT_SUCCESS
-        } else {
+        if (suppressPings) {
+            Log.w(logTag, "Firmware update in progress; command not sent")
+            return false
+        }
+        enqueue(PendingOp(OpKind.WRITE, gatt, characteristic, null, payload, logTag, "command write", onResult))
+        return true
+    }
+
+    // ---- GATT operation queue ----
+    // Android allows one GATT operation in flight and refuses any other, so
+    // command writes (pings, controls, settings, the resync burst on connect,
+    // the CAN filter, Tesla commands), notification subscriptions and reads go
+    // out one at a time from this queue. Each waits for its completion callback
+    // before the next is dispatched.
+
+    private enum class OpKind { WRITE, SUBSCRIBE, READ }
+
+    private class PendingOp(
+        val kind: OpKind,
+        val gatt: BluetoothGatt,
+        val characteristic: BluetoothGattCharacteristic,
+        val descriptor: BluetoothGattDescriptor?,   // SUBSCRIBE
+        val payload: ByteArray?,                    // WRITE
+        val logTag: String,
+        val label: String,
+        val onResult: ((Boolean) -> Unit)?
+    ) {
+        var firstRefusedAtMs = 0L
+        var sentAtMs = 0L
+    }
+
+    private val opQueue = ArrayDeque<PendingOp>()
+    private var opInFlight: PendingOp? = null  // guarded by opQueue
+    private val drainRunnable = Runnable { drainOps() }
+
+    // Results go through their own handler: disconnect() wipes the other one,
+    // and every sender must hear how its operation ended, exactly once.
+    private val resultHandler = Handler(Looper.getMainLooper())
+
+    // Tell the sender how its operation ended, on the main thread (the
+    // callbacks touch UI state).
+    private fun finishOp(op: PendingOp, delivered: Boolean) {
+        op.onResult?.let { resultHandler.post { it(delivered) } }
+    }
+
+    private fun enqueue(op: PendingOp) {
+        synchronized(opQueue) { opQueue.addLast(op) }
+        drainOps()
+    }
+
+    // A completion callback arrived: if it is the operation in flight, it is done.
+    private fun completeOp(kind: OpKind, charUuid: UUID?, status: Int) {
+        synchronized(opQueue) {
+            val op = opInFlight ?: return
+            if (op.kind != kind || op.characteristic.uuid != charUuid) return
+            opInFlight = null
+            finishOp(op, status == BluetoothGatt.GATT_SUCCESS)
+        }
+    }
+
+    // The link is gone: nothing queued or in flight will complete.
+    private fun failPendingOps() {
+        synchronized(opQueue) {
+            handler.removeCallbacks(drainRunnable)
+            opInFlight?.let { finishOp(it, false) }
+            opInFlight = null
+            opQueue.forEach { finishOp(it, false) }
+            opQueue.clear()
+        }
+    }
+
+    private fun drainOps() {
+        synchronized(opQueue) {
+            handler.removeCallbacks(drainRunnable)   // one pending wake-up at most
+            val now = android.os.SystemClock.elapsedRealtime()
+            opInFlight?.let {
+                if (it.gatt !== gatt) {
+                    opInFlight = null
+                    finishOp(it, false)
+                } else if (now - it.sentAtMs > OP_TIMEOUT_MS) {
+                    Log.w(it.logTag, "${it.label}: no completion after ${OP_TIMEOUT_MS} ms; giving up")
+                    opInFlight = null
+                    finishOp(it, false)
+                }
+            }
+            if (suppressPings) {
+                // A firmware update writes to the link itself. Commands are dropped;
+                // subscriptions and reads wait until it is over.
+                val held = opQueue.filter { it.kind != OpKind.WRITE }
+                opQueue.filter { it.kind == OpKind.WRITE }.forEach { finishOp(it, false) }
+                opQueue.clear()
+                opQueue.addAll(held)
+                // Waiting here is not the stack refusing them.
+                held.forEach { it.firstRefusedAtMs = 0L }
+                opInFlight?.let {
+                    handler.postDelayed(drainRunnable, it.sentAtMs + OP_TIMEOUT_MS + 1 - now)
+                }
+                return
+            }
+            while (opInFlight == null) {
+                val next = opQueue.firstOrNull() ?: return
+                if (next.gatt !== gatt) {
+                    opQueue.removeFirst()  // queued for a link that is gone
+                    finishOp(next, false)
+                    continue
+                }
+                val accepted = try {
+                    dispatchOp(next)
+                } catch (e: Exception) {
+                    // E.g. the Bluetooth permission was revoked. Retrying cannot help,
+                    // and leaving it at the head would throw again on every drain.
+                    Log.w(next.logTag, "${next.label}: ${e.message}; dropping")
+                    opQueue.removeFirst()
+                    finishOp(next, false)
+                    continue
+                }
+                if (accepted) {
+                    opQueue.removeFirst()
+                    next.sentAtMs = now
+                    opInFlight = next
+                    break
+                }
+                if (next.firstRefusedAtMs == 0L) next.firstRefusedAtMs = now
+                if (now - next.firstRefusedAtMs >= OP_BUSY_WINDOW_MS) {
+                    Log.w(next.logTag, "${next.label}: not accepted for ${OP_BUSY_WINDOW_MS} ms; dropping")
+                    opQueue.removeFirst()
+                    finishOp(next, false)
+                    continue
+                }
+                handler.postDelayed(drainRunnable, OP_RETRY_DELAY_MS)
+                return
+            }
+            // Without a later operation nothing else would notice a lost completion.
+            opInFlight?.let {
+                handler.postDelayed(drainRunnable, it.sentAtMs + OP_TIMEOUT_MS + 1 - now)
+            }
+        }
+    }
+
+    private fun dispatchOp(op: PendingOp): Boolean = when (op.kind) {
+        OpKind.WRITE -> {
+            val payload = op.payload ?: ByteArray(0)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                op.gatt.writeCharacteristic(
+                    op.characteristic,
+                    payload,
+                    BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+                ) == BluetoothGatt.GATT_SUCCESS
+            } else {
+                @Suppress("DEPRECATION")
+                op.characteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+                @Suppress("DEPRECATION")
+                op.characteristic.value = payload
+                @Suppress("DEPRECATION")
+                op.gatt.writeCharacteristic(op.characteristic)
+            }
+        }
+        OpKind.SUBSCRIBE -> {
+            val descriptor = op.descriptor
+            if (descriptor == null) {
+                false
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                op.gatt.writeDescriptor(descriptor, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE) ==
+                    BluetoothGatt.GATT_SUCCESS
+            } else {
+                @Suppress("DEPRECATION")
+                descriptor.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+                @Suppress("DEPRECATION")
+                op.gatt.writeDescriptor(descriptor)
+            }
+        }
+        OpKind.READ -> {
             @Suppress("DEPRECATION")
-            characteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
-            @Suppress("DEPRECATION")
-            characteristic.value = payload
-            @Suppress("DEPRECATION")
-            gatt.writeCharacteristic(characteristic)
+            op.gatt.readCharacteristic(op.characteristic)
         }
     }
 }

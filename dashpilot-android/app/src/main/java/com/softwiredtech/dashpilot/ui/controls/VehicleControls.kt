@@ -58,6 +58,43 @@ object ControlsState {
     var rearFanOn by mutableStateOf(false)
 }
 
+/**
+ * A toggle whose command is queued, not sent, when it is tapped. It shows the
+ * new state at once; when the outcome of every queued command is known it
+ * shows what the car actually took, so lost commands (a dying link, a refused
+ * write) do not leave the button out of step. Used from the main thread.
+ *
+ * [flips]: the command toggles the car's state (so a delivered one inverts
+ * it) instead of setting it to the requested value.
+ */
+private class OptimisticToggle(
+    private val flips: Boolean,
+    private val get: () -> Boolean,
+    private val set: (Boolean) -> Unit
+) {
+    private var confirmed = false   // the car's state, as far as acknowledged commands tell
+    private var pending = 0         // commands queued whose outcome is not known yet
+
+    /** [send] queues the command for [target] and returns whether it was queued. */
+    fun request(target: Boolean, send: (onResult: (Boolean) -> Unit) -> Boolean) {
+        if (pending == 0) confirmed = get()
+        val queued = send { delivered ->
+            if (delivered) confirmed = if (flips) !confirmed else target
+            pending--
+            if (pending == 0) set(confirmed)
+        }
+        if (queued) {
+            pending++
+            set(target)
+        }
+    }
+}
+
+private val preheatToggle = OptimisticToggle(false, { ControlsState.preheatOn }, { ControlsState.preheatOn = it })
+private val chargePortToggle = OptimisticToggle(false, { ControlsState.chargePortOpen }, { ControlsState.chargePortOpen = it })
+private val mirrorFoldToggle = OptimisticToggle(false, { ControlsState.mirrorsFolded }, { ControlsState.mirrorsFolded = it })
+private val rearFanToggle = OptimisticToggle(true, { ControlsState.rearFanOn }, { ControlsState.rearFanOn = it })
+
 /** Categories change presentation only; command IDs and gesture codes stay stable. */
 enum class ControlCategory(val titleRes: Int, val icon: ImageVector) {
     DOORS(R.string.commands_category_doors, Icons.Rounded.MeetingRoom),
@@ -98,10 +135,12 @@ val vehicleControls: List<ControlAction> = listOf(
         gestureValue = 2,
         perform = { manager ->
             val next = !ControlsState.preheatOn
-            if (manager == null ||
-                VehicleControl.send(manager, VehicleControl.CMD_BATTERY_PREHEAT, if (next) 1 else 0)
-            ) {
+            if (manager == null) {
                 ControlsState.preheatOn = next
+            } else {
+                preheatToggle.request(next) { onResult ->
+                    VehicleControl.send(manager, VehicleControl.CMD_BATTERY_PREHEAT, if (next) 1 else 0, onResult)
+                }
             }
         }
     ),
@@ -137,8 +176,11 @@ val vehicleControls: List<ControlAction> = listOf(
         perform = { manager ->
             val opcode = if (ControlsState.chargePortOpen) VehicleControl.CMD_CHARGE_PORT_CLOSE
             else VehicleControl.CMD_CHARGE_PORT_OPEN
-            if (manager == null || VehicleControl.send(manager, opcode, 1)) {
-                ControlsState.chargePortOpen = !ControlsState.chargePortOpen
+            val next = !ControlsState.chargePortOpen
+            if (manager == null) {
+                ControlsState.chargePortOpen = next
+            } else {
+                chargePortToggle.request(next) { onResult -> VehicleControl.send(manager, opcode, 1, onResult) }
             }
         }
     ),
@@ -152,8 +194,13 @@ val vehicleControls: List<ControlAction> = listOf(
         perform = { manager ->
             val value = if (ControlsState.mirrorsFolded) VehicleControl.MIRROR_UNFOLD
             else VehicleControl.MIRROR_FOLD
-            if (manager == null || VehicleControl.send(manager, VehicleControl.CMD_MIRROR_FOLD, value)) {
-                ControlsState.mirrorsFolded = !ControlsState.mirrorsFolded
+            val next = !ControlsState.mirrorsFolded
+            if (manager == null) {
+                ControlsState.mirrorsFolded = next
+            } else {
+                mirrorFoldToggle.request(next) { onResult ->
+                    VehicleControl.send(manager, VehicleControl.CMD_MIRROR_FOLD, value, onResult)
+                }
             }
         }
     ),
@@ -165,8 +212,11 @@ val vehicleControls: List<ControlAction> = listOf(
         active = { ControlsState.rearFanOn },
         gestureValue = 7,
         perform = { manager ->
-            if (manager == null || VehicleControl.sendRearFanToggle(manager)) {
-                ControlsState.rearFanOn = !ControlsState.rearFanOn
+            val next = !ControlsState.rearFanOn
+            if (manager == null) {
+                ControlsState.rearFanOn = next
+            } else {
+                rearFanToggle.request(next) { onResult -> VehicleControl.sendRearFanToggle(manager, onResult) }
             }
         }
     ),

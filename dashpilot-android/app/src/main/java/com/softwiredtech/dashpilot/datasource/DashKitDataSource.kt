@@ -72,7 +72,7 @@ class DashKitDataSource(
             return
         }
         Log.d(TAG, "Writing the CAN filter (${payload.size} bytes)")
-        manager.writeCommandWithRetry(SERVICE_UUID, FILTER_UUID, payload, TAG, "CAN filter")
+        manager.writeCommand(SERVICE_UUID, FILTER_UUID, payload, TAG)
     }
 
     override fun onCharacteristicChanged(

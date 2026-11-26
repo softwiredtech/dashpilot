@@ -47,7 +47,8 @@ class TeslaStatusSource(private val manager: DashKitBleManager) : GattListener {
 
     fun requestReset(): Boolean {
         _resetPending.value = true
-        if (TeslaClient.sendReset(manager)) return true
+        // Queued is not sent: clear the flag again if the command is lost.
+        if (TeslaClient.sendReset(manager) { delivered -> if (!delivered) _resetPending.value = false }) return true
         _resetPending.value = false
         return false
     }
@@ -78,7 +79,7 @@ class TeslaStatusSource(private val manager: DashKitBleManager) : GattListener {
         if (characteristic.uuid == TeslaClient.STATUS_CHAR_UUID &&
             status == BluetoothGatt.GATT_SUCCESS
         ) {
-            gatt.readCharacteristic(characteristic)
+            manager.readCharacteristic(gatt, characteristic, TAG)
         }
     }
 
