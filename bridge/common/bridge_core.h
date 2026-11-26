@@ -17,6 +17,7 @@
 #include <atomic>
 #include <chrono>
 #include <cstdio>
+#include <cstring>
 #include <functional>
 #include <map>
 #include <string>
@@ -36,33 +37,46 @@ namespace bridge {
 inline bool processMessage(Message* msg, VehicleDecoder* decoder,
                            double& madsActive, double& experimentalMode,
                            double& selfdriveActive, double& changingLane) {
-    kj::ArrayPtr<capnp::word> words(
-        reinterpret_cast<capnp::word*>(msg->getData()),
-        msg->getSize() / sizeof(capnp::word));
-    capnp::FlatArrayMessageReader reader(words);
-    auto event = reader.getRoot<cereal::Event>();
+    // msgq/zmq buffers have no alignment guarantee and capnp reads 8-byte
+    // words, so copy into an aligned buffer first (as openpilot does). Only
+    // the receive loop's thread calls this.
+    static thread_local std::vector<uint64_t> aligned;  // capnp::word itself is not copyable
+    const size_t wordCount = msg->getSize() / sizeof(capnp::word);
+    aligned.resize(wordCount);
+    std::memcpy(aligned.data(), msg->getData(), wordCount * sizeof(capnp::word));
 
-    if (event.which() == cereal::Event::CAN) {
-        auto canList = event.getCan();
-        for (const auto& c : canList) {
-            decoder->updateFrame(c.getSrc(), c.getAddress(),
-                reinterpret_cast<const uint8_t*>(c.getDat().begin()),
-                c.getDat().size());
+    // A truncated or non-capnp message from whatever publishes on the port
+    // must not take the app down: skip it.
+    try {
+        capnp::FlatArrayMessageReader reader(kj::ArrayPtr<const capnp::word>(
+            reinterpret_cast<const capnp::word*>(aligned.data()), wordCount));
+        auto event = reader.getRoot<cereal::Event>();
+
+        if (event.which() == cereal::Event::CAN) {
+            auto canList = event.getCan();
+            for (const auto& c : canList) {
+                decoder->updateFrame(c.getSrc(), c.getAddress(),
+                    reinterpret_cast<const uint8_t*>(c.getDat().begin()),
+                    c.getDat().size());
+            }
+            decoder->updateMapper();
+            decoder->state().madsActive = madsActive;
+            decoder->state().experimentalMode = experimentalMode;
+            decoder->state().selfdriveActive = selfdriveActive;
+            decoder->state().changingLane = changingLane;
+            return true;
+        } else if (event.which() == cereal::Event::SELFDRIVE_STATE) {
+            auto sd = event.getSelfdriveState();
+            experimentalMode = sd.getExperimentalMode() ? 1.0 : 0.0;
+            selfdriveActive = sd.getActive() ? 1.0 : 0.0;
+            std::string alertType = sd.getAlertType().cStr();
+            changingLane = (alertType == "laneChange/warning") ? 1.0 : 0.0;
+        } else if (event.which() == cereal::Event::SELFDRIVE_STATE_S_P) {
+            madsActive = event.getSelfdriveStateSP().getMads().getActive() ? 1.0 : 0.0;
         }
-        decoder->updateMapper();
-        decoder->state().madsActive = madsActive;
-        decoder->state().experimentalMode = experimentalMode;
-        decoder->state().selfdriveActive = selfdriveActive;
-        decoder->state().changingLane = changingLane;
-        return true;
-    } else if (event.which() == cereal::Event::SELFDRIVE_STATE) {
-        auto sd = event.getSelfdriveState();
-        experimentalMode = sd.getExperimentalMode() ? 1.0 : 0.0;
-        selfdriveActive = sd.getActive() ? 1.0 : 0.0;
-        std::string alertType = sd.getAlertType().cStr();
-        changingLane = (alertType == "laneChange/warning") ? 1.0 : 0.0;
-    } else if (event.which() == cereal::Event::SELFDRIVE_STATE_S_P) {
-        madsActive = event.getSelfdriveStateSP().getMads().getActive() ? 1.0 : 0.0;
+    } catch (const kj::Exception& e) {
+        BRIDGE_LOG("Dropping malformed message (%zu bytes): %s",
+                   msg->getSize(), e.getDescription().cStr());
     }
     return false;
 }
